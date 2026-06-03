@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rapport Technique IT — Module NC — Muller Automotive v7</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#c0392b;--dark:#1a1a1a;--mid:#2c2c2c;--grey:#555;
+  --blue:#0c447c;--green:#1e8449;--orange:#d35400;
+  --code-bg:#1e1e1e;--code-fg:#d4d4d4;
+  --border:#e0e0e0;--bg:#f8f8f8;--sidebar:260px
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;display:flex;min-height:100vh}
+#sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--dark);overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+#sidebar-header{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1);background:var(--mid);flex-shrink:0}
+#sidebar-header .ma-badge{background:var(--red);color:#fff;font-size:0.72rem;font-weight:800;padding:3px 9px;border-radius:4px;letter-spacing:.5px;display:inline-block;margin-bottom:8px}
+#sidebar-header h1{color:#fff;font-size:0.88rem;font-weight:700;line-height:1.3}
+#sidebar-header .ver{color:rgba(255,255,255,.4);font-size:0.7rem;margin-top:4px}
+nav{padding:12px 0;flex:1}
+nav a{display:block;padding:7px 18px;color:rgba(255,255,255,.55);font-size:0.78rem;text-decoration:none;line-height:1.35;border-left:3px solid transparent;transition:all .15s}
+nav a:hover{color:#fff;background:rgba(255,255,255,.06);border-left-color:rgba(255,255,255,.2)}
+nav a.active{color:#fff;background:rgba(192,57,43,.18);border-left-color:var(--red)}
+nav .nav-section{padding:10px 18px 4px;color:rgba(255,255,255,.22);font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px}
+nav a.sub{padding-left:28px;font-size:0.74rem}
+#sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);font-size:0.67rem;flex-shrink:0;line-height:1.5}
+#main{margin-left:var(--sidebar);flex:1;padding:0}
+#top-banner{background:linear-gradient(135deg,var(--dark) 0%,#2c1010 100%);padding:36px 48px 32px;border-bottom:3px solid var(--red)}
+#top-banner h1{color:#fff;font-size:1.6rem;font-weight:900;line-height:1.2}
+#top-banner .sub{color:rgba(255,255,255,.45);font-size:0.85rem;margin-top:6px}
+.ver-badge{display:inline-block;background:rgba(192,57,43,.25);border:1px solid var(--red);color:#e07070;font-size:0.72rem;font-weight:700;padding:3px 11px;border-radius:12px;letter-spacing:.5px;margin-top:10px}
+.meta-row{display:flex;gap:24px;margin-top:14px;flex-wrap:wrap}
+.meta-item{font-size:0.78rem;color:rgba(255,255,255,.5)}
+.meta-item strong{color:rgba(255,255,255,.8)}
+#content{padding:0 48px 60px;max-width:900px}
+.section{padding-top:52px}
+.section-title{font-size:1.25rem;font-weight:800;color:var(--dark);border-bottom:2px solid var(--red);padding-bottom:8px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.section-num{background:var(--red);color:#fff;font-size:0.72rem;font-weight:800;padding:2px 8px;border-radius:4px;flex-shrink:0}
+.subsection{margin-top:24px}
+.subsection-title{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:12px;padding-left:10px;border-left:3px solid var(--red)}
+p{color:#444;line-height:1.7;margin-bottom:10px;font-size:0.92rem}
+p + p{margin-top:4px}
+ul.dot{list-style:none;margin:8px 0}
+ul.dot li{padding:4px 0 4px 18px;position:relative;font-size:0.88rem;color:#333;line-height:1.5}
+ul.dot li::before{content:'·';position:absolute;left:4px;color:var(--red);font-weight:900;font-size:1rem}
+ul.check{list-style:none;margin:8px 0}
+ul.check li{padding:4px 0 4px 22px;position:relative;font-size:0.88rem;color:#333;line-height:1.5}
+ul.check li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:900}
+ul.cross{list-style:none;margin:8px 0}
+ul.cross li{padding:4px 0 4px 22px;position:relative;font-size:0.88rem;color:#333;line-height:1.5}
+ul.cross li::before{content:'✗';position:absolute;left:0;color:var(--red);font-weight:900}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:0.84rem}
+th{background:var(--dark);color:#fff;padding:9px 12px;text-align:left;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:#333;vertical-align:top}
+tr:nth-child(even) td{background:#f9f9f9}
+tr:last-child td{border-bottom:none}
+.tbl-total td{background:#e8f4e8 !important;font-weight:700;color:var(--green);border-top:2px solid var(--green)}
+.tbl-warn td{background:#fff3e0 !important;font-weight:700;color:var(--orange)}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:16px 18px;margin:12px 0;overflow-x:auto;font-size:0.8rem;line-height:1.6;border:1px solid #333;font-family:'Cascadia Code','Consolas',monospace}
+code.inline{background:#f0f0f0;color:#c0392b;padding:1px 6px;border-radius:3px;font-size:0.82rem;font-family:monospace}
+.box{border-radius:8px;padding:14px 18px;margin:14px 0;font-size:0.87rem;line-height:1.6}
+.box-green{background:#f0fbf6;border-left:4px solid var(--green);color:#1e5c35}
+.box-orange{background:#fff8f0;border-left:4px solid var(--orange);color:#7d3100}
+.box-red{background:#fff0f0;border-left:4px solid var(--red);color:#7d1a1a}
+.box-blue{background:#eff5ff;border-left:4px solid var(--blue);color:#0a2d5a}
+.box-grey{background:#f5f5f5;border-left:4px solid #aaa;color:#444}
+.box strong{display:block;margin-bottom:4px}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+.env-card{border-radius:8px;padding:16px 18px;font-size:0.84rem}
+.env-dev{background:#f0fbf6;border:1px solid #a9dfbf}
+.env-prod{background:#eff5ff;border:1px solid #b0c8f0}
+.env-title{font-weight:800;font-size:0.78rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.env-dev .env-title{color:var(--green)}
+.env-prod .env-title{color:var(--blue)}
+.env-url{font-family:monospace;font-size:0.78rem;background:rgba(0,0,0,.07);padding:3px 7px;border-radius:4px;display:inline-block;margin-bottom:8px}
+.step{display:flex;gap:14px;margin:14px 0;align-items:flex-start}
+.step-num{background:var(--red);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.82rem;flex-shrink:0;margin-top:1px}
+.step-body{flex:1}
+.step-title{font-weight:700;color:var(--dark);font-size:0.9rem;margin-bottom:4px}
+.step-desc{font-size:0.85rem;color:#555;line-height:1.5}
+.file-tree{background:#1a1a1a;border-radius:8px;padding:14px 18px;margin:12px 0;font-family:'Cascadia Code','Consolas',monospace;font-size:0.8rem;color:#ccc;line-height:1.7;border:1px solid #333}
+.file-tree .ok{color:#6dbf67}
+.file-tree .no{color:#e07070}
+.file-tree .cm{color:#888}
+details{margin:10px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+details[open]{border-color:#b0c8f0}
+summary{padding:13px 18px;cursor:pointer;font-weight:700;font-size:0.88rem;background:#f5f7fa;color:var(--dark);list-style:none;display:flex;align-items:center;gap:10px;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'▶';font-size:0.65rem;color:var(--red);transition:transform .2s;flex-shrink:0}
+details[open] summary::before{transform:rotate(90deg)}
+details[open] summary{background:#eff5ff;color:var(--blue)}
+.faq-body{padding:16px 18px;font-size:0.86rem;color:#444;line-height:1.65;border-top:1px solid var(--border)}
+.faq-body p{margin-bottom:8px}
+.faq-cat{margin-top:28px;margin-bottom:8px;font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--red);display:flex;align-items:center;gap:8px}
+.faq-cat::after{content:'';flex:1;height:1px;background:#f0d0d0}
+.badge{display:inline-block;border-radius:4px;padding:2px 7px;font-size:0.72rem;font-weight:700}
+.badge-green{background:#d4efdd;color:#1a6e2e}
+.badge-orange{background:#fde8cc;color:#7d3100}
+.badge-red{background:#fdddd8;color:#7d1a1a}
+.badge-blue{background:#d8eaff;color:#0a2d5a}
+.badge-grey{background:#e8e8e8;color:#555}
+@media print{#sidebar{display:none}#main{margin-left:0}#top-banner{background:#1a1a1a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}pre{border:1px solid #ccc}details{break-inside:avoid}details[open]{display:block}summary::before{display:none}}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <div class="ma-badge">MA</div>
+    <h1>Rapport Technique IT<br>Module NC</h1>
+    <div class="ver">Version 7 — 25/05/2026</div>
+  </div>
+  <nav>
+    <div class="nav-section">Avancement</div>
+    <a href="#s0">Journal des mises à jour</a>
+    <div class="nav-section">Contexte</div>
+    <a href="#s1">1. Contexte &amp; objectifs</a>
+    <a href="#s2">2. Architecture deux environnements</a>
+    <a href="#s2-1" class="sub">2.1 Environnement dev (PC)</a>
+    <a href="#s2-2" class="sub">2.2 Environnement prod (OVH)</a>
+    <a href="#s2-3" class="sub">2.3 Arborescence production</a>
+    <div class="nav-section">Application</div>
+    <a href="#s3">3. Fonctionnalités v4</a>
+    <a href="#s4">4. Volumétrie 10 ans</a>
+    <a href="#s5">5. Format CSV</a>
+    <a href="#s6">6. Format PDF</a>
+    <div class="nav-section">Déploiement</div>
+    <a href="#s7">7. Export NC + déploiement OVH</a>
+    <a href="#s7-1" class="sub">7.1 Périmètre export</a>
+    <a href="#s7-2" class="sub">7.2 Adaptations avant déploiement</a>
+    <a href="#s7-3" class="sub">7.3 Préparation clé USB</a>
+    <a href="#s7-4" class="sub">7.4 Déploiement VPS (13 étapes)</a>
+    <a href="#s8">8. Infrastructure OVH</a>
+    <a href="#s9">9. Emails @mullerautomotive.fr</a>
+    <div class="nav-section">Exploitation</div>
+    <a href="#s10">10. Sécurité</a>
+    <a href="#s11">11. Plan de reprise (PRA)</a>
+    <a href="#s12">12. Coûts estimés</a>
+    <div class="nav-section">FAQ</div>
+    <a href="#s13">13. FAQ démarrage OVH</a>
+    <a href="#s14">14. FAQ technique</a>
+    <a href="#s15">15. Résumé exécutif</a>
+  </nav>
+  <div id="sidebar-footer">
+    Muller Automotive<br>
+    avet.mat@gmail.com<br>
+    MàJ : 25/05/2026 — Bascule PostgreSQL production
+  </div>
+</div>
+
+<div id="main">
+
+<div id="top-banner">
+  <h1>Rapport Technique IT — Module Non-Conformités</h1>
+  <div class="sub">Muller Automotive — Document destiné au responsable IT</div>
+  <div class="ver-badge">Version 7 — 25/05/2026</div>
+  <div class="meta-row">
+    <div class="meta-item"><strong>Auteur :</strong> Support technique Muller Automotive</div>
+    <div class="meta-item"><strong>Mis à jour :</strong> 25/05/2026 (Bascule PostgreSQL production)</div>
+    <div class="meta-item"><strong>Contact :</strong> avet.mat@gmail.com</div>
+  </div>
+</div>
+
+<div id="content">
+
+<!-- ══ 0. JOURNAL ══ -->
+<div class="section" id="s0">
+  <div class="section-title"><span class="section-num">0</span>Journal des mises à jour — Avancement et planification</div>
+
+  <div class="subsection">
+    <div class="subsection-title">Réalisé — 25/05/2026 (état actuel)</div>
+    <div class="box box-green">
+      <strong>Bascule PostgreSQL — 100 % production depuis le 25/05/2026</strong>
+      DATA_SOURCE=postgres actif. PostgreSQL est la source de vérité unique pour toutes les lectures et écritures. Les fichiers JSON sont conservés comme archive historique uniquement.
+    </div>
+    <table>
+      <tr><th>Tâche</th><th>Statut</th><th>Détail technique</th></tr>
+      <tr><td>Phase 1 sécurité (bcrypt, rate-limit, helmet, blocage JSON)</td><td><span class="badge badge-green">✅ Actif</span></td><td>Actif depuis le 09/05/2026 — transparent pour les utilisateurs.</td></tr>
+      <tr><td>PostgreSQL 16 installé + schéma appliqué</td><td><span class="badge badge-green">✅ Fait</span></td><td>12 tables, 3 vues, index performance. Service Windows <code class="inline">postgresql-x64-16</code> démarrage automatique.</td></tr>
+      <tr><td>Migration données JSON → PG</td><td><span class="badge badge-green">✅ Fait</span></td><td>8 fiches NC, 24 historiques, 4 actions, 5 réponses, 20 utilisateurs. Parité validée.</td></tr>
+      <tr><td>Corrections critiques 12–15/05 (pgSyncFiche, migrate.js, satellites)</td><td><span class="badge badge-green">✅ Fait</span></td><td>Bug nc_action_reponses corrigé. migrate.js idempotent. Satellites : statut restauré à la désattache.</td></tr>
+      <tr><td>Corrections désynchronisations 16–25/05</td><td><span class="badge badge-green">✅ Fait</span></td><td>NC 260521-0007 absente PG et réponses 260511-0005/0006 corrigées. node migrate.js rejoué. plan_controle.js → TOUT VERT ✅</td></tr>
+      <tr><td>Bascule DATA_SOURCE=postgres</td><td><span class="badge badge-green">✅ Actif depuis 25/05</span></td><td>Lecture et écriture exclusivement PostgreSQL. nc-data.json = archive. plan_controle.js TOUT VERT.</td></tr>
+      <tr><td>Backup complet avant bascule</td><td><span class="badge badge-green">✅ Fait</span></td><td><code class="inline">D:\formation_backup_20260525_avant_postgres\</code> — 769 fichiers, 702 Mo.</td></tr>
+    </table>
+    <div class="box box-blue">
+      <strong>Procédure de rollback rapide (&lt; 2 min) — si anomalie PostgreSQL</strong>
+      1. Éditer <code class="inline">C:\formation\.env</code> : DATA_SOURCE=postgres → DATA_SOURCE=dual<br>
+      2. <code class="inline">pm2 reload formation-sav --update-env</code><br>
+      3. Le système reprend JSON comme source de vérité, PG en écriture parallèle.<br>
+      Backup complet disponible : <code class="inline">D:\formation_backup_20260525_avant_postgres\</code> (769 fichiers, 702 Mo)
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">Planification — Prochaines étapes (objectif final : production OVH)</div>
+    <table>
+      <tr><th>Date</th><th>Tâche</th><th>Priorité</th></tr>
+      <tr><td><strong>25–31/05</strong></td><td>Phase 3 : vérification fonctionnelle continue en mode postgres. Surveiller pm2 logs après chaque opération. Relancer <code class="inline">node plan_controle.js</code> si suspicion d'écart. En cas d'anomalie : rollback dual.</td><td><span class="badge badge-orange">Important</span></td></tr>
+      <tr><td><strong>Fin mai / début juin</strong></td><td>Phase 4 sécurité : pg_dump automatique quotidien, CORS restrict origins, Helmet CSP activé, <code class="inline">app.set('trust proxy', 1)</code> dans server.js.</td><td><span class="badge badge-blue">Standard</span></td></tr>
+      <tr><td><strong>Juin 2026</strong></td><td><strong>Déploiement OVH</strong> : VPS Elite commandé, PostgreSQL Managed OVH ou PG sur VPS, déploiement 13 étapes (section 7.4), bascule DNS, surveillance 48h.</td><td><span class="badge badge-green">Objectif final</span></td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">Architecture cible OVH — avec PostgreSQL</div>
+    <pre>Internet (HTTPS — domaine muller-automotive)
+  └── Nginx (port 443, Let's Encrypt)
+       ├── /NC/*      → /opt/nc/NC/       (HTML/JS statiques)
+       ├── /NC/media/ → /opt/nc/NC/media/ (pièces jointes)
+       └── /api/*     → http://127.0.0.1:3001 (Node.js / PM2)
+
+PM2 → Node.js port 3001
+  ├── .env (DATA_SOURCE=postgres, PG_HOST, PG_PASSWORD...)
+  └── PostgreSQL (Managed OVH OU postgres local VPS)
+       └── base nc_muller (12 tables)
+
+Sauvegardes :
+  cron 02h00 → pg_dump nc_muller + NC/media/ → /opt/backups/</pre>
+    <div class="box box-orange">
+      <strong>Choix PostgreSQL OVH à valider avant déploiement</strong>
+      Option A — PostgreSQL sur le même VPS (~0 €/mois de plus, gestion manuelle).<br>
+      Option B — Managed Database OVH PostgreSQL (~10–20 €/mois, sauvegardes auto, HA).<br>
+      Recommandation : Option B pour la production (zéro administration base de données).
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">État des sauvegardes actuelles (PC dev)</div>
+    <table>
+      <tr><th>Support</th><th>Contenu</th><th>Fréquence</th></tr>
+      <tr><td><code class="inline">C:\formation\</code></td><td>Environnement de travail actif</td><td>En temps réel</td></tr>
+      <tr><td><code class="inline">D:\formation\</code></td><td>Copie synchronisée (robocopy)</td><td>Manuelle</td></tr>
+      <tr><td><code class="inline">D:\formation_backup_20260525_avant_postgres\</code></td><td>Backup complet avant bascule postgres</td><td>Archive — 25/05/2026 (769 fichiers, 702 Mo)</td></tr>
+      <tr><td>PostgreSQL <code class="inline">nc_muller</code></td><td>Source de vérité unique — toutes les données NC</td><td>En temps réel depuis 25/05/2026</td></tr>
+      <tr><td>Clé USB</td><td>Export NC production</td><td>Avant chaque déploiement OVH</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══ 1. CONTEXTE ══ -->
+<div class="section" id="s1">
+  <div class="section-title"><span class="section-num">1</span>Contexte et objectifs</div>
+  <p>Le module Non-Conformités (NC) est actuellement hébergé sur un PC Windows local exposé via un tunnel Cloudflare sous le domaine <code class="inline">formation-sav.fr</code>. Ce domaine et cet hébergement sont utilisés comme <strong>environnement de développement</strong> (tests, évolutions futures, formation).</p>
+  <div class="box box-blue">
+    <strong>Objectif</strong>
+    Déployer le module NC en <strong>PRODUCTION</strong> sur un VPS OVH dédié, sous un nouveau domaine professionnel Muller Automotive, accessible partout dans le monde depuis n'importe quel navigateur, sans installation, sans VPN.
+  </div>
+  <div class="env-grid">
+    <div class="env-card env-dev">
+      <div class="env-title">Développement (inchangé)</div>
+      <div class="env-url">formation-sav.fr/NC/</div>
+      <ul class="dot">
+        <li>PC Windows local</li>
+        <li>Tests, mises à jour, nouvelles versions</li>
+        <li>Aucun impact sur les utilisateurs production</li>
+      </ul>
+    </div>
+    <div class="env-card env-prod">
+      <div class="env-title">Production (nouveau)</div>
+      <div class="env-url">espace-client.muller-automotive.fr</div>
+      <ul class="dot">
+        <li>VPS OVH Linux — IP fixe</li>
+        <li>Usage quotidien entreprise</li>
+        <li>Clients, fournisseurs, auditeurs</li>
+        <li>SLA 99,9 % OVH garanti</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box box-orange">
+    <strong>⚠ Domaine de production (PLACEHOLDER)</strong>
+    <code class="inline">https://espace-client.muller-automotive.fr/NC/</code><br>
+    Remplacer par le vrai domaine choisi par la direction IT avant déploiement.
+  </div>
+</div>
+
+<!-- ══ 2. ARCHITECTURE ══ -->
+<div class="section" id="s2">
+  <div class="section-title"><span class="section-num">2</span>Architecture — Deux environnements</div>
+
+  <div class="subsection" id="s2-1">
+    <div class="subsection-title">2.1 Environnement de développement — PC Windows (inchangé)</div>
+    <table>
+      <tr><th>Paramètre</th><th>Valeur</th></tr>
+      <tr><td>URL</td><td><code class="inline">https://formation-sav.fr/NC/</code></td></tr>
+      <tr><td>Usage</td><td>Développement, tests, évolutions de version, formation interne</td></tr>
+      <tr><td>Risque</td><td>Panne PC = indisponibilité (acceptable en DEV, inacceptable en PROD)</td></tr>
+      <tr><td>Node.js</td><td>v25.9.0 / npm 11.x</td></tr>
+      <tr><td>Base de données</td><td>PostgreSQL 16 — <code class="inline">DATA_SOURCE=postgres</code> (source de vérité unique depuis 25/05/2026)</td></tr>
+      <tr><td>OS</td><td>Windows 11 IoT Enterprise LTSC 2024 (build 26100)</td></tr>
+    </table>
+    <pre>Internet (formation-sav.fr)
+  └── Cloudflare Tunnel (cloudflared)
+       └── Nginx port 80  (C:\tools\nginx-1.29.7\)
+            └── Node.js port 3001 (PM2 — process "formation-sav")
+                 └── C:\formation\  (code NC dev)
+                      └── PostgreSQL 16 nc_muller (source de vérité unique)</pre>
+  </div>
+
+  <div class="subsection" id="s2-2">
+    <div class="subsection-title">2.2 Environnement de production cible — VPS OVH Linux</div>
+    <table>
+      <tr><th>Paramètre</th><th>Valeur</th></tr>
+      <tr><td>URL</td><td><code class="inline">https://espace-client.muller-automotive.fr/NC/</code> <span class="badge badge-orange">PLACEHOLDER</span></td></tr>
+      <tr><td>Usage</td><td>Production entreprise — utilisateurs finaux, clients, auditeurs</td></tr>
+      <tr><td>SLA</td><td>99,9 % garanti OVH — indépendant du PC local</td></tr>
+      <tr><td>OS</td><td>Ubuntu 22.04 LTS (support jusqu'en 2027)</td></tr>
+      <tr><td>Node.js</td><td>v20.x LTS (version stable recommandée en production)</td></tr>
+      <tr><td>Base de données</td><td>PostgreSQL — Managed OVH (recommandé) ou local VPS. <code class="inline">DATA_SOURCE=postgres</code>.</td></tr>
+    </table>
+    <pre>Internet (HTTPS — nouveau domaine entreprise)
+  └── Nginx (port 443, Let's Encrypt)  ← cert auto-renouvelé
+       ├── /NC/*       → /opt/nc/NC/        (HTML/JS statiques)
+       ├── /NC/media/* → /opt/nc/NC/media/  (pièces jointes)
+       └── /api/*      → http://127.0.0.1:3001  (Node.js via PM2)
+
+PM2 → Node.js port 3001 → PostgreSQL nc_muller (source de vérité unique — DATA_SOURCE=postgres)</pre>
+  </div>
+
+  <div class="subsection" id="s2-3">
+    <div class="subsection-title">2.3 Arborescence NC de production (sur VPS OVH)</div>
+    <div class="file-tree">
+/opt/nc/<br>
+├── server.js              <span class="cm">Point d'entrée Express — toutes les routes NC</span><br>
+├── package.json           <span class="cm">Dépendances Node.js (bcryptjs, pg, dotenv, helmet, express-rate-limit)</span><br>
+├── package-lock.json      <span class="cm">Verrou versions exactes npm</span><br>
+├── ecosystem.config.js    <span class="cm">Configuration PM2 (variables d'environnement)</span><br>
+├── .env                   <span class="cm">DATA_SOURCE=postgres, PG_HOST/PORT/USER/PASSWORD/DB — CONFIDENTIEL</span><br>
+├── schema_postgresql.sql  <span class="cm">Schéma PG complet (12 tables, 3 vues) — appliquer au déploiement</span><br>
+├── migrate.js             <span class="cm">Migration JSON → PG (idempotent) — utiliser une seule fois au déploiement</span><br>
+├── nc-config.json         <span class="cm">Configuration (emails, familles, types cause)</span><br>
+├── nc-users.json          <span class="cm">ARCHIVE — ne pas modifier. Source = PostgreSQL nc_users</span><br>
+├── nc-data.json           <span class="cm">ARCHIVE JSON uniquement. Ne pas modifier. Source = PostgreSQL nc_fiches</span><br>
+└── NC/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── index.html         <span class="cm">Formulaire public (sans authentification) — champs dynamiques via API</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── console.html       <span class="cm">Console admin/pilote (JWT requis)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── login.html         <span class="cm">Page de connexion JWT</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── synoptique.html    <span class="cm">Documentation fonctionnelle complète</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── favicon.svg        <span class="cm">Icône onglet navigateur</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;└── media/             <span class="cm">Pièces jointes (photos, PDF, vidéos)</span><br>
+<br>
+<span class="cm">── PostgreSQL (Managed OVH ou local VPS) ──────────────────</span><br>
+<span class="ok">nc_muller</span>/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── nc_fiches          <span class="cm">Toutes les déclarations NC (source de vérité)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── nc_historique      <span class="cm">Journal cycle de vie</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── nc_actions         <span class="cm">Actions CAPA</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── nc_users           <span class="cm">Comptes utilisateurs NC</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── app_users          <span class="cm">Comptes utilisateurs application principale</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;└── + 7 autres tables  <span class="cm">(historique actions, réponses, relances, discussion, journal, notifications)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3. FONCTIONNALITÉS ══ -->
+<div class="section" id="s3">
+  <div class="section-title"><span class="section-num">3</span>Fonctionnalités applicatives — v4 (03/05/2026)</div>
+
+  <div class="subsection">
+    <div class="subsection-title">3.1 Accès et rôles</div>
+    <p><strong>URLs Production</strong> (après déploiement OVH) :</p>
+    <table>
+      <tr><th>Accès</th><th>URL</th></tr>
+      <tr><td>Déclaration publique NC</td><td><code class="inline">https://espace-client.muller-automotive.fr/NC/</code></td></tr>
+      <tr><td>Console admin/pilote</td><td><code class="inline">https://espace-client.muller-automotive.fr/NC/console.html</code></td></tr>
+      <tr><td>Connexion</td><td><code class="inline">https://espace-client.muller-automotive.fr/NC/login.html</code></td></tr>
+      <tr><td>Synoptique</td><td><code class="inline">https://espace-client.muller-automotive.fr/NC/synoptique.html</code></td></tr>
+    </table>
+    <p style="margin-top:12px"><strong>3 rôles JWT :</strong></p>
+    <table>
+      <tr><th>Rôle</th><th>Droits</th></tr>
+      <tr><td><span class="badge badge-red">nc_admin</span></td><td>Accès total, configuration, gestion utilisateurs, analyse qualité, clôture NC, export CSV</td></tr>
+      <tr><td><span class="badge badge-blue">nc_chef_produit</span></td><td>Double profil : mode Pilote (ses actions CAPA) / mode Lecteur (toutes NC en lecture)</td></tr>
+      <tr><td><span class="badge badge-grey">nc_lecteur</span></td><td>Consultation seule — toutes NC, stats, archives (aucune modification)</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">3.2 Workflow NC</div>
+    <p>Statuts : <code class="inline">ouvert → en_cours → resolu → clos / non_pertinent</code></p>
+    <p>Format numéro NC : <code class="inline">AAMMJJ-NNNN</code> (ex. 260503-0001) — compteur 4 chiffres, remis à zéro chaque 1er janvier → 9 999 NC/an maximum.</p>
+    <p><strong>Clôture NC — 4 champs obligatoires :</strong></p>
+    <ul class="dot">
+      <li>Type de cause (liste configurable par l'admin)</li>
+      <li>Coût NC en euros (0 accepté)</li>
+      <li>Commentaire de clôture (interne qualité uniquement)</li>
+      <li>Commentaire général (inclus dans l'email de clôture)</li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">3.3 Analyse qualité intégrée (nc_admin)</div>
+    <table>
+      <tr><th>Outil</th><th>Description</th></tr>
+      <tr><td>Gravité NC</td><td>mineure / majeure / critique (PATCH /api/nc/:n/meta)</td></tr>
+      <tr><td>Score de risque</td><td>Cotation 4 axes (impact client, conformité, sécurité, récurrence) → score 1–9. Alerte direction si score ≥ 7</td></tr>
+      <tr><td>Analyse 5 Pourquoi</td><td>5 champs de cause racine enchaînés</td></tr>
+      <tr><td>Diagramme Ishikawa</td><td>6 branches (Méthodes, Matière, Milieu, Machine, Main-d'œuvre, Management) + SVG arête de poisson généré</td></tr>
+      <tr><td>NC parent / satellites</td><td>Regroupement de NC liées. Statut satellite restauré à la désattache.</td></tr>
+      <tr><td>Retour client</td><td>Confirmation satisfaction client à la clôture</td></tr>
+      <tr><td>Blocage signalé</td><td>Indicateur d'urgence visible en liste NC</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">3.4 Notifications email</div>
+    <table>
+      <tr><th>Événement</th><th>Destinataire</th><th>CC Qualité</th></tr>
+      <tr><td>Création NC</td><td>Qualité</td><td>—</td></tr>
+      <tr><td>Création action</td><td>Pilote</td><td>Optionnel</td></tr>
+      <tr><td>Changement statut</td><td>Rédacteur</td><td>Optionnel</td></tr>
+      <tr><td>Relance pilote</td><td>Pilote en retard</td><td>Optionnel</td></tr>
+      <tr><td>Clôture NC</td><td>Qualité</td><td>—</td></tr>
+    </table>
+    <div class="box box-green">
+      <strong>Expéditeur production</strong>
+      <code class="inline">qualite@mullerautomotive.fr</code> — SMTP entreprise @mullerautomotive.fr (voir section 9)<br>
+      Configuration des destinataires depuis la console NC → ⚙ Configuration (sans accès SSH ni redémarrage).
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4. VOLUMÉTRIE ══ -->
+<div class="section" id="s4">
+  <div class="section-title"><span class="section-num">4</span>Volumétrie prévisionnelle — 10 ans / 400 NC par an</div>
+  <table>
+    <tr><th>Poste</th><th>Détail</th><th>Volume</th></tr>
+    <tr><td>Base PostgreSQL nc_muller</td><td>4 000 NC × métadonnées + historique</td><td>~2 Go</td></tr>
+    <tr><td>Photos déclarant (JPG/HEIC)</td><td>3 × 4 Mo / NC</td><td>12 Mo / NC</td></tr>
+    <tr><td>Photos réponses pilotes</td><td>2 × 4 Mo / NC</td><td>8 Mo / NC</td></tr>
+    <tr><td>Documents PDF</td><td>2 × 3 Mo / NC</td><td>6 Mo / NC</td></tr>
+    <tr><td>Vidéo courte (1/5 NC)</td><td>0,2 × 80 Mo / NC</td><td>16 Mo / NC</td></tr>
+    <tr><td>Captures + divers</td><td>1 × 1 Mo / NC</td><td>1 Mo / NC</td></tr>
+    <tr><td colspan="2"><strong>Total médias / NC</strong></td><td><strong>~43 Mo</strong></td></tr>
+    <tr><td colspan="2">Médias NC totaux (4 000 × 43 Mo)</td><td>172 Go</td></tr>
+    <tr><td colspan="2">Sauvegardes cron (30 jours)</td><td>50 Go</td></tr>
+    <tr><td colspan="2">OS Ubuntu + Node.js + Nginx + logs</td><td>20 Go</td></tr>
+    <tr><td colspan="2">Marge 20 %</td><td>48 Go</td></tr>
+    <tr class="tbl-total"><td colspan="2">TOTAL RECOMMANDÉ</td><td>~290 Go</td></tr>
+  </table>
+  <div class="box box-blue">
+    Choisir un VPS avec au minimum <strong>320 Go de stockage NVMe</strong>.<br>
+    Au-delà de 180 Go de médias : envisager Object Storage OVH (S3) pour délester le disque VPS.<br>
+    Bande passante estimée : <strong>&lt; 50 Go/mois</strong> — inclus dans les offres VPS OVH standard.
+  </div>
+  <div class="box box-green">
+    <strong>PostgreSQL — source de vérité unique depuis le 25/05/2026</strong>
+    La base nc_muller est opérationnelle en mode <code class="inline">DATA_SOURCE=postgres</code>. Les fichiers JSON sont conservés comme archives uniquement. Les médias NC restent sur disque (fichiers) — PostgreSQL ne stocke que les métadonnées.
+  </div>
+</div>
+
+<!-- ══ 5. FORMAT CSV ══ -->
+<div class="section" id="s5">
+  <div class="section-title"><span class="section-num">5</span>Format CSV — Structure et colonnes</div>
+  <div class="box box-grey">
+    <strong>Déclencheur :</strong> Console NC → Onglet Liste → bouton "Exporter CSV"<br>
+    Encodage : UTF-8 avec BOM (compatible Excel Windows direct) · Séparateur : point-virgule (;)
+  </div>
+  <table>
+    <tr><th>Colonne</th><th>Type</th><th>Description</th></tr>
+    <tr><td>Numéro NC</td><td>Texte</td><td>Format AAMMJJ-NNNN (ex. 260503-0001)</td></tr>
+    <tr><td>Date création</td><td>Date</td><td>ISO 8601 (AAAA-MM-JJ)</td></tr>
+    <tr><td>Heure création</td><td>Heure</td><td>HH:MM</td></tr>
+    <tr><td>Statut</td><td>Texte</td><td>ouvert / en_cours / resolu / clos / non_pertinent</td></tr>
+    <tr><td>Gravité</td><td>Texte</td><td>mineure / majeure / critique / (vide)</td></tr>
+    <tr><td>Score risque</td><td>Entier</td><td>1–9 ou vide</td></tr>
+    <tr><td>Périmètre / Famille</td><td>Texte</td><td>Famille produit (liste configurable)</td></tr>
+    <tr><td>Source détection</td><td>Texte</td><td>client / audit / interne / fournisseur…</td></tr>
+    <tr><td>Référence produit</td><td>Texte</td><td>Référence article</td></tr>
+    <tr><td>Numéro de série</td><td>Texte</td><td>Identifiant pièce</td></tr>
+    <tr><td>Nom client</td><td>Texte</td><td>Nom de l'entreprise ou personne</td></tr>
+    <tr><td>Email client</td><td>Texte</td><td>Email du déclarant</td></tr>
+    <tr><td>Rédacteur</td><td>Texte</td><td>Prénom Nom</td></tr>
+    <tr><td>Description</td><td>Texte</td><td>Texte libre (peut contenir des ;)</td></tr>
+    <tr><td>Description réparation</td><td>Texte</td><td>Réparation effectuée si applicable</td></tr>
+    <tr><td>Suggestion amélioration</td><td>Texte</td><td>Suggestion libre du déclarant</td></tr>
+    <tr><td>Cause racine (5 Pourquoi)</td><td>Texte</td><td>Synthèse de l'analyse 5P</td></tr>
+    <tr><td>Nombre actions</td><td>Entier</td><td>Total actions créées sur cette NC</td></tr>
+    <tr><td>Pilotes assignés</td><td>Texte</td><td>Noms séparés par | si plusieurs</td></tr>
+    <tr><td>Date clôture</td><td>Date</td><td>ISO 8601 ou vide si NC ouverte</td></tr>
+    <tr><td>Durée traitement (jours)</td><td>Entier</td><td>Nb de jours entre création et clôture</td></tr>
+    <tr><td>Coût NC (€)</td><td>Décimal</td><td>Valeur numérique (0 si sans coût)</td></tr>
+    <tr><td>Type de cause</td><td>Texte</td><td>Cause de clôture (liste configurable)</td></tr>
+    <tr><td>Commentaire clôture</td><td>Texte</td><td>Commentaire interne qualité</td></tr>
+    <tr><td>Respect échéance</td><td>Texte</td><td>dans_delais / hors_delais / ouvert / non_applicable</td></tr>
+    <tr><td>Nombre pièces jointes</td><td>Entier</td><td>Total PJ sur la NC (toutes étapes)</td></tr>
+  </table>
+  <p>Fréquence recommandée : mensuel (suivi KPI) · annuel (archivage définitif) · ad hoc (avant intervention serveur).</p>
+</div>
+
+<!-- ══ 6. FORMAT PDF ══ -->
+<div class="section" id="s6">
+  <div class="section-title"><span class="section-num">6</span>Format PDF — Rapport de direction</div>
+  <div class="box box-grey">
+    <strong>Déclencheur :</strong> Console NC → Onglet Archives → bouton "Rapport PDF"<br>
+    Format : A4 paysage recommandé · Méthode : Ctrl+P → Enregistrer en PDF (window.print())
+  </div>
+  <table>
+    <tr><th>Page</th><th>Contenu</th></tr>
+    <tr><td>Page 1</td><td>Logo + titre · Période + date d'édition · Indicateurs synthétiques (total NC, closes, taux clôture, durée moyenne, coût total)</td></tr>
+    <tr><td>Page 2</td><td>Répartition par statut / famille / source détection · Respect des échéances · Courbe mensuelle créations vs clôtures</td></tr>
+    <tr><td>Page 3+</td><td>Tableau NC closes : N° · Date · Famille · Client · Durée · Coût · Cause (20 lignes/page)</td></tr>
+  </table>
+  <div class="box box-green">
+    Conformité documentée : ISO 9001:2015 §9.3 Revue de direction · §8.7 Maîtrise des NC · §10.2.1/10.2.2 Actions correctives<br>
+    Nommage archivage suggéré : <code class="inline">Rapport_NC_2026_v20261231.pdf</code>
+  </div>
+</div>
+
+<!-- ══ 7. EXPORT + DÉPLOIEMENT ══ -->
+<div class="section" id="s7">
+  <div class="section-title"><span class="section-num">7</span>Export NC seul + déploiement production OVH</div>
+
+  <div class="subsection" id="s7-1">
+    <div class="subsection-title">7.1 Périmètre export — fichiers NC uniquement</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0">
+      <div>
+        <p style="color:var(--green);font-weight:700;margin-bottom:6px">✅ INCLURE dans l'export</p>
+        <div class="file-tree">
+          <span class="ok">✅</span> server.js<br>
+          <span class="ok">✅</span> package.json<br>
+          <span class="ok">✅</span> package-lock.json<br>
+          <span class="ok">✅</span> ecosystem.config.js<br>
+          <span class="ok">✅</span> .env <span class="cm">(adapter PG_HOST pour OVH)</span><br>
+          <span class="ok">✅</span> schema_postgresql.sql <span class="cm">(appliquer sur PG OVH)</span><br>
+          <span class="ok">✅</span> migrate.js <span class="cm">(migration initiale données)</span><br>
+          <span class="ok">✅</span> plan_controle.js <span class="cm">(vérification parité)</span><br>
+          <span class="ok">✅</span> nc-config.json<br>
+          <span class="ok">✅</span> nc-data.json <span class="cm">(migration initiale uniquement)</span><br>
+          <span class="ok">✅</span> NC\index.html<br>
+          <span class="ok">✅</span> NC\console.html<br>
+          <span class="ok">✅</span> NC\login.html<br>
+          <span class="ok">✅</span> NC\synoptique.html<br>
+          <span class="ok">✅</span> NC\favicon.svg<br>
+          <span class="ok">✅</span> NC\media\
+        </div>
+      </div>
+      <div>
+        <p style="color:var(--red);font-weight:700;margin-bottom:6px">❌ NE PAS INCLURE</p>
+        <div class="file-tree">
+          <span class="no">❌</span> node_modules\ <span class="cm">(npm install)</span><br>
+          <span class="no">❌</span> Base de cas\ <span class="cm">(formation)</span><br>
+          <span class="no">❌</span> presentation-codir-nc.html<br>
+          <span class="no">❌</span> *.log, *.tmp<br>
+          <span class="no">❌</span> *.bat, scripts Windows<br>
+          <span class="no">❌</span> Tout contenu pédagogique
+        </div>
+      </div>
+    </div>
+    <div class="box box-blue">
+      <strong>Important — données de production OVH</strong>
+      nc-data.json est inclus uniquement pour la migration initiale (node migrate.js). Une fois les données importées dans PostgreSQL OVH, nc-data.json devient archive et ne doit plus être modifié. La source de vérité est PostgreSQL.
+    </div>
+  </div>
+
+  <div class="subsection" id="s7-2">
+    <div class="subsection-title">7.2 Adaptations obligatoires AVANT déploiement production</div>
+    <p><strong>A. Mettre à jour l'URL du FAB "Synoptique" dans NC\console.html</strong></p>
+    <pre># Rechercher "nc-synoptique-fab" dans console.html
+AVANT  : href = 'https://formation-sav.fr/NC/synoptique.html'
+APRÈS  : href = 'https://espace-client.muller-automotive.fr/NC/synoptique.html'</pre>
+    <p><strong>B. Remplacer toutes les références à formation-sav.fr</strong></p>
+    <pre># Depuis PowerShell (PC Windows)
+Get-ChildItem -Path C:\formation\NC\ -Recurse -Include *.html,*.js |
+  Select-String "formation-sav.fr"
+# Remplacer chaque occurrence par le nouveau domaine de production</pre>
+    <p><strong>C. Créer le fichier ecosystem.config.js de production</strong></p>
+    <pre>module.exports = {
+  apps: [{
+    name        : 'muller-nc',
+    script      : 'server.js',
+    cwd         : '/opt/nc',
+    instances   : 1,
+    autorestart : true,
+    watch       : false,
+    env: {
+      NODE_ENV   : 'production',
+      PORT       : 3001,
+      DATA_SOURCE: 'postgres',
+      PG_HOST    : '&lt;&lt;HOST_PG_OVH&gt;&gt;',
+      PG_PORT    : '5432',
+      PG_USER    : '&lt;&lt;USER_PG_OVH&gt;&gt;',
+      PG_PASSWORD: '&lt;&lt;PASSWORD_PG_OVH&gt;&gt;',
+      PG_DB      : 'nc_muller',
+      JWT_SECRET : '&lt;&lt;CHANGER_CLE_ALEATOIRE_64_CHARS&gt;&gt;',
+      SMTP_HOST  : '&lt;&lt;HOTE_SMTP_ENTREPRISE&gt;&gt;',
+      SMTP_PORT  : '&lt;&lt;PORT_SMTP&gt;&gt;',
+      SMTP_USER  : '&lt;&lt;EMAIL_EXPEDITEUR_NC&gt;&gt;',
+      SMTP_PASS  : '&lt;&lt;MOT_DE_PASSE_SMTP&gt;&gt;'
+    }
+  }]
+};</pre>
+    <pre># Générer une clé JWT_SECRET sécurisée (depuis le PC Windows)
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"</pre>
+  </div>
+
+  <div class="subsection" id="s7-3">
+    <div class="subsection-title">7.3 Préparation clé USB (PC Windows)</div>
+    <pre># ÉTAPE A — Synchroniser D:\formation
+robocopy C:\formation D:\formation /MIR /XD node_modules /XF "*.log" "*.tmp"
+
+# ÉTAPE B — Copier vers la clé USB (E:\)
+robocopy D:\formation E:\NC_PRODUCTION /MIR /XD node_modules "Base de cas" ^
+  /XF "*.log" "*.bat" "*.tmp" "presentation-codir-nc.html"</pre>
+    <div class="box box-blue">
+      Créer un fichier <code class="inline">E:\README_IT.txt</code> sur la clé USB avec : date de préparation, domaine production, volume media, contact.
+    </div>
+  </div>
+
+  <div class="subsection" id="s7-4">
+    <div class="subsection-title">7.4 Déploiement sur VPS OVH — 13 étapes</div>
+    <div class="box box-orange">
+      <strong>Pré-requis</strong>
+      VPS OVH commandé · OS Ubuntu 22.04 LTS · Accès SSH root · DNS du domaine pointant vers l'IP du VPS
+    </div>
+
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Connexion SSH et mise à jour OS</div>
+    <pre>ssh root@&lt;IP_VPS&gt;
+apt update && apt upgrade -y</pre></div></div>
+
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Installation des composants serveur</div>
+    <pre>curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs nginx certbot python3-certbot-nginx rsync
+npm install -g pm2
+node -v   # doit afficher v20.x.x</pre></div></div>
+
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Créer la structure de répertoires</div>
+    <pre>mkdir -p /opt/nc/NC/media
+chmod 755 /opt/nc /opt/nc/NC /opt/nc/NC/media</pre></div></div>
+
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Transférer les fichiers depuis la clé USB</div>
+    <pre># Option A — rsync (Linux/Mac)
+rsync -avz --exclude='node_modules' /media/usb/NC_PRODUCTION/ root@&lt;IP_VPS&gt;:/opt/nc/
+
+# Option B — WinSCP (Windows, graphique)
+# SFTP → &lt;IP_VPS&gt; → Login root → Copier E:\NC_PRODUCTION\ → /opt/nc/
+
+# Option C — SCP (Windows ligne de commande)
+scp -r "E:\NC_PRODUCTION\*" root@&lt;IP_VPS&gt;:/opt/nc/</pre></div></div>
+
+    <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Installer les dépendances Node.js</div>
+    <pre>cd /opt/nc
+npm install --production   # crée node_modules/ — durée 30s à 3min</pre></div></div>
+
+    <div class="step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Appliquer le schéma PostgreSQL et migrer les données</div>
+    <pre># Appliquer le schéma sur la base OVH
+psql -U &lt;PG_USER&gt; -h &lt;PG_HOST&gt; -d nc_muller -f /opt/nc/schema_postgresql.sql
+
+# Migrer les données JSON → PG (une seule fois au déploiement)
+node /opt/nc/migrate.js --dry-run   # vérification sans écriture
+node /opt/nc/migrate.js             # migration réelle
+
+# Vérifier la parité complète
+node /opt/nc/plan_controle.js       # doit afficher TOUT VERT ✅</pre></div></div>
+
+    <div class="step"><div class="step-num">7</div><div class="step-body"><div class="step-title">Configurer et démarrer PM2</div>
+    <pre>cd /opt/nc
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup   # copier-coller la commande affichée
+pm2 status    # "muller-nc" doit afficher "online"
+pm2 logs muller-nc --lines 30</pre></div></div>
+
+    <div class="step"><div class="step-num">8</div><div class="step-body"><div class="step-title">Configurer Nginx</div>
+    <pre>nano /etc/nginx/sites-available/muller-nc</pre>
+    <pre>server {
+    listen 80;
+    server_name espace-client.muller-automotive.fr
+                www.espace-client.muller-automotive.fr;
+    return 301 https://$host$request_uri;
+}
+server {
+    listen 443 ssl;
+    server_name espace-client.muller-automotive.fr
+                www.espace-client.muller-automotive.fr;
+    root /opt/nc;
+    client_max_body_size 200m;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_read_timeout 120s;
+    }
+    location /NC/media/ {
+        alias /opt/nc/NC/media/;
+        expires 30d;
+    }
+    location /NC/ {
+        root /opt/nc;
+        try_files $uri $uri/ =404;
+    }
+    location = / { return 302 /NC/; }
+}</pre>
+    <pre>ln -s /etc/nginx/sites-available/muller-nc /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl reload nginx</pre></div></div>
+
+    <div class="step"><div class="step-num">9</div><div class="step-body"><div class="step-title">Certificat HTTPS Let's Encrypt</div>
+    <div class="box box-orange"><strong>Important :</strong> Le DNS doit pointer vers l'IP du VPS AVANT de lancer Certbot. Attendre la propagation (15–60 min).</div>
+    <pre>certbot --nginx -d espace-client.muller-automotive.fr \
+  -d www.espace-client.muller-automotive.fr
+certbot renew --dry-run   # tester le renouvellement auto</pre></div></div>
+
+    <div class="step"><div class="step-num">10</div><div class="step-body"><div class="step-title">Pare-feu et sécurité</div>
+    <pre>apt install -y ufw fail2ban
+ufw allow 22/tcp && ufw allow 80/tcp && ufw allow 443/tcp
+ufw --force enable
+systemctl enable --now fail2ban
+sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+systemctl reload sshd</pre></div></div>
+
+    <div class="step"><div class="step-num">11</div><div class="step-body"><div class="step-title">Droits fichiers</div>
+    <pre>chmod 600 /opt/nc/.env /opt/nc/ecosystem.config.js \
+          /opt/nc/nc-data.json /opt/nc/nc-config.json</pre></div></div>
+
+    <div class="step"><div class="step-num">12</div><div class="step-body"><div class="step-title">Sauvegardes automatiques (crontab)</div>
+    <pre>mkdir -p /opt/backups && crontab -e
+
+# Ajouter dans crontab :
+0 2 * * * pg_dump -U &lt;PG_USER&gt; -h &lt;PG_HOST&gt; nc_muller | \
+  gzip > /opt/backups/pg-nc-$(date +\%Y\%m\%d).sql.gz 2>/dev/null
+0 3 * * * tar -czf /opt/backups/media-$(date +\%Y\%m\%d).tar.gz \
+  /opt/nc/NC/media/ 2>/dev/null
+0 4 * * * find /opt/backups/ -name "*.gz" -mtime +30 -delete
+0 5 * * 1 certbot renew --quiet</pre></div></div>
+
+    <div class="step"><div class="step-num">13</div><div class="step-body"><div class="step-title">Tests avant bascule DNS</div>
+    <pre>curl http://&lt;IP_VPS&gt;/NC/        # doit retourner du HTML
+curl http://&lt;IP_VPS&gt;/api/health  # doit retourner {"status":"ok"}
+pm2 status                        # "muller-nc" doit être "online"</pre>
+    <ul class="check">
+      <li>Connexion avec compte nc_admin</li>
+      <li>Création d'une NC de test</li>
+      <li>Upload d'une pièce jointe</li>
+      <li>Envoi email de notification (@mullerautomotive.fr)</li>
+      <li>Export CSV</li>
+      <li>node plan_controle.js → TOUT VERT ✅</li>
+    </ul>
+    <p style="margin-top:10px"><strong>Bascule DNS :</strong> Dans le panneau DNS OVH — enregistrement A → <code class="inline">&lt;IP_PUBLIQUE_VPS_OVH&gt;</code> TTL 300. Vérifier sur dnschecker.org. Attendre 15 min à 48h.</p></div></div>
+
+    <div class="box box-green">
+      <strong>Après bascule</strong>
+      L'environnement dev (PC Windows + formation-sav.fr) reste intact. Aucune action requise. Il continue à servir la version de développement pour les évolutions futures.
+    </div>
+  </div>
+</div>
+
+<!-- ══ 8. INFRASTRUCTURE OVH ══ -->
+<div class="section" id="s8">
+  <div class="section-title"><span class="section-num">8</span>Recommandations infrastructure OVH</div>
+  <table>
+    <tr><th>Offre VPS</th><th>CPU</th><th>RAM</th><th>SSD</th><th>Prix/mois</th><th>Verdict</th></tr>
+    <tr><td>VPS Starter</td><td>1 vCore</td><td>2 Go</td><td>20 Go</td><td>~3 €</td><td><span class="badge badge-red">Insuffisant</span></td></tr>
+    <tr><td>VPS Value</td><td>2 vCores</td><td>2 Go</td><td>40 Go</td><td>~5 €</td><td><span class="badge badge-red">Stockage insuffisant</span></td></tr>
+    <tr><td>VPS Comfort</td><td>4 vCores</td><td>8 Go</td><td>160 Go</td><td>~17 €</td><td><span class="badge badge-orange">Adapté 5 ans</span></td></tr>
+    <tr><td>VPS Elite</td><td>8 vCores</td><td>8 Go</td><td>320 Go</td><td>~35 €</td><td><span class="badge badge-green">⭐ Recommandé 10 ans</span></td></tr>
+  </table>
+  <div class="box box-green">
+    Recommandation : VPS Elite pour 10 ans avec 400 NC/an + pièces jointes.<br>
+    Si budget contraint : VPS Comfort + Object Storage OVH pour les médias.
+  </div>
+  <div class="box box-orange">
+    <strong>Choix PostgreSQL OVH — à valider avant déploiement</strong>
+    Option A — PostgreSQL sur le même VPS (~0 €/mois de plus, gestion manuelle des sauvegardes et mises à jour).<br>
+    Option B — Managed Database OVH (~10–20 €/mois) : sauvegardes automatiques, haute disponibilité, zéro administration.<br>
+    <strong>Recommandation pour production ISO 9001 : Option B.</strong>
+  </div>
+</div>
+
+<!-- ══ 9. EMAILS ══ -->
+<div class="section" id="s9">
+  <div class="section-title"><span class="section-num">9</span>Configuration emails entreprise (@mullerautomotive.fr)</div>
+  <p>En production, les emails NC doivent être envoyés depuis une adresse <code class="inline">@mullerautomotive.fr</code>. La configuration SMTP est dans <code class="inline">ecosystem.config.js</code> et ne nécessite pas de modifier server.js.</p>
+
+  <div class="subsection">
+    <div class="subsection-title">Option A — OVH Email Pro / MX Plan</div>
+    <table>
+      <tr><th>Paramètre</th><th>Valeur</th></tr>
+      <tr><td>SMTP_HOST</td><td><code class="inline">ssl0.ovh.net</code></td></tr>
+      <tr><td>SMTP_PORT</td><td><code class="inline">465</code></td></tr>
+      <tr><td>SMTP_SECURE</td><td><code class="inline">true</code> (SSL/TLS direct)</td></tr>
+      <tr><td>SMTP_USER</td><td><code class="inline">qualite@mullerautomotive.fr</code></td></tr>
+      <tr><td>SMTP_PASS</td><td>Mot de passe de la boîte email</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">Option B — Microsoft 365 / Exchange Online</div>
+    <table>
+      <tr><th>Paramètre</th><th>Valeur</th></tr>
+      <tr><td>SMTP_HOST</td><td><code class="inline">smtp.office365.com</code></td></tr>
+      <tr><td>SMTP_PORT</td><td><code class="inline">587</code></td></tr>
+      <tr><td>SMTP_SECURE</td><td><code class="inline">false</code> (STARTTLS)</td></tr>
+      <tr><td>SMTP_USER</td><td><code class="inline">qualite@mullerautomotive.fr</code></td></tr>
+      <tr><td>SMTP_PASS</td><td>Mot de passe compte Microsoft 365</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">Mise à jour sur le VPS</div>
+    <pre>nano /opt/nc/ecosystem.config.js
+# Renseigner SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS
+
+pm2 restart muller-nc
+pm2 logs muller-nc --lines 30   # vérifier l'absence d'erreur SMTP</pre>
+    <div class="box box-blue">
+      Les adresses <strong>destinataires</strong> (qualité, direction) se configurent depuis la console NC → ⚙ Configuration, sans SSH ni redémarrage.
+    </div>
+  </div>
+</div>
+
+<!-- ══ 10. SÉCURITÉ ══ -->
+<div class="section" id="s10">
+  <div class="section-title"><span class="section-num">10</span>Sécurité</div>
+  <p><strong>Checklist sécurité — avancement au 25/05/2026 :</strong></p>
+  <table>
+    <tr><th>Point</th><th>DEV (PC)</th><th>PROD (OVH)</th></tr>
+    <tr><td>Bcrypt — mots de passe hashés (lazy migration)</td><td><span class="badge badge-green">✅ Actif</span></td><td>☐ Sera actif (identique)</td></tr>
+    <tr><td>Rate limiting — 5 tentatives/15 min/IP</td><td><span class="badge badge-green">✅ Actif</span></td><td>☐ Sera actif (identique)</td></tr>
+    <tr><td>Helmet — headers sécurité HTTP</td><td><span class="badge badge-green">✅ Actif</span></td><td>☐ Sera actif (identique)</td></tr>
+    <tr><td>Blocage accès direct fichiers JSON</td><td><span class="badge badge-green">✅ Actif</span></td><td>☐ Sera actif + Nginx deny</td></tr>
+    <tr><td>Variables d'environnement (.env)</td><td><span class="badge badge-green">✅ Actif</span></td><td>☐ Adapter PG_HOST/credentials OVH</td></tr>
+    <tr><td>PostgreSQL — source de vérité unique</td><td><span class="badge badge-green">✅ DATA_SOURCE=postgres</span></td><td>☐ Managed DB OVH recommandé</td></tr>
+    <tr><td>JWT_SECRET — clé aléatoire 64+ chars (jamais défaut)</td><td><span class="badge badge-orange">⚠ Clé dev</span></td><td>☐ Obligatoire avant déploiement</td></tr>
+    <tr><td>SMTP_PASS — @mullerautomotive.fr (pas Gmail dev)</td><td><span class="badge badge-orange">⚠ Gmail dev</span></td><td>☐ Obligatoire avant déploiement</td></tr>
+    <tr><td>trust proxy (ERR_ERL_UNEXPECTED_X_FORWARDED_FOR)</td><td><span class="badge badge-orange">⚠ À corriger</span></td><td>☐ app.set('trust proxy', 1) dans server.js</td></tr>
+    <tr><td>SSH par clé uniquement — PasswordAuthentication no</td><td>N/A</td><td>☐ Lors de la config VPS</td></tr>
+    <tr><td>UFW — ports 22, 80, 443 uniquement</td><td>N/A</td><td>☐ Lors de la config VPS</td></tr>
+    <tr><td>Fail2ban installé et actif</td><td>N/A</td><td>☐ Lors de la config VPS</td></tr>
+    <tr><td>HTTPS Let's Encrypt — renouvellement auto testé</td><td>N/A</td><td>☐ Lors de la config VPS</td></tr>
+    <tr><td>Droits fichiers sensibles en chmod 600</td><td>N/A</td><td>☐ Lors de la config VPS</td></tr>
+    <tr><td>pg_dump sauvegarde cron quotidienne</td><td>N/A</td><td>☐ Lors de la config VPS</td></tr>
+    <tr><td>CORS — restreindre origins autorisées (enlever *)</td><td><span class="badge badge-orange">⚠ * en dev</span></td><td>☐ Phase 4 avant déploiement</td></tr>
+    <tr><td>Helmet CSP — contentSecurityPolicy activé</td><td><span class="badge badge-orange">⚠ Désactivé</span></td><td>☐ Phase 4 avant déploiement</td></tr>
+  </table>
+  <div class="box box-blue">
+    <strong>Révocation de tous les tokens JWT :</strong> Changer <code class="inline">JWT_SECRET</code> dans ecosystem.config.js puis <code class="inline">pm2 restart muller-nc</code> — reconnexion forcée de tous les utilisateurs.
+  </div>
+</div>
+
+<!-- ══ 11. PRA ══ -->
+<div class="section" id="s11">
+  <div class="section-title"><span class="section-num">11</span>Plan de reprise d'activité (PRA)</div>
+  <table>
+    <tr><th>Incident</th><th>Cause probable</th><th>Action</th></tr>
+    <tr><td>Site inaccessible</td><td>Panne VPS OVH</td><td>OVH remédie (SLA 99,9 %)</td></tr>
+    <tr><td>Site inaccessible</td><td>PM2 planté</td><td><code class="inline">pm2 restart muller-nc</code></td></tr>
+    <tr><td>Site inaccessible</td><td>Nginx arrêté</td><td><code class="inline">systemctl restart nginx</code></td></tr>
+    <tr><td>Node.js crash répété</td><td>Erreur applicative</td><td><code class="inline">pm2 logs</code> → diagnostiquer</td></tr>
+    <tr><td>Disque saturé</td><td>Médias NC volumineux</td><td>Nettoyer media/ + archiver vers Object Storage</td></tr>
+    <tr><td>Perte/corruption données PostgreSQL</td><td>Sinistre ou bug</td><td>Restaurer pg_dump depuis /opt/backups/ ou snapshot OVH</td></tr>
+    <tr><td>Perte totale VPS</td><td>Sinistre datacenter</td><td>Snapshot OVH → nouveau VPS</td></tr>
+    <tr><td>Email SMTP bloqué</td><td>Config erronée / quota</td><td><code class="inline">pm2 logs</code> → reconfig SMTP</td></tr>
+    <tr><td>Certificat SSL expiré</td><td>Renouvellement échoué</td><td><code class="inline">certbot renew --force-renew</code></td></tr>
+    <tr><td>Anomalie données PG</td><td>Désynchronisation</td><td><code class="inline">node plan_controle.js</code> → <code class="inline">node migrate.js</code> si écart</td></tr>
+  </table>
+  <pre># Restaurer PostgreSQL depuis pg_dump
+ls -lh /opt/backups/
+pm2 stop muller-nc
+gunzip -c /opt/backups/pg-nc-AAAAMMJJ.sql.gz | psql -U &lt;PG_USER&gt; -h &lt;PG_HOST&gt; nc_muller
+pm2 start muller-nc
+
+# Vérifier l'intégrité après restauration
+node /opt/nc/plan_controle.js
+
+# Mettre à jour une version (depuis PC Windows dev)
+scp C:\formation\server.js root@&lt;IP_VPS&gt;:/opt/nc/
+scp C:\formation\NC\console.html root@&lt;IP_VPS&gt;:/opt/nc/NC/
+pm2 restart muller-nc --update-env   # si server.js modifié</pre>
+</div>
+
+<!-- ══ 12. COÛTS ══ -->
+<div class="section" id="s12">
+  <div class="section-title"><span class="section-num">12</span>Coûts estimés</div>
+
+  <div class="subsection">
+    <div class="subsection-title">12.1 Coûts infrastructure OVH — annuels</div>
+    <table>
+      <tr><th>Poste</th><th>/mois</th><th>/an HT</th></tr>
+      <tr><td>VPS Elite 320 Go ⭐ <span class="badge badge-green">recommandé 10 ans</span></td><td>~35 €</td><td>~420 €</td></tr>
+      <tr><td>VPS Comfort 160 Go <span class="badge badge-orange">horizon 5 ans</span></td><td>~17 €</td><td>~200 €</td></tr>
+      <tr><td>Managed Database OVH PostgreSQL <span class="badge badge-green">recommandé prod</span></td><td>~15 €</td><td>~180 €</td></tr>
+      <tr><td>Snapshot sauvegarde OVH</td><td>~3 €</td><td>~36 €</td></tr>
+      <tr><td>Domaine entreprise</td><td colspan="2">Déjà existant</td></tr>
+      <tr><td>SSL Let's Encrypt</td><td colspan="2" style="color:var(--green);font-weight:700">Gratuit</td></tr>
+      <tr class="tbl-total"><td>TOTAL VPS Elite + Managed DB ⭐</td><td>~53 €</td><td>~636 €</td></tr>
+      <tr><td style="color:var(--green);font-weight:700">TOTAL VPS Comfort + PG local</td><td style="color:var(--green);font-weight:700">~20 €</td><td style="color:var(--green);font-weight:700">~236 €</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">12.2 Coût de déploiement (one-shot)</div>
+    <table>
+      <tr><th>Tâche</th><th>Durée</th></tr>
+      <tr><td>Adaptations URL + SMTP entreprise</td><td>1–2 h</td></tr>
+      <tr><td>Préparation clé USB (export NC seul)</td><td>1 h</td></tr>
+      <tr><td>Déploiement VPS OVH (13 étapes + migration PG)</td><td>3–5 h</td></tr>
+      <tr><td>Tests fonctionnels complets + plan_controle.js</td><td>2–3 h</td></tr>
+      <tr><td>Bascule DNS + surveillance 48h</td><td>1–2 h</td></tr>
+      <tr class="tbl-warn"><td>TOTAL travail IT</td><td>8–13 h</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">12.3 Coût total de possession sur 10 ans</div>
+    <table>
+      <tr><th>Poste</th><th>VPS Comfort + PG local</th><th>VPS Elite + Managed DB ⭐</th></tr>
+      <tr><td>Infrastructure + snapshot (10 ans)</td><td>~2 360 €</td><td>~6 360 €</td></tr>
+      <tr><td>Maintenance IT (~4 h/an @ 80 €/h)</td><td colspan="2">~3 200 €</td></tr>
+      <tr class="tbl-total"><td>TOTAL POSSESSION 10 ANS</td><td>~5 560 €</td><td>~9 560 €</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══ 13. FAQ DÉMARRAGE OVH ══ -->
+<div class="section" id="s13">
+  <div class="section-title"><span class="section-num">13</span>FAQ démarrage OVH — Problèmes courants</div>
+
+  <div class="faq-cat">Node.js / PM2</div>
+
+  <details>
+    <summary>Node.js ne démarre pas — pm2 status affiche "errored"</summary>
+    <div class="faq-body">
+      <p>Diagnostic : <code class="inline">pm2 logs muller-nc --lines 50</code></p>
+      <table>
+        <tr><th>Message d'erreur</th><th>Cause</th><th>Solution</th></tr>
+        <tr><td>Cannot find module 'express'</td><td>node_modules absent</td><td><code class="inline">cd /opt/nc && npm install --production</code></td></tr>
+        <tr><td>EADDRINUSE port 3001</td><td>Port déjà utilisé</td><td><code class="inline">lsof -i :3001</code> → <code class="inline">kill -9 &lt;PID&gt;</code></td></tr>
+        <tr><td>SASL password error / PG auth failed</td><td>Credentials PG incorrects dans ecosystem.config.js</td><td>Vérifier PG_USER / PG_PASSWORD / PG_HOST</td></tr>
+        <tr><td>ECONNREFUSED postgres</td><td>Service PG inaccessible</td><td>Vérifier que Managed DB OVH est démarrée et que PG_HOST est correct</td></tr>
+        <tr><td>SyntaxError: Unexpected token</td><td>JSON corrompu</td><td>Restaurer depuis sauvegarde</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>PM2 ne redémarre pas au boot du VPS</summary>
+    <div class="faq-body">
+      <pre>pm2 startup   # copier-coller la commande affichée
+pm2 save
+systemctl status pm2-root   # doit afficher "active (running)"</pre>
+    </div>
+  </details>
+
+  <div class="faq-cat">Nginx / Accès web</div>
+
+  <details>
+    <summary>502 Bad Gateway</summary>
+    <div class="faq-body">
+      <p>Nginx ne peut pas joindre Node.js (Node planté ou mauvais port).</p>
+      <pre>pm2 status                           # vérifier que muller-nc est "online"
+curl localhost:3001/api/health       # tester Node.js directement
+pm2 restart muller-nc
+nginx -t && systemctl reload nginx</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>Site ne répond pas (timeout, ERR_CONNECTION_REFUSED)</summary>
+    <div class="faq-body">
+      <ul class="dot">
+        <li><strong>DNS pas propagé</strong> → vérifier sur dnschecker.org, attendre 15 min–48h</li>
+        <li><strong>Nginx arrêté</strong> → <code class="inline">systemctl start nginx</code> · <code class="inline">nginx -t</code></li>
+        <li><strong>Pare-feu</strong> → <code class="inline">ufw status</code> · <code class="inline">ufw allow 443/tcp && ufw allow 80/tcp</code></li>
+        <li><strong>Certbot non configuré</strong> → tester en HTTP : <code class="inline">http://&lt;IP_VPS&gt;/NC/</code></li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Erreur Certbot — validation SSL échoue</summary>
+    <div class="faq-body">
+      <table>
+        <tr><th>Erreur</th><th>Cause</th><th>Solution</th></tr>
+        <tr><td>Challenge failed for domain</td><td>DNS ne pointe pas encore vers le VPS</td><td>Attendre propagation DNS puis relancer certbot</td></tr>
+        <tr><td>Could not bind to IPv4</td><td>Nginx arrêté</td><td><code class="inline">systemctl start nginx</code></td></tr>
+        <tr><td>Certificat expiré en production</td><td>Renouvellement cron échoué</td><td><code class="inline">certbot renew --force-renew</code></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="faq-cat">PostgreSQL OVH</div>
+
+  <details>
+    <summary>Erreur de connexion PostgreSQL au démarrage</summary>
+    <div class="faq-body">
+      <pre>pm2 logs muller-nc --lines 30 | grep -i pg
+pm2 logs muller-nc --lines 30 | grep -i error</pre>
+      <table>
+        <tr><th>Symptôme</th><th>Cause</th><th>Solution</th></tr>
+        <tr><td>SASL password error</td><td>PG_PASSWORD incorrect ou manquant</td><td>Vérifier ecosystem.config.js → pm2 reload muller-nc --update-env</td></tr>
+        <tr><td>ECONNREFUSED</td><td>PG_HOST incorrect ou Managed DB arrêtée</td><td>Vérifier l'IP/hostname de la Managed DB OVH</td></tr>
+        <tr><td>database "nc_muller" does not exist</td><td>Base non créée</td><td>Créer la base via le panel OVH puis relancer psql -f schema_postgresql.sql</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>Données manquantes après déploiement</summary>
+    <div class="faq-body">
+      <pre># Vérifier la parité données (8 sections)
+node /opt/nc/plan_controle.js
+
+# Si écart : relancer la migration (idempotente — safe à relancer)
+node /opt/nc/migrate.js</pre>
+      <p>La migration est idempotente : elle peut être relancée plusieurs fois sans risque de doublon grâce aux clauses ON CONFLICT DO UPDATE.</p>
+    </div>
+  </details>
+
+  <div class="faq-cat">Emails</div>
+
+  <details>
+    <summary>Emails non reçus après création d'une NC</summary>
+    <div class="faq-body">
+      <pre>pm2 logs muller-nc --lines 50 | grep -i smtp
+pm2 logs muller-nc --lines 50 | grep -i error</pre>
+      <table>
+        <tr><th>Symptôme</th><th>Cause</th><th>Solution</th></tr>
+        <tr><td>Authentication failed / Invalid login</td><td>Identifiants SMTP incorrects</td><td>Vérifier SMTP_USER / SMTP_PASS dans ecosystem.config.js</td></tr>
+        <tr><td>Connection timeout port 25</td><td>OVH bloque port 25</td><td>Utiliser port 465 (SSL) ou 587 (STARTTLS) — jamais port 25</td></tr>
+        <tr><td>SMTP_SECURE mal configuré</td><td>Port/mode incohérents</td><td>Port 465 → SMTP_SECURE=true · Port 587 → SMTP_SECURE=false</td></tr>
+        <tr><td>Emails en spam</td><td>SPF manquant</td><td>Ajouter enregistrement DNS TXT : <code class="inline">v=spf1 include:mx.ovh.com ~all</code></td></tr>
+        <tr><td>Aucun email (pas d'erreur)</td><td>Destinataire non configuré</td><td>Console NC → ⚙ Configuration → vérifier adresses destinataires</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="faq-cat">Pièces jointes / Stockage</div>
+
+  <details>
+    <summary>Pièces jointes inaccessibles — erreur 404</summary>
+    <div class="faq-body">
+      <pre>mkdir -p /opt/nc/NC/media && chmod 755 /opt/nc/NC/media</pre>
+      <p>Vérifier la directive <code class="inline">alias</code> (pas <code class="inline">root</code>) dans nginx.conf :</p>
+      <pre>location /NC/media/ { alias /opt/nc/NC/media/; }</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>Disque plein — uploads refusés</summary>
+    <div class="faq-body">
+      <pre>df -h /opt/nc/
+du -sh /opt/nc/NC/media/ /opt/backups/
+
+# Nettoyer sauvegardes > 30 jours
+find /opt/backups/ -name "*.gz" -mtime +30 -delete
+pm2 flush   # vider les logs PM2</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>"Serveur inaccessible" au login — page blanche ou erreur CORS</summary>
+    <div class="faq-body">
+      <p>Ouvrir F12 → Network → regarder la requête POST <code class="inline">/api/nc-auth/login</code> :</p>
+      <table>
+        <tr><th>Code réponse</th><th>Cause</th><th>Solution</th></tr>
+        <tr><td>502</td><td>Node.js planté</td><td><code class="inline">pm2 restart muller-nc</code></td></tr>
+        <tr><td>404</td><td>Mauvaise route Nginx</td><td>Vérifier bloc <code class="inline">location /api/</code> dans nginx.conf</td></tr>
+        <tr><td>CORS error</td><td>En-têtes manquants</td><td>Vérifier <code class="inline">Access-Control-Allow-Origin</code> dans server.js</td></tr>
+      </table>
+    </div>
+  </details>
+</div>
+
+<!-- ══ 14. FAQ TECHNIQUE ══ -->
+<div class="section" id="s14">
+  <div class="section-title"><span class="section-num">14</span>FAQ technique — Questions fréquentes</div>
+
+  <details>
+    <summary>Quelle base de données est utilisée ?</summary>
+    <div class="faq-body">
+      <p><strong>PostgreSQL 16 — source de vérité unique depuis le 25/05/2026.</strong></p>
+      <p>Le module fonctionne en mode <code class="inline">DATA_SOURCE=postgres</code> : toutes les lectures et écritures se font exclusivement dans PostgreSQL. Les fichiers JSON (<code class="inline">nc-data.json</code>, <code class="inline">nc-users.json</code>) sont conservés comme archives historiques uniquement — ne pas les modifier manuellement.</p>
+      <p>Sur OVH : recommandation Managed Database OVH PostgreSQL pour zéro administration + sauvegardes automatiques.</p>
+      <pre># Appliquer le schéma sur OVH (depuis le VPS)
+psql -U &lt;PG_USER&gt; -h &lt;PG_HOST&gt; -d nc_muller -f /opt/nc/schema_postgresql.sql
+
+# Migrer les données JSON → PG (une seule fois au déploiement)
+node /opt/nc/migrate.js --dry-run   # vérification
+node /opt/nc/migrate.js             # migration réelle
+
+# Vérifier la parité complète
+node /opt/nc/plan_controle.js       # doit afficher TOUT VERT ✅</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>Le code doit-il être réécrit pour Linux ?</summary>
+    <div class="faq-body">Non. Node.js, Express, PM2, Nginx, PostgreSQL sont identiques Windows/Linux. Seuls les chemins changent (<code class="inline">C:\formation</code> → <code class="inline">/opt/nc</code>). Adaptations : ecosystem.config.js (chemins Linux + credentials PG OVH + SMTP), nginx.conf (nouveau domaine + HTTPS), URLs internes dans les HTML.</div>
+  </details>
+
+  <details>
+    <summary>Comment déployer une mise à jour future ?</summary>
+    <div class="faq-body">
+      <p>Développer et tester sur l'environnement dev (PC Windows + formation-sav.fr), puis :</p>
+      <pre>scp C:\formation\server.js root@&lt;IP_VPS&gt;:/opt/nc/
+scp C:\formation\NC\console.html root@&lt;IP_VPS&gt;:/opt/nc/NC/
+pm2 restart muller-nc --update-env   # si server.js modifié
+# Les fichiers HTML/JS sont actifs immédiatement sans redémarrage</pre>
+      <p>Si le schéma PostgreSQL est modifié : ajouter le nouveau champ dans <code class="inline">pgSyncFiche()</code> ET dans <code class="inline">schema_postgresql.sql</code>, puis appliquer l'ALTER TABLE manuellement sur la base OVH.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Les données NC sont-elles perdues pendant la migration ?</summary>
+    <div class="faq-body">Non. L'ancien PC reste actif pendant toute la migration. Les NC saisies entre le transfert clé USB et la bascule DNS doivent être récupérées manuellement (export CSV). Planifier la bascule un vendredi soir ou week-end pour minimiser le delta.</div>
+  </details>
+
+  <details>
+    <summary>Comment gérer les utilisateurs NC en production ?</summary>
+    <div class="faq-body">
+      <p>Depuis la console NC (nc_admin connecté) → ⚙ Configuration → Utilisateurs. Aucun accès SSH requis.</p>
+      <p>En cas d'oubli du mot de passe admin :</p>
+      <pre>node -e "const bcrypt=require('bcryptjs'); \
+  bcrypt.hash('NouveauPass',10,(e,h)=>console.log(h));"
+# Mettre à jour le hash directement dans PostgreSQL :
+psql -U &lt;PG_USER&gt; -h &lt;PG_HOST&gt; nc_muller
+UPDATE nc_users SET password_hash='&lt;HASH&gt;' WHERE email='admin@...';
+\q</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>Comment appliquer les mises à jour de sécurité Linux ?</summary>
+    <div class="faq-body">
+      <pre>apt update && apt upgrade -y
+# Si kernel mis à jour : reboot (PM2 redémarre automatiquement)
+# Certbot et PM2 assurent leurs propres renouvellements automatiques</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>Comment vérifier l'intégrité des données et que faire en cas d'anomalie ?</summary>
+    <div class="faq-body">
+      <p>En mode <code class="inline">DATA_SOURCE=postgres</code>, la vérification se fait via <code class="inline">plan_controle.js</code> :</p>
+      <pre>node /opt/nc/plan_controle.js   # 8 sections de vérification → doit afficher TOUT VERT ✅
+
+# En cas d'écart : resynchronisation complète (idempotente — safe à relancer)
+node /opt/nc/migrate.js
+
+# Restaurer PostgreSQL depuis sauvegarde pg_dump
+pm2 stop muller-nc
+gunzip -c /opt/backups/pg-nc-AAAAMMJJ.sql.gz | psql -U &lt;PG_USER&gt; -h &lt;PG_HOST&gt; nc_muller
+pm2 start muller-nc</pre>
+      <p>Perte de données maximale : &lt; 24h (pg_dump cron quotidien à 02h00). Pour limiter à &lt; 1h : configurer le cron toutes les heures.</p>
+    </div>
+  </details>
+</div>
+
+<!-- ══ 15. RÉSUMÉ EXÉCUTIF ══ -->
+<div class="section" id="s15">
+  <div class="section-title"><span class="section-num">15</span>Résumé exécutif — Pour présentation à la direction</div>
+
+  <div class="env-grid">
+    <div class="env-card" style="background:#fff8f0;border:1px solid #f5cba7">
+      <div class="env-title" style="color:var(--orange)">Situation actuelle (dev)</div>
+      <ul class="dot">
+        <li>Module NC sur PC Windows local (tunnel Cloudflare)</li>
+        <li>Accessible via formation-sav.fr/NC/</li>
+        <li>PostgreSQL actif — source de vérité depuis 25/05/2026</li>
+        <li>Risque : panne PC = indisponibilité immédiate</li>
+        <li>Conservé en parallèle pour les évolutions futures</li>
+      </ul>
+    </div>
+    <div class="env-card" style="background:#f0fbf6;border:1px solid #a9dfbf">
+      <div class="env-title" style="color:var(--green)">Cible — VPS OVH Linux</div>
+      <ul class="check">
+        <li>Domaine professionnel Muller Automotive</li>
+        <li>Accessible partout — PC, tablette, smartphone</li>
+        <li>Aucune installation, aucun VPN requis</li>
+        <li>SLA 99,9 % OVH — indépendant du PC local</li>
+        <li>PostgreSQL Managed OVH — sauvegardes auto</li>
+        <li>Emails envoyés depuis @mullerautomotive.fr</li>
+      </ul>
+    </div>
+  </div>
+
+  <table style="margin-top:16px">
+    <tr><th>Décision requise</th><th>Options</th></tr>
+    <tr><td>Domaine production</td><td><code class="inline">espace-client.muller-automotive.fr</code> ou autre sous-domaine (à créer dans le DNS OVH)</td></tr>
+    <tr><td>Offre VPS</td><td>Comfort (~200 €/an, 5 ans) ou Elite (~420 €/an, 10 ans)</td></tr>
+    <tr><td>PostgreSQL OVH</td><td>Sur VPS (gratuit, gestion manuelle) ou Managed DB (~180 €/an, recommandé ISO 9001)</td></tr>
+    <tr><td>Email expéditeur NC</td><td>Compte @mullerautomotive.fr à confirmer + identifiants SMTP</td></tr>
+    <tr><td>Responsable IT déploiement</td><td>À désigner — procédure complète documentée dans ce rapport (8–13h)</td></tr>
+    <tr><td>Date de bascule</td><td>Week-end recommandé (minimise le delta de données)</td></tr>
+  </table>
+
+  <div class="box box-green" style="margin-top:16px">
+    <strong>Coût annuel production NC (hors maintenance IT)</strong>
+    VPS Comfort + PG local : ~236 €/an · VPS Elite + Managed DB : ~636 €/an<br>
+    Zéro coût d'infrastructure interne — zéro serveur physique à maintenir — zéro licence logicielle
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('nav a');
+function onScroll(){
+  let cur='';
+  sections.forEach(s=>{
+    if(window.scrollY + 120 >= s.offsetTop) cur = s.id;
+  });
+  navLinks.forEach(a=>{
+    const href = a.getAttribute('href').replace('#','');
+    a.classList.toggle('active', href===cur);
+  });
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+</script>
+</body>
+</html>

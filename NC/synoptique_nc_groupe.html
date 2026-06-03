@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Synoptique — Module NC Parent-Satellites — Muller Automotive</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:#f4f6f9;color:#212529;font-size:14px;line-height:1.5}
+/* ─── Nav ─────────────────────────────────────── */
+header{background:#0c447c;color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+header h1{font-size:15px;font-weight:700;letter-spacing:.3px}
+header span{font-size:11px;opacity:.7}
+.tabs{display:flex;gap:0;background:#fff;border-bottom:2px solid #dee2e6;overflow-x:auto;position:sticky;top:53px;z-index:99;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.tab{padding:11px 20px;font-size:12px;font-weight:600;border:none;background:none;cursor:pointer;color:#6c757d;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s}
+.tab.act{color:#0c447c;border-bottom-color:#0c447c;background:#f0f6ff}
+/* ─── Layout ──────────────────────────────────── */
+.page{display:none;padding:28px 32px;max-width:1100px;margin:0 auto}
+.page.act{display:block}
+/* ─── Typography ──────────────────────────────── */
+h2{font-size:18px;font-weight:700;color:#0c447c;margin-bottom:6px}
+h3{font-size:14px;font-weight:700;color:#212529;margin:20px 0 8px}
+p{color:#495057;margin-bottom:10px;font-size:13px}
+code{font-family:'Consolas','Cascadia Code',monospace;font-size:12px;background:#f0f4f8;padding:1px 5px;border-radius:3px;color:#0c447c}
+pre{background:#1a2332;color:#e8f0fe;padding:16px 18px;border-radius:8px;font-size:12px;line-height:1.7;overflow-x:auto;margin:10px 0}
+pre code{background:none;color:inherit;padding:0}
+/* ─── Cards ───────────────────────────────────── */
+.card{background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.card-blue{background:#E6F1FB;border-color:#85B7EB}
+.card-green{background:#EAF3DE;border-color:#8FBB5A}
+.card-amber{background:#FAEEDA;border-color:#F5BF7C}
+.card-red{background:#FCEBEB;border-color:#E6A3A3}
+.card-violet{background:#EEEDFE;border-color:#B5B0F5}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;margin:2px}
+.chip-iso{background:#cfe2ff;color:#0a3464}
+.chip-lne{background:#d1e7dd;color:#0a3622}
+.chip-oblig{background:#f8d7da;color:#721c24}
+.chip-rec{background:#fff3cd;color:#664d03}
+.chip-info{background:#e2e3e5;color:#495057}
+/* ─── Grids ───────────────────────────────────── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}}
+/* ─── Flow diagram (SVG wrapper) ──────────────── */
+.flow-wrap{background:#fff;border:1px solid #dee2e6;border-radius:10px;overflow:hidden;margin-bottom:16px}
+.flow-wrap svg{width:100%;height:auto;display:block}
+/* ─── Status diagram ──────────────────────────── */
+.state-box{display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;min-width:120px;text-align:center}
+.st-blue{background:#E6F1FB;color:#0c447c;border:2px solid #0c447c}
+.st-green{background:#EAF3DE;color:#27500A;border:2px solid #27500A}
+.st-amber{background:#FAEEDA;color:#633806;border:2px solid #633806}
+.st-red{background:#FCEBEB;color:#791F1F;border:2px solid #791F1F}
+.st-grey{background:#e9ecef;color:#495057;border:2px solid #adb5bd}
+/* ─── Reference table ─────────────────────────── */
+.ref-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+.ref-tbl th{background:#0c447c;color:#fff;padding:9px 12px;text-align:left;font-weight:600;font-size:11px}
+.ref-tbl td{padding:8px 12px;border-bottom:1px solid #e9ecef;vertical-align:top}
+.ref-tbl tr:nth-child(even) td{background:#f8f9fa}
+.ref-tbl tr:hover td{background:#E6F1FB}
+.risk-h{color:#721c24;font-weight:700}.risk-m{color:#664d03;font-weight:600}.risk-l{color:#0a3622}
+/* ─── Print ───────────────────────────────────── */
+@media print{
+  header{position:relative}.tabs{display:none}
+  .page{display:block!important;page-break-after:always}
+  body{background:#fff}
+}
+/* ─── Arrows ──────────────────────────────────── */
+.arr{display:flex;align-items:center;justify-content:center;font-size:20px;color:#0c447c;margin:4px 0}
+.arr-row{display:flex;align-items:center;gap:12px;margin:8px 0;flex-wrap:wrap}
+.arr-right{font-size:18px;color:#adb5bd}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Synoptique — Module NC Parent-Satellites</h1>
+  <span>Muller Automotive · ISO 9001:2015 · LNE · v1 — 05/05/2026</span>
+</header>
+
+<div class="tabs">
+  <button class="tab act" onclick="showTab(0)">1 · Vue d'ensemble</button>
+  <button class="tab" onclick="showTab(1)">2 · NC décalée</button>
+  <button class="tab" onclick="showTab(2)">3 · NC post-clôture</button>
+  <button class="tab" onclick="showTab(3)">4 · Statuts &amp; transitions</button>
+  <button class="tab" onclick="showTab(4)">5 · Référentiel ISO/LNE</button>
+  <button class="tab" onclick="showTab(5)">6 · Intégration technique</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET 1 — Vue d'ensemble
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page act" id="t0">
+<h2>Vue d'ensemble — Flux NC parent-satellites</h2>
+<p>Plusieurs personnes de secteurs différents signalent le même problème → le système les regroupe sous une NC parent unique. L'analyse est faite une seule fois. La clôture est en cascade.</p>
+
+<div class="flow-wrap">
+<svg viewBox="0 0 680 820" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',Arial,sans-serif">
+  <defs>
+    <marker id="arr-g"   markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L8,3.5 z" fill="#6c757d"/></marker>
+    <marker id="arr-amb" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L8,3.5 z" fill="#EF9F27"/></marker>
+    <marker id="arr-vio" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L8,3.5 z" fill="#7F77DD"/></marker>
+    <marker id="arr-grn" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L8,3.5 z" fill="#1D9E75"/></marker>
+  </defs>
+
+  <!-- ═══ ZONE 1 — Étape 1 : signalements indépendants ═══ -->
+  <text x="340" y="19" text-anchor="middle" font-size="10.5" fill="#6c757d" font-style="italic">Étape 1 — Signalements indépendants (pilotes / opérateurs)</text>
+  <!-- NC-001 -->
+  <rect x="20" y="26" width="190" height="52" rx="7" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="1"/>
+  <text x="115" y="47" text-anchor="middle" font-size="12" font-weight="700" fill="#444441">NC-001</text>
+  <text x="115" y="63" text-anchor="middle" font-size="10" fill="#6c757d">SAV — boîtier</text>
+  <!-- NC-002 -->
+  <rect x="245" y="26" width="190" height="52" rx="7" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="1"/>
+  <text x="340" y="47" text-anchor="middle" font-size="12" font-weight="700" fill="#444441">NC-002</text>
+  <text x="340" y="63" text-anchor="middle" font-size="10" fill="#6c757d">Production — idem</text>
+  <!-- NC-003…NC-N -->
+  <rect x="470" y="26" width="190" height="52" rx="7" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="1"/>
+  <text x="565" y="44" text-anchor="middle" font-size="11" font-weight="700" fill="#444441">NC-003 … NC-N</text>
+  <text x="565" y="62" text-anchor="middle" font-size="10" fill="#6c757d">Appro — fournisseur</text>
+
+  <!-- ═══ ZONE 2 — Étape 2 : Admin qualité ═══ -->
+  <text x="340" y="100" text-anchor="middle" font-size="10.5" fill="#6c757d" font-style="italic">Étape 2 — Détection similarité par l'admin qualité</text>
+  <text x="340" y="114" text-anchor="middle" font-size="10.5" fill="#6c757d" font-style="italic">(même famille, même lot, même cause probable)</text>
+  <!-- Admin box -->
+  <g onclick="showTab(0)" style="cursor:pointer" title="Vue d'ensemble">
+    <rect x="175" y="122" width="330" height="64" rx="9" fill="#FAEEDA" stroke="#EF9F27" stroke-width="1.5"/>
+    <text x="340" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="#633806">Admin qualité — console</text>
+    <text x="340" y="163" text-anchor="middle" font-size="10" fill="#633806">Sélection NC + motif + libellé groupe</text>
+  </g>
+  <!-- Flèches pointillées amber NC → Admin -->
+  <line x1="115" y1="78" x2="255" y2="122" stroke="#EF9F27" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr-amb)"/>
+  <line x1="340" y1="78" x2="340" y2="122" stroke="#EF9F27" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr-amb)"/>
+  <line x1="565" y1="78" x2="425" y2="122" stroke="#EF9F27" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr-amb)"/>
+  <!-- Flèche descendante admin → NC parent -->
+  <line x1="340" y1="186" x2="340" y2="226" stroke="#EF9F27" stroke-width="2" marker-end="url(#arr-amb)"/>
+  <!-- Texte sur la flèche -->
+  <text x="348" y="210" font-size="9" fill="#633806" font-style="italic">NC-001, NC-002, NC-003…NC-N rattachées (sans limite)</text>
+  <!-- Labels statut latéraux -->
+  <text x="12" y="204" font-size="9" fill="#633806" font-style="italic">statut →</text>
+  <text x="12" y="215" font-size="9" fill="#633806" font-style="italic">rattachee</text>
+  <text x="668" y="204" font-size="9" fill="#633806" font-style="italic" text-anchor="end">statut →</text>
+  <text x="668" y="215" font-size="9" fill="#633806" font-style="italic" text-anchor="end">rattachee</text>
+
+  <!-- ═══ ZONE 3 — NC Parent ═══ -->
+  <!-- Badge au-dessus -->
+  <rect x="279" y="218" width="122" height="17" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="1"/>
+  <text x="340" y="230" text-anchor="middle" font-size="9" font-weight="700" fill="#0C447C">◆ PARENT · 3 satellites</text>
+  <!-- NC Parent box -->
+  <g onclick="showTab(3)" style="cursor:pointer" title="Voir statuts et transitions">
+    <rect x="163" y="234" width="354" height="66" rx="9" fill="#E6F1FB" stroke="#378ADD" stroke-width="2"/>
+    <text x="340" y="258" text-anchor="middle" font-size="13" font-weight="700" fill="#0C447C">NC-PARENT-P001</text>
+    <text x="340" y="276" text-anchor="middle" font-size="10" fill="#0C447C">Défaut boîtier BT-2200 — SAV + Prod + Appro</text>
+  </g>
+  <text x="340" y="317" text-anchor="middle" font-size="10.5" fill="#6c757d" font-style="italic">Étape 3 — Analyse unique sur la NC parent</text>
+  <!-- Flèche → Analyse -->
+  <line x1="340" y1="300" x2="340" y2="330" stroke="#7F77DD" stroke-width="2" marker-end="url(#arr-vio)"/>
+
+  <!-- ═══ ZONE 4 — Analyse 5P + Ishikawa ═══ -->
+  <g onclick="showTab(4)" style="cursor:pointer" title="Référentiel ISO/LNE — §10.2.1b">
+    <rect x="163" y="335" width="354" height="58" rx="9" fill="#EEEDFE" stroke="#7F77DD" stroke-width="1.5"/>
+    <text x="340" y="358" text-anchor="middle" font-size="13" font-weight="700" fill="#3C3489">5 Pourquoi + Ishikawa</text>
+    <text x="340" y="376" text-anchor="middle" font-size="10" fill="#3C3489">Cause racine couvrant tous les périmètres</text>
+  </g>
+  <!-- Flèche → CAPA -->
+  <line x1="340" y1="393" x2="340" y2="418" stroke="#7F77DD" stroke-width="2" marker-end="url(#arr-vio)"/>
+
+  <!-- ═══ ZONE 5 — CAPA ═══ -->
+  <g onclick="showTab(4)" style="cursor:pointer" title="Référentiel ISO/LNE — §10.2.1c">
+    <rect x="163" y="423" width="354" height="58" rx="9" fill="#EEEDFE" stroke="#7F77DD" stroke-width="1.5"/>
+    <text x="340" y="446" text-anchor="middle" font-size="13" font-weight="700" fill="#3C3489">CAPA 3 types</text>
+    <text x="340" y="464" text-anchor="middle" font-size="10" fill="#3C3489">Correction + Corrective + Préventive</text>
+  </g>
+  <!-- Flèche → Clôture -->
+  <line x1="340" y1="481" x2="340" y2="506" stroke="#1D9E75" stroke-width="2" marker-end="url(#arr-grn)"/>
+
+  <!-- ═══ ZONE 6 — Clôture ═══ -->
+  <g onclick="showTab(3)" style="cursor:pointer" title="Statuts et transitions">
+    <rect x="163" y="511" width="354" height="66" rx="9" fill="#EAF3DE" stroke="#1D9E75" stroke-width="1.5"/>
+    <text x="340" y="534" text-anchor="middle" font-size="13" font-weight="700" fill="#27500A">Clôture parent + preuve efficacité</text>
+    <text x="340" y="552" text-anchor="middle" font-size="10" fill="#27500A">ISO §10.2.1e — pièce jointe obligatoire</text>
+  </g>
+  <text x="340" y="591" text-anchor="middle" font-size="10.5" fill="#6c757d" font-style="italic">Étape 4 — Clôture en cascade (automatique)</text>
+  <!-- 3 flèches vers satellites -->
+  <line x1="205" y1="577" x2="115" y2="608" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#arr-grn)"/>
+  <line x1="340" y1="577" x2="340" y2="608" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#arr-grn)"/>
+  <line x1="475" y1="577" x2="565" y2="608" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#arr-grn)"/>
+
+  <!-- ═══ ZONE 7 — Clôtures satellites ═══ -->
+  <rect x="20" y="612" width="187" height="54" rx="7" fill="#EAF3DE" stroke="#1D9E75" stroke-width="1"/>
+  <text x="113" y="633" text-anchor="middle" font-size="11" font-weight="700" fill="#27500A">NC-001 close</text>
+  <text x="113" y="650" text-anchor="middle" font-size="10" fill="#27500A">notif. J. Dupont (SAV)</text>
+
+  <rect x="246" y="612" width="187" height="54" rx="7" fill="#EAF3DE" stroke="#1D9E75" stroke-width="1"/>
+  <text x="339" y="633" text-anchor="middle" font-size="11" font-weight="700" fill="#27500A">NC-002 close</text>
+  <text x="339" y="650" text-anchor="middle" font-size="10" fill="#27500A">notif. M. Martin (Prod)</text>
+
+  <rect x="472" y="612" width="187" height="54" rx="7" fill="#EAF3DE" stroke="#1D9E75" stroke-width="1"/>
+  <text x="565" y="633" text-anchor="middle" font-size="11" font-weight="700" fill="#27500A">NC-N close</text>
+  <text x="565" y="650" text-anchor="middle" font-size="10" fill="#27500A">notif. déclarant N</text>
+
+  <!-- ═══ ZONE 8 — Bande info ═══ -->
+  <rect x="20" y="682" width="640" height="44" rx="6" fill="#F8F9FA" stroke="#dee2e6" stroke-width="1"/>
+  <text x="340" y="701" text-anchor="middle" font-size="11" fill="#495057">Journal d'audit immuable sur chaque opération — ISO §10.2.2 / LNE-4</text>
+  <text x="340" y="718" text-anchor="middle" font-size="10" fill="#6c757d">Tous les enregistrements conservés — aucune donnée supprimée</text>
+
+  <!-- ═══ ZONE 9 — Résultat final ═══ -->
+  <rect x="20" y="738" width="640" height="64" rx="10" fill="#F8F9FA" stroke="#dee2e6" stroke-width="1.5"/>
+  <text x="340" y="760" text-anchor="middle" font-size="11" font-weight="600" fill="#212529">Résultat : 1 analyse rigoureuse · 1 CAPA couvrant tous les périmètres · N déclarants informés</text>
+  <text x="340" y="778" text-anchor="middle" font-size="10" fill="#495057">Trace complète auditeur · §10.2 + §10.3 + §9.3 couverts · LNE points 1-2-3-4-5 résolus</text>
+</svg>
+</div>
+
+<div class="grid3">
+  <div class="card card-blue">
+    <h3 style="color:#0c447c;margin-top:0">Création du groupe</h3>
+    <p>Admin sélectionne ≥ 2 NC → saisit le libellé du groupe et le motif → valide.<br>Les NC passent en statut <code>rattachee</code>. Journal d'audit créé.</p>
+    <span class="chip chip-iso">§ 10.2.2</span> <span class="chip chip-lne">LNE-4</span>
+  </div>
+  <div class="card card-amber">
+    <h3 style="color:#633806;margin-top:0">Analyse unique</h3>
+    <p>5P + Ishikawa + CAPA portés par la NC parent. Les satellites pointent vers l'analyse via badge cliquable <code>→ NC-P-XXXXX</code>.</p>
+    <span class="chip chip-iso">§ 10.2.1</span> <span class="chip chip-lne">LNE-1</span> <span class="chip chip-lne">LNE-2</span>
+  </div>
+  <div class="card card-green">
+    <h3 style="color:#27500A;margin-top:0">Clôture en cascade</h3>
+    <p>Admin saisit la preuve d'efficacité (min. 30 car.) → clôture simultanée de tous les satellites → notification individuelle de chaque déclarant.</p>
+    <span class="chip chip-iso">§ 10.2.1e</span> <span class="chip chip-lne">LNE-2 bloquant</span>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET 2 — NC décalée
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="t1">
+<h2>Scénario 1 — NC décalée dans le temps (rattachement différé)</h2>
+<p>Un groupe est créé le 15 mars. Le 28 mars, un technicien SAV au Maroc signale NC-007 sur le même défaut. Le groupe est toujours ouvert.</p>
+
+<div class="flow-wrap">
+<svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <defs>
+    <marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#633806"/></marker>
+    <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0c447c"/></marker>
+    <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#27500A"/></marker>
+  </defs>
+
+  <!-- NC tardive -->
+  <rect x="20" y="110" width="140" height="60" rx="8" fill="#FCEBEB" stroke="#791F1F" stroke-width="1.5"/>
+  <text x="90" y="133" text-anchor="middle" font-size="12" font-weight="700" fill="#791F1F">NC-007</text>
+  <text x="90" y="149" text-anchor="middle" font-size="10" fill="#791F1F">SAV Maroc</text>
+  <text x="90" y="163" text-anchor="middle" font-size="9" fill="#791F1F">28 mars (+13j)</text>
+
+  <!-- Moteur similarité -->
+  <line x1="160" y1="140" x2="240" y2="140" stroke="#633806" stroke-width="2" marker-end="url(#a1)"/>
+  <rect x="240" y="95" width="180" height="90" rx="10" fill="#FAEEDA" stroke="#F5BF7C" stroke-width="2"/>
+  <text x="330" y="117" text-anchor="middle" font-size="11" font-weight="700" fill="#633806">Moteur Similarité</text>
+  <text x="330" y="133" text-anchor="middle" font-size="10" fill="#633806">famille 35 + ref 25</text>
+  <text x="330" y="147" text-anchor="middle" font-size="10" fill="#633806">lot 20 + fourn. 15</text>
+  <text x="330" y="161" text-anchor="middle" font-size="10" fill="#633806">cause 10 + période 5</text>
+  <rect x="260" y="168" width="140" height="20" rx="10" fill="#633806"/>
+  <text x="330" y="182" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">Score : 82/100 ≥ seuil 60</text>
+
+  <!-- Alerte admin -->
+  <line x1="420" y1="140" x2="510" y2="140" stroke="#633806" stroke-width="2" marker-end="url(#a1)"/>
+  <rect x="510" y="105" width="160" height="70" rx="10" fill="#FAEEDA" stroke="#F5BF7C" stroke-width="1.5"/>
+  <text x="590" y="128" text-anchor="middle" font-size="11" font-weight="700" fill="#633806">Alerte Admin</text>
+  <text x="590" y="144" text-anchor="middle" font-size="10" fill="#633806">Badge ⚠ 82%</text>
+  <text x="590" y="160" text-anchor="middle" font-size="10" fill="#633806">sur la NC-007</text>
+
+  <!-- Décision admin -->
+  <line x1="670" y1="140" x2="740" y2="140" stroke="#0c447c" stroke-width="2" marker-end="url(#a2)"/>
+  <rect x="740" y="105" width="140" height="70" rx="10" fill="#E6F1FB" stroke="#0c447c" stroke-width="2"/>
+  <text x="810" y="127" text-anchor="middle" font-size="11" font-weight="700" fill="#0c447c">Admin rattache</text>
+  <text x="810" y="143" text-anchor="middle" font-size="10" fill="#0c447c">NC-007 → NC-P-001</text>
+  <text x="810" y="160" text-anchor="middle" font-size="9" fill="#0c447c">[RATTACHEMENT TARDIF]</text>
+
+  <!-- Timeline bas -->
+  <line x1="20" y1="250" x2="880" y2="250" stroke="#dee2e6" stroke-width="1.5"/>
+  <line x1="90" y1="243" x2="90" y2="257" stroke="#0c447c" stroke-width="2"/>
+  <text x="90" y="270" text-anchor="middle" font-size="10" fill="#0c447c">15 mars</text>
+  <text x="90" y="283" text-anchor="middle" font-size="9" fill="#6c757d">Groupe créé</text>
+  <line x1="360" y1="243" x2="360" y2="257" stroke="#791F1F" stroke-width="2"/>
+  <text x="360" y="270" text-anchor="middle" font-size="10" fill="#791F1F">28 mars</text>
+  <text x="360" y="283" text-anchor="middle" font-size="9" fill="#6c757d">NC tardive</text>
+  <line x1="810" y1="243" x2="810" y2="257" stroke="#27500A" stroke-width="2"/>
+  <text x="810" y="270" text-anchor="middle" font-size="10" fill="#27500A">Clôture</text>
+  <text x="810" y="283" text-anchor="middle" font-size="9" fill="#6c757d">NC-007 couverte</text>
+  <text x="450" y="240" text-anchor="middle" font-size="9" fill="#aaa">Aucune limite de délai si groupe encore ouvert</text>
+</svg>
+</div>
+
+<div class="grid2">
+  <div class="card card-amber">
+    <h3 style="margin-top:0;color:#633806">Règles spécifiques</h3>
+    <ul style="padding-left:16px;font-size:13px;color:#495057;line-height:1.8">
+      <li>Aucune limite de délai pour rattacher à un groupe <strong>ouvert</strong></li>
+      <li>La NC tardive enrichit l'analyse — elle ne l'invalide pas</li>
+      <li>Seuil d'alerte automatique : score ≥ 60/100</li>
+      <li>Motif tracé : <code>[RATTACHEMENT TARDIF]</code> dans le journal</li>
+      <li>Notification au déclarant dès le rattachement</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Grille de score /100</h3>
+    <table style="width:100%;font-size:12px;border-collapse:collapse">
+      <tr><td style="padding:4px 6px;font-weight:600">Famille produit</td><td style="padding:4px 6px;text-align:right;color:#0c447c;font-weight:700">35 pts</td></tr>
+      <tr style="background:#f8f9fa"><td style="padding:4px 6px;font-weight:600">Référence produit</td><td style="padding:4px 6px;text-align:right;color:#0c447c;font-weight:700">25 pts</td></tr>
+      <tr><td style="padding:4px 6px;font-weight:600">Lot de production</td><td style="padding:4px 6px;text-align:right;color:#0c447c;font-weight:700">20 pts</td></tr>
+      <tr style="background:#f8f9fa"><td style="padding:4px 6px;font-weight:600">Fournisseur</td><td style="padding:4px 6px;text-align:right;color:#0c447c;font-weight:700">15 pts</td></tr>
+      <tr><td style="padding:4px 6px;font-weight:600">Type de cause</td><td style="padding:4px 6px;text-align:right;color:#0c447c;font-weight:700">10 pts</td></tr>
+      <tr style="background:#f8f9fa"><td style="padding:4px 6px;font-weight:600">Même période (mois)</td><td style="padding:4px 6px;text-align:right;color:#0c447c;font-weight:700">5 pts</td></tr>
+      <tr style="border-top:2px solid #0c447c"><td style="padding:6px 6px;font-weight:700">TOTAL max</td><td style="padding:6px 6px;text-align:right;font-weight:800;color:#0c447c">100 pts</td></tr>
+    </table>
+    <p style="margin-top:8px;font-size:11px;color:#633806">⚠ Seuil d'alerte automatique : <strong>60/100</strong></p>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET 3 — NC post-clôture
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="t2">
+<h2>Scénario 2 — NC après clôture parent (résiduel ou récidive)</h2>
+<p>Le groupe NC-P-001 est clôturé le 20 avril. Le 5 mai, un client signale le même défaut sur du matériel expédié en mars. <strong>La date de fabrication du matériel est la clé de décision.</strong></p>
+
+<div class="flow-wrap">
+<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <defs>
+    <marker id="b1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#495057"/></marker>
+    <marker id="b2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#27500A"/></marker>
+    <marker id="b3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#791F1F"/></marker>
+    <marker id="b4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#633806"/></marker>
+  </defs>
+
+  <!-- NC similaire -->
+  <rect x="20" y="140" width="120" height="55" rx="8" fill="#FCEBEB" stroke="#791F1F" stroke-width="1.5"/>
+  <text x="80" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#791F1F">NC similaire</text>
+  <text x="80" y="178" text-anchor="middle" font-size="10" fill="#791F1F">après clôture</text>
+
+  <!-- Groupe clôturé -->
+  <rect x="20" y="40" width="120" height="55" rx="8" fill="#EAF3DE" stroke="#27500A" stroke-width="1.5"/>
+  <text x="80" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="#27500A">NC-P-001</text>
+  <text x="80" y="79" text-anchor="middle" font-size="10" fill="#27500A">Clôturé 20/04</text>
+  <text x="80" y="93" text-anchor="middle" font-size="9" fill="#27500A">CAPA validée</text>
+
+  <!-- Analyse -->
+  <line x1="140" y1="168" x2="230" y2="168" stroke="#495057" stroke-width="2" marker-end="url(#b1)"/>
+  <line x1="140" y1="67" x2="210" y2="120" stroke="#27500A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#b2)"/>
+
+  <rect x="230" y="120" width="175" height="96" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+  <text x="317" y="145" text-anchor="middle" font-size="12" font-weight="700" fill="#212529">Analyser</text>
+  <text x="317" y="161" text-anchor="middle" font-size="11" fill="#212529">date fabrication</text>
+  <text x="317" y="177" text-anchor="middle" font-size="11" fill="#212529">vs date clôture</text>
+  <rect x="250" y="185" width="130" height="22" rx="11" fill="#0c447c"/>
+  <text x="315" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">analyserPostCloture()</text>
+
+  <!-- Bifurcation -->
+  <line x1="405" y1="150" x2="450" y2="100" stroke="#27500A" stroke-width="2" marker-end="url(#b2)"/>
+  <text x="427" y="118" text-anchor="middle" font-size="10" fill="#27500A" font-weight="600">ANTÉRIEURE</text>
+  <line x1="405" y1="168" x2="450" y2="240" stroke="#791F1F" stroke-width="2" marker-end="url(#b3)"/>
+  <text x="427" y="218" text-anchor="middle" font-size="10" fill="#791F1F" font-weight="600">POSTÉRIEURE</text>
+  <line x1="405" y1="168" x2="450" y2="168" stroke="#633806" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#b4)"/>
+  <text x="428" y="163" text-anchor="middle" font-size="9" fill="#633806">INCONNUE</text>
+
+  <!-- CAS A — Résiduel -->
+  <rect x="450" y="55" width="200" height="100" rx="10" fill="#EAF3DE" stroke="#27500A" stroke-width="2.5"/>
+  <text x="550" y="80" text-anchor="middle" font-size="12" font-weight="800" fill="#27500A">CAS A — RÉSIDUEL</text>
+  <text x="550" y="96" text-anchor="middle" font-size="10" fill="#27500A">Nouveau groupe §8.7</text>
+  <text x="550" y="112" text-anchor="middle" font-size="10" fill="#27500A">CAPA d'origine VALIDE</text>
+  <text x="550" y="128" text-anchor="middle" font-size="10" fill="#27500A">est_residuel = true</text>
+  <text x="550" y="144" text-anchor="middle" font-size="9" fill="#6c757d">CAPA résiduel : rappel/remplacement terrain</text>
+
+  <!-- CAS B — Récidive -->
+  <rect x="450" y="200" width="200" height="110" rx="10" fill="#FCEBEB" stroke="#791F1F" stroke-width="2.5"/>
+  <text x="550" y="225" text-anchor="middle" font-size="12" font-weight="800" fill="#791F1F">CAS B — RÉCIDIVE</text>
+  <text x="550" y="241" text-anchor="middle" font-size="10" fill="#791F1F">Réouverture §10.2.1d</text>
+  <text x="550" y="257" text-anchor="middle" font-size="10" fill="#791F1F">LNE-2 invalidée + archivée</text>
+  <text x="550" y="273" text-anchor="middle" font-size="10" fill="#791F1F">Nouvelle analyse 5P</text>
+  <text x="550" y="289" text-anchor="middle" font-size="9" fill="#6c757d">Statut : en_traitement_reouvert</text>
+
+  <!-- CAS C — Indéterminé -->
+  <rect x="450" y="155" width="200" height="35" rx="8" fill="#FAEEDA" stroke="#F5BF7C" stroke-width="1.5"/>
+  <text x="550" y="170" text-anchor="middle" font-size="11" font-weight="700" fill="#633806">INDÉTERMINÉ</text>
+  <text x="550" y="183" text-anchor="middle" font-size="9" fill="#633806">Vérifier N° lot avant toute décision</text>
+
+  <!-- Fenêtre de veille -->
+  <rect x="695" y="55" width="190" height="255" rx="10" fill="#EEEDFE" stroke="#B5B0F5" stroke-width="1.5"/>
+  <text x="790" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#3C3489">Fenêtre de veille</text>
+  <text x="790" y="94" text-anchor="middle" font-size="10" fill="#3C3489">post-clôture</text>
+  <line x1="710" y1="103" x2="875" y2="103" stroke="#B5B0F5" stroke-width="1"/>
+  <text x="790" y="120" text-anchor="middle" font-size="10" fill="#3C3489">critique : 180 jours</text>
+  <text x="790" y="136" text-anchor="middle" font-size="10" fill="#3C3489">majeure : 90 jours</text>
+  <text x="790" y="152" text-anchor="middle" font-size="10" fill="#3C3489">mineure : 30 jours</text>
+  <line x1="710" y1="162" x2="875" y2="162" stroke="#B5B0F5" stroke-width="1"/>
+  <text x="790" y="179" text-anchor="middle" font-size="10" fill="#3C3489">Si NC similaire dans</text>
+  <text x="790" y="195" text-anchor="middle" font-size="10" fill="#3C3489">la fenêtre :</text>
+  <rect x="715" y="202" width="160" height="38" rx="6" fill="#3C3489"/>
+  <text x="795" y="218" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">⚠ Résiduel probable</text>
+  <text x="795" y="232" text-anchor="middle" font-size="9" fill="#ddd">Badge amber sur la NC</text>
+  <text x="790" y="260" text-anchor="middle" font-size="9" fill="#6c757d">Configurable par gravité</text>
+  <text x="790" y="274" text-anchor="middle" font-size="9" fill="#6c757d">§10.3 · LNE-3</text>
+  <text x="790" y="292" text-anchor="middle" font-size="9" fill="#6c757d">openVeille()</text>
+</svg>
+</div>
+
+<div class="grid2">
+  <div class="card card-green">
+    <h3 style="margin-top:0;color:#27500A">CAS A — Résiduel §8.7</h3>
+    <p>Matériel fabriqué <strong>avant</strong> la date de correction. Le défaut était déjà en circulation lors de la CAPA. La CAPA est valide et efficace.</p>
+    <p><strong>Action :</strong> Créer un groupe résiduel lié au groupe clôturé (<code>est_residuel=true</code>, <code>parent_clos_reference</code>). CAPA propres : rappel, remplacement terrain, surveillance.</p>
+    <span class="chip chip-iso">§ 8.7</span>
+  </div>
+  <div class="card card-red">
+    <h3 style="margin-top:0;color:#791F1F">CAS B — Récidive §10.2.1d</h3>
+    <p>Matériel fabriqué <strong>après</strong> la correction. Le défaut réapparaît sur de la production post-CAPA. La CAPA est inefficace.</p>
+    <p><strong>Action :</strong> Réouvrir le groupe. LNE-2 invalidée et archivée. Nouvelle analyse 5P obligatoire depuis la cause racine. Motif ≥ 20 caractères.</p>
+    <span class="chip chip-iso">§ 10.2.1d</span> <span class="chip chip-lne">LNE-2 invalidée</span>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET 4 — Statuts et transitions
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="t3">
+<h2>Statuts et transitions</h2>
+
+<div class="grid2">
+<div>
+  <h3>NC Satellite</h3>
+  <div class="flow-wrap" style="padding:20px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div class="state-box st-blue">en_traitement</div>
+      <div style="display:flex;gap:16px;align-items:center">
+        <div style="text-align:center">
+          <div style="font-size:10px;color:#633806;margin-bottom:4px">Admin rattache (RG-01)</div>
+          <div class="arr">↓</div>
+          <div class="state-box st-amber">rattachee</div>
+          <div style="font-size:10px;color:#6c757d;margin-top:4px">Verrouillé tant que parent ouverte (RG-05)</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:flex-start;margin-top:8px">
+        <div style="text-align:center">
+          <div style="font-size:10px;color:#27500A;margin-bottom:4px">Clôture parent (RG-06)</div>
+          <div class="arr">↓</div>
+          <div class="state-box st-green">clos</div>
+          <div style="font-size:10px;color:#6c757d;margin-top:4px">cloture_via_parent</div>
+        </div>
+        <div style="text-align:center;margin-top:30px">
+          <div style="font-size:10px;color:#633806">Admin détache (RG-10)</div>
+          <div style="font-size:18px;color:#633806">↙</div>
+          <div class="state-box st-blue" style="font-size:11px">en_traitement</div>
+          <div style="font-size:10px;color:#6c757d">Redevient libre</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div>
+  <h3>NC Parent</h3>
+  <div class="flow-wrap" style="padding:20px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div class="state-box st-blue">en_traitement</div>
+      <div style="font-size:10px;color:#27500A">Admin clôture + preuve (RG-07)</div>
+      <div class="arr">↓</div>
+      <div class="state-box st-green">close</div>
+      <div style="font-size:10px;color:#6c757d;margin-bottom:8px">Satellites clôturés en cascade</div>
+      <div style="display:flex;gap:16px">
+        <div style="text-align:center">
+          <div style="font-size:10px;color:#791F1F">Récidive détectée</div>
+          <div style="font-size:10px;color:#791F1F">§10.2.1d</div>
+          <div class="arr">↓</div>
+          <div class="state-box st-red" style="font-size:10px">en_traitement_reouvert</div>
+          <div style="font-size:10px;color:#791F1F;margin-top:4px">LNE-2 invalidée</div>
+          <div style="font-size:10px;color:#791F1F">Nouvelle analyse 5P</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:10px;color:#633806">Résiduel §8.7</div>
+          <div class="arr">↓</div>
+          <div class="state-box st-amber" style="font-size:10px">Nouveau groupe résiduel</div>
+          <div style="font-size:10px;color:#495057;margin-top:4px">est_residuel=true</div>
+          <div style="font-size:10px;color:#495057">CAPA origin. valide</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<h3>Qui peut faire quoi ?</h3>
+<table class="ref-tbl">
+<thead><tr><th>Action</th><th>nc_admin</th><th>nc_chef_produit</th><th>nc_lecteur</th></tr></thead>
+<tbody>
+<tr><td>Créer un groupe parent</td><td style="color:#27500A;font-weight:700">✅ Oui</td><td style="color:#aaa">Voir badge</td><td style="color:#aaa">Voir badge</td></tr>
+<tr><td>Ajouter / détacher un satellite</td><td style="color:#27500A;font-weight:700">✅ Oui</td><td style="color:#aaa">—</td><td style="color:#aaa">—</td></tr>
+<tr><td>Clôturer le groupe (cascade)</td><td style="color:#27500A;font-weight:700">✅ Oui</td><td style="color:#aaa">—</td><td style="color:#aaa">—</td></tr>
+<tr><td>Rattachement tardif</td><td style="color:#27500A;font-weight:700">✅ Oui</td><td style="color:#aaa">—</td><td style="color:#aaa">—</td></tr>
+<tr><td>Réouvrir un groupe (récidive)</td><td style="color:#27500A;font-weight:700">✅ Oui</td><td style="color:#aaa">—</td><td style="color:#aaa">—</td></tr>
+<tr><td>Créer groupe résiduel</td><td style="color:#27500A;font-weight:700">✅ Oui</td><td style="color:#aaa">—</td><td style="color:#aaa">—</td></tr>
+<tr><td>Configurer fenêtres de veille</td><td style="color:#27500A;font-weight:700">✅ Oui</td><td style="color:#aaa">—</td><td style="color:#aaa">—</td></tr>
+<tr><td>Consulter groupes / journal</td><td style="color:#27500A;font-weight:700">✅ Oui</td><td style="color:#27500A;font-weight:700">✅ Oui (lecture)</td><td style="color:#27500A;font-weight:700">✅ Oui (lecture)</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET 5 — Référentiel ISO/LNE
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="t4">
+<h2>Référentiel ISO 9001:2015 et LNE — Module NC Parent-Satellites</h2>
+
+<table class="ref-tbl">
+<thead><tr><th>Code</th><th>Exigence</th><th>Champ / Mécanisme</th><th>Niveau</th><th>Conséquence si absent</th></tr></thead>
+<tbody>
+<tr><td><code>§ 5.3</code></td><td>Rôles, responsabilités et autorités</td><td>Pilote attribué nominatif, responsable action CAPA (email), droit de réponse par rôle, matrice des droits système</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-m">Si le responsable n'a pas les droits système pour répondre à son action → double écart §5.3 + §10.2.1c (système inadapté)</td></tr>
+<tr><td><code>§ 10.2.1c</code></td><td>Actions correctives / préventives + droit réponse</td><td>CAPA 3 types avec responsable nommé + réponse responsable tracée (chef produit / pilote)</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">Si réponse non tracée → auditeur LNE considère l'action non menée. Si droit absent → §5.3 + §10.2.1c simultanément</td></tr>
+<tr><td><code>§ 4.4</code></td><td>Approche processus</td><td>Processus ISO + groupe multi-périmètre</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-m">NC sans processus = audit §4.4 impossible</td></tr>
+<tr><td><code>§ 6.1</code></td><td>Risques et opportunités</td><td>Score risque 4 axes, gravité NC parent = max satellites</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-m">NC mineure si cotation absente</td></tr>
+<tr><td><code>§ 7.4</code></td><td>Communication interne</td><td>Notifications rattachement + clôture cascade</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-l">Observation si canal non documenté</td></tr>
+<tr><td><code>§ 8.2</code></td><td>Communication client</td><td>Notification client à la clôture (NC SAV/garantie)</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-m">Écart §8.2 sur NC SAV sans notif</td></tr>
+<tr><td><code>§ 8.7</code></td><td>Maîtrise sorties NC</td><td>Groupe résiduel pour matériel antérieur à la correction</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">NC majeure si résiduel traité en récidive ou ignoré</td></tr>
+<tr><td><code>§ 9.1</code></td><td>Surveillance et mesure</td><td>KPI récurrence, taux efficacité CAPA, coût non-qualité</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-m">Écart si métriques absentes</td></tr>
+<tr><td><code>§ 9.1.2</code></td><td>Satisfaction client</td><td>Confirmation satisfaction à la clôture</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-m">Écart si aucune mesure satisfaction</td></tr>
+<tr><td><code>§ 9.3</code></td><td>Revue de direction</td><td>Rapport PDF incluant groupes NC + KPI récurrence</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">NC majeure si revue sans données NC structurées</td></tr>
+<tr><td><code>§ 10.2.1a</code></td><td>Correction immédiate</td><td>1er type CAPA — ≤ 24h critique</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">Point systématiquement contrôlé</td></tr>
+<tr><td><code>§ 10.2.1b</code></td><td>Analyse cause racine</td><td>5P en cascade, Ishikawa 6M</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">NC mineure si cause = catégorie (LNE-1)</td></tr>
+<tr><td><code>§ 10.2.1c</code></td><td>Actions correctives/préventives</td><td>CAPA 2e et 3e types avec responsable + échéance</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">Motif n°1 écart audit</td></tr>
+<tr><td><code>§ 10.2.1d</code></td><td>Vérification efficacité CAPA</td><td>Preuve efficacité bloquante + réouverture si récidive post-correction</td><td><span class="chip chip-oblig" style="background:#f8d7da;color:#721c24;border:1px solid #f1aeb5">Bloquant</span></td><td class="risk-h">NC mineure certaine si absent — LNE-2</td></tr>
+<tr><td><code>§ 10.2.2</code></td><td>Conservation documentée</td><td>Journal d'audit immuable, horodaté, min. 10 ans</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">Toute suppression = NC majeure</td></tr>
+<tr><td><code>§ 10.3</code></td><td>Amélioration continue</td><td>KPI récurrence, fenêtres de veille, alerte systémique</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-m">Observation si pas de boucle amélioration</td></tr>
+<tr style="background:#d1e7dd20"><td><code>LNE-1</code></td><td>Cause racine réelle</td><td>5P cascade + Ishikawa</td><td><span class="chip chip-lne" style="background:#f8d7da;color:#721c24">Bloquant</span></td><td class="risk-h">NC mineure quasi-certaine si cause = catégorie</td></tr>
+<tr style="background:#d1e7dd20"><td><code>LNE-2</code></td><td>Preuve efficacité CAPA</td><td>Pièce jointe obligatoire + invalidation si récidive</td><td><span class="chip chip-lne" style="background:#f8d7da;color:#721c24">Bloquant</span></td><td class="risk-h">Motif n°1 observation LNE</td></tr>
+<tr style="background:#d1e7dd20"><td><code>LNE-3</code></td><td>Récurrence systémique</td><td>Alerte ≥ 2/6 mois, groupe multi-périmètre = signal</td><td><span class="chip chip-lne">Attendu</span></td><td class="risk-m">Observation forte si famille récidivante sans plan</td></tr>
+<tr style="background:#d1e7dd20"><td><code>LNE-4</code></td><td>Journal d'audit immuable</td><td>Qui/quoi/quand sur chaque opération groupe</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">NC majeure si modif rétroactive possible</td></tr>
+<tr style="background:#d1e7dd20"><td><code>LNE-5</code></td><td>Délai maximal analyse</td><td>NC satellite ≠ NC dormante — lien parent tracé</td><td><span class="chip chip-lne">Attendu</span></td><td class="risk-m">Observation NC sans cause &gt; 10 jours</td></tr>
+<tr style="background:#d1e7dd20"><td><code>LNE-6</code></td><td>Lien satellite → parent</td><td>Badge cliquable → analyse complète visible en audit</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-m">NC satellite sans lien = rupture traçabilité LNE-4</td></tr>
+<tr style="background:#d1e7dd20"><td><code>LNE-7</code></td><td>Résiduel vs Récidive</td><td>Date fabrication = preuve décisive</td><td><span class="chip chip-oblig">Obligatoire</span></td><td class="risk-h">NC majeure probable si confusion résiduel/récidive</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET 6 — Intégration technique
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="t5">
+<h2>Intégration technique</h2>
+
+<h3>Matrice des droits CAPA par rôle — ISO §5.3</h3>
+<table class="ref-tbl" style="margin-bottom:20px">
+<thead><tr><th>Rôle système</th><th>Voir CAPA</th><th>Créer action</th><th>Répondre si assigné</th><th>Valider efficacité</th><th>Clôturer groupe</th></tr></thead>
+<tbody>
+<tr><td><code>nc_lecteur</code></td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td><code>nc_chef_produit</code></td><td>✅</td><td>❌</td><td>✅ <small>(§5.3)</small></td><td>❌</td><td>❌</td></tr>
+<tr><td><code>nc_pilote_attribue</code></td><td>✅</td><td>❌</td><td>✅ <small>(§5.3)</small></td><td>❌</td><td>❌</td></tr>
+<tr style="background:#e8f5e9"><td><code>nc_admin</code></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+</tbody></table>
+<p style="font-size:12px;color:#6c757d;margin-bottom:20px">La vérification <code>peutRepondreAction(action, email)</code> dans <code>nc_droits_pilote.js</code> implémente cette matrice côté client. La vérification serveur reste dans server.js (route PUT /api/nc/:numero).</p>
+
+<div class="grid2">
+<div>
+  <h3>Ordre de chargement</h3>
+  <pre><code>&lt;!-- Dans console.html, avant &lt;/body&gt; --&gt;
+&lt;script src="nc_parent_satellites.js"&gt;&lt;/script&gt;
+&lt;script src="nc_parent_avance.js"&gt;&lt;/script&gt;
+&lt;script src="nc_droits_pilote.js"&gt;&lt;/script&gt;
+&lt;script src="nc_liste_accordeon.js"&gt;&lt;/script&gt;
+
+&lt;!-- NCAide (inline dans console.html)
+     fournit window.NCAide --&gt;</code></pre>
+
+  <h3>Prérequis localStorage</h3>
+  <pre><code>// Définis par le système d'auth existant
+session.role   // 'nc_admin' pour l'accès
+session.email  // identifiant admin
+session.name   // fallback si pas d'email</code></pre>
+
+  <h3>4 boutons FAB admin</h3>
+  <pre><code>NcParent.open()              // Regrouper NC (vert)
+NcParentAvance.openTardive() // NC tardive (amber)
+NcParentAvance.openPostCloture() // Après clôture (rouge)
+NcParentAvance.openVeille()  // Fenêtres (violet)</code></pre>
+</div>
+<div>
+  <h3>API publique — NcParent</h3>
+  <pre><code>// Créer un groupe
+NcParent.creerGroupe({
+  label: 'Défaut boîtier lot F24-09',
+  nc_ids: ['NC-001', 'NC-002', 'NC-003'],
+  motif: 'Même symptôme SAV + Prod',
+  admin_email: 'admin@muller.fr'
+});
+
+// Clôturer en cascade
+NcParent.cloturerGroupe({
+  parent_id: 'NC-P-00001',
+  preuve: 'Aucune récidive sur 3 mois, stats jointes',
+  admin_email: 'admin@muller.fr'
+});
+
+// Données
+NcParent.getGroupes()         // [] tous les groupes
+NcParent.getSatellites(pid)   // [] NC d'un groupe
+NcParent.getJournal()         // [] journal immuable</code></pre>
+
+  <h3>API publique — NcParentAvance</h3>
+  <pre><code>// Rattachement tardif
+NcParentAvance.rattacherTardif({
+  nc_id: 'NC-007', parent_id: 'NC-P-00001',
+  motif_tardif: 'Signalement reçu du Maroc +13j'
+});
+
+// Analyser post-clôture
+const r = NcParentAvance.analyserPostCloture({
+  nc_id: 'NC-012', parent_clos_id: 'NC-P-00001',
+  date_fabrication_nc: '2026-03-15' // avant cloture
+});
+// r.type = 'residuel' | 'recidive_probable' | 'indetermine'
+
+// Moteur similarité
+NcParentAvance.scanSimilarite(nc) // → [{parent, score}]
+
+// Configurer fenêtres
+NcParentAvance.configurerVeille({ gravite:'critique', jours:180 });</code></pre>
+</div>
+</div>
+
+<h3>Modèle de données — Nouvelles colonnes (si migration vers SQL)</h3>
+<pre><code>-- Table nc_groupes (nouvelle)
+CREATE TABLE nc_groupes (
+  id                    VARCHAR(15) PRIMARY KEY,  -- 'NC-P-00001'
+  groupe_label          VARCHAR(200) NOT NULL,
+  gravite               ENUM('mineure','majeure','critique'),
+  statut                ENUM('en_traitement','close','en_traitement_reouvert'),
+  groupe_created_at     DATETIME NOT NULL,
+  groupe_created_by     VARCHAR(100),
+  groupe_motif          TEXT,
+  est_residuel          BOOLEAN DEFAULT FALSE,
+  parent_clos_reference VARCHAR(15),              -- FK → nc_groupes.id
+  preuve_efficacite     TEXT,
+  clos_le               DATETIME,
+  clos_par              VARCHAR(100),
+  reouvert_le           DATETIME,
+  preuve_anterieure     JSON                      -- LNE-2 archivée
+);
+
+-- Table nc_satellites (relation NC ↔ groupe)
+CREATE TABLE nc_satellites (
+  nc_numero             VARCHAR(20) NOT NULL,
+  parent_id             VARCHAR(15) NOT NULL,     -- FK → nc_groupes.id
+  rattachement_date     DATETIME NOT NULL,
+  rattachement_by       VARCHAR(100),
+  rattachement_motif    TEXT,
+  cloture_via_parent    VARCHAR(15),
+  PRIMARY KEY (nc_numero, parent_id)
+);
+
+-- Table nc_journal_groupes (audit immuable)
+CREATE TABLE nc_journal_groupes (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  timestamp   DATETIME NOT NULL,
+  action      VARCHAR(50) NOT NULL,
+  parent_id   VARCHAR(15),
+  nc_id       VARCHAR(20),
+  by_user     VARCHAR(100),
+  motif       TEXT,
+  extra_json  JSON                                -- données variables
+);
+
+-- Ajout colonnes table nc existante
+ALTER TABLE nc ADD COLUMN is_satellite BOOLEAN DEFAULT FALSE;
+ALTER TABLE nc ADD COLUMN parent_id    VARCHAR(15);
+ALTER TABLE nc ADD COLUMN parent_label VARCHAR(200);</code></pre>
+
+<h3>Stub de remplacement Store → API REST (production OVH)</h3>
+<pre><code>// Dans nc_parent_satellites.js, remplacer Store.addGroup par :
+async function creerGroupeRemote(groupeData) {
+  const res = await fetch('/api/nc-groupes', {
+    method: 'POST',
+    headers: { ...authHdr() },
+    body: JSON.stringify(groupeData)
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json();
+}
+
+// Routes API à créer dans server.js :
+// POST   /api/nc-groupes              → creerGroupe
+// PATCH  /api/nc-groupes/:id/satellites → ajouterSatellites
+// DELETE /api/nc-groupes/:id/satellites/:ncId → detacherSatellite
+// POST   /api/nc-groupes/:id/cloture  → cloturerGroupe
+// POST   /api/nc-groupes/:id/reouvrir → reouvrir
+// POST   /api/nc-groupes/residuels    → creerGroupeResiduel
+// GET    /api/nc-groupes              → getGroupes
+// GET    /api/nc-journal-groupes      → getJournal</code></pre>
+
+<div class="card card-blue" style="margin-top:16px">
+  <strong style="font-size:13px">Risques audit à surveiller</strong>
+  <ul style="padding-left:16px;font-size:12px;color:#495057;margin-top:8px;line-height:1.9">
+    <li>NC satellite sans lien parent tracé → <span class="chip chip-lne">LNE-4</span> NC mineure probable</li>
+    <li>Groupe résiduel sans date fabrication documentée → <span class="chip chip-iso">§ 8.7</span> observation</li>
+    <li>Réouverture sans motif ≥ 20 caractères → <span class="chip chip-iso">§ 10.2.1d</span> NC mineure</li>
+    <li>Fenêtre de veille non configurée sur NC critique → <span class="chip chip-iso">§ 10.3</span> observation</li>
+  </ul>
+</div>
+</div>
+
+<script>
+function showTab(n) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('act', i === n));
+  document.querySelectorAll('.page').forEach((p, i) => p.classList.toggle('act', i === n));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

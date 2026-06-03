@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Géométrie des trains roulants — Trains Roulants</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Righteous&family=Nunito:wght@400;700;800;900&display=swap');
+:root{--rail:#FFD600;--rail2:#FF6B35;--sky:#0A0E2A;--track:#1C2340;--green:#00E676;--red:#FF3D5A;--blue:#29B6F6;--c1:#4A148C;--c2:#B71C1C;--c3:#1A237E;--c4:#1B5E20;--white:#F0F4FF}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--sky);color:var(--white);min-height:100vh}
+body::after{content:'';position:fixed;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rail),var(--rail2),var(--rail));pointer-events:none;z-index:9999}
+.screen{display:none;min-height:100vh;padding:20px;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+.righty{font-family:'Righteous',cursive}
+.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:2px;color:rgba(240,244,255,.45);margin-bottom:4px}
+.btn{padding:15px 36px;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:900;cursor:pointer;transition:transform .15s;letter-spacing:.5px;text-transform:uppercase}
+.btn:hover:not(:disabled){transform:translateY(-2px) scale(1.04)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-y{background:var(--rail);color:var(--sky);box-shadow:0 4px 18px rgba(255,214,0,.4)}
+.btn-b{background:var(--blue);color:var(--sky);box-shadow:0 4px 18px rgba(41,182,246,.35)}
+.btn-g{background:var(--green);color:var(--sky)}
+.btn-o{background:transparent;color:var(--white);border:2px solid rgba(240,244,255,.25)}
+.btn-qr{background:transparent;color:var(--rail);border:2px solid var(--rail);padding:8px 18px;font-size:.82rem;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:900;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;margin-top:8px}
+.panel{width:100%;max-width:920px;background:var(--track);border-radius:20px;padding:28px;border:1px solid rgba(255,255,255,.07);position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rail),var(--rail2))}
+.hbar{width:100%;max-width:920px;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.04);border-radius:14px;padding:14px 22px;margin-bottom:20px;gap:12px;flex-wrap:wrap;border:1px solid rgba(255,214,0,.15)}
+.prog-wrap{width:100%;max-width:920px;height:5px;background:rgba(255,255,255,.08);border-radius:3px;margin-bottom:20px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--rail),var(--rail2));border-radius:3px;transition:width .5s}
+.ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:920px;margin-bottom:18px}
+.ans-card{padding:18px 16px;border-radius:16px;font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:12px;border:3px solid transparent;position:relative;overflow:hidden;transition:border-color .2s,opacity .2s}
+.ans-card:nth-child(1){background:var(--c1)}.ans-card:nth-child(2){background:var(--c2)}.ans-card:nth-child(3){background:var(--c3)}.ans-card:nth-child(4){background:var(--c4)}
+.ans-card .pct{position:absolute;right:14px;font-size:1.1rem;font-weight:900}
+.ans-card .bar{position:absolute;bottom:0;left:0;height:4px;background:rgba(255,255,255,.35);transition:width .6s}
+.ans-card.ok{border-color:var(--green)!important;box-shadow:0 0 18px rgba(0,230,118,.35)}.ans-card.ko{opacity:.38}
+.timer-ring{width:76px;height:76px;position:relative;flex-shrink:0}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Righteous',cursive;font-size:1.3rem;color:var(--rail)}
+.lb-row{display:flex;align-items:center;gap:14px;padding:13px 18px;margin-bottom:7px;background:var(--track);border-radius:12px;border:1px solid rgba(255,255,255,.06);animation:slideIn .4s ease both}
+@keyframes slideIn{from{transform:translateX(-24px);opacity:0}to{transform:translateX(0);opacity:1}}
+.lb-rank{font-family:'Righteous',cursive;font-size:1.3rem;width:32px;text-align:center}
+.lb-name{flex:1;font-weight:800;font-size:1rem}
+.lb-bar-wrap{width:90px;background:rgba(255,255,255,.1);border-radius:4px;height:7px}
+.lb-bar{height:7px;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .7s}
+.lb-score{font-family:'Righteous',cursive;font-size:1.1rem;color:var(--green)}
+.s-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:600px}
+.s-btn{padding:22px 14px;border-radius:16px;border:3px solid transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;color:white;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .12s,border-color .2s}
+.s-btn:nth-child(1){background:var(--c1)}.s-btn:nth-child(2){background:var(--c2)}.s-btn:nth-child(3){background:var(--c3)}.s-btn:nth-child(4){background:var(--c4)}
+.s-btn:hover:not(:disabled){transform:scale(1.05);filter:brightness(1.15)}.s-btn:disabled{cursor:not-allowed}
+.s-btn.ok{border-color:var(--green);box-shadow:0 0 22px rgba(0,230,118,.4);animation:pop .4s}.s-btn.ko{border-color:var(--red);box-shadow:0 0 22px rgba(255,61,90,.35);animation:shk .35s}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.fb{display:inline-block;padding:10px 26px;border-radius:50px;font-size:1.3rem;font-weight:900;margin-top:14px}
+.fb.ok{background:rgba(0,230,118,.15);color:var(--green);border:2px solid var(--green)}.fb.ko{background:rgba(255,61,90,.15);color:var(--red);border:2px solid var(--red)}
+.pts-pop{font-family:'Righteous',cursive;font-size:1.8rem;color:var(--rail);animation:floatUp .9s ease forwards;display:block;margin-top:6px}
+@keyframes floatUp{from{transform:translateY(0);opacity:1}to{transform:translateY(-28px);opacity:0}}
+.dots{display:flex;gap:8px;justify-content:center;margin:20px 0}
+.dot{width:13px;height:13px;border-radius:50%;animation:bce 1.2s ease-in-out infinite}
+.dot:nth-child(1){background:var(--rail)}.dot:nth-child(2){background:var(--blue);animation-delay:.2s}.dot:nth-child(3){background:var(--green);animation-delay:.4s}
+@keyframes bce{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.join-box{background:var(--track);border-radius:22px;padding:40px;max-width:430px;width:100%;border:1px solid rgba(41,182,246,.2);text-align:center}
+.field{width:100%;padding:13px 18px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);border-radius:11px;color:var(--white);font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:14px;text-align:center;letter-spacing:2px;transition:border-color .2s}
+.field:focus{outline:none;border-color:var(--blue)}.field::placeholder{color:rgba(240,244,255,.3);letter-spacing:1px}
+.score-bar{width:100%;max-width:600px;display:flex;justify-content:space-between;align-items:center;background:var(--track);border-radius:50px;padding:10px 20px;margin-bottom:16px;border:1px solid rgba(255,255,255,.07)}
+.wait-card{background:var(--track);border-radius:20px;padding:28px 24px;max-width:440px;width:100%;text-align:center;border:1px solid rgba(255,255,255,.07)}
+.wait-code{font-family:'Righteous',cursive;font-size:3.5rem;color:var(--rail);letter-spacing:6px;text-shadow:0 0 30px rgba(255,214,0,.3);margin:10px 0}
+.train-anim{font-size:64px;display:block;animation:trainRock 2.5s ease-in-out infinite}
+@keyframes trainRock{0%,100%{transform:translateX(0) rotate(-2deg)}50%{transform:translateX(7px) rotate(2deg)}}
+.trophy{font-size:72px;animation:spinIn .8s ease}
+@keyframes spinIn{from{transform:rotate(-180deg) scale(0)}to{transform:rotate(0) scale(1)}}
+#qr-modal{display:none;position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.85);align-items:center;justify-content:center}
+.qr-box{background:#0d1226;border:2px solid var(--rail);border-radius:24px;padding:36px 40px;text-align:center;max-width:360px;width:90%;box-shadow:0 0 60px rgba(255,214,0,.2)}
+.qr-code-big{font-family:'Righteous',cursive;font-size:2.8rem;color:var(--sky);background:var(--rail);padding:8px 28px;border-radius:12px;display:inline-block;letter-spacing:4px;margin:16px 0}
+.ctrl{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+@media(max-width:520px){.ans-grid,.s-grid{grid-template-columns:1fr}.hbar{flex-direction:column;align-items:flex-start}.s-btn{padding:18px 10px;font-size:.9rem}}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:var(--sky);padding:11px 26px;border-radius:50px;font-weight:900;font-size:.95rem;transition:transform .35s;z-index:9999;pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="pg-landing" class="screen active" style="justify-content:center;background:radial-gradient(ellipse at 50% 30%,#1a2060,var(--sky) 70%)">
+  <span class="train-anim">🚗​</span>
+  <div class="righty" style="font-size:clamp(2.8rem,7vw,5.5rem);color:var(--rail);letter-spacing:3px;text-align:center;text-shadow:0 0 40px rgba(255,214,0,.3)">Géométrie des Trains roulants</div>
+  <div style="font-size:1rem;color:var(--blue);text-align:center;margin:8px 0 40px;font-weight:800;letter-spacing:3px;text-transform:uppercase">Trains Roulants · Formation Auto</div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+    <button class="btn btn-y" id="btn-teacher">🎓 Mode Professeur</button>
+    <button class="btn btn-b" id="btn-student">🎒 Mode Élève</button>
+  </div>
+</div>
+
+<!-- JOIN -->
+<div id="pg-join" class="screen" style="justify-content:center">
+  <div class="join-box">
+    <div style="font-size:44px;margin-bottom:10px">🚉</div>
+    <div class="righty" style="font-size:1.9rem;color:var(--blue);margin-bottom:6px">Rejoindre</div>
+    <p style="color:rgba(240,244,255,.55);margin-bottom:24px;font-size:.95rem">Entre le code du prof et ton prénom</p>
+    <div class="lbl" style="text-align:left">Code de session</div>
+    <input id="inp-code" class="field" type="text" maxlength="6" placeholder="ex: GEO42">
+    <div class="lbl" style="text-align:left">Ton prénom</div>
+    <input id="inp-name" class="field" type="text" maxlength="22" placeholder="Ton prénom">
+    <button class="btn btn-b" style="width:100%;margin-top:6px" id="btn-join">Monter à bord 🚀</button>
+    <div style="margin-top:14px">
+      <button class="btn btn-o" style="font-size:.82rem;padding:9px 22px" id="btn-back">← Retour</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEACHER -->
+<div id="pg-teacher" class="screen">
+  <div class="hbar">
+    <div>
+      <div class="lbl">Code de session</div>
+      <div class="righty" style="font-size:2.2rem;color:var(--rail)" id="t-code">—</div>
+      <button class="btn-qr" id="btn-qr">📱 QR Code élèves</button>
+    </div>
+    <div style="text-align:center">
+      <div class="lbl">Élèves connectés</div>
+      <div style="font-size:2.2rem;font-weight:900;color:var(--green)" id="t-count">0</div>
+    </div>
+    <div style="text-align:right">
+      <div class="lbl">Question</div>
+      <div style="font-size:1.4rem;font-weight:900" id="t-qprog">1 / 15</div>
+    </div>
+  </div>
+  <div class="prog-wrap"><div class="prog-fill" id="t-prog" style="width:6.6%"></div></div>
+  <div class="panel" style="margin-bottom:18px">
+    <div style="font-size:.72rem;color:var(--rail);text-transform:uppercase;letter-spacing:3px;font-weight:800;margin-bottom:8px" id="t-qnum">Question 1</div>
+    <div style="font-size:clamp(1.1rem,3vw,1.65rem);font-weight:800;line-height:1.35" id="t-qtext">…</div>
+    <div style="display:flex;justify-content:center;margin:14px 0" id="t-svg"></div>
+  </div>
+  <div style="width:100%;max-width:920px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+    <div class="ans-grid" style="flex:1;min-width:260px" id="t-answers"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <div class="timer-ring">
+        <svg width="76" height="76" viewBox="0 0 76 76">
+          <circle cx="38" cy="38" r="32" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="6"/>
+          <circle id="t-tcircle" cx="38" cy="38" r="32" fill="none" stroke="#FFD600" stroke-width="6" stroke-dasharray="201" stroke-dashoffset="0" stroke-linecap="round"/>
+        </svg>
+        <div class="timer-num" id="t-tnum">20</div>
+      </div>
+      <div style="text-align:center">
+        <div class="lbl">Réponses</div>
+        <div style="font-size:1.6rem;font-weight:900;color:var(--blue)" id="t-acount">0</div>
+      </div>
+    </div>
+  </div>
+  <div class="ctrl">
+    <button class="btn btn-g" id="btn-start">▶ Lancer</button>
+    <button class="btn btn-y" id="btn-reveal">👁 Révéler</button>
+    <button class="btn btn-o" id="btn-next">Suivante →</button>
+    <button class="btn btn-o" style="font-size:.82rem;padding:9px 22px" id="btn-end">✕ Terminer</button>
+  </div>
+  <div style="width:100%;max-width:920px;margin-top:26px">
+    <div class="lbl" style="margin-bottom:10px">🏆 Classement en direct</div>
+    <div id="t-lb"></div>
+  </div>
+</div>
+
+<!-- STUDENT -->
+<div id="pg-student" class="screen">
+  <div class="score-bar">
+    <div>
+      <div style="font-weight:800;font-size:1rem" id="s-name">—</div>
+      <div style="font-size:.78rem;color:rgba(240,244,255,.4)" id="s-status">En attente…</div>
+    </div>
+    <div class="righty" style="font-size:1.2rem;color:var(--rail)" id="s-score">0 pts</div>
+  </div>
+  <div id="s-waiting">
+    <div class="wait-card">
+      <div style="font-size:2rem;margin-bottom:4px">🚂</div>
+      <div class="lbl">Session rejointe</div>
+      <div class="wait-code" id="s-wait-code">—</div>
+      <div style="color:rgba(240,244,255,.5);font-size:.9rem;margin-bottom:16px">Le prof va lancer le quiz…</div>
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    </div>
+  </div>
+  <div id="s-qarea" style="display:none;width:100%;max-width:600px">
+    <div class="panel" style="text-align:center;margin-bottom:16px">
+      <div style="font-size:.72rem;color:var(--rail);text-transform:uppercase;letter-spacing:3px;font-weight:800;margin-bottom:6px" id="s-qnum">Q1</div>
+      <div style="font-size:1.15rem;font-weight:800;line-height:1.4" id="s-qtext">…</div>
+      <div style="display:flex;justify-content:center;margin:12px 0" id="s-svg"></div>
+    </div>
+    <div class="s-grid" id="s-answers"></div>
+    <div style="text-align:center" id="s-fb"></div>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="pg-final" class="screen" style="justify-content:center;background:radial-gradient(ellipse at 50% 50%,#1a1060,var(--sky) 70%)">
+  <div class="trophy">🏆</div>
+  <div class="righty" style="font-size:clamp(2rem,5vw,3.2rem);color:var(--rail);margin:14px 0 6px;text-align:center">Quiz Terminé !</div>
+  <div style="color:rgba(240,244,255,.5);margin-bottom:26px;text-align:center">Résultats finaux</div>
+  <div id="f-lb" style="max-width:600px;width:100%"></div>
+  <div class="ctrl" style="margin-top:22px">
+    <button class="btn btn-y" id="btn-restart">🔄 Nouveau quiz</button>
+    <button class="btn btn-o" id="btn-home">🏠 Accueil</button>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div id="qr-modal">
+  <div class="qr-box">
+    <div class="righty" style="font-size:1.6rem;color:var(--rail);margin-bottom:4px">📱 Rejoindre</div>
+    <p style="color:rgba(240,244,255,.55);font-size:.85rem;margin-bottom:20px">Scanne ou saisis le code</p>
+    <div id="qr-canvas" style="display:flex;justify-content:center;margin-bottom:16px"></div>
+    <div style="font-size:.75rem;color:rgba(240,244,255,.3);word-break:break-all;margin-bottom:12px" id="qr-url"></div>
+    <div class="lbl">Code à saisir</div>
+    <div class="qr-code-big" id="qr-code-txt">—</div>
+    <button class="btn btn-o" style="font-size:.85rem;padding:10px 24px;margin-top:8px" id="btn-close-qr">✕ Fermer</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+'use strict';
+
+/* ── CONFIG ── */
+const FB_CFG = {
+  apiKey:"AIzaSyA2-PPOziFLx4xPY5dXkbJ5kyXgczQ1wvA",
+  authDomain:"geotrain-1eb5a.firebaseapp.com",
+  databaseURL:"https://geotrain-1eb5a-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"geotrain-1eb5a",
+  storageBucket:"geotrain-1eb5a.firebasestorage.app",
+  messagingSenderId:"102297633833",
+  appId:"1:102297633833:web:377b1e3b19f250d4448838"
+};
+
+/* ── SVG ── */
+function svgOrdre(){return'<svg width="200" height="80" viewBox="0 0 200 80"><defs><marker id="ar" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#FFD600"/></marker></defs><rect x="10" y="22" width="70" height="34" rx="6" fill="#1B5E20" stroke="#00E676" stroke-width="1.5"/><text x="45" y="42" fill="#00E676" font-size="11" font-family="Nunito,sans-serif" text-anchor="middle" font-weight="bold">Train AR</text><text x="45" y="54" fill="rgba(240,244,255,.5)" font-size="9" font-family="Nunito,sans-serif" text-anchor="middle">1er</text><line x1="82" y1="39" x2="105" y2="39" stroke="#FFD600" stroke-width="2" marker-end="url(#ar)"/><rect x="108" y="22" width="70" height="34" rx="6" fill="#1A237E" stroke="#4FC3F7" stroke-width="1.5"/><text x="143" y="42" fill="#4FC3F7" font-size="11" font-family="Nunito,sans-serif" text-anchor="middle" font-weight="bold">Train AV</text><text x="143" y="54" fill="rgba(240,244,255,.5)" font-size="9" font-family="Nunito,sans-serif" text-anchor="middle">2e</text></svg>';}
+function svgParallel(){return'<svg width="180" height="90" viewBox="0 0 180 90"><line x1="20" y1="18" x2="20" y2="72" stroke="#4FC3F7" stroke-width="6" stroke-linecap="round"/><line x1="160" y1="18" x2="160" y2="72" stroke="#4FC3F7" stroke-width="6" stroke-linecap="round"/><line x1="20" y1="18" x2="160" y2="23" stroke="#FFD600" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="20" y1="72" x2="160" y2="67" stroke="#FFD600" stroke-width="1.5" stroke-dasharray="4 3"/><text x="90" y="86" fill="rgba(240,244,255,.45)" font-size="10" font-family="Nunito,sans-serif" text-anchor="middle">pincement (+)</text></svg>';}
+function svgCamber(){return'<svg width="120" height="110" viewBox="0 0 120 110"><line x1="60" y1="8" x2="60" y2="100" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="60" y1="8" x2="45" y2="100" stroke="#4FC3F7" stroke-width="4" stroke-linecap="round"/><path d="M 60 30 A 18 18 0 0 0 52 37" fill="none" stroke="#FFD600" stroke-width="2"/><text x="30" y="32" fill="#FFD600" font-size="13" font-family="Righteous,cursive">-</text><text x="56" y="108" fill="rgba(240,244,255,.4)" font-size="9" font-family="Nunito,sans-serif" text-anchor="middle">Carrossage negatif</text></svg>';}
+function svgChasse(){return'<svg width="120" height="110" viewBox="0 0 120 110"><line x1="60" y1="5" x2="60" y2="102" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="68" y1="10" x2="52" y2="100" stroke="#4FC3F7" stroke-width="4" stroke-linecap="round"/><path d="M 60 30 A 14 14 0 0 1 66 38" fill="none" stroke="#FFD600" stroke-width="2"/><text x="67" y="40" fill="#FFD600" font-size="10" font-family="Righteous,cursive">CH</text><text x="60" y="108" fill="rgba(240,244,255,.4)" font-size="9" font-family="Nunito,sans-serif" text-anchor="middle">Vue de cote</text></svg>';}
+function svgEmpattement(){return'<svg width="200" height="80" viewBox="0 0 200 80"><circle cx="30" cy="55" r="14" fill="none" stroke="#4FC3F7" stroke-width="2.5"/><circle cx="170" cy="55" r="14" fill="none" stroke="#4FC3F7" stroke-width="2.5"/><line x1="30" y1="55" x2="170" y2="55" stroke="#FFD600" stroke-width="1.5" stroke-dasharray="5 3"/><line x1="30" y1="45" x2="30" y2="35" stroke="#FFD600" stroke-width="1.5"/><line x1="170" y1="45" x2="170" y2="35" stroke="#FFD600" stroke-width="1.5"/><line x1="30" y1="38" x2="170" y2="38" stroke="#FFD600" stroke-width="2"/><text x="100" y="30" fill="#FFD600" font-size="10" font-family="Righteous,cursive" text-anchor="middle">Empattement</text></svg>';}
+function svgPoussee(){return'<svg width="180" height="100" viewBox="0 0 180 100"><line x1="90" y1="8" x2="90" y2="95" stroke="rgba(255,255,255,.15)" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="90" y1="95" x2="112" y2="10" stroke="#FF6B35" stroke-width="2.5" stroke-linecap="round"/><path d="M 90 40 A 28 28 0 0 1 104 34" fill="none" stroke="#FFD600" stroke-width="2"/><text x="108" y="33" fill="#FFD600" font-size="10" font-family="Righteous,cursive">AP</text></svg>';}
+
+/* ── QUESTIONS ── */
+const QS = [
+  {q:"Que mesure le parallélisme d'un véhicule ?",s:null,
+   a:["L'angle d'inclinaison des roues dans le plan frontal","La convergence ou divergence des roues dans le plan horizontal","L'inclinaison longitudinale de l'axe de pivot","L'écart entre essieu avant et arrière"],ok:1},
+  {q:"Qu'est-ce que le carrossage ?",s:svgCamber(),
+   a:["L'inclinaison de la roue dans le plan frontal, vu de face","La distance entre les deux essieux","Le réglage de la hauteur de caisse","L'angle de braquage maximal"],ok:0},
+  {q:"Quelle est la conséquence d'un parallélisme en ouverture à l'avant ?",s:svgParallel(),
+   a:["Usure sur le flanc extérieur","Usure sur le flanc intérieur","Sous-virage prononcé","Vibrations de direction"],ok:1},
+  {q:"Qu'appelle-t-on la 'voie' d'un véhicule ?",s:null,
+   a:["La distance entre essieu avant et arrière","La distance entre les centres des roues du même essieu","La largeur maximale du véhicule hors tout","L'angle de carrossage dynamique"],ok:1},
+  {q:"Qu'est-ce que l'empattement ?",s:svgEmpattement(),
+   a:["La largeur du véhicule hors tout","L'offset de la jante","La distance entre l'essieu avant et l'essieu arrière","L'angle de chasse"],ok:2},
+  {q:"Qu'est-ce que l'angle de chasse (caster) ?",s:svgChasse(),
+   a:["L'angle entre la roue et la verticale vu de face","L'inclinaison longitudinale de l'axe de pivot vu de profil","La différence d'angle entre roue gauche et droite","L'angle de pincement des roues"],ok:1},
+  {q:"Que mesure l'angle de pivot (KPI / SAI) ?",s:null,
+   a:["L'inclinaison de l'axe de fusée dans le plan frontal, vu de face","L'angle de braquage au volant","La hauteur du centre de roulis","L'offset négatif de la jante"],ok:0},
+  {q:"Comment se calcule l'angle inclus ?",s:null,
+   a:["Chasse + Carrossage","KPI − Chasse","Carrossage + KPI","Carrossage × 2"],ok:2},
+  {q:"Qu'est-ce que le set-back ?",s:null,
+   a:["Le décalage vertical des roues","Le recul d'une roue par rapport à l'autre sur le même essieu","La différence de carrossage entre gauche et droite","L'angle de dérive du pneu"],ok:1},
+  {q:"Quel est le premier contrôle à effectuer AVANT toute mesure géométrique ?",s:null,
+   a:["Mesurer le carrossage","Régler le parallélisme","Vérifier la pression des pneus et l'état de la suspension","Centrer le volant"],ok:2},
+  {q:"Un carrossage négatif excessif provoque quelle usure ?",s:null,
+   a:["Usure uniforme sur tout le pneu","Usure accélérée sur le bord extérieur","Usure accélérée sur le bord intérieur","Aucune usure particulière"],ok:2},
+  {q:"À quoi sert la chasse positive sur une direction ?",s:svgChasse(),
+   a:["À réduire le rayon de braquage","À donner un effet de rappel en ligne droite et une stabilité directionnelle","À réduire l'usure des pneus avant","À augmenter le carrossage dynamique"],ok:1},
+  {q:"Qu'indique une différence importante de set-back entre gauche et droite ?",s:null,
+   a:["Un problème de réglage de hauteur de caisse","Un choc ou une déformation de châssis/caisse","Un pneumatique usé","Un problème de roulement de roue"],ok:1},
+  {q:"Pourquoi vérifie-t-on la poussée arrière (thrust angle) ?",s:svgPoussee(),
+   a:["Pour centrer le volant uniquement","Pour s'assurer que l'essieu arrière pousse droit et que l'avant est réglé par rapport à cet axe","Pour mesurer l'empattement","Pour calculer l'angle inclus"],ok:1},
+  {q:"Avant un contrôle, quels sont les 3 points à vérifier ?",s:null,
+   a:["Vitesse max, ABS, direction assistée","Pression des pneus, absence de jeux dans le train roulant, planéité du pont","Hauteur de caisse, couleur des pneus, jantes sans rayures","Vidange, freins, éclairage"],ok:1}
+];
+const ICONS=['◆','●','▲','★'];
+const TIMER=20;
+
+/* ── STATE ── */
+let db=null;
+let S={mode:null,code:null,name:null,qIdx:0,myScore:0,myAnswered:false,timer:null,timerVal:TIMER,lastShownQ:-1,feedbackShown:false};
+
+/* ── UTILS ── */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function g(id){return document.getElementById(id);}
+function toast(m){const t=g('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function dbSet(p,v){return db?db.ref(p).set(v):Promise.resolve();}
+function dbGet(p){return db?db.ref(p).once('value').then(s=>s.val()):Promise.resolve(null);}
+function dbOn(p,cb){if(db)db.ref(p).on('value',s=>cb(s.val()));}
+function dbOff(p){if(db)db.ref(p).off();}
+function dbUpd(p,v){return db?db.ref(p).update(v):Promise.resolve();}
+
+/* ── TEACHER ── */
+async function startTeacher(){
+  const code='GEO'+Math.floor(10+Math.random()*90);
+  S.mode='teacher';S.code=code;S.qIdx=0;
+  g('t-code').textContent=code;
+  await dbSet('sessions/'+code,{code,currentQ:-1,questionActive:false,revealed:false,ended:false,questionStart:0});
+  dbOn('sessions/'+code+'/students',students=>{
+    const names=students?Object.keys(students):[];
+    g('t-count').textContent=names.length;
+    if(S.questionActive){let ans=0;names.forEach(n=>{if(students[n].lastAnsweredQ===S.qIdx)ans++;});g('t-acount').textContent=ans;}
+    renderLB(students,'t-lb');
+  });
+  renderTQ();
+  show('pg-teacher');
+  toast('Session créée : '+code);
+}
+
+function renderTQ(){
+  const q=QS[S.qIdx];
+  g('t-qnum').textContent='Question '+(S.qIdx+1);
+  g('t-qtext').textContent=q.q;
+  g('t-qprog').textContent=(S.qIdx+1)+' / '+QS.length;
+  g('t-prog').style.width=((S.qIdx+1)/QS.length*100)+'%';
+  g('t-svg').innerHTML=q.s||'';
+  g('t-acount').textContent='0';
+  const grid=g('t-answers');
+  grid.innerHTML='';
+  q.a.forEach((a,i)=>{grid.innerHTML+='<div class="ans-card" id="ta'+i+'"><span style="font-size:1.4rem;flex-shrink:0">'+ICONS[i]+'</span><span>'+a+'</span><div class="bar" id="tb'+i+'" style="width:0%"></div></div>';});
+  g('btn-start').disabled=false;
+  g('btn-reveal').disabled=true;
+  g('btn-next').disabled=true;
+  S.questionActive=false;
+}
+
+async function teacherStart(){
+  S.questionActive=true;S.timerVal=TIMER;
+  g('btn-start').disabled=true;g('btn-reveal').disabled=false;
+  const now=Date.now();
+  await dbUpd('sessions/'+S.code,{currentQ:S.qIdx,questionActive:true,revealed:false,questionStart:now});
+  clearInterval(S.timer);
+  S.timer=setInterval(()=>{
+    S.timerVal--;
+    g('t-tnum').textContent=S.timerVal;
+    g('t-tcircle').style.strokeDashoffset=201*(1-S.timerVal/TIMER);
+    if(S.timerVal<=0){clearInterval(S.timer);teacherReveal();}
+  },1000);
+  toast('Question lancée !');
+}
+
+async function teacherReveal(){
+  clearInterval(S.timer);S.questionActive=false;
+  g('btn-reveal').disabled=true;g('btn-next').disabled=false;
+  const students=await dbGet('sessions/'+S.code+'/students');
+  const counts=[0,0,0,0];
+  if(students)Object.values(students).forEach(sd=>{if(sd.lastAnsweredQ===S.qIdx&&sd.lastAnswer>=0)counts[sd.lastAnswer]++;});
+  const total=Math.max(counts.reduce((a,b)=>a+b,0),1);
+  const ok=QS[S.qIdx].ok;
+  QS[S.qIdx].a.forEach((_,i)=>{
+    const card=g('ta'+i);const pct=Math.round(counts[i]/total*100);
+    g('tb'+i).style.width=pct+'%';card.classList.add(i===ok?'ok':'ko');
+    const badge=document.createElement('div');badge.className='pct';badge.textContent=pct+'%';card.appendChild(badge);
+  });
+  await dbUpd('sessions/'+S.code,{revealed:true,questionActive:false});
+  toast('Réponses révélées !');
+}
+
+async function teacherNext(){
+  S.qIdx++;
+  if(S.qIdx>=QS.length){teacherEnd();return;}
+  renderTQ();
+  await dbUpd('sessions/'+S.code,{questionActive:false,revealed:false});
+}
+
+async function teacherEnd(){
+  clearInterval(S.timer);dbOff('sessions/'+S.code+'/students');
+  await dbSet('sessions/'+S.code+'/ended',true);
+  const students=await dbGet('sessions/'+S.code+'/students');
+  renderLB(students,'f-lb');show('pg-final');
+}
+
+function renderLB(students,cid){
+  const lb=g(cid);if(!lb)return;
+  let arr=[];
+  if(students)Object.entries(students).forEach(([name,sd])=>arr.push({name,score:sd.score||0}));
+  arr.sort((a,b)=>b.score-a.score);
+  if(!arr.length){lb.innerHTML='<div style="color:rgba(240,244,255,.3);text-align:center;padding:20px">En attente des élèves…</div>';return;}
+  const max=arr[0].score||1;lb.innerHTML='';
+  arr.slice(0,12).forEach((s,i)=>{
+    const icon=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+    const col=i===0?'color:#FFD600':i===1?'color:#B0BEC5':i===2?'color:#FF8A65':'';
+    lb.innerHTML+='<div class="lb-row" style="animation-delay:'+(i*.07)+'s"><div class="lb-rank" style="'+col+'">'+icon+'</div><div class="lb-name">'+s.name+'</div><div class="lb-bar-wrap"><div class="lb-bar" style="width:'+Math.round(s.score/max*100)+'%"></div></div><div class="lb-score">+'+s.score+'</div></div>';
+  });
+}
+
+/* ── STUDENT ── */
+async function joinSession(){
+  const code=g('inp-code').value.trim().toUpperCase();
+  const name=g('inp-name').value.trim();
+  if(code.length<4){toast('Entre un code valide !');return;}
+  if(name.length<2){toast('Entre ton prénom !');return;}
+  const sess=await dbGet('sessions/'+code);
+  if(!sess){toast('Session introuvable !');return;}
+  if(sess.ended){toast('Session terminée.');return;}
+  S.mode='student';S.code=code;S.name=name;S.myScore=0;S.lastShownQ=-1;S.feedbackShown=false;
+  await dbUpd('sessions/'+code+'/students/'+name,{score:0,lastAnsweredQ:-1,lastAnswer:-1});
+  g('s-name').textContent=name;g('s-score').textContent='0 pts';
+  g('s-status').textContent='En attente…';g('s-wait-code').textContent=code;
+  g('s-waiting').style.display='';g('s-qarea').style.display='none';
+  show('pg-student');
+  dbOn('sessions/'+code,sess=>{
+    if(!sess)return;
+    if(sess.ended){dbOff('sessions/'+code);dbGet('sessions/'+code+'/students').then(st=>{renderLB(st,'f-lb');show('pg-final');});return;}
+    if(sess.questionActive&&sess.currentQ>=0&&sess.currentQ!==S.lastShownQ){
+      S.lastShownQ=sess.currentQ;S.myAnswered=false;S.feedbackShown=false;
+      showSQ(sess.currentQ,sess.questionStart);
+    }
+    if(sess.revealed&&S.lastShownQ===sess.currentQ&&!S.feedbackShown){
+      S.feedbackShown=true;if(!S.myAnswered)showTimedOut();
+    }
+  });
+  toast('Tu as rejoint le quiz !');
+}
+
+function showSQ(qIdx,qStart){
+  const q=QS[qIdx];
+  g('s-waiting').style.display='none';g('s-qarea').style.display='';
+  g('s-fb').innerHTML='';g('s-qnum').textContent='Q'+(qIdx+1)+' / '+QS.length;
+  g('s-qtext').textContent=q.q;g('s-svg').innerHTML=q.s||'';
+  g('s-status').textContent='Question '+(qIdx+1)+'…';
+  const grid=g('s-answers');grid.innerHTML='';
+  q.a.forEach((a,i)=>{
+    const b=document.createElement('button');b.className='s-btn';
+    b.innerHTML='<span style="font-size:1.5rem">'+ICONS[i]+'</span><span>'+a+'</span>';
+    b.addEventListener('click',()=>studentAns(i,qIdx,qStart));
+    grid.appendChild(b);
+  });
+}
+
+async function studentAns(idx,qIdx,qStart){
+  if(S.myAnswered)return;S.myAnswered=true;
+  const q=QS[qIdx];const isOK=idx===q.ok;
+  const elapsed=Math.max(0,(Date.now()-qStart)/1000);
+  const pts=isOK?100+Math.max(0,Math.round((TIMER-elapsed)*5)):0;
+  S.myScore+=pts;
+  await dbUpd('sessions/'+S.code+'/students/'+S.name,{score:S.myScore,lastAnsweredQ:qIdx,lastAnswer:idx});
+  g('s-score').textContent=S.myScore+' pts';
+  g('s-status').textContent=isOK?'+'+pts+' pts!':'Raté…';
+  document.querySelectorAll('.s-btn').forEach((b,i)=>{b.disabled=true;if(i===idx)b.classList.add(isOK?'ok':'ko');});
+  const fb=g('s-fb');
+  if(isOK){fb.innerHTML='<div class="fb ok">✅ Bonne réponse !</div><span class="pts-pop">+'+pts+' pts</span>';}
+  else{fb.innerHTML='<div class="fb ko">❌ Raté !</div><div style="color:rgba(240,244,255,.5);font-size:.9rem;margin-top:8px">Bonne réponse : <strong>'+q.a[q.ok]+'</strong></div>';}
+}
+
+function showTimedOut(){
+  document.querySelectorAll('.s-btn').forEach(b=>b.disabled=true);
+  const q=QS[S.lastShownQ];
+  g('s-fb').innerHTML='<div class="fb ko">⏱ Temps écoulé !</div><div style="color:rgba(240,244,255,.5);font-size:.9rem;margin-top:8px">Bonne réponse : <strong>'+q.a[q.ok]+'</strong></div>';
+}
+
+/* ── QR CODE ── */
+function showQR(){
+  const base=window.location.href.split('?')[0];
+  const url=base+'?join='+S.code;
+  g('qr-url').textContent=url;g('qr-code-txt').textContent=S.code;
+  const canvas=g('qr-canvas');canvas.innerHTML='';
+  try{new QRCode(canvas,{text:url,width:220,height:220,colorDark:'#0A0E2A',colorLight:'#FFD600',correctLevel:QRCode.CorrectLevel.M});}
+  catch(e){canvas.innerHTML='<div style="color:rgba(240,244,255,.4);padding:20px;font-size:.85rem">Partage l\'URL ci-dessus</div>';}
+  g('qr-modal').style.display='flex';
+}
+
+/* ── RESET ── */
+function resetAll(){
+  clearInterval(S.timer);
+  if(S.code){dbOff('sessions/'+S.code);dbOff('sessions/'+S.code+'/students');}
+  S={mode:null,code:null,name:null,qIdx:0,myScore:0,myAnswered:false,timer:null,timerVal:TIMER,lastShownQ:-1,feedbackShown:false};
+  show('pg-landing');
+}
+
+/* ── BOOT ── */
+document.addEventListener('DOMContentLoaded',function(){
+  /* Firebase */
+  try{firebase.initializeApp(FB_CFG);db=firebase.database();}catch(e){console.warn('Firebase:',e.message);}
+
+  /* Wire ALL buttons here — no onclick attributes, no conflicts */
+  g('btn-teacher').addEventListener('click', startTeacher);
+  g('btn-student').addEventListener('click', function(){ show('pg-join'); });
+  g('btn-join').addEventListener('click', joinSession);
+  g('btn-back').addEventListener('click', function(){ show('pg-landing'); });
+  g('btn-start').addEventListener('click', teacherStart);
+  g('btn-reveal').addEventListener('click', teacherReveal);
+  g('btn-next').addEventListener('click', teacherNext);
+  g('btn-end').addEventListener('click', teacherEnd);
+  g('btn-qr').addEventListener('click', showQR);
+  g('btn-close-qr').addEventListener('click', function(){ g('qr-modal').style.display='none'; });
+  g('btn-restart').addEventListener('click', resetAll);
+  g('btn-home').addEventListener('click', resetAll);
+
+  g('inp-code').addEventListener('input', function(){ this.value=this.value.toUpperCase(); });
+  g('inp-code').addEventListener('keydown', function(e){ if(e.key==='Enter') g('inp-name').focus(); });
+  g('inp-name').addEventListener('keydown', function(e){ if(e.key==='Enter') joinSession(); });
+
+  /* Auto-join from QR URL */
+  const p=new URLSearchParams(window.location.search).get('join');
+  if(p){g('inp-code').value=p.toUpperCase();show('pg-join');}
+
+  /* Initial button states */
+  g('btn-reveal').disabled=true;
+  g('btn-next').disabled=true;
+});
+</script>
+</body>
+</html>

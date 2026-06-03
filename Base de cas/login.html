@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Muller Automotive — Connexion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .login-box { background: #fff; border-radius: 12px; width: 100%; max-width: 420px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
+        .login-header { background: #2b2b2b; padding: 28px 30px 24px; text-align: center; }
+        .login-header img { height: 48px; margin-bottom: 14px; display: block; margin-left: auto; margin-right: auto; }
+        .login-header h1 { color: #fff; font-size: 1rem; font-weight: 600; }
+        .login-header p { color: #888; font-size: 0.78rem; margin-top: 4px; }
+        .login-body { padding: 28px 30px 32px; }
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #777; margin-bottom: 6px; }
+        .field input { width: 100%; padding: 11px 14px; border: 1.5px solid #e0e0e0; border-radius: 7px; font-size: 0.9rem; background: #fafafa; transition: border-color 0.2s; }
+        .field input:focus { outline: none; border-color: #c00000; background: #fff; }
+        .btn-login { width: 100%; background: #c00000; color: #fff; border: none; padding: 13px; border-radius: 7px; font-size: 0.92rem; font-weight: 700; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
+        .btn-login:hover { background: #a00000; }
+        .msg { display: none; border-radius: 6px; padding: 10px 14px; font-size: 0.82rem; margin-bottom: 14px; text-align: center; }
+        .msg.show { display: block; }
+        .msg.error { background: #fff0f0; border: 1px solid #f5c0c0; color: #c00000; }
+        .msg.info { background: #fffbe0; border: 1px solid #e0d080; color: #886600; }
+        .divider { border: none; border-top: 1px solid #eee; margin: 22px 0; }
+        .register-section p { font-size: 0.8rem; color: #888; margin-bottom: 10px; text-align: center; }
+        .btn-register { width: 100%; background: #fff; color: #555; border: 1.5px solid #ddd; padding: 10px; border-radius: 7px; font-size: 0.84rem; font-weight: 600; cursor: pointer; }
+        .btn-register:hover { border-color: #c00000; color: #c00000; }
+        .register-form { display: none; flex-direction: column; gap: 12px; margin-top: 14px; }
+        .register-form.show { display: flex; }
+        .register-form input { width: 100%; padding: 11px 14px; border: 1.5px solid #e0e0e0; border-radius: 7px; font-size: 0.88rem; background: #fafafa; }
+        .register-form input:focus { outline: none; border-color: #c00000; }
+        .btn-send { background: #2b2b2b; color: #fff; border: none; padding: 11px; border-radius: 7px; font-size: 0.86rem; font-weight: 600; cursor: pointer; }
+        .btn-send:hover { background: #444; }
+        footer { margin-top: 24px; color: #555; font-size: 0.73rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <div class="login-header">
+        <img src="logo/Logo.png" onerror="this.style.display='none'">
+        <h1>Base Maintenance</h1>
+        <p>Connectez-vous pour accéder à la base de cas</p>
+    </div>
+    <div class="login-body">
+        <div class="msg error" id="msg-error"></div>
+        <div class="msg info" id="msg-info"></div>
+
+        <div class="field">
+            <label>Identifiant</label>
+            <input type="text" id="login-user" placeholder="Votre identifiant" autocomplete="username">
+        </div>
+        <div class="field">
+            <label>Mot de passe</label>
+            <input type="password" id="login-pass" placeholder="Votre mot de passe" autocomplete="current-password">
+        </div>
+        <button class="btn-login" onclick="tenterConnexion()">Se connecter →</button>
+
+        <hr class="divider">
+
+        <div class="register-section">
+            <p>Pas encore de compte ?</p>
+            <button class="btn-register" onclick="toggleRegister()">Demander un accès</button>
+            <div class="register-form" id="register-form">
+                <input type="text" id="reg-name" placeholder="Prénom et nom">
+                <input type="text" id="reg-company" placeholder="Société / Entreprise">
+                <input type="text" id="reg-user" placeholder="Identifiant souhaité">
+                <input type="password" id="reg-pass" placeholder="Mot de passe (min. 4 caractères)">
+                <button class="btn-send" onclick="envoyerDemande()">Envoyer la demande</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>© 2026 MULLER Automotive — <i>by M@t</i></footer>
+
+<script src="auth.js"></script>
+<script>
+/* ── Redirection si déjà connecté ── */
+(function() {
+    const s = AUTH.getSession();
+    if (s) window.location.href = ['admin','contributor'].includes(s.role) ? 'admin.html' : 'index.html';
+})();
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') tenterConnexion(); });
+
+function showMsg(type, text) {
+    document.getElementById('msg-error').classList.remove('show');
+    document.getElementById('msg-info').classList.remove('show');
+    const el = document.getElementById('msg-' + type);
+    if (el) { el.textContent = text; el.classList.add('show'); }
+}
+
+async function tenterConnexion() {
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    if (!user || !pass) { showMsg('error', 'Veuillez remplir tous les champs.'); return; }
+    const btn = document.querySelector('.btn-login');
+    btn.disabled = true; btn.textContent = 'Connexion…';
+    try {
+        const res = await AUTH.login(user, pass);
+        if      (res === 'ok_admin')          window.location.href = 'admin.html';
+        else if (res === 'ok_contributor')    window.location.href = 'admin.html';
+        else if (res === 'ok_user')           window.location.href = 'index.html';
+        else if (res === 'pending')           showMsg('info', '⏳ Votre compte est en attente de validation par un administrateur.');
+        else if (res === 'no_module_access')  showMsg('error', '🔒 Accès à la Base de cas non autorisé. Contactez un administrateur.');
+        else                                  showMsg('error', 'Identifiant ou mot de passe incorrect.');
+    } catch {
+        showMsg('error', 'Serveur inaccessible. Réessayez dans un instant.');
+    } finally {
+        btn.disabled = false; btn.textContent = 'Se connecter →';
+    }
+}
+
+function toggleRegister() { document.getElementById('register-form').classList.toggle('show'); }
+
+async function envoyerDemande() {
+    const name    = document.getElementById('reg-name').value.trim();
+    const company = document.getElementById('reg-company').value.trim();
+    const user    = document.getElementById('reg-user').value.trim();
+    const pass    = document.getElementById('reg-pass').value;
+    if (!name || !user || !pass) { alert('Veuillez remplir tous les champs.'); return; }
+    if (pass.length < 4) { alert('Mot de passe trop court (min. 4 caractères).'); return; }
+    const res = await AUTH.register(name, user, pass, company);
+    if (res === 'existe') { alert('Identifiant déjà pris, choisissez-en un autre.'); return; }
+    document.getElementById('register-form').classList.remove('show');
+    showMsg('info', '✅ Demande envoyée ! Un administrateur validera votre accès prochainement.');
+    document.getElementById('reg-name').value = '';
+    document.getElementById('reg-company').value = '';
+    document.getElementById('reg-user').value = '';
+    document.getElementById('reg-pass').value = '';
+}
+</script>
+</body>
+</html>

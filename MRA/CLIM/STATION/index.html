@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Station de climatisation — Formation Muller</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;600&display=swap');
+:root{--red:#cd121d;--black:#0a0a0a;--dark:#111;--card:#1a1a1a;--border:#2a2a2a;--white:#f0f0f0;--muted:#999;--green:#22c55e;--yellow:#eab308;--blue:#3b82f6;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--black);color:var(--white);min-height:100vh;}
+.app{display:flex;flex-direction:column;min-height:100vh;}
+.top-bar{background:var(--dark);border-bottom:3px solid var(--red);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;}
+.top-bar img{height:38px;object-fit:contain;}
+.top-bar h1{font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:5px;text-transform:uppercase;color:var(--muted);flex:1;}
+.back-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;white-space:nowrap;}
+.back-btn:hover{color:var(--red);}
+.progress-bar-wrap{background:#1a1a1a;height:4px;}
+.progress-bar{background:var(--red);height:4px;transition:width .4s ease;}
+.body-layout{display:flex;flex:1;}
+.sidebar{width:250px;flex-shrink:0;background:var(--dark);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto;}
+.sidebar-title{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:#444;padding:0 20px 12px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:.82rem;color:var(--muted);transition:all .15s;border-left:3px solid transparent;}
+.nav-item:hover{background:#1e1e1e;color:var(--white);}
+.nav-item.active{background:#1e1e1e;color:var(--white);border-left-color:var(--red);}
+.nav-item.done .nav-check{color:var(--green);}
+.nav-num{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;color:#444;min-width:18px;}
+.nav-item.active .nav-num{color:var(--red);}
+.nav-check{font-size:.9rem;margin-left:auto;}
+.main-content{flex:1;padding:40px 48px;max-width:900px;}
+.chapter{display:none;animation:fadeIn .35s ease;}
+.chapter.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.chapter-label{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:10px;}
+.chapter-title{font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;line-height:1.1;margin-bottom:28px;}
+.chapter-title span{color:var(--red);}
+.lead{font-size:1rem;color:#ccc;line-height:1.85;margin-bottom:28px;}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin:32px 0 14px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:#222;}
+p{color:#bbb;line-height:1.85;margin-bottom:14px;font-size:.9rem;}
+.alert{border-radius:6px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.alert-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px;}
+.alert-body{font-size:.87rem;line-height:1.7;color:#ccc;}
+.alert-body strong{display:block;margin-bottom:4px;font-size:.9rem;}
+.alert.red{background:rgba(205,18,29,.1);border:1px solid rgba(205,18,29,.3);}
+.alert.yellow{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);}
+.alert.green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);}
+.alert.blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);}
+.spec-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.84rem;}
+.spec-table th{background:#1e1e1e;color:var(--red);padding:10px 12px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;border-bottom:2px solid var(--border);}
+.spec-table td{padding:10px 12px;border-bottom:1px solid #1a1a1a;color:#bbb;vertical-align:top;}
+.spec-table tr:hover td{background:#111;}
+.spec-table td:first-child{color:var(--muted);font-weight:600;width:42%;}
+.steps{margin:20px 0;}
+.step{display:flex;gap:14px;margin-bottom:18px;}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-body{flex:1;padding-top:3px;}
+.step-title{font-weight:600;font-size:.9rem;color:var(--white);margin-bottom:3px;}
+.step-desc{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.img-block{margin:20px 0;}
+.img-block img{width:100%;border-radius:6px;border:1px solid var(--border);}
+.img-caption{font-size:.78rem;color:var(--muted);margin-top:6px;text-align:center;font-style:italic;}
+.schema-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+.schema-item{text-align:center;}
+.schema-item img{width:100%;border-radius:6px;border:1px solid var(--border);}
+.schema-caption{font-size:.78rem;color:var(--muted);margin-top:8px;font-style:italic;line-height:1.4;}
+.panne-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px;}
+.panne-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.panne-icon{font-size:1.3rem;}
+.panne-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);}
+.panne-steps{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.panne-steps li{font-size:.84rem;color:#bbb;line-height:1.5;padding-left:16px;position:relative;}
+.panne-steps li::before{content:'→';color:var(--red);position:absolute;left:0;}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:16px 0;}
+.doc-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);transition:border-color .2s;}
+.doc-card:hover{border-color:var(--red);}
+.doc-icon{font-size:1.4rem;flex-shrink:0;}
+.doc-name{font-size:.81rem;font-weight:600;}
+.doc-sub{font-size:.71rem;color:var(--muted);margin-top:2px;}
+.code-path{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:4px;padding:9px 14px;font-family:'Courier New',monospace;font-size:.82rem;color:#7ec8e3;margin:8px 0;}
+.flashcard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin:24px 0;}
+.flashcard{height:160px;perspective:1000px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;border-radius:8px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;backface-visibility:hidden;}
+.flashcard-front{background:var(--card);border:1px solid #333;}
+.flashcard-back{background:var(--red);transform:rotateY(180deg);}
+.fc-q{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;color:var(--white);line-height:1.4;}
+.fc-hint{font-size:.68rem;color:#555;margin-top:10px;letter-spacing:1px;text-transform:uppercase;}
+.fc-a{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;color:#fff;line-height:1.4;}
+.fc-detail{font-size:.76rem;color:rgba(255,255,255,.75);margin-top:6px;line-height:1.5;}
+.quiz-wrap{max-width:680px;}
+.quiz-ptxt{font-size:.78rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
+.question-block{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:26px;margin-bottom:18px;}
+.q-num{font-size:.68rem;text-transform:uppercase;letter-spacing:3px;color:var(--red);margin-bottom:10px;}
+.q-text{font-size:.98rem;font-weight:600;color:var(--white);line-height:1.6;margin-bottom:18px;}
+.choices{display:flex;flex-direction:column;gap:9px;}
+.choice{display:flex;align-items:center;gap:12px;padding:12px 15px;background:#161616;border:1.5px solid #2a2a2a;border-radius:6px;cursor:pointer;font-size:.86rem;color:#bbb;transition:all .15s;}
+.choice:hover:not(.disabled){border-color:var(--red);color:var(--white);background:#1a1010;}
+.choice.correct{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.07);}
+.choice.wrong{border-color:#c00;color:#ff6b6b;background:rgba(200,0,0,.07);}
+.choice.disabled{cursor:default;pointer-events:none;}
+.choice-letter{width:24px;height:24px;border-radius:50%;border:1.5px solid #333;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;flex-shrink:0;}
+.feedback{margin-top:14px;padding:11px 15px;border-radius:6px;font-size:.84rem;line-height:1.6;display:none;}
+.feedback.show{display:block;}
+.feedback.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac;}
+.feedback.ko{background:rgba(205,18,29,.1);border:1px solid rgba(205,18,29,.3);color:#fca5a5;}
+.quiz-btn{background:var(--red);color:#fff;border:none;padding:11px 26px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:16px;display:none;transition:background .2s;}
+.quiz-btn:hover{background:#a00;}
+.quiz-btn.show{display:inline-flex;align-items:center;gap:8px;}
+.score-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;display:none;}
+.score-card.show{display:block;animation:fadeIn .4s ease;}
+.score-circle{width:120px;height:120px;border-radius:50%;margin:0 auto 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid;}
+.score-num{font-family:'Barlow Condensed',sans-serif;font-size:2.5rem;font-weight:800;}
+.score-title{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;}
+.score-msg{font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:24px;}
+.btn-retry{background:transparent;border:1.5px solid var(--red);color:var(--red);padding:10px 24px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-retry:hover{background:var(--red);color:#fff;}
+.chapter-nav{display:flex;justify-content:space-between;margin-top:48px;padding-top:24px;border-top:1px solid #1e1e1e;}
+.nav-btn{background:transparent;border:1.5px solid #333;color:var(--muted);padding:10px 22px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;}
+.nav-btn:hover{border-color:var(--red);color:var(--white);}
+.nav-btn.primary{background:var(--red);border-color:var(--red);color:#fff;}
+.nav-btn.primary:hover{background:#a00;}
+.nav-btn:disabled{opacity:.2;pointer-events:none;}
+@media(max-width:768px){.sidebar{display:none;}.main-content{padding:24px 18px;}.chapter-title{font-size:1.8rem;}.schema-2col{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="top-bar">
+  <img src="https://www.mullerautomotive.fr/wp-content/uploads/2025/01/logo-Muller-automotive-full-1.png" alt="Muller">
+  <h1>Station de climatisation</h1>
+  <a class="back-btn" href="/MRA/CLIM/">← Modules Climatisation</a>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:11%"></div></div>
+
+<div class="body-layout">
+<nav class="sidebar">
+  <div class="sidebar-title">Sommaire</div>
+  <div class="nav-item active" onclick="goTo(0)"><span class="nav-num">01</span>Introduction<span class="nav-check" id="ck0"></span></div>
+  <div class="nav-item" onclick="goTo(1)"><span class="nav-num">02</span>Configuration<span class="nav-check" id="ck1"></span></div>
+  <div class="nav-item" onclick="goTo(2)"><span class="nav-num">03</span>Mise en service<span class="nav-check" id="ck2"></span></div>
+  <div class="nav-item" onclick="goTo(3)"><span class="nav-num">04</span>Menus & Interface<span class="nav-check" id="ck3"></span></div>
+  <div class="nav-item" onclick="goTo(4)"><span class="nav-num">05</span>Maintenance<span class="nav-check" id="ck4"></span></div>
+  <div class="nav-item" onclick="goTo(5)"><span class="nav-num">06</span>Étalonnage<span class="nav-check" id="ck5"></span></div>
+  <div class="nav-item" onclick="goTo(6)"><span class="nav-num">07</span>Résolution de pannes<span class="nav-check" id="ck6"></span></div>
+  <div class="nav-item" onclick="goTo(7)"><span class="nav-num">08</span>Schéma hydraulique<span class="nav-check" id="ck7"></span></div>
+  <div class="nav-item" onclick="goTo(8)"><span class="nav-num">09</span>Flashcards<span class="nav-check" id="ck8"></span></div>
+  <div class="nav-item" onclick="goTo(9)"><span class="nav-num">10</span>QCM Final<span class="nav-check" id="ck9"></span></div>
+</nav>
+
+<div class="main-content">
+
+<!-- ═══ CH 0 : INTRO ═══ -->
+<div class="chapter active" id="ch0">
+  <div class="chapter-label">Chapitre 01 — Introduction</div>
+  <h2 class="chapter-title">Station de <span>climatisation</span></h2>
+  <p class="lead">La station de recharge permet d'intervenir sur les circuits de climatisation en toute sécurité : récupération du réfrigérant, tirage au vide, injection d'huile, recharge constructeur. Ce module couvre les stations ECK FLAG et ECK NEXT PRO de Muller Automotive.</p>
+
+  <div class="section-title">Gamme de stations</div>
+  <div class="schema-2col">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:2px;color:var(--red);margin-bottom:10px;">ECK FLAG</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.83rem;color:#bbb;">
+        <li>✓ Procédure automatique</li><li>✓ Procédure manuelle</li><li>✓ Configuration avancée</li><li>✓ Option WIFI (AC24)</li><li>✓ Remplissage bouteille</li><li>✓ Purge air manuelle</li><li>✓ Étalonnage intégré</li>
+      </ul>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:2px;color:var(--red);margin-bottom:10px;">ECK NEXT PRO</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.83rem;color:#bbb;">
+        <li>✓ Hybrid kit (rinçage flexible)</li><li>✓ Change huile flacon</li><li>✓ Analyse de gaz (option)</li><li>✓ Contrôle pressions A/C</li><li>✓ Flushing kit (rinçage véhicule)</li><li>✓ Diagnostic statique</li><li>✓ Étalonnage avancé</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">Cycle d'entretien complet</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Récupération</div><div class="step-desc">Le compresseur de la station aspire et récupère le réfrigérant du circuit véhicule dans la bouteille interne.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Tirage au vide</div><div class="step-desc">La pompe à vide descend le circuit en dépression pour éliminer toute humidité résiduelle (min. 5 minutes).</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Injection d'huile</div><div class="step-desc">Injection par dépression du circuit : huile PAG + traceur UV selon les préconisations constructeur.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Recharge réfrigérant</div><div class="step-desc">Injection de la quantité exacte préconisée par le constructeur, par pression du réfrigérant et dépression du circuit.</div></div></div>
+  </div>
+
+  <div class="section-title">Documents de référence</div>
+  <div class="doc-grid">
+    <a class="doc-card" href="docs/E19-TOP_ECK FLAG HYDRAULIC DIAGRAM.PDF" target="_blank"><div class="doc-icon">📐</div><div><div class="doc-name">Schéma hydraulique ECK FLAG</div><div class="doc-sub">E19-TOP — Hydraulic Diagram</div></div></a>
+    <a class="doc-card" href="docs/E19-TOP_ECK FLAG HYDRAULIC DIAGRAM phase to phase.pdf" target="_blank"><div class="doc-icon">📐</div><div><div class="doc-name">Schéma hydraulique phase/phase</div><div class="doc-sub">ECK FLAG — étape par étape</div></div></a>
+    <a class="doc-card" href="docs/Système climatisation véhicule électrique.docx" target="_blank"><div class="doc-icon">📄</div><div><div class="doc-name">Clim — véhicule électrique</div><div class="doc-sub">Spécificités VE/hybride</div></div></a>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" disabled>← Précédent</button>
+    <button class="nav-btn primary" onclick="goTo(1)">Configuration →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 1 : CONFIGURATION ═══ -->
+<div class="chapter" id="ch1">
+  <div class="chapter-label">Chapitre 02 — Configuration</div>
+  <h2 class="chapter-title">Configuration <span>de la station</span></h2>
+
+  <div class="section-title">Station neutre — concept</div>
+  <div class="img-block">
+    <img src="images/image5.png" alt="Station neutre + kits R134a / R1234yf">
+    <div class="img-caption">Concept "Station neutre" — une seule machine de base + kit R134a = Machine R134a, ou + kit R1234yf = Machine HFO1234yf. Solution flexible pour équiper le centre.</div>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">🔧</div>
+    <div class="alert-body"><strong>Activation sur site — AC24</strong>
+      L'activation du type de gaz se fait via le portail <strong>http://ac-service24.com/app/</strong> (KIT WIFI disponible pour l'ECK FLAG). Sélectionner le site en anglais, télécharger la mise à jour et suivre la procédure.
+    </div>
+  </div>
+
+  <div class="section-title">Réception de la station</div>
+  <div class="img-block">
+    <img src="images/image6.png" alt="Composition et réception station">
+    <div class="img-caption">Vérification à la réception : composition de la station, accessoires inclus, état général et conformité de la livraison</div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(0)">← Introduction</button>
+    <button class="nav-btn primary" onclick="goTo(2)">Mise en service →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 2 : MISE EN SERVICE ═══ -->
+<div class="chapter" id="ch2">
+  <div class="chapter-label">Chapitre 03 — Mise en service</div>
+  <h2 class="chapter-title">Mise en <span>service</span></h2>
+
+  <div class="section-title">Mise à jour logicielle</div>
+  <div class="img-block">
+    <img src="images/image8.png" alt="Procédure mise à jour USB">
+    <div class="img-caption">Interface mise à jour — procédure via clé USB (2 Go min / 32 Go max, format FAT32)</div>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Préparer la clé USB</div><div class="step-desc">Clé USB 2 Go minimum, 32 Go maximum. <strong>Formater en FAT32</strong> avant utilisation.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Télécharger la mise à jour</div><div class="step-desc">Sélectionner le site en anglais sur ac-service24.com. Extraire le fichier téléchargé directement à la racine de la clé USB.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Lancer la mise à jour</div><div class="step-desc">Machine éteinte — insérer la clé USB. Allumer l'appareil sans toucher à la clé. Après ~3 secondes, l'écran clignote en noir et blanc.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Attendre la fin</div><div class="step-desc">Après ~50 secondes, l'écran d'activation s'affiche pour saisir le code réponse. Ne pas interrompre la procédure.</div></div></div>
+  </div>
+
+  <div class="section-title">Menu démarrage rapide (QuickSetup)</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:16px 0;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:.83rem;color:#bbb;"><strong style="color:var(--white);display:block;margin-bottom:4px;">🌍 Langue</strong>Sélection de la langue d'interface</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:.83rem;color:#bbb;"><strong style="color:var(--white);display:block;margin-bottom:4px;">📏 Unités</strong>Bar / PSI — grammes / onces</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:.83rem;color:#bbb;"><strong style="color:var(--white);display:block;margin-bottom:4px;">🕐 Date/Heure</strong>Configuration horodatage tickets</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:.83rem;color:#bbb;"><strong style="color:var(--white);display:block;margin-bottom:4px;">🖨️ En-tête ticket</strong>Nom centre, N° agrément</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:.83rem;color:#bbb;"><strong style="color:var(--white);display:block;margin-bottom:4px;">💨 Données du vide</strong>Réglage paramètres tirage au vide</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:.83rem;color:#bbb;"><strong style="color:var(--white);display:block;margin-bottom:4px;">🪣 Remplissage</strong>Remplissage réservoir interne</div>
+  </div>
+  <div class="alert yellow">
+    <div class="alert-icon">💡</div>
+    <div class="alert-body">Si la procédure QuickSetup n'est pas terminée, elle s'affichera à nouveau à chaque démarrage de la station jusqu'à validation complète.</div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(1)">← Configuration</button>
+    <button class="nav-btn primary" onclick="goTo(3)">Menus →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 3 : MENUS ═══ -->
+<div class="chapter" id="ch3">
+  <div class="chapter-label">Chapitre 04 — Interface</div>
+  <h2 class="chapter-title">Menus & <span>Interface</span></h2>
+
+  <div class="section-title">Écrans d'accueil — 2 générations</div>
+  <div class="schema-2col">
+    <div class="schema-item">
+      <img src="images/image9.png" alt="Écran accueil nouvelle génération">
+      <div class="schema-caption">Nouvelle génération — interface graphique avec grandes tuiles (Procédure Auto/Manuelle, Configuration, Maintenance, Données)</div>
+    </div>
+    <div class="schema-item">
+      <img src="images/image11.png" alt="Écran accueil ancienne génération">
+      <div class="schema-caption">Ancienne génération — interface liste avec menus textuels</div>
+    </div>
+  </div>
+
+  <div class="section-title">Menu Configuration — ECK FLAG vs ECK NEXT PRO</div>
+  <table class="spec-table">
+    <thead><tr><th>Option</th><th>ECK FLAG</th><th>ECK NEXT PRO</th></tr></thead>
+    <tbody>
+      <tr><td>Réglages du vide</td><td>✓</td><td>✓</td></tr>
+      <tr><td>Options (code 43210791)</td><td>✓</td><td>✓</td></tr>
+      <tr><td>WIFI</td><td>✓ (KIT WIFI)</td><td>✓ (si option)</td></tr>
+      <tr><td>Config test N2</td><td>✓</td><td>—</td></tr>
+      <tr><td>Paramètres huile</td><td>✓</td><td>—</td></tr>
+      <tr><td>Base de données véhicules</td><td>✓</td><td>✓</td></tr>
+      <tr><td>Configuration Date/Heure</td><td>✓</td><td>✓</td></tr>
+      <tr><td>N° agrément opérateur</td><td>✓</td><td>✓</td></tr>
+      <tr><td>Code opérateur</td><td>—</td><td>✓</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert blue">
+    <div class="alert-icon">🔑</div>
+    <div class="alert-body"><strong>Code Options</strong> : <span style="font-family:'Courier New',monospace;font-size:1rem;color:#7ec8e3;">43210791</span><br>Donne accès aux réglages avancés de configuration (étalonnage, options matérielles).</div>
+  </div>
+
+  <div class="section-title">Écran Données / Informations machine</div>
+  <div class="img-block">
+    <img src="images/image22.png" alt="Écran informations bouteille">
+    <div class="img-caption">Écran Données — informations bouteille réfrigérant en temps réel : total (4581g), disponible (3221g), température bouteille (22,1°C), huile (7ml)</div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(2)">← Mise en service</button>
+    <button class="nav-btn primary" onclick="goTo(4)">Maintenance →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 4 : MAINTENANCE ═══ -->
+<div class="chapter" id="ch4">
+  <div class="chapter-label">Chapitre 05 — Maintenance</div>
+  <h2 class="chapter-title"><span>Maintenance</span> station</h2>
+
+  <div class="section-title">Remplacement du filtre déshydrateur</div>
+  <div class="alert yellow">
+    <div class="alert-icon">🔧</div>
+    <div class="alert-body"><strong>Procédure filtre</strong>
+      Menu → Remplacement filtre → Suivre la procédure → Saisir le <strong>code inscrit sur le nouveau filtre</strong> pour effacer l'alarme « remplacement filtre ». Ce code supprime simultanément l'alarme filtre ET huile.
+    </div>
+  </div>
+
+  <div class="section-title">Remplacement de l'huile pompe à vide</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Accéder au menu</div><div class="step-desc">Menu → Remplacement huile → Suivre la procédure affichée à l'écran.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Saisir le code flacon</div><div class="step-desc">Saisir le <strong>code inscrit sur le flacon d'huile</strong> pour effacer l'alarme « remplacer huile ». Ce code supprime uniquement l'alarme huile.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Vérifier le niveau</div><div class="step-desc">Toujours faire le niveau <strong>au milieu de l'œilleton</strong> pour un bon fonctionnement de la pompe.</div></div></div>
+  </div>
+
+  <div class="alert red">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body"><strong>Niveau d'huile critique</strong>
+      <strong>Trop d'huile :</strong> la pompe peine, difficulté à descendre en dépression.<br>
+      <strong>Pas assez d'huile :</strong> problème pour atteindre la dépression requise. Risque d'endommagement de la pompe.
+    </div>
+  </div>
+
+  <div class="section-title">Vérification d'étanchéité machine</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Contrôle visuel</div><div class="step-desc">Vérifier l'état des flexibles et raccords rapides HP et BP (état, fissures, usure).</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Tirage au vide 5 min</div><div class="step-desc">Lancer un tirage au vide minimum 5 minutes. À la fin, noter les valeurs manomètres HP et BP et le transducteur A/C.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Contrôle 5/10 min après</div><div class="step-desc">Laisser reposer 5 à 10 minutes puis comparer les valeurs. Toute remontée de pression indique une fuite.</div></div></div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(3)">← Menus</button>
+    <button class="nav-btn primary" onclick="goTo(5)">Étalonnage →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 5 : ÉTALONNAGE ═══ -->
+<div class="chapter" id="ch5">
+  <div class="chapter-label">Chapitre 06 — Étalonnage</div>
+  <h2 class="chapter-title"><span>Étalonnage</span> de la station</h2>
+
+  <div class="section-title">Contrôle balance de gaz — tolérance 5%</div>
+  <div class="alert green">
+    <div class="alert-icon">⚖️</div>
+    <div class="alert-body"><strong>Méthode de contrôle</strong>
+      Vérifier le poids affiché en ajoutant un poids étalon sur la bouteille. <strong>Tolérance : ±5%</strong>. Utiliser 3 ou 4 poids différents : 1 kg, 5 kg, 10 kg, 20 kg.
+    </div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Exemple de calcul</div>
+    <p style="font-size:.88rem;margin-bottom:8px;">Machine indique : <strong style="color:var(--white);">5,75 kg</strong> total réfrigérant</p>
+    <p style="font-size:.88rem;margin-bottom:8px;">Ajout d'un poids étalon : <strong style="color:var(--white);">5 kg</strong></p>
+    <p style="font-size:.88rem;margin-bottom:8px;">Poids attendu affiché : <strong style="color:var(--white);">10,75 kg</strong></p>
+    <p style="font-size:.88rem;">Plage de conformité (±5%) : <strong style="color:var(--green);">entre 10,50 kg et 11,00 kg</strong></p>
+  </div>
+
+  <div class="section-title">Contrôle manomètres</div>
+  <table class="spec-table">
+    <thead><tr><th>Manomètre</th><th>Méthode</th><th>Tolérance</th></tr></thead>
+    <tbody>
+      <tr><td>Basse pression (BP)</td><td>Comparaison avec manomètre digital de référence</td><td><strong style="color:var(--green);">±0,15 bar</strong></td></tr>
+      <tr><td>Haute pression (HP)</td><td>Injection gaz dans tuyaux + lecture comparative</td><td><strong style="color:var(--yellow);">±0,35 bar</strong></td></tr>
+      <tr><td>Zéro manomètre mécanique</td><td>Vérification du zéro à vide</td><td>Doit pointer exactement à 0</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Ajustage des balances — code 0791</div>
+  <div class="schema-2col">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;color:var(--red);margin-bottom:10px;letter-spacing:1px;">BALANCE BOUTEILLE</div>
+      <div style="font-size:.82rem;color:#bbb;line-height:1.7;">• Zéro sans bouteille<br>• Gain : 20 kg sur plateau<br>• Tare bouteille pleine : 5800 g (défaut)<br><em style="color:#555;">Bouteille 12 kg : tare ≈ 6000 g<br>Bouteille 22 kg : tare ≈ 9000 g</em></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;color:var(--red);margin-bottom:10px;letter-spacing:1px;">BALANCE HUILES/TRACEUR</div>
+      <div style="font-size:.82rem;color:#bbb;line-height:1.7;">• Zéro sans bouteille<br>• Gain : 100 à 200 g<br>• Tare si huile présente : 150 g (défaut)<br><em style="color:#555;">100 g = 104 ml pour balances d'huiles</em></div>
+    </div>
+  </div>
+
+  <div class="section-title">Ajustage capteurs de pression et de température</div>
+  <table class="spec-table">
+    <thead><tr><th>Capteur</th><th>Condition requise</th><th>Procédure</th></tr></thead>
+    <tbody>
+      <tr><td>Transducteur pression bouteille</td><td>Étalonnage A/C fait + min 1000 g réfrigérant</td><td>Procédure automatique → valider les étapes</td></tr>
+      <tr><td>Transducteur pression évaporateur</td><td>Étalonnage A/C fait + min 1000 g réfrigérant</td><td>Procédure automatique → valider les étapes</td></tr>
+      <tr><td>Capteurs température</td><td>—</td><td>Saisir T° bouteille mesurée + T° ambiante mesurée</td></tr>
+    </tbody>
+  </table>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(4)">← Maintenance</button>
+    <button class="nav-btn primary" onclick="goTo(6)">Résolution de pannes →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 6 : PANNES ═══ -->
+<div class="chapter" id="ch6">
+  <div class="chapter-label">Chapitre 07 — Diagnostic</div>
+  <h2 class="chapter-title">Résolution <span>de pannes</span></h2>
+
+  <div class="panne-card">
+    <div class="panne-header"><div class="panne-icon">💨</div><div class="panne-title">Fumée blanche — tirage au vide</div></div>
+    <p style="font-size:.84rem;color:#bbb;margin-bottom:10px;">La fumée blanche en sortie de pompe à vide ou bouteille d'huile usagée = vapeur d'eau froide. Indique une probable aspiration d'air.</p>
+    <ul class="panne-steps">
+      <li>Vérifier valeurs manomètres HP et BP (doivent être en dépression ±−0,9 bar)</li>
+      <li>Si non : présence d'une prise d'air — comparer avec capteur A/C si disponible</li>
+      <li>Faire fonctionner la station à vide (sans véhicule) pour isoler la fuite</li>
+      <li>Contrôler état des tuyaux (poreux ?), serrage des raccords</li>
+      <li>Contrôler état des raccords rapides HP et BP</li>
+      <li style="color:var(--yellow);">Si défaut persiste → fuite interne à la machine (SAV)</li>
+    </ul>
+  </div>
+
+  <div class="panne-card">
+    <div class="panne-header"><div class="panne-icon">🔄</div><div class="panne-title">Problème phase de récupération</div></div>
+    <ul class="panne-steps">
+      <li>Problème d'entretien — filtre(s) bouché(s)</li>
+      <li>Prise d'air dans le circuit (récupération longue)</li>
+      <li>Bouteille interne pleine ou pression trop élevée</li>
+      <li>Problème d'ouverture d'une électrovanne</li>
+      <li>Problème compresseur interne station</li>
+    </ul>
+  </div>
+
+  <div class="panne-card">
+    <div class="panne-header"><div class="panne-icon">⚙️</div><div class="panne-title">Problème compresseur station</div></div>
+    <ul class="panne-steps">
+      <li>Vérifier la présence du 220V en entrée compresseur (pendant récupération de gaz)</li>
+      <li>Si pas de tension → contrôler le pressostat de surpression (branché en série, contact NC) — peut afficher «alarme surpression»</li>
+      <li>Si compresseur très chaud et ne tourne pas → probablement hors service</li>
+      <li>Si compresseur tremble mais récupération très longue → faire un contrôle de pression sortie compresseur</li>
+      <li style="color:var(--red);">⚠ Ne pas dépasser 30 bar lors du test — décharger dès 20 bar. Pression inférieure à 20 bar = compresseur HS</li>
+    </ul>
+  </div>
+
+  <div class="panne-card">
+    <div class="panne-header"><div class="panne-icon">🌀</div><div class="panne-title">Message — Ventilateur bloqué</div></div>
+    <ul class="panne-steps">
+      <li>Ce message concerne le ventilateur du condenseur de la station</li>
+      <li>Vérifier que le ventilateur tourne physiquement</li>
+      <li>Mesurer la tension en sortie d'alimentation</li>
+      <li>Réglage à 12,2V par le trimmer situé sur l'alimentation (si réglable)</li>
+    </ul>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(5)">← Étalonnage</button>
+    <button class="nav-btn primary" onclick="goTo(7)">Schéma hydraulique →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 7 : SCHÉMA HYDRAULIQUE ═══ -->
+<div class="chapter" id="ch7">
+  <div class="chapter-label">Chapitre 08 — SAV</div>
+  <h2 class="chapter-title">Schéma <span>hydraulique</span></h2>
+
+  <div class="alert red">
+    <div class="alert-icon">🔴</div>
+    <div class="alert-body"><strong>Test actionneur — SAV expérimenté uniquement</strong>
+      Ce test permet de commander chaque élément individuellement ou tous simultanément. À utiliser avec le schéma hydraulique en parallèle pour suivre le cheminement du gaz dans la machine.
+    </div>
+  </div>
+
+  <div class="section-title">Schéma hydraulique ECK FLAG</div>
+  <div class="img-block">
+    <img src="images/image34.png" alt="Schéma hydraulique ECK FLAG">
+    <div class="img-caption">Schéma hydraulique complet ECK FLAG — tous les composants (compresseur, électrovannes, séparateur d'huile, bouteille, pompe à vide, condenseur) et leurs interconnexions</div>
+  </div>
+
+  <div class="section-title">Lecture du schéma — étape par étape</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Phase récupération</div><div class="step-desc">Ouverture EV BP et HP côté véhicule → le compresseur aspire le réfrigérant → passage par le séparateur d'huile → bouteille interne.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Phase tirage au vide</div><div class="step-desc">La pompe à vide est activée → descente en dépression du circuit véhicule via les flexibles HP et BP.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Phase injection</div><div class="step-desc">EV huile et traceur s'ouvrent → injection par dépression. EV réfrigérant → recharge par pression de la bouteille interne.</div></div></div>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">📐</div>
+    <div class="alert-body"><strong>Documents hydrauliques disponibles</strong>
+      Les schémas hydrauliques complets ECK FLAG (standard et phase par phase) sont disponibles dans l'onglet Introduction → Documents.
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(6)">← Résolution pannes</button>
+    <button class="nav-btn primary" onclick="goTo(8)">Flashcards →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 8 : FLASHCARDS ═══ -->
+<div class="chapter" id="ch8">
+  <div class="chapter-label">Chapitre 09 — Révision</div>
+  <h2 class="chapter-title">Flashcards <span>— mémorisation</span></h2>
+  <p style="color:var(--muted);font-size:.85rem;margin-bottom:24px;">Cliquez sur chaque carte pour révéler la réponse.</p>
+  <div class="flashcard-grid">
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Code d'accès aux options avancées des stations ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">43210791</div><div class="fc-detail">Code commun ECK FLAG et ECK NEXT PRO pour accéder aux options de configuration avancées.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Tolérance balance de gaz lors de l'étalonnage ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">±5%</div><div class="fc-detail">Vérification avec 3 ou 4 poids différents : 1 kg, 5 kg, 10 kg, 20 kg.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Tolérance manomètre basse pression ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">±0,15 bar</div><div class="fc-detail">Tolérance HP : ±0,35 bar. Les manomètres sont contrôlés par comparaison avec un manomètre digital de référence.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Niveau d'huile pompe à vide — où faire le niveau ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Au milieu de l'œilleton</div><div class="fc-detail">Trop d'huile → pompe peine. Pas assez → problème de dépression. Le niveau exact au milieu est impératif.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Que signifie la fumée blanche en sortie de pompe à vide ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Vapeur d'eau froide — aspiration d'air</div><div class="fc-detail">Indique une prise d'air. Rechercher dans les flexibles, raccords rapides HP/BP, ou interne machine.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Pression max lors du test compresseur (sortie) ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Ne pas dépasser 30 bar — décharger dès 20 bar</div><div class="fc-detail">Si pression mesurée inférieure à 20 bar → compresseur hors service.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Durée minimale du tirage au vide pour vérification étanchéité ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">5 minutes minimum</div><div class="fc-detail">Puis laisser reposer 5 à 10 minutes et comparer les valeurs lues pour détecter toute remontée de pression.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Code d'ajustage des balances ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Code 0791</div><div class="fc-detail">Accès à l'ajustage balance bouteille (zéro, gain 20kg, tare) et balance huiles (zéro, gain 100-200g, tare).</div></div></div></div>
+  </div>
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(7)">← Schéma hydraulique</button>
+    <button class="nav-btn primary" onclick="goTo(9)">QCM Final →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 9 : QCM ═══ -->
+<div class="chapter" id="ch9">
+  <div class="chapter-label">Chapitre 10 — Évaluation</div>
+  <h2 class="chapter-title">QCM <span>Final</span></h2>
+  <div class="quiz-wrap" id="quizWrap">
+    <div class="quiz-ptxt" id="quizProgressTxt">Question 1 / 9</div>
+    <div id="questionContainer"></div>
+    <button class="quiz-btn" id="btnNext" onclick="nextQuestion()">Question suivante →</button>
+    <button class="quiz-btn" id="btnFinish" onclick="showScore()">Voir mon score →</button>
+  </div>
+  <div class="score-card" id="scoreCard">
+    <div class="score-circle" id="scoreCircle"><div class="score-num" id="scoreNum">0/9</div></div>
+    <div class="score-title" id="scoreTitle">Résultat</div>
+    <p class="score-msg" id="scoreMsg"></p>
+    <button class="btn-retry" onclick="resetQuiz()">↺ Recommencer</button>
+  </div>
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(8)">← Flashcards</button>
+    <button class="nav-btn" disabled>Fin du module ✓</button>
+  </div>
+</div>
+
+</div></div></div>
+
+<script>
+const TOTAL=10;let currentChapter=0;const visited=new Set([0]);
+function goTo(n){
+  document.getElementById('ch'+currentChapter).classList.remove('active');
+  document.querySelectorAll('.nav-item')[currentChapter].classList.remove('active');
+  if(currentChapter!==n){document.querySelectorAll('.nav-item')[currentChapter].classList.add('done');document.getElementById('ck'+currentChapter).textContent='✓';}
+  currentChapter=n;visited.add(n);
+  document.getElementById('ch'+n).classList.add('active');
+  document.querySelectorAll('.nav-item')[n].classList.remove('done');
+  document.querySelectorAll('.nav-item')[n].classList.add('active');
+  document.getElementById('progressBar').style.width=Math.round((visited.size/TOTAL)*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===9&&!quizStarted)initQuiz();
+}
+
+const questions=[
+  {q:"Quel code permet d'accéder aux options avancées de configuration des stations ECK ?",choices:["0791","6836","43210791","12345678"],correct:2,explain:"Le code 43210791 est commun aux stations ECK FLAG et ECK NEXT PRO pour accéder aux options de configuration avancées."},
+  {q:"Quelle est la tolérance autorisée pour la balance de gaz lors de l'étalonnage ?",choices:["±1%","±5%","±10%","±2%"],correct:1,explain:"La tolérance de la balance de gaz est de ±5%, vérifiée avec 3 ou 4 poids différents (1 kg, 5 kg, 10 kg, 20 kg)."},
+  {q:"Quelle est la tolérance du manomètre basse pression ?",choices:["±0,35 bar","±0,50 bar","±0,15 bar","±1 bar"],correct:2,explain:"Tolérance BP : ±0,15 bar. Tolérance HP : ±0,35 bar. Mesure par comparaison avec un manomètre digital de référence."},
+  {q:"À quel endroit précis doit-on faire le niveau d'huile de la pompe à vide ?",choices:["En dessous de l'œilleton","En haut de l'œilleton","Au milieu de l'œilleton","L'œilleton n'est pas utilisé"],correct:2,explain:"Le niveau doit être exactement au milieu de l'œilleton. Trop = pompe peine. Pas assez = problème de dépression."},
+  {q:"Que signifie la fumée blanche en sortie de pompe à vide lors du tirage au vide ?",choices:["Réfrigérant dans la pompe","Vapeur d'eau — aspiration d'air","Huile brûlée","Surchauffe compresseur"],correct:1,explain:"La fumée blanche est de la vapeur d'eau froide, signe d'une aspiration d'air (prise d'air dans flexibles, raccords ou interne machine)."},
+  {q:"Quelle pression ne doit pas être dépassée lors du test compresseur en sortie ?",choices:["10 bar","20 bar","30 bar","50 bar"],correct:2,explain:"Ne pas dépasser 30 bar lors du test. Décharger dès que 20 bar est atteint. Si pression < 20 bar → compresseur HS."},
+  {q:"Quelle est la durée minimale du tirage au vide pour un contrôle d'étanchéité ?",choices:["1 minute","3 minutes","5 minutes","10 minutes"],correct:2,explain:"Tirage au vide minimum 5 minutes, puis laisser reposer 5 à 10 minutes et comparer les valeurs pour détecter toute remontée de pression."},
+  {q:"Quel code d'étalonnage permet l'ajustage des balances ?",choices:["0791","43210791","6836","1234"],correct:0,explain:"Le code 0791 donne accès à l'ajustage des balances : balance bouteille (zéro, gain 20kg, tare) et balance huiles (zéro, gain 100-200g)."},
+  {q:"Lors du remplacement du filtre déshydrateur, que faut-il saisir pour effacer l'alarme ?",choices:["Le N° de série de la station","Le code du technicien","Le code inscrit sur le nouveau filtre","Le code 43210791"],correct:2,explain:"Le code inscrit sur le nouveau filtre supprime l'alarme 'remplacement filtre' ET l'alarme 'huile' simultanément."}
+];
+
+let quizStarted=false,currentQ=0,score=0;
+function initQuiz(){quizStarted=true;currentQ=0;score=0;renderQuestion();}
+function renderQuestion(){
+  const q=questions[currentQ];
+  document.getElementById('quizProgressTxt').textContent=`Question ${currentQ+1} / ${questions.length}`;
+  const L=['A','B','C','D'];
+  document.getElementById('questionContainer').innerHTML=`<div class="question-block"><div class="q-num">Question ${currentQ+1}</div><div class="q-text">${q.q}</div><div class="choices">${q.choices.map((c,i)=>`<div class="choice" id="choice${i}" onclick="selectChoice(${i})"><div class="choice-letter">${L[i]}</div>${c}</div>`).join('')}</div><div class="feedback" id="feedback"></div></div>`;
+  document.getElementById('btnNext').classList.remove('show');
+  document.getElementById('btnFinish').classList.remove('show');
+}
+function selectChoice(idx){
+  const q=questions[currentQ];
+  document.querySelectorAll('.choice').forEach(c=>c.classList.add('disabled'));
+  const fb=document.getElementById('feedback');
+  if(idx===q.correct){score++;document.getElementById('choice'+idx).classList.add('correct');fb.className='feedback show ok';fb.innerHTML='✅ <strong>Correct !</strong> '+q.explain;}
+  else{document.getElementById('choice'+idx).classList.add('wrong');document.getElementById('choice'+q.correct).classList.add('correct');fb.className='feedback show ko';fb.innerHTML='❌ <strong>Incorrect.</strong> '+q.explain;}
+  if(currentQ<questions.length-1)document.getElementById('btnNext').classList.add('show');
+  else document.getElementById('btnFinish').classList.add('show');
+}
+function nextQuestion(){currentQ++;renderQuestion();}
+function showScore(){
+  document.getElementById('quizWrap').style.display='none';
+  const sc=document.getElementById('scoreCard');sc.classList.add('show');
+  const pct=score/questions.length;
+  const color=pct>=0.75?'#22c55e':pct>=0.5?'#eab308':'#cd121d';
+  document.getElementById('scoreCircle').style.borderColor=color;
+  document.getElementById('scoreNum').style.color=color;
+  document.getElementById('scoreNum').textContent=score+'/'+questions.length;
+  let title,msg;
+  if(pct===1){title='🏆 Parfait !';msg='Maîtrise complète de la station de climatisation !';}
+  else if(pct>=0.75){title='✅ Très bien';msg=`${score}/${questions.length} — Bonne maîtrise. Relisez les points manqués.`;}
+  else if(pct>=0.5){title='⚠️ À revoir';msg=`${score}/${questions.length} — Recommencez les chapitres concernés.`;}
+  else{title='❌ À reprendre';msg=`${score}/${questions.length} — Reprenez l'ensemble du module.`;}
+  document.getElementById('scoreTitle').textContent=title;
+  document.getElementById('scoreMsg').textContent=msg;
+}
+function resetQuiz(){document.getElementById('quizWrap').style.display='block';document.getElementById('scoreCard').classList.remove('show');initQuiz();}
+</script>
+</body>
+</html>

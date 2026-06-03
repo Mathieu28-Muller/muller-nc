@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Admin — Muller Automotive</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;}
+header{background:#1e1e1e;color:#fff;padding:0 30px;height:58px;display:flex;align-items:center;gap:16px;}
+header img{height:34px;}
+header h1{font-size:1rem;font-weight:600;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.badge{background:#c00000;color:#fff;font-size:0.65rem;font-weight:700;padding:3px 9px;border-radius:3px;letter-spacing:1px;}
+.hdr-user{font-size:0.76rem;color:#aaa;}
+.hdr-user strong{color:#ddd;}
+.btn-logout{background:none;border:1px solid #555;color:#999;padding:4px 12px;border-radius:4px;font-size:0.73rem;cursor:pointer;}
+.btn-logout:hover{border-color:#c00000;color:#c00000;}
+
+.shell{display:flex;height:calc(100vh - 58px);overflow:hidden;}
+aside{width:260px;background:#fff;border-right:1px solid #ddd;display:flex;flex-direction:column;flex-shrink:0;}
+.aside-top{padding:16px 16px 10px;border-bottom:1px solid #eee;}
+.aside-top p{font-size:0.7rem;text-transform:uppercase;color:#aaa;letter-spacing:1px;margin-bottom:10px;}
+.gamme-btns{display:flex;gap:8px;}
+.gamme-btns button{flex:1;padding:7px;border:1.5px solid #c00000;background:#fff;color:#c00000;border-radius:5px;font-weight:700;font-size:0.8rem;cursor:pointer;}
+.gamme-btns button.active{background:#c00000;color:#fff;}
+.machine-scroll{flex:1;overflow-y:auto;padding:10px 0;}
+.cat-label{font-size:0.65rem;text-transform:uppercase;color:#bbb;letter-spacing:1px;padding:12px 16px 4px;}
+.m-item{padding:8px 16px;font-size:0.85rem;color:#555;cursor:pointer;border-left:3px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-item:hover{background:#fff5f5;border-left-color:#e08080;}
+.m-item.active{background:#fff5f5;border-left-color:#c00000;color:#c00000;font-weight:700;}
+
+main{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:18px;}
+#machine-banner{background:#1e1e1e;border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;}
+#machine-banner.empty{background:#f5f5f5;border:2px dashed #ddd;}
+.m-icon{width:42px;height:42px;background:#c00000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.m-label{color:#fff;}
+.m-label strong{display:block;font-size:1rem;}
+.m-label small{color:#888;font-size:0.78rem;}
+#machine-banner.empty .m-label{color:#aaa;}
+#machine-banner.empty .m-label strong{font-size:0.9rem;font-weight:400;}
+#machine-banner.empty .m-icon{background:#e0e0e0;}
+
+.card{background:#fff;border:1px solid #e2e2e2;border-radius:10px;padding:20px 24px;}
+.tabs{display:flex;border-bottom:2px solid #eee;flex-wrap:wrap;}
+.tab{padding:11px 16px;font-size:0.83rem;font-weight:600;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.tab.active{color:#c00000;border-bottom-color:#c00000;}
+.tab-panel{display:none;padding-top:20px;}
+.tab-panel.active{display:block;}
+
+#drop-zone{border:2.5px dashed #d0d0d0;border-radius:10px;padding:32px 20px;text-align:center;cursor:pointer;background:#fafafa;position:relative;transition:all .2s;}
+#drop-zone.hover{border-color:#c00000;background:#fff5f5;}
+#drop-zone.disabled{opacity:0.4;pointer-events:none;}
+#drop-zone input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
+.drop-icon{font-size:2rem;margin-bottom:8px;display:block;}
+.drop-title{font-size:0.92rem;font-weight:600;color:#555;margin-bottom:4px;}
+.drop-sub{font-size:0.76rem;color:#aaa;}
+.drop-types{display:flex;justify-content:center;gap:7px;margin-top:12px;}
+.type-pill{font-size:0.67rem;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.5px;}
+.pill-red{background:#ffe0e0;color:#c00000;}
+.pill-blue{background:#e0eeff;color:#1a5bc4;}
+.pill-green{background:#e0f5e8;color:#1a7a3c;}
+
+#file-preview{display:none;align-items:center;gap:12px;padding:12px 16px;margin-top:12px;background:#f5fff8;border:1.5px solid #a8d5b5;border-radius:8px;}
+#file-preview.show{display:flex;}
+.fp-icon{font-size:1.7rem;flex-shrink:0;}
+#fp-name{font-weight:600;font-size:0.88rem;}
+#fp-size{font-size:0.73rem;color:#888;margin-top:2px;}
+.btn-remove{margin-left:auto;background:none;border:1px solid #f0c0c0;color:#c00000;padding:5px 10px;border-radius:5px;font-size:0.76rem;cursor:pointer;}
+
+.fields{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;}
+.field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px;}
+.field label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#777;}
+.field input{padding:9px 13px;border:1.5px solid #e0e0e0;border-radius:7px;font-size:0.88rem;background:#fafafa;}
+.field input:focus{outline:none;border-color:#c00000;background:#fff;}
+
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;}
+.btn-main{background:#c00000;color:#fff;border:none;padding:10px 22px;border-radius:7px;font-size:0.86rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;}
+.btn-main:hover{background:#a00000;}
+.btn-main:disabled{background:#ccc;cursor:default;}
+.btn-dark{background:#2b2b2b;color:#ddd;border:none;padding:9px 16px;border-radius:6px;font-size:0.82rem;cursor:pointer;}
+.btn-dark:hover{background:#444;}
+.hint{font-size:0.78rem;color:#999;}
+
+.section-divider{border:none;border-top:1px solid #eee;margin:18px 0;}
+.card-title{font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#888;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+
+.panne-row{display:flex;align-items:center;padding:9px 12px;border:1px solid #eee;border-radius:7px;gap:10px;margin-bottom:6px;background:#fafafa;}
+.pr-icon{font-size:1rem;flex-shrink:0;}
+.pr-info{flex:1;min-width:0;}
+.pr-name{font-weight:600;font-size:0.83rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pr-file{font-size:0.71rem;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.btn-del{background:none;border:1px solid #f5c0c0;color:#c00000;padding:4px 9px;border-radius:5px;font-size:0.73rem;cursor:pointer;flex-shrink:0;}
+.btn-del:hover{background:#fff0f0;}
+.panne-row-active{background:#eef4ff !important;border-color:#b0c8f5 !important;}
+.btn-replace{background:none;border:1px solid #b0c8f5;color:#1a5bc4;padding:4px 9px;border-radius:5px;font-size:0.73rem;cursor:pointer;flex-shrink:0;}
+.btn-replace:hover{background:#e0eeff;}
+#replace-banner{display:none;font-size:0.78rem;color:#1a5bc4;background:#e0eeff;border:1px solid #b0c8f5;border-radius:6px;padding:8px 13px;margin-top:10px;align-items:center;gap:8px;}
+#replace-banner.show{display:flex;}
+.empty-msg{text-align:center;color:#ccc;padding:18px;font-size:0.86rem;}
+
+.add-fields{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:13px;}
+.add-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:150px;}
+.add-field label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#777;}
+.add-field select,.add-field input{padding:9px 12px;border:1.5px solid #e0e0e0;border-radius:7px;font-size:0.86rem;background:#fafafa;}
+.add-field select:focus,.add-field input:focus{outline:none;border-color:#c00000;}
+
+.pagination{display:flex;gap:6px;align-items:center;padding:12px 0 4px;flex-wrap:wrap;}
+.page-btn{background:#fff;border:1.5px solid #e0e0e0;color:#555;padding:5px 13px;border-radius:5px;font-size:0.8rem;cursor:pointer;font-weight:600;}
+.page-btn.active{background:#c00000;color:#fff;border-color:#c00000;}
+.page-btn:hover:not(.active){border-color:#c00000;color:#c00000;}
+.page-info{font-size:0.76rem;color:#aaa;margin-left:auto;}
+.page-info-inline{font-size:0.76rem;color:#aaa;padding:8px 0 4px;}
+.sort-th{cursor:pointer;user-select:none;}
+.sort-th:hover{color:#c00000;}
+
+#toast{position:fixed;bottom:24px;right:24px;background:#1e1e1e;color:#fff;padding:11px 18px;border-radius:8px;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:9px;transform:translateY(16px);opacity:0;transition:all .22s;pointer-events:none;z-index:999;max-width:340px;}
+#toast.show{transform:translateY(0);opacity:1;}
+.t-dot{width:7px;height:7px;background:#4caf50;border-radius:50%;flex-shrink:0;}
+#toast.warn .t-dot{background:#ff9800;}
+
+#path-info{display:none;font-size:0.78rem;color:#888;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;padding:8px 13px;margin-top:10px;font-family:'Courier New',monospace;}
+#path-info.show{display:block;}
+
+/* ══ UTILISATEURS ══ */
+.pending-count{display:inline-flex;align-items:center;justify-content:center;background:#c00000;color:white;border-radius:50%;width:18px;height:18px;font-size:0.68rem;font-weight:700;margin-left:6px;vertical-align:middle;}
+.pending-count.hidden{display:none;}
+
+.user-filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-btn{padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;cursor:pointer;border:1.5px solid #e0e0e0;background:#fff;color:#777;}
+.filter-btn.active{background:#c00000;color:white;border-color:#c00000;}
+
+.user-table{width:100%;border-collapse:collapse;font-size:0.84rem;}
+.user-table th{text-align:left;padding:9px 12px;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#888;border-bottom:2px solid #eee;background:#fafafa;}
+.user-table td{padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+.user-table tr:last-child td{border-bottom:none;}
+.user-table tr:hover td{background:#fffafa;}
+
+.status-pill{display:inline-block;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:20px;}
+.s-active{background:#e0f5e8;color:#1a7a3c;}
+.s-pending{background:#fffbe0;color:#886600;}
+.role-pill{display:inline-block;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:20px;}
+.r-admin{background:#ffe0e0;color:#c00000;}
+.r-contrib{background:#e8f5e0;color:#1a7a3c;}
+.r-user{background:#e0eeff;color:#1a5bc4;}
+
+.uact{display:flex;gap:6px;flex-wrap:wrap;}
+.btn-validate{background:#e0f5e8;color:#1a7a3c;border:1px solid #a8d5b5;padding:4px 10px;border-radius:5px;font-size:0.73rem;cursor:pointer;font-weight:600;}
+.btn-validate:hover{background:#c0ecd0;}
+.btn-role{background:#e0eeff;color:#1a5bc4;border:1px solid #b0c8f5;padding:4px 10px;border-radius:5px;font-size:0.73rem;cursor:pointer;font-weight:600;}
+.btn-role:hover{background:#c8dcf8;}
+.btn-mdp{background:none;border:1px solid #ddd;color:#555;padding:4px 9px;border-radius:5px;font-size:0.73rem;cursor:pointer;}
+.btn-mdp:hover{border-color:#c00000;color:#c00000;}
+.btn-del-u{background:none;border:1px solid #f5c0c0;color:#c00000;padding:4px 9px;border-radius:5px;font-size:0.73rem;cursor:pointer;}
+.btn-del-u:hover{background:#fff0f0;}
+.mod-checks{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.mod-cb{display:inline-flex;align-items:center;gap:4px;font-size:.71rem;color:#555;cursor:pointer;user-select:none;}
+.mod-cb input{accent-color:#1a5bc4;width:13px;height:13px;cursor:pointer;}
+.mod-cb.admin-mod{color:#bbb;font-style:italic;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<header>
+    <img src="logo/Logo.png" onerror="this.style.display='none'">
+    <h1>Base de Cas Muller</h1>
+    <div class="hdr-right">
+        <a href="index.html" class="btn-logout" style="text-decoration:none">← Retour</a>
+        <span class="hdr-user" id="hdr-user"></span>
+        <span class="badge" id="hdr-badge">—</span>
+        <button class="btn-logout" onclick="AUTH.deconnecter()">Déconnexion</button>
+    </div>
+</header>
+
+<div class="shell">
+    <aside>
+        <div class="aside-top">
+            <p>Gamme active</p>
+            <div class="gamme-btns">
+                <button class="active" onclick="switchGamme('CT',this)">CT</button>
+                <button onclick="switchGamme('MRA',this)">MRA</button>
+            </div>
+        </div>
+        <div class="machine-scroll" id="machine-list"></div>
+    </aside>
+
+    <main>
+        <div id="machine-banner" class="empty">
+            <div class="m-icon">⚙</div>
+            <div class="m-label"><strong>Sélectionnez une machine dans la liste</strong></div>
+        </div>
+
+        <div class="card" style="padding-bottom:0;">
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('tab-doc',this)">📎 Ajouter un document</div>
+                <div class="tab" onclick="showTab('tab-machine',this)">🔧 Machines</div>
+                <div class="tab admin-only" onclick="showTab('tab-users',this)">👥 Utilisateurs <span id="pending-badge" class="pending-count hidden">0</span></div>
+            </div>
+
+            <!-- TAB DOC -->
+            <div class="tab-panel active" id="tab-doc">
+                <div id="drop-zone" class="disabled">
+                    <input type="file" id="file-input" accept=".pdf,.mp4,.avi,.html,.htm,.jpg,.png,.xlsx,.docx" onchange="onFileSelect(this.files[0])">
+                    <span class="drop-icon">📂</span>
+                    <div class="drop-title">Glissez votre fichier ici</div>
+                    <div class="drop-sub">ou cliquez pour parcourir</div>
+                    <div class="drop-types">
+                        <span class="type-pill pill-red">PDF</span>
+                        <span class="type-pill pill-blue">MP4</span>
+                        <span class="type-pill pill-green">HTML</span>
+                        <span class="type-pill pill-red">DOCX</span>
+                    </div>
+                </div>
+                <div id="file-preview">
+                    <div class="fp-icon" id="fp-icon">📄</div>
+                    <div><div id="fp-name">—</div><div id="fp-size">—</div></div>
+                    <button class="btn-remove" onclick="resetFile()">✕ Retirer</button>
+                </div>
+                <div id="path-info"></div>
+                <div id="replace-banner">🔄 Remplacement de : <strong id="replace-banner-name"></strong><button class="btn-dark" onclick="annulerRemplacement()" style="margin-left:auto;font-size:0.73rem;padding:4px 10px;">✕ Annuler</button></div>
+                <div class="fields">
+                    <div class="field"><label>Nom du document / panne</label><input type="text" id="doc-name" placeholder="Ex: Erreur 24..."></div>
+                    <div class="field"><label>Nom du fichier (rempli auto)</label><input type="text" id="doc-file" placeholder="Ex: erreur24.pdf"></div>
+                </div>
+                <div class="actions">
+                    <button class="btn-main" id="btn-add-doc" onclick="ajouterDocument()" disabled>✚ Enregistrer la fiche</button>
+                    <span class="hint" id="dl-hint" style="display:none">⬇ Le fichier sera téléchargé automatiquement.</span>
+                </div>
+                <hr class="section-divider">
+                <div class="card-title"><span>📋</span> Documents existants <span id="panne-count" style="margin-left:auto;font-size:0.73rem;color:#bbb;font-weight:400;text-transform:none;letter-spacing:0;"></span></div>
+                <div id="panne-list"><div class="empty-msg">Sélectionnez une machine.</div></div>
+            </div>
+
+            <!-- TAB MACHINE -->
+            <div class="tab-panel" id="tab-machine">
+                <div class="card-title"><span>🔧</span> Nouvelle machine</div>
+                <div class="add-fields">
+                    <div class="add-field"><label>Gamme</label><select id="nm-gamme" onchange="refreshCats()"><option>CT</option><option>MRA</option></select></div>
+                    <div class="add-field"><label>Catégorie</label><select id="nm-cat"></select></div>
+                    <div class="add-field" style="flex:2"><label>Nom machine</label><input type="text" id="nm-name" placeholder="Ex: XG_VL2"></div>
+                </div>
+                <button class="btn-main" onclick="ajouterMachine()">✚ Ajouter la machine</button>
+                <hr class="section-divider">
+                <div class="card-title"><span>📂</span> Nouvelle catégorie</div>
+                <div class="add-fields">
+                    <div class="add-field"><label>Gamme</label><select id="nc-gamme"><option>CT</option><option>MRA</option></select></div>
+                    <div class="add-field" style="flex:3"><label>Nom catégorie</label><input type="text" id="nc-name" placeholder="Ex: COMPRESSEUR"></div>
+                </div>
+                <button class="btn-main" onclick="ajouterCategorie()">✚ Ajouter la catégorie</button>
+            </div>
+
+            <!-- TAB UTILISATEURS -->
+            <div class="tab-panel" id="tab-users">
+                <div class="card-title"><span>👥</span> Gestion des utilisateurs</div>
+                <div class="user-filter-bar">
+                    <button class="filter-btn active" onclick="filtrerUsers('tous',this)">Tous</button>
+                    <button class="filter-btn" onclick="filtrerUsers('pending',this)">⏳ En attente</button>
+                    <button class="filter-btn" onclick="filtrerUsers('active',this)">✅ Actifs</button>
+                    <button class="filter-btn" onclick="filtrerUsers('contributor',this)">✏ Contributeurs</button>
+                    <button class="filter-btn" onclick="filtrerUsers('admin',this)">🔑 Admins</button>
+                </div>
+                <div id="user-list-container"><div class="empty-msg">Chargement...</div></div>
+
+                <hr class="section-divider">
+                <div class="card-title"><span>➕</span> Créer un compte manuellement</div>
+                <div class="add-fields">
+                    <div class="add-field"><label>Prénom Nom</label><input type="text" id="new-name" placeholder="Jean Dupont"></div>
+                    <div class="add-field"><label>Société</label><input type="text" id="new-company" placeholder="Nom de la société"></div>
+                    <div class="add-field"><label>Identifiant</label><input type="text" id="new-user" placeholder="jdupont"></div>
+                    <div class="add-field"><label>Mot de passe</label><input type="password" id="new-pass" placeholder="••••••"></div>
+                    <div class="add-field"><label>Rôle</label>
+                        <select id="new-role">
+                            <option value="user">Lecture seule</option>
+                            <option value="contributor">Contributeur</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-main" onclick="creerCompteManuel()">✚ Créer le compte</button>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<div id="toast"><div class="t-dot"></div><span id="toast-msg"></span></div>
+
+<script src="auth.js"></script>
+<script>
+
+/* ── Protection ── */
+const SESSION = AUTH.protegerPage('contributor');
+if (SESSION) {
+    document.getElementById('hdr-user').innerHTML = `<strong>${SESSION.user}</strong>`;
+    const badgeEl = document.getElementById('hdr-badge');
+    if (SESSION.role === 'admin') {
+        badgeEl.textContent = 'ADMIN';
+        badgeEl.style.background = '#c00000';
+    } else {
+        badgeEl.textContent = 'CONTRIBUTEUR';
+        badgeEl.style.background = '#1a5bc4';
+        // Masquer les onglets et sections réservés aux admins
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    }
+}
+
+/* ================================================================
+   BASE DE DONNÉES — chargée depuis l'API, sauvegardée auto
+   ================================================================ */
+let baseDeDonnees = {};
+let documentsPannes = {};
+let gammeActive="CT", machineActive=null, currentFile=null, userFilter='tous';
+let replacingIndex=null, replacingOldFile=null;
+let userSort={col:'name',dir:'asc'}, userPage=1;
+const PAGE_SIZE=20;
+
+async function sauvegarderDonnees() {
+    try {
+        const token = localStorage.getItem('ma_jwt');
+        const res = await fetch('/api/data', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ baseDeDonnees, documentsPannes })
+        });
+        if (!res.ok) toast('⚠️ Erreur de sauvegarde.', true);
+    } catch { toast('⚠️ Serveur inaccessible.', true); }
+}
+
+async function chargerDonnees() {
+    try {
+        const res = await fetch('/api/data');
+        const data = await res.json();
+        baseDeDonnees  = data.baseDeDonnees;
+        documentsPannes = data.documentsPannes;
+    } catch { toast('⚠️ Impossible de charger les données.', true); }
+}
+
+/* ── Tabs ── */
+function showTab(id,el){
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+    if(id==='tab-machine') refreshCats();
+    if(id==='tab-users') renderUserList();
+}
+
+/* ── Sidebar ── */
+function switchGamme(g,btn){gammeActive=g;document.querySelectorAll('.gamme-btns button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');machineActive=null;resetBanner();renderSidebar();}
+
+function renderSidebar(){
+    const ul=document.getElementById('machine-list');ul.innerHTML='';
+    for(const[cat,machines]of Object.entries(baseDeDonnees[gammeActive])){
+        const lbl=document.createElement('div');lbl.className='cat-label';lbl.textContent=cat;ul.appendChild(lbl);
+        machines.forEach(m=>{const item=document.createElement('div');item.className='m-item'+(m===machineActive?' active':'');item.textContent=m.replaceAll('_',' ');item.title=m;item.onclick=()=>selectMachine(m);ul.appendChild(item);});
+    }
+}
+
+function selectMachine(m){
+    machineActive=m;renderSidebar();renderPanneList();
+    const b=document.getElementById('machine-banner');b.className='';
+    b.innerHTML=`<div class="m-icon">⚙</div><div class="m-label"><strong>${m.replaceAll('_',' ')}</strong><small>Gamme ${gammeActive} — ${getCatOfMachine(m)}</small></div>`;
+    document.getElementById('drop-zone').classList.remove('disabled');
+    const pi=document.getElementById('path-info');pi.style.display='block';pi.textContent=`📁 Dossier cible : media/${gammeActive}/${machineActive}/`;
+}
+
+function resetBanner(){
+    const b=document.getElementById('machine-banner');b.className='empty';
+    b.innerHTML=`<div class="m-icon">⚙</div><div class="m-label"><strong>Sélectionnez une machine dans la liste</strong></div>`;
+    document.getElementById('drop-zone').classList.add('disabled');
+    document.getElementById('path-info').style.display='none';
+    renderPanneList();
+}
+
+function getCatOfMachine(m){for(const[cat,list]of Object.entries(baseDeDonnees[gammeActive]))if(list.includes(m))return cat;return '—';}
+
+/* ── Drag & Drop ── */
+const dz=document.getElementById('drop-zone');
+dz.addEventListener('dragover',e=>{e.preventDefault();if(!dz.classList.contains('disabled'))dz.classList.add('hover');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('hover'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('hover');if(dz.classList.contains('disabled'))return;const f=e.dataTransfer.files[0];if(f)onFileSelect(f);});
+
+function slugifyFilename(name){
+    const dot=name.lastIndexOf('.');
+    const ext=dot>=0?name.slice(dot).toLowerCase():'';
+    const base=dot>=0?name.slice(0,dot):name;
+    return base.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9\-_.]/g,'_').replace(/_+/g,'_').replace(/^_+|_+$/g,'')+ext;
+}
+
+function onFileSelect(f){
+    if(!f)return;currentFile=f;
+    let icon='📄';if(/\.mp4|\.avi/i.test(f.name))icon='🎥';if(/\.html?/i.test(f.name))icon='🌐';if(/\.jpe?g|\.png/i.test(f.name))icon='🖼';if(/\.xlsx?/i.test(f.name))icon='📊';
+    document.getElementById('fp-icon').textContent=icon;document.getElementById('fp-name').textContent=f.name;document.getElementById('fp-size').textContent=formatSize(f.size);
+    document.getElementById('file-preview').classList.add('show');
+    if(!document.getElementById('doc-file').value)document.getElementById('doc-file').value=slugifyFilename(f.name);
+    document.getElementById('dl-hint').style.display='inline';checkBtnState();
+}
+
+function resetFile(){currentFile=null;document.getElementById('file-preview').classList.remove('show');document.getElementById('doc-file').value=replacingIndex!==null?(replacingOldFile||''):'';document.getElementById('file-input').value='';document.getElementById('dl-hint').style.display='none';checkBtnState();}
+function formatSize(b){if(b<1024)return b+' o';if(b<1048576)return (b/1024).toFixed(1)+' Ko';return (b/1048576).toFixed(1)+' Mo';}
+function checkBtnState(){const ok=document.getElementById('doc-name').value.trim()&&document.getElementById('doc-file').value.trim();document.getElementById('btn-add-doc').disabled=!machineActive||!ok;}
+document.getElementById('doc-name').addEventListener('input',checkBtnState);
+document.getElementById('doc-file').addEventListener('input',checkBtnState);
+
+async function ajouterDocument(){
+    if(!machineActive)return;
+    const name=document.getElementById('doc-name').value.trim();const fileName=document.getElementById('doc-file').value.trim();
+    if(!name||!fileName){toast('Remplissez le nom et le fichier.',true);return;}
+
+    const token=localStorage.getItem('ma_jwt');
+    const isReplace=replacingIndex!==null;
+
+    // Suppression de l'ancien fichier physique si le nom a changé
+    if(isReplace && replacingOldFile && replacingOldFile!==fileName){
+        try{
+            await fetch(`/api/media?gamme=${encodeURIComponent(gammeActive)}&machine=${encodeURIComponent(machineActive)}&file=${encodeURIComponent(replacingOldFile)}`,
+                {method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
+        }catch{}
+    }
+
+    // Upload du fichier si sélectionné
+    if(currentFile){
+        const fd=new FormData();
+        fd.append('file', currentFile, fileName);
+        toast('⏳ Upload en cours…');
+        document.getElementById('btn-add-doc').disabled=true;
+        try{
+            const r=await fetch(`/api/upload?gamme=${encodeURIComponent(gammeActive)}&machine=${encodeURIComponent(machineActive)}`,{
+                method:'POST',
+                headers:{Authorization:`Bearer ${token}`},
+                body:fd
+            });
+            if(!r.ok){const e=await r.json();toast('⚠️ Erreur upload : '+(e.error||r.status),true);document.getElementById('btn-add-doc').disabled=false;return;}
+        }catch{toast('⚠️ Serveur inaccessible lors de l\'upload.',true);document.getElementById('btn-add-doc').disabled=false;return;}
+    }
+
+    // Sauvegarde des métadonnées
+    if(!documentsPannes[machineActive])documentsPannes[machineActive]=[];
+    if(isReplace){
+        documentsPannes[machineActive][replacingIndex]={name,file:fileName};
+        toast(`✅ "${name}" mis à jour.`);
+    } else {
+        documentsPannes[machineActive].push({name,file:fileName});
+        toast(currentFile?`✅ "${fileName}" uploadé dans media/${gammeActive}/${machineActive}/`:`✅ "${name}" ajouté à ${machineActive.replaceAll('_',' ')}`);
+    }
+    await sauvegarderDonnees();
+    document.getElementById('doc-name').value='';
+    annulerRemplacement();
+    resetFile();
+    renderPanneList();
+    checkBtnState();
+}
+
+function renderPanneList(){
+    const c=document.getElementById('panne-list');
+    if(!machineActive){c.innerHTML='<div class="empty-msg">Sélectionnez une machine.</div>';document.getElementById('panne-count').textContent='';return;}
+    const pannes=documentsPannes[machineActive]||[];
+    document.getElementById('panne-count').textContent=`${pannes.length} fiche${pannes.length!==1?'s':''}`;
+    if(!pannes.length){c.innerHTML='<div class="empty-msg">Aucun document pour cette machine.</div>';return;}
+    c.innerHTML='';
+    pannes.forEach((p,i)=>{
+        let icon='📄';if(/\.mp4/i.test(p.file))icon='🎥';if(/\.html?/i.test(p.file))icon='🌐';if(/\.jpe?g|\.png/i.test(p.file))icon='🖼';
+        const row=document.createElement('div');row.className='panne-row'+(i===replacingIndex?' panne-row-active':'');
+        row.innerHTML=`<div class="pr-icon">${icon}</div><div class="pr-info"><div class="pr-name">${p.name}</div><div class="pr-file">${p.file}</div></div><button class="btn-replace" title="Remplacer ce document" onclick="demarrerRemplacement(${i})">🔄</button><button class="btn-del" onclick="supprimerPanne(${i})">Supprimer</button>`;
+        c.appendChild(row);
+    });
+}
+
+function demarrerRemplacement(i){
+    const p=documentsPannes[machineActive][i];
+    replacingIndex=i; replacingOldFile=p.file;
+    document.getElementById('doc-name').value=p.name;
+    document.getElementById('doc-file').value=p.file;
+    document.getElementById('replace-banner-name').textContent=p.name;
+    document.getElementById('replace-banner').classList.add('show');
+    document.getElementById('btn-add-doc').innerHTML='💾 Mettre à jour';
+    document.getElementById('btn-add-doc').disabled=false;
+    renderPanneList();
+    document.getElementById('drop-zone').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function annulerRemplacement(){
+    replacingIndex=null; replacingOldFile=null;
+    document.getElementById('replace-banner').classList.remove('show');
+    document.getElementById('btn-add-doc').innerHTML='✚ Enregistrer la fiche';
+    checkBtnState();
+}
+
+async function supprimerPanne(i){
+    if(!confirm('Supprimer cette fiche et son fichier sur le serveur ?'))return;
+    const panne=documentsPannes[machineActive][i];
+    const token=localStorage.getItem('ma_jwt');
+
+    // Suppression physique du fichier (non bloquante : on continue même si le fichier est absent)
+    if(panne.file){
+        try{
+            await fetch(`/api/media?gamme=${encodeURIComponent(gammeActive)}&machine=${encodeURIComponent(machineActive)}&file=${encodeURIComponent(panne.file)}`,
+                {method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
+        }catch{}
+    }
+
+    documentsPannes[machineActive].splice(i,1);
+    await sauvegarderDonnees();
+    renderPanneList();
+    toast('Fiche et fichier supprimés.');
+}
+
+function refreshCats(){const g=document.getElementById('nm-gamme').value;document.getElementById('nm-cat').innerHTML=Object.keys(baseDeDonnees[g]||{}).map(c=>`<option>${c}</option>`).join('');}
+
+async function ajouterMachine(){
+    const g=document.getElementById('nm-gamme').value,cat=document.getElementById('nm-cat').value,name=document.getElementById('nm-name').value.trim().toUpperCase().replace(/ /g,'_');
+    if(!name){toast('Entrez un nom de machine.',true);return;}
+    if(baseDeDonnees[g][cat].includes(name)){toast('Machine déjà existante.',true);return;}
+    baseDeDonnees[g][cat].push(name);await sauvegarderDonnees();document.getElementById('nm-name').value='';renderSidebar();toast(`✅ Machine "${name}" ajoutée.`);
+}
+
+async function ajouterCategorie(){
+    const g=document.getElementById('nc-gamme').value,name=document.getElementById('nc-name').value.trim().toUpperCase();
+    if(!name){toast('Entrez un nom.',true);return;}
+    if(baseDeDonnees[g][name]){toast('Catégorie déjà existante.',true);return;}
+    baseDeDonnees[g][name]=[];await sauvegarderDonnees();document.getElementById('nc-name').value='';refreshCats();renderSidebar();toast(`✅ Catégorie "${name}" créée.`);
+}
+
+/* ════════════════════════════════════════════
+   GESTION UTILISATEURS
+   ════════════════════════════════════════════ */
+async function renderUserList(){
+    const users=await AUTH.listerUsers();
+    const pending=users.filter(u=>u.status==='pending').length;
+    const badge=document.getElementById('pending-badge');
+    badge.textContent=pending;badge.classList.toggle('hidden',pending===0);
+
+    // Filtrage
+    let filtered=users;
+    if(userFilter==='pending')     filtered=users.filter(u=>u.status==='pending');
+    else if(userFilter==='active') filtered=users.filter(u=>u.status==='active');
+    else if(userFilter==='contributor') filtered=users.filter(u=>u.role==='contributor');
+    else if(userFilter==='admin')  filtered=users.filter(u=>u.role==='admin');
+
+    // Tri
+    const roleOrder={admin:0,contributor:1,user:2};
+    filtered.sort((a,b)=>{
+        let av,bv;
+        if(userSort.col==='name')    {av=(a.name||'').toLowerCase();bv=(b.name||'').toLowerCase();}
+        else if(userSort.col==='company'){av=(a.company||'').toLowerCase();bv=(b.company||'').toLowerCase();}
+        else if(userSort.col==='role')  {av=roleOrder[a.role]??9;bv=roleOrder[b.role]??9;}
+        else if(userSort.col==='status'){av=a.status;bv=b.status;}
+        const cmp=av<bv?-1:av>bv?1:0;
+        return userSort.dir==='asc'?cmp:-cmp;
+    });
+
+    const c=document.getElementById('user-list-container');
+    if(!filtered.length){c.innerHTML='<div class="empty-msg">Aucun utilisateur dans cette catégorie.</div>';return;}
+
+    // Pagination
+    const total=filtered.length;
+    const totalPages=Math.ceil(total/PAGE_SIZE);
+    if(userPage>totalPages)userPage=1;
+    const page=filtered.slice((userPage-1)*PAGE_SIZE,userPage*PAGE_SIZE);
+
+    // En-têtes triables
+    const si=(col)=>userSort.col===col?(userSort.dir==='asc'?' ▲':' ▼'):'';
+    const moi=SESSION?SESSION.user:'';
+
+    let html=`<table class="user-table"><thead><tr>
+        <th class="sort-th" onclick="setSort('name')">Nom${si('name')}</th>
+        <th>Identifiant</th>
+        <th class="sort-th" onclick="setSort('company')">Société${si('company')}</th>
+        <th class="sort-th" onclick="setSort('role')">Rôle${si('role')}</th>
+        <th class="sort-th" onclick="setSort('status')">Statut${si('status')}</th>
+        <th>Créé le</th><th>Dernière connexion</th><th>Modules Formation</th><th>Actions</th>
+    </tr></thead><tbody>`;
+
+    page.forEach(u=>{
+        const estMoi=u.user===moi;
+        const date=u.createdAt?new Date(u.createdAt).toLocaleDateString('fr-FR'):'—';
+        const lastLogin=u.lastLogin?new Date(u.lastLogin).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}):'Jamais';
+        html+=`<tr>
+            <td>${u.name||'—'}</td>
+            <td><strong>${u.user}</strong>${estMoi?' <em style="color:#aaa;font-size:0.72rem">(vous)</em>':''}</td>
+            <td style="font-size:0.78rem;color:#666">${u.company||'—'}</td>
+            <td><span class="role-pill ${u.role==='admin'?'r-admin':u.role==='contributor'?'r-contrib':'r-user'}">${u.role==='admin'?'Admin':u.role==='contributor'?'Contributeur':'Lecture seule'}</span></td>
+            <td><span class="status-pill ${u.status==='active'?'s-active':'s-pending'}">${u.status==='active'?'✅ Actif':'⏳ En attente'}</span></td>
+            <td style="font-size:0.78rem;color:#888">${date}</td>
+            <td style="font-size:0.78rem;color:#888">${lastLogin}</td>
+            <td>${renderModuleChecks(u)}</td>
+            <td><div class="uact">
+                ${u.status==='pending'?`<button class="btn-validate" onclick="doValider('${u.user}')">✓ Valider</button>`:''}
+                ${!estMoi?`<select class="btn-role" onchange="doRole('${u.user}',this.value)" style="cursor:pointer">
+                    <option value="user" ${u.role==='user'?'selected':''}>Lecture seule</option>
+                    <option value="contributor" ${u.role==='contributor'?'selected':''}>Contributeur</option>
+                    <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+                </select>`:''}
+                <button class="btn-mdp" onclick="doMdp('${u.user}')">🔑 MDP</button>
+                ${!estMoi?`<button class="btn-del-u" onclick="doSuppr('${u.user}')">✕</button>`:''}
+            </div></td>
+        </tr>`;
+    });
+    html+=`</tbody></table>`;
+
+    // Barre de pagination
+    if(totalPages>1){
+        html+=`<div class="pagination">`;
+        for(let i=1;i<=totalPages;i++)
+            html+=`<button class="page-btn${i===userPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+        html+=`<span class="page-info">${total} utilisateur${total>1?'s':''}</span></div>`;
+    } else {
+        html+=`<div class="page-info-inline">${total} utilisateur${total>1?'s':''}</div>`;
+    }
+
+    c.innerHTML=html;
+}
+
+function setSort(col){
+    if(userSort.col===col)userSort.dir=userSort.dir==='asc'?'desc':'asc';
+    else{userSort.col=col;userSort.dir='asc';}
+    userPage=1;renderUserList();
+}
+function goPage(p){userPage=p;renderUserList();}
+function filtrerUsers(f,btn){userFilter=f;userPage=1;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderUserList();}
+/* ── Modules Formation ── */
+const FORMATION_MODULES=[{id:'BASE_CAS',label:'Base de cas'},{id:'CT',label:'CT'},{id:'MRA',label:'MRA'},{id:'SENSIBILISATION',label:'Sensib.'}];
+
+function renderModuleChecks(u){
+    // Admin et contributeur ont accès à tout — affichage figé
+    if(['admin','contributor'].includes(u.role)){
+        return `<div class="mod-checks">${FORMATION_MODULES.map(m=>`<span class="mod-cb admin-mod">✓ ${m.label}</span>`).join('')}</div>`;
+    }
+    const mods=u.modules||[];
+    return `<div class="mod-checks">${FORMATION_MODULES.map(m=>`
+        <label class="mod-cb" title="Accès ${m.id}">
+            <input type="checkbox" ${mods.includes(m.id)?'checked':''}
+                onchange="toggleModule('${u.user}','${m.id}',this.checked)">
+            ${m.label}
+        </label>`).join('')}</div>`;
+}
+
+async function toggleModule(user,module,enabled){
+    const token=localStorage.getItem('ma_jwt');
+    // Récupérer les modules actuels depuis la liste chargée
+    const allUsers=await AUTH.listerUsers();
+    const u=allUsers.find(x=>x.user===user);
+    if(!u)return;
+    let mods=[...(u.modules||[])];
+    if(enabled&&!mods.includes(module))mods.push(module);
+    if(!enabled)mods=mods.filter(m=>m!==module);
+    try{
+        const r=await fetch(`/api/users/${encodeURIComponent(user)}/modules`,{
+            method:'PUT',
+            headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+            body:JSON.stringify({modules:mods})
+        });
+        if(!r.ok){toast(`⚠️ Erreur mise à jour modules.`,true);return;}
+        toast(`✅ Modules de "${user}" mis à jour.`);
+    }catch{toast('⚠️ Serveur inaccessible.',true);}
+}
+
+async function doValider(user){await AUTH.validerUser(user);toast(`✅ Compte "${user}" activé.`);renderUserList();}
+async function doRole(user,newRole){
+    const labels={admin:'Admin',contributor:'Contributeur',user:'Lecture seule'};
+    await AUTH.changerRole(user,newRole);
+    toast(`Rôle de "${user}" → ${labels[newRole]||newRole}.`);
+    renderUserList();
+}
+async function doMdp(user){const p=prompt(`Nouveau mot de passe pour "${user}" :`);if(!p)return;if(p.length<4){toast('Trop court (min. 4 car.).',true);return;}await AUTH.changerMotDePasse(user,p);toast(`🔑 Mot de passe de "${user}" mis à jour.`);}
+async function doSuppr(user){if(!confirm(`Supprimer définitivement "${user}" ?`))return;await AUTH.supprimerUser(user);toast(`Compte "${user}" supprimé.`);renderUserList();}
+
+async function creerCompteManuel(){
+    const name=document.getElementById('new-name').value.trim();
+    const company=document.getElementById('new-company').value.trim();
+    const user=document.getElementById('new-user').value.trim();
+    const pass=document.getElementById('new-pass').value;
+    const role=document.getElementById('new-role').value;
+    if(!name||!user||!pass){toast('Remplissez tous les champs obligatoires.',true);return;}
+    if(pass.length<4){toast('Mot de passe trop court.',true);return;}
+    const res=await AUTH.creerUtilisateur(name,user,pass,role,company);
+    if(res==='existe'){toast('Identifiant déjà existant.',true);return;}
+    const labels={admin:'Admin',contributor:'Contributeur',user:'Lecture seule'};
+    document.getElementById('new-name').value='';
+    document.getElementById('new-company').value='';
+    document.getElementById('new-user').value='';
+    document.getElementById('new-pass').value='';
+    toast(`✅ Compte "${user}" créé (${labels[role]||role}).`);
+    renderUserList();
+}
+
+
+/* ── Toast ── */
+let toastTimer;
+function toast(msg,warn=false){const el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='show'+(warn?' warn':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),4500);}
+
+/* ── Init ── */
+// Chargement initial : données + badge utilisateurs
+(async function(){
+    await chargerDonnees();
+    renderSidebar();
+    refreshCats();
+    const users=await AUTH.listerUsers();
+    const p=users.filter(u=>u.status==='pending').length;
+    const b=document.getElementById('pending-badge');
+    if(b){b.textContent=p;b.classList.toggle('hidden',p===0);}
+})();
+</script>
+</body>
+</html>

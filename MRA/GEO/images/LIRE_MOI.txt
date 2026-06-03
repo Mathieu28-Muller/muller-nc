@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════════════
+ IMAGES DU COURS — GÉOMÉTRIE DES TRAINS ROULANTS
+═══════════════════════════════════════════════════════
+
+Remplacez les fichiers placeholder par vos propres images.
+Respectez EXACTEMENT les noms de fichiers ci-dessous.
+Format accepté : JPG, JPEG, PNG (renommez en .jpg si besoin)
+
+── CARROSSAGE ─────────────────────────────────────────
+  carrossage-1.jpg   → Schéma carrossage (votre document)
+  carrossage-2.jpg   → Vue suspension avec carrossage
+  carrossage-3.jpg   → Usure pneu liée au carrossage
+
+── PARALLÉLISME ──────────────────────────────────────
+  parallelisme-1.jpg → Schéma parallélisme
+  parallelisme-2.jpg → Vue dessus toe-in / toe-out
+
+── CHASSE ────────────────────────────────────────────
+  chasse-1.jpg       → Schéma angle de chasse
+  chasse-2.jpg       → Vue latérale axe de pivot
+
+── PIVOT / KPI ───────────────────────────────────────
+  pivot-1.jpg        → Schéma inclinaison de pivot
+  pivot-2.jpg        → Vue suspension KPI
+
+── DÉPORT AU SOL ─────────────────────────────────────
+  deport-1.jpg       → Schéma déport au sol
+  deport-2.jpg       → Vue frontale déport et axe pivot
+
+── ANGLE INCLUS ──────────────────────────────────────
+  inclus-1.jpg       → Schéma angle inclus
+  inclus-2.jpg       → Diagnostic pièces déformées
+
+── SETBACK ───────────────────────────────────────────
+  setback-1.jpg      → Schéma setback
+  setback-2.jpg      → Vue dessus décalage axial
+
+── ANGLE DE POUSSÉE ──────────────────────────────────
+  poussee-1.jpg      → Schéma angle de poussée
+  poussee-2.jpg      → Marche en crabe vue dessus
+
+═══════════════════════════════════════════════════════
+ Si une image est absente, la zone est simplement cachée
+ Si le nom est incorrect, l'image ne s'affiche pas
+═══════════════════════════════════════════════════════

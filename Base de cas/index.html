@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Muller Automotive - Base Maintenance</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .user-bar { background: #1a1a1a; display: flex; align-items: center; justify-content: space-between; padding: 6px 20px; gap: 12px; font-size: 0.76rem; color: #999; flex-wrap: wrap; }
+        .user-bar-left { display: flex; align-items: center; }
+        .user-bar-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .btn-accueil { display: flex; align-items: center; gap: 6px; text-decoration: none; color: #999; font-size: 0.74rem; transition: color 0.2s; }
+        .btn-accueil:hover { color: #c00000; }
+        .btn-accueil svg { flex-shrink: 0; }
+        .user-bar .username { color: #ddd; font-weight: 600; }
+        .role-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.8px; text-transform: uppercase; }
+        .role-badge.admin { background: #c00000; color: white; }
+        .role-badge.user { background: #2b6cb0; color: white; }
+        .btn-bar { background: none; border: 1px solid #555; color: #999; padding: 4px 12px; border-radius: 4px; font-size: 0.74rem; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .btn-bar:hover { border-color: #c00000; color: #c00000; }
+        .btn-bar.admin-link { background: #c00000; color: white; border-color: #c00000; font-weight: 600; }
+        .btn-bar.admin-link:hover { background: #a00000; }
+    </style>
+</head>
+<body>
+
+<div class="user-bar">
+    <div class="user-bar-left">
+        <a class="btn-accueil" href="/">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Accueil
+        </a>
+    </div>
+    <div class="user-bar-right" id="user-bar">Chargement...</div>
+</div>
+
+<header>
+    <img src="logo/Logo.png" class="logo">
+    <h1>Base de Cas / Pannes Machines</h1>
+</header>
+
+<div class="nav-gamme">
+    <button onclick="filtrerGamme('CT')" id="btn-CT" class="btn-cat active">MATÉRIEL CT</button>
+    <button onclick="filtrerGamme('MRA')" id="btn-MRA" class="btn-cat">MATÉRIEL MRA</button>
+</div>
+
+<input id="search" placeholder="Rechercher machine ou panne">
+<div id="machines" class="grid"></div>
+
+<footer>
+    <p><strong>© 2026 MULLER Automotive</strong> <i>by M@t</i></p>
+</footer>
+
+<script src="auth.js"></script>
+<script>
+
+/* ── Protection + barre utilisateur ── */
+const SESSION = AUTH.protegerPage('any');
+if (SESSION) {
+    const bar = document.getElementById('user-bar');
+    bar.innerHTML = `
+        <span class="username">👤 ${SESSION.user}</span>
+        <span class="role-badge ${SESSION.role}">${SESSION.role === 'admin' ? 'Administrateur' : SESSION.role === 'contributor' ? 'Contributeur' : 'Lecture seule'}</span>
+        ${SESSION.role === 'admin' ? '<a class="btn-bar admin-link" href="admin.html">⚙ Administration</a>' : SESSION.role === 'contributor' ? '<a class="btn-bar admin-link" href="admin.html">✏ Contribuer</a>' : ''}
+        <button class="btn-bar" onclick="AUTH.deconnecter()">Déconnexion</button>
+    `;
+}
+</script>
+<script src="script.js?v=2"></script>
+</body>
+</html>

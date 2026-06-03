@@ -1,0 +1,1263 @@
+{
+  "demandes": [
+    {
+      "id": "1776013594955",
+      "createdAt": "2026-04-12T17:06:34.955Z",
+      "status": "validee",
+      "agrement": "S033J182",
+      "compteClt": "CFRA28773",
+      "nomCentre": "AUTOVISION POIDS LOURDS",
+      "adresse": "27 AVENUE DU GENERAL DE GAULLE",
+      "cp": "33530",
+      "ville": "BASSENS",
+      "email": "t@t.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "PL",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "numSerie": "368",
+              "modele": "PXG PL"
+            },
+            {
+              "label": "Freinage",
+              "numSerie": "124"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "764-8",
+          "materiels": [
+            {
+              "label": "R�gle phare",
+              "numSerie": "3206"
+            }
+          ]
+        }
+      ],
+      "attestations": [
+        {
+          "numero": "260412A",
+          "pdfUrl": "/api/archives/260412A.pdf",
+          "sectionIndex": 0
+        },
+        {
+          "numero": "260412B",
+          "pdfUrl": "/api/archives/260412B.pdf",
+          "sectionIndex": 1
+        }
+      ],
+      "numero": "260412A",
+      "valideeAt": "2026-04-12T17:06:53.706Z"
+    },
+    {
+      "id": "1776013969833",
+      "createdAt": "2026-04-12T17:12:49.834Z",
+      "status": "validee",
+      "agrement": "S062D101",
+      "compteClt": "C497615000",
+      "nomCentre": "ABF -DEKRA(2109001299) CHURCHILL",
+      "adresse": "58 AVENUE WINSTON CHURCHILL",
+      "cp": "62000",
+      "ville": "ARRAS",
+      "telephone": "33321237005",
+      "email": "test@test.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "",
+              "numSerie": "",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "FREIN 4T MUX 4KW 400 50H F C",
+              "numSerie": "43300207",
+              "versionLog": ""
+            },
+            {
+              "label": "Ripage",
+              "modele": "44100(-D)",
+              "numSerie": "454",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "46600-MUX",
+              "numSerie": "1812",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "764-8",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "REGLE PHARE",
+              "numSerie": "172",
+              "versionLog": ""
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "",
+              "numSerie": "",
+              "versionLog": ""
+            },
+            {
+              "label": "Analyseur de gaz",
+              "modele": "AT505",
+              "numSerie": "612/18",
+              "versionLog": "2.0.34.4 LAN3.01"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "ACTIGAS AT605",
+              "numSerie": "508336",
+              "versionLog": "2.22.2094 LAN3.01"
+            },
+            {
+              "label": "OBD",
+              "modele": "CONTROLEUR OBD VL-ACTIGAS BTSF",
+              "numSerie": "0571-16",
+              "versionLog": ""
+            }
+          ]
+        }
+      ],
+      "attestations": [
+        {
+          "numero": "260412C",
+          "pdfUrl": "/api/archives/260412C.pdf",
+          "sectionIndex": 0
+        },
+        {
+          "numero": "260412D",
+          "pdfUrl": "/api/archives/260412D.pdf",
+          "sectionIndex": 1
+        },
+        {
+          "numero": "260412E",
+          "pdfUrl": "/api/archives/260412E.pdf",
+          "sectionIndex": 2
+        }
+      ],
+      "numero": "260412C",
+      "valideeAt": "2026-04-12T17:13:43.767Z"
+    },
+    {
+      "id": "1776021613180",
+      "createdAt": "2026-04-12T19:20:13.180Z",
+      "status": "validee",
+      "agrement": "S047S102",
+      "compteClt": "CFRA30465",
+      "nomCentre": "AUTO CONTROLE MARMANDAIS",
+      "adresse": "AVENUE FRANCOIS MITTERAND",
+      "cp": "47200",
+      "ville": "MARMANDE",
+      "telephone": "33553931128",
+      "email": "moi@test.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "PUP SECU XG VL/230-400/INFO",
+              "numSerie": "543102615",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "43350$",
+              "numSerie": "1720",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Ripage",
+              "modele": "44100(-L-D)",
+              "numSerie": "3549",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "55950$",
+              "numSerie": "358",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "764-8",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "REGLE PHARE",
+              "numSerie": "1489",
+              "versionLog": "1.00 LAN1.00"
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "AT505",
+              "numSerie": "192/18",
+              "versionLog": "1.0.0.1 LAN5.00"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "OPACIMETRE FR",
+              "numSerie": "136325",
+              "versionLog": "2.0.0.1 LAN5.00"
+            },
+            {
+              "label": "OBD",
+              "modele": "INTERFACE ACTI-OBD SEULE",
+              "numSerie": "0221-23",
+              "versionLog": "1.0.0.2 LAN5.00"
+            }
+          ]
+        },
+        {
+          "type": "classeL",
+          "sousType": "CELEROMETRE+SONOMETRE",
+          "materiels": [
+            {
+              "label": "Célérométre",
+              "modele": "BANC CELEROMETRE CYCLO L1",
+              "numSerie": "CEL.50 0252",
+              "versionLog": ""
+            },
+            {
+              "label": "Calibreur",
+              "modele": "",
+              "numSerie": "",
+              "versionLog": ""
+            },
+            {
+              "label": "Sonomètre",
+              "modele": "SONOMETRE CLASSE 2",
+              "numSerie": "10229",
+              "versionLog": ""
+            }
+          ]
+        }
+      ],
+      "attestations": [
+        {
+          "numero": "260412F",
+          "pdfUrl": "/api/archives/260412F.pdf",
+          "sectionIndex": 0
+        },
+        {
+          "numero": "260412G",
+          "pdfUrl": "/api/archives/260412G.pdf",
+          "sectionIndex": 1
+        },
+        {
+          "numero": "260412H",
+          "pdfUrl": "/api/archives/260412H.pdf",
+          "sectionIndex": 2
+        },
+        {
+          "numero": "260412I",
+          "pdfUrl": "/api/archives/260412I.pdf",
+          "sectionIndex": 3
+        }
+      ],
+      "numero": "260412F",
+      "valideeAt": "2026-04-12T19:39:32.016Z"
+    },
+    {
+      "id": "1776027623549",
+      "createdAt": "2026-04-12T21:00:23.549Z",
+      "status": "validee",
+      "agrement": "S047S102",
+      "compteClt": "CFRA30465",
+      "nomCentre": "AUTO CONTROLE MARMANDAIS",
+      "adresse": "AVENUE FRANCOIS MITTERAND",
+      "cp": "47200",
+      "ville": "MARMANDE",
+      "telephone": "33553931128",
+      "email": "t@tt.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "PUP SECU XG VL/230-400/INFO",
+              "numSerie": "1013",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "43350$",
+              "numSerie": "1720",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Ripage",
+              "modele": "44100(-L-D)",
+              "numSerie": "3549",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "55950$",
+              "numSerie": "358",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "764-8",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "REGLE PHARE",
+              "numSerie": "1489",
+              "versionLog": "1.00 LAN1.00"
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "ANALYSEUR DE GAZ FR",
+              "numSerie": "164/17",
+              "versionLog": "2.0.34.4 LAN5.00"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "$PPRO HLT OPTICAL UNIT PTI L",
+              "numSerie": "1489",
+              "versionLog": "2.22.2094 LAN3.01"
+            },
+            {
+              "label": "OBD",
+              "modele": "CONTROLEUR OBD VL-ACTIGAS BTSF",
+              "numSerie": "0668/16",
+              "versionLog": "1.0.0.2 LAN5.00"
+            }
+          ]
+        },
+        {
+          "type": "classeL",
+          "sousType": "CELEROMETRE+SONOMETRE",
+          "materiels": [
+            {
+              "label": "Célérométre",
+              "modele": "CEL.50",
+              "numSerie": "252",
+              "versionLog": "1.3.0.2 LAN5.00"
+            },
+            {
+              "label": "Calibreur",
+              "modele": "CALIBREUR CLASSE 1",
+              "numSerie": "105631",
+              "versionLog": ""
+            },
+            {
+              "label": "Sonomètre",
+              "modele": "SLM.50RT",
+              "numSerie": "10145",
+              "versionLog": "1.3.0.2 LAN5.00"
+            }
+          ]
+        }
+      ],
+      "attestations": [
+        {
+          "numero": "260413S",
+          "pdfUrl": "/api/archives/260413S.pdf",
+          "sectionIndex": 0
+        },
+        {
+          "numero": "260413T",
+          "pdfUrl": "/api/archives/260413T.pdf",
+          "sectionIndex": 1
+        },
+        {
+          "numero": "260413U",
+          "pdfUrl": "/api/archives/260413U.pdf",
+          "sectionIndex": 2
+        },
+        {
+          "numero": "260413V",
+          "pdfUrl": "/api/archives/260413V.pdf",
+          "sectionIndex": 3
+        }
+      ],
+      "numero": "260413S",
+      "valideeAt": "2026-04-13T15:45:20.237Z"
+    },
+    {
+      "id": "1776028165244",
+      "createdAt": "2026-04-12T21:09:25.244Z",
+      "status": "non_conforme",
+      "agrement": "S059S281",
+      "compteClt": "CFRA38847",
+      "nomCentre": "AUTOSUR DELANNOY ERIC **",
+      "adresse": "18 RUE MARECHAL JOFFRE",
+      "cp": "59660",
+      "ville": "MERVILLE",
+      "telephone": "33328496592",
+      "email": "po@ppp.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "PUP SECU XG VL/230-400/INFO",
+              "numSerie": "1013",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "FREIN 4T 4KW 50H CB3000 FREIN",
+              "numSerie": "4894",
+              "versionLog": "1.1.2.5"
+            },
+            {
+              "label": "Ripage",
+              "modele": "RIPAGE T   DETENTE STD",
+              "numSerie": "514",
+              "versionLog": "1.1.2.5"
+            },
+            {
+              "label": "Suspension",
+              "modele": "SUSP MONOB EUSAMA N 50H MB",
+              "numSerie": "227",
+              "versionLog": "1.1.2.5"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "SMARTLYNX",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "REGLE PHARE",
+              "numSerie": "1489",
+              "versionLog": ""
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "ANALYSEUR DE GAZ FR",
+              "numSerie": "164/17",
+              "versionLog": "1.2.34.4 LAN4.01"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "$PPRO HLT OPTICAL UNIT PTI L",
+              "numSerie": "1489",
+              "versionLog": "2.22.2094 LAN4.01"
+            },
+            {
+              "label": "OBD",
+              "modele": "CONTROLEUR OBD VL-ACTIGAS BTSF",
+              "numSerie": "0668/16",
+              "versionLog": ""
+            }
+          ]
+        },
+        {
+          "type": "classeL",
+          "sousType": "CELEROMETRE+SONOMETRE",
+          "materiels": [
+            {
+              "label": "Célérométre",
+              "modele": "CEL.50",
+              "numSerie": "495",
+              "versionLog": "1.3.0.2 LAN5.00"
+            },
+            {
+              "label": "Calibreur",
+              "modele": "CALIBREUR CLASSE 1",
+              "numSerie": "109084",
+              "versionLog": ""
+            },
+            {
+              "label": "Sonomètre",
+              "modele": "SONOMETRE CL2  + CALIBREUR",
+              "numSerie": "11869",
+              "versionLog": "1.3.0.2 LAN5.00"
+            }
+          ]
+        }
+      ],
+      "raisonNC": "pb opacimètre"
+    },
+    {
+      "id": "1776067453284",
+      "createdAt": "2026-04-13T08:04:13.285Z",
+      "status": "validee",
+      "agrement": "S047Z046",
+      "compteClt": "C500000121",
+      "nomCentre": "SARL CORREIA FRERES",
+      "adresse": "CONTROLE TECH.SECURITAS",
+      "cp": "47500",
+      "ville": "MONTAYRAL",
+      "telephone": "33553495864",
+      "email": "cnt@fff.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "PUP SECU XG VL/230-400/INFO",
+              "numSerie": "1115",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "43300$A 4.7 KW",
+              "numSerie": "993",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Ripage",
+              "modele": "RIPAGE VL MUX+DECONT+DETECT OP",
+              "numSerie": "2312",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "SUSP 230-400V/50H/MONO/MUX",
+              "numSerie": "3166",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "SMARTLYNX",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "N-REGLEPHARE CCD TOUCH SCREEN",
+              "numSerie": "2152",
+              "versionLog": "1.00 LAN1.00"
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "ANALYSEUR DE GAZ FR",
+              "numSerie": "210/18",
+              "versionLog": "2.0.34.4 LAN5.00"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "OPACIMETRE FR",
+              "numSerie": "503354/18",
+              "versionLog": "2.22.2094 LAN5.00"
+            },
+            {
+              "label": "OBD",
+              "modele": "CONTROLEUR OBD VL-ACTIGAS BTSF",
+              "numSerie": "0253-16",
+              "versionLog": "1.07 LAN5.00"
+            }
+          ]
+        },
+        {
+          "type": "classeL",
+          "sousType": "SONOMETRE",
+          "materiels": [
+            {
+              "label": "Sonomètre",
+              "modele": "SONOMETRE CL2  + CALIBREUR",
+              "numSerie": "10216",
+              "versionLog": "1.3.0.2 LAN5.00"
+            }
+          ]
+        }
+      ],
+      "attestations": [
+        {
+          "numero": "260413G",
+          "pdfUrl": "/api/archives/260413G.pdf",
+          "sectionIndex": 0
+        },
+        {
+          "numero": "260413H",
+          "pdfUrl": "/api/archives/260413H.pdf",
+          "sectionIndex": 1
+        },
+        {
+          "numero": "260413I",
+          "pdfUrl": "/api/archives/260413I.pdf",
+          "sectionIndex": 2
+        },
+        {
+          "numero": "260413J",
+          "pdfUrl": "/api/archives/260413J.pdf",
+          "sectionIndex": 3
+        }
+      ],
+      "numero": "260413G",
+      "valideeAt": "2026-04-13T14:22:25.763Z"
+    },
+    {
+      "id": "1776089718098",
+      "createdAt": "2026-04-13T14:15:18.098Z",
+      "status": "validee",
+      "agrement": "S028F026",
+      "compteClt": "C188100000",
+      "nomCentre": "ACTBGF   FROUDIERE",
+      "adresse": "VAL DE LUISANT",
+      "cp": "28600",
+      "ville": "LUISANT",
+      "telephone": "33237907474",
+      "email": "tsete@cct.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "PUP SECU XG VL/230-400/INFO",
+              "numSerie": "2654",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "FREIN 4T 4KW 50H CB3000 FREIN",
+              "numSerie": "5503",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Ripage",
+              "modele": "RIPAGE VL MUX DECONT DETECT BA",
+              "numSerie": "1456",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "SUSP 230-400V/50H/MONO/MUX",
+              "numSerie": "1319",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "Pup Secu XG",
+              "numSerie": "2558",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "43350$",
+              "numSerie": "2052",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Ripage",
+              "modele": "44100(-L-D)",
+              "numSerie": "4458",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "55950$",
+              "numSerie": "686",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "764-8",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "N-REGLEPHARE CCD TOUCH SCREEN",
+              "numSerie": "1817",
+              "versionLog": "V2.00 LAN2.01"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "SMARTLYNX",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "AC922353",
+              "numSerie": "3184",
+              "versionLog": "1.00 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "ANALYSEUR DE GAZ",
+              "numSerie": "116/10",
+              "versionLog": "1.2.34.4 LAN3.01"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "OPACIMETRE FR + PRIMITIVE",
+              "numSerie": "399",
+              "versionLog": "2.22.2094 LAN3.01"
+            },
+            {
+              "label": "OBD",
+              "modele": "CONTROLEUR OBD VL-ACTIGAS BTSF",
+              "numSerie": "1368-16",
+              "versionLog": "1.07 LAN3.01"
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "AT505",
+              "numSerie": "014/23",
+              "versionLog": "2.0.34.4 LAN3.01"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "ACTIGAS AT605",
+              "numSerie": "540174",
+              "versionLog": "2.22.2094 LAN3.01"
+            },
+            {
+              "label": "OBD",
+              "modele": "ACTI-OBD",
+              "numSerie": "57216",
+              "versionLog": "1.07 LAN3.01"
+            }
+          ]
+        }
+      ],
+      "attestations": [
+        {
+          "numero": "260413A",
+          "pdfUrl": "/api/archives/260413A.pdf",
+          "sectionIndex": 0
+        },
+        {
+          "numero": "260413B",
+          "pdfUrl": "/api/archives/260413B.pdf",
+          "sectionIndex": 1
+        },
+        {
+          "numero": "260413C",
+          "pdfUrl": "/api/archives/260413C.pdf",
+          "sectionIndex": 2
+        },
+        {
+          "numero": "260413D",
+          "pdfUrl": "/api/archives/260413D.pdf",
+          "sectionIndex": 3
+        },
+        {
+          "numero": "260413E",
+          "pdfUrl": "/api/archives/260413E.pdf",
+          "sectionIndex": 4
+        },
+        {
+          "numero": "260413F",
+          "pdfUrl": "/api/archives/260413F.pdf",
+          "sectionIndex": 5
+        }
+      ],
+      "numero": "260413A",
+      "valideeAt": "2026-04-13T14:17:21.514Z"
+    },
+    {
+      "id": "1776093937705",
+      "createdAt": "2026-04-13T15:25:37.705Z",
+      "status": "validee",
+      "agrement": "S028F026",
+      "compteClt": "C188100000",
+      "nomCentre": "ACTBGF   FROUDIERE",
+      "adresse": "VAL DE LUISANT",
+      "cp": "28600",
+      "ville": "LUISANT",
+      "telephone": "33237907474",
+      "email": "test@test.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "chaineType": "",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "PUP SECU XG VL/230-400/INFO",
+              "numSerie": "2654",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "FREIN 4T 4KW 50H CB3000 FREIN",
+              "numSerie": "5503",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Ripage",
+              "modele": "RIPAGE VL MUX DECONT DETECT BA",
+              "numSerie": "1456",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "SUSP 230-400V/50H/MONO/MUX",
+              "numSerie": "1319",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "chaineType": "",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "xg",
+              "numSerie": "26555",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "43350$",
+              "numSerie": "2052",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Ripage",
+              "modele": "44100(-L-D)",
+              "numSerie": "4458",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "55950$",
+              "numSerie": "686",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "764-8",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "N-REGLEPHARE CCD TOUCH SCREEN",
+              "numSerie": "1817",
+              "versionLog": "V2.00 LAN2.01"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "SMARTLYNX",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "AC922353",
+              "numSerie": "3184",
+              "versionLog": "1.00 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "ANALYSEUR DE GAZ",
+              "numSerie": "116/10",
+              "versionLog": "1.2.34.4 LAN3.01"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "OPACIMETRE FR + PRIMITIVE",
+              "numSerie": "399",
+              "versionLog": "2.22.2094 LAN3.01"
+            },
+            {
+              "label": "OBD",
+              "modele": "CONTROLEUR OBD VL-ACTIGAS BTSF",
+              "numSerie": "1368-16",
+              "versionLog": "1.07 LAN3.01"
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "AT505",
+              "numSerie": "014/23",
+              "versionLog": "2.0.34.4 LAN3.01"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "ACTIGAS AT605",
+              "numSerie": "540174",
+              "versionLog": "2.22.2094 LAN3.01"
+            },
+            {
+              "label": "OBD",
+              "modele": "ACTI-OBD",
+              "numSerie": "57216",
+              "versionLog": "1.07 LAN3.01"
+            }
+          ]
+        },
+        {
+          "type": "classeL",
+          "sousType": "CELEROMETRE",
+          "certOtclan": "25/LAN/ECE/0231",
+          "versionLog": "1.3.0.2 LAN5.00",
+          "materiels": [
+            {
+              "label": "Célérométre",
+              "modele": "CEL.50",
+              "numSerie": "399",
+              "versionLog": "1.3.0.2 LAN5.00"
+            }
+          ]
+        },
+        {
+          "type": "classeL",
+          "sousType": "SONOMETRE",
+          "certOtclan": "25/LAN/ECE/0225",
+          "versionLog": "1.3.0.2 LAN5.00",
+          "sonoPollution": "",
+          "materiels": [
+            {
+              "label": "Sonomètre",
+              "modele": "SLM.50RT",
+              "numSerie": "10877",
+              "versionLog": "1.3.0.2 LAN5.00"
+            },
+            {
+              "label": "Calibreur",
+              "modele": "CALIBREUR CLASSE 1",
+              "numSerie": "109718",
+              "versionLog": ""
+            }
+          ]
+        }
+      ],
+      "attestations": [
+        {
+          "numero": "260413K",
+          "pdfUrl": "/api/archives/260413K.pdf",
+          "sectionIndex": 0
+        },
+        {
+          "numero": "260413L",
+          "pdfUrl": "/api/archives/260413L.pdf",
+          "sectionIndex": 1
+        },
+        {
+          "numero": "260413M",
+          "pdfUrl": "/api/archives/260413M.pdf",
+          "sectionIndex": 2
+        },
+        {
+          "numero": "260413N",
+          "pdfUrl": "/api/archives/260413N.pdf",
+          "sectionIndex": 3
+        },
+        {
+          "numero": "260413O",
+          "pdfUrl": "/api/archives/260413O.pdf",
+          "sectionIndex": 4
+        },
+        {
+          "numero": "260413P",
+          "pdfUrl": "/api/archives/260413P.pdf",
+          "sectionIndex": 5
+        },
+        {
+          "numero": "260413Q",
+          "pdfUrl": "/api/archives/260413Q.pdf",
+          "sectionIndex": 6
+        },
+        {
+          "numero": "260413R",
+          "pdfUrl": "/api/archives/260413R.pdf",
+          "sectionIndex": 7
+        }
+      ],
+      "numero": "260413K",
+      "valideeAt": "2026-04-13T15:27:15.157Z"
+    },
+    {
+      "id": "1776095417245",
+      "createdAt": "2026-04-13T15:50:17.245Z",
+      "status": "en_attente",
+      "agrement": "S028F026",
+      "compteClt": "C188100000",
+      "nomCentre": "ACTBGF   FROUDIERE",
+      "adresse": "VAL DE LUISANT",
+      "cp": "28600",
+      "ville": "LUISANT",
+      "telephone": "33237907474",
+      "email": "t@r.fr",
+      "sections": [
+        {
+          "type": "classeL",
+          "sousType": "CELEROMETRE",
+          "certOtclan": "25/LAN/ECE/0231",
+          "versionLog": "1.3.0.2 LAN5.00",
+          "materiels": [
+            {
+              "label": "Célérométre",
+              "modele": "CEL.50",
+              "numSerie": "399",
+              "versionLog": "1.3.0.2 LAN5.00"
+            }
+          ]
+        },
+        {
+          "type": "classeL",
+          "sousType": "SONOMETRE",
+          "certOtclan": "25/LAN/ECE/0225",
+          "versionLog": "1.3.0.2 LAN5.00",
+          "sonoPollution": "",
+          "materiels": [
+            {
+              "label": "Sonomètre",
+              "modele": "SLM.50RT",
+              "numSerie": "10877",
+              "versionLog": "1.3.0.2 LAN5.00"
+            },
+            {
+              "label": "Calibreur",
+              "modele": "CALIBREUR CLASSE 1",
+              "numSerie": "109718",
+              "versionLog": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1776153335917",
+      "createdAt": "2026-04-14T07:55:35.917Z",
+      "status": "validee",
+      "agrement": "S063C053",
+      "compteClt": "C000050926",
+      "nomCentre": "CONTROLE AUTOMOBILE MARTROIS",
+      "adresse": "144 RUE ARISTIDE D'AUBREE",
+      "cp": "63730",
+      "ville": "LES MARTRES DE VEYRE",
+      "telephone": "33473396006",
+      "email": "test@test.fr",
+      "sections": [
+        {
+          "type": "ct",
+          "sousType": "VL",
+          "chaineType": "",
+          "materiels": [
+            {
+              "label": "Pupitre",
+              "modele": "PUP SECU XG VL/230-400/INFO",
+              "numSerie": "543102892",
+              "versionLog": ""
+            },
+            {
+              "label": "Freinage",
+              "modele": "FREIN 4T MUX 4KW 230-400 50H R",
+              "numSerie": "333",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Ripage",
+              "modele": "RIPAGE VL MUX DECONT DETECT BA",
+              "numSerie": "407",
+              "versionLog": "1.1.2.5 LAN2.00"
+            },
+            {
+              "label": "Suspension",
+              "modele": "SUSP 230-400V/50H/MONO/MUX",
+              "numSerie": "355",
+              "versionLog": "1.1.2.5 LAN2.00"
+            }
+          ]
+        },
+        {
+          "type": "reglophare",
+          "sousType": "764-8",
+          "materiels": [
+            {
+              "label": "Règle phare",
+              "modele": "N-REGLEPHARE CCD TOUCH SCREEN",
+              "numSerie": "1696",
+              "versionLog": "V2.00 LAN2.01"
+            }
+          ]
+        },
+        {
+          "type": "pollution",
+          "sousType": "ACTIGAS",
+          "materiels": [
+            {
+              "label": "Analyseur de gaz",
+              "modele": "ANALYSEUR DE GAZ FR",
+              "numSerie": "200/16",
+              "versionLog": "1.2.34.4 LAN3.01"
+            },
+            {
+              "label": "Opacimètre",
+              "modele": "OPACIMETRE FR + PRIMITIVE",
+              "numSerie": "129859",
+              "versionLog": "2.22.2094 LAN3.01"
+            },
+            {
+              "label": "OBD",
+              "modele": "CONTROLEUR OBD VL-ACTIGAS BTSF",
+              "numSerie": "0517-16",
+              "versionLog": "1.07 LAN3.01"
+            }
+          ]
+        },
+        {
+          "type": "classeL",
+          "sousType": "SONOMETRE",
+          "certOtclan": "25/LAN/ECE/0225",
+          "versionLog": "1.3.0.2 LAN5.00",
+          "sonoPollution": "",
+          "materiels": [
+            {
+              "label": "Sonomètre",
+              "modele": "SONOMETRE CLASSE 2",
+              "numSerie": "10144",
+              "versionLog": "1.3.0.2 LAN5.00"
+            },
+            {
+              "label": "Calibreur",
+              "modele": "CALIBREUR CLASSE 1",
+              "numSerie": "105537",
+              "versionLog": ""
+            }
+          ]
+        }
+      ],
+      "attestations": [
+        {
+          "numero": "260414A",
+          "pdfUrl": "/api/archives/260414A.pdf",
+          "sectionIndex": 0
+        },
+        {
+          "numero": "260414B",
+          "pdfUrl": "/api/archives/260414B.pdf",
+          "sectionIndex": 1
+        },
+        {
+          "numero": "260414C",
+          "pdfUrl": "/api/archives/260414C.pdf",
+          "sectionIndex": 2
+        },
+        {
+          "numero": "260414D",
+          "pdfUrl": "/api/archives/260414D.pdf",
+          "sectionIndex": 3
+        }
+      ],
+      "numero": "260414A",
+      "valideeAt": "2026-04-14T07:58:32.049Z"
+    }
+  ],
+  "archives": [],
+  "compteur": {
+    "260412": 9,
+    "260413": 22,
+    "260414": 4
+  },
+  "config": {
+    "emailQualite": "qualite@muller-automotive.fr",
+    "emailExpediteur": "",
+    "mdpExpediteur": "",
+    "smtpHost": "smtp.gmail.com",
+    "smtpPort": 587,
+    "validationAuto": false,
+    "copieService": true,
+    "objetMailClient": "Confirmation de votre demande d'attestation de conformité",
+    "corpsMailClient": "Votre demande a bien été envoyée au service qualité. Elle sera traitée dans les plus brefs délais.\n\nCordialement,\nLe Service Qualité Muller Automotive",
+    "objetMailAttestation": "Vos attestations de conformité",
+    "corpsMailAttestation": "Veuillez trouver ci-joint vos attestations de conformité.\n\nCordialement,\nLe Service Qualité Muller Automotive"
+  },
+  "comptes": [
+    {
+      "login": "admin",
+      "mdp": "admin123",
+      "role": "admin",
+      "nom": "Administrateur"
+    },
+    {
+      "login": "Katya",
+      "nom": "Katya",
+      "mdp": "123",
+      "role": "operateur"
+    }
+  ]
+}

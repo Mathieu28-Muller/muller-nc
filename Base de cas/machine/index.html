@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Muller Automotive - Détails</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header>
+    <img src="../logo/Logo.png" class="logo">
+    <h1 id="machineTitle">Chargement...</h1>
+    <a id="btn-home" class="btn-home" href="../index.html">← Accueil</a>
+</header>
+<script>
+    (function(){
+        const g = new URLSearchParams(location.search).get('gamme') || 'CT';
+        document.getElementById('btn-home').href = '../index.html?gamme=' + g;
+    })();
+</script>
+
+<div class="nav-gamme">
+    <button onclick="filtrerGamme('CT')" id="btn-CT" class="btn-cat">MATÉRIEL CT</button>
+    <button onclick="filtrerGamme('MRA')" id="btn-MRA" class="btn-cat">MATÉRIEL MRA</button>
+</div>
+
+<input id="search-detail" class="search-style" placeholder="Rechercher un document dans cette machine...">
+
+<div id="files" class="grid"></div>
+
+<footer>
+    <p><strong>© 2026 MULLER Automotive</strong> <i>by M@t</i></p>
+</footer>
+
+<script src="../script.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muller Automotive — Formation MRA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;600&display=swap');
+
+  :root {
+    --red:    #cd121d;
+    --black:  #0a0a0a;
+    --dark:   #111111;
+    --card:   #1a1a1a;
+    --border: #2a2a2a;
+    --white:  #f5f5f5;
+    --muted:  #aaaaaa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── HEADER ── */
+  header {
+    width: 100%;
+    background: var(--dark);
+    border-bottom: 3px solid var(--red);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px 28px;
+    gap: 18px;
+  }
+
+  header img {
+    height: 60px;
+    object-fit: contain;
+  }
+
+  .header-divider {
+    width: 40px;
+    height: 2px;
+    background: var(--red);
+  }
+
+  header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── HERO BAND ── */
+  .hero {
+    width: 100%;
+    background: var(--red);
+    padding: 18px 24px;
+    text-align: center;
+  }
+
+  .hero h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  /* ── BACK LINK ── */
+  .back {
+    align-self: flex-start;
+    margin: 24px 0 0 32px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+  }
+  .back:hover { color: var(--red); }
+
+  /* ── GRID ── */
+  main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 32px;
+    width: 100%;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    width: 100%;
+    max-width: 720px;
+  }
+
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+
+  .card-img.img-clim {
+    background-image: url('/MRA/CLIM/images/boucle_cover.jpeg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1px solid #333;
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow:
+      0 4px 8px rgba(0,0,0,0.5),
+      0 8px 24px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      0 8px 16px rgba(0,0,0,0.6),
+      0 20px 48px rgba(0,0,0,0.5),
+      0 0 0 1px var(--red),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* ── IMAGE ZONE ── */
+  .card-img {
+    height: 200px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #181818;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.10) 0%,
+      rgba(0,0,0,0.50) 100%
+    );
+  }
+
+  .card-img.img-geo {
+    background-image: url('https://www.mullerautomotive.fr/wp-content/uploads/2026/01/voiturepontgeopod3.png');
+  }
+
+  .card-img.img-quiz {
+    font-size: 4.5rem;
+    line-height: 1;
+  }
+
+  /* ── CARD BODY ── */
+  .card-body {
+    padding: 28px 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 3px solid var(--red);
+    flex: 1;
+  }
+
+  .card-body h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    line-height: 1.15;
+  }
+
+  .card-body p {
+    font-size: 0.84rem;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+  }
+
+  .card-arrow {
+    margin-top: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+  }
+
+  .card:hover .card-arrow { color: var(--red); }
+
+  .card-arrow::after {
+    content: '→';
+    font-size: 1rem;
+  }
+
+  footer {
+    width: 100%;
+    background: var(--dark);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #444;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="https://www.mullerautomotive.fr/wp-content/uploads/2025/01/logo-Muller-automotive-full-1.png" alt="Muller Automotive">
+  <div class="header-divider"></div>
+  <h1>Formation MRA</h1>
+</header>
+
+<div class="hero">
+  <h2>Sélectionnez un module</h2>
+</div>
+
+<a class="back" href="/">← Retour à l'accueil</a>
+
+<main>
+  <div class="grid">
+
+    <a class="card" href="/MRA/GEO/">
+      <div class="card-img img-geo"></div>
+      <div class="card-body">
+        <h2>Géométrie des trains</h2>
+        <p>Cours complet sur les trains roulants, chasse, pivot et parallélisme.</p>
+        <span class="card-arrow">Accéder</span>
+      </div>
+    </a>
+
+    <a class="card" href="/MRA/Quiz/">
+      <div class="card-img img-quiz">⚡</div>
+      <div class="card-body">
+        <h2>Quiz interactif</h2>
+        <p>Questions chronométrées en mode compétition.</p>
+        <span class="card-arrow">Accéder</span>
+      </div>
+    </a>
+
+    <a class="card" href="/MRA/CLIM/" style="grid-column: 1 / -1; max-width: 340px; margin: 0 auto;">
+      <div class="card-img img-clim"></div>
+      <div class="card-body">
+        <h2>Climatisation</h2>
+        <p>Boucle de froid, réfrigérants, propriétés physiques — Station ECK FLAG & ECK NEXT PRO : maintenance et étalonnage.</p>
+        <span class="card-arrow">Accéder</span>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+<footer>© Muller Automotive — formation-sav.fr</footer>
+
+<script src="/formation-auth.js"></script>
+<script>FA.init('MRA');</script>
+</body>
+</html>

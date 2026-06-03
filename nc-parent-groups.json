@@ -1,0 +1,17 @@
+{
+  "groups": [],
+  "journal": [
+    {
+      "action": "GROUPE_CREE",
+      "parent_id": "NC-P-00001",
+      "satellites": [
+        "260507-0001",
+        "260507-0002"
+      ],
+      "by": "MAt",
+      "motif": "Même symptôme",
+      "label": "Moteur en court circuit",
+      "timestamp": "2026-05-07T15:11:08.904Z"
+    }
+  ]
+}

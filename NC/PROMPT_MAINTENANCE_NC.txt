@@ -1,0 +1,291 @@
+================================================================================
+PROMPT DE MAINTENANCE — Module NC — Muller Automotive
+Copier dans une nouvelle conversation Claude pour toute mise à jour du module
+Mis à jour le : 29/05/2026
+================================================================================
+
+Tu travailles sur le système NC de Muller Automotive (ISO 9001:2015 / LNE).
+Serveur Node.js, port 3001, base de données PostgreSQL 16 (source de vérité unique).
+Dossier principal : C:\formation\
+
+FICHIERS DU MODULE (ne jamais supprimer, toujours ajouter) :
+  C:\formation\server.js                  → API Express (routes /api/nc/*)
+  C:\formation\.env                       → DATA_SOURCE=postgres, PG_HOST/PORT/USER/PASSWORD/DB
+  C:\formation\schema_postgresql.sql      → Schéma PG complet (12 tables, 3 vues)
+  C:\formation\migrate.js                 → Migration JSON → PG (idempotent, safe à relancer)
+  C:\formation\plan_controle.js           → Vérification complète JSON ↔ PG (8 sections)
+  C:\formation\NC\console.html            → Interface admin NC (4500+ lignes)
+  C:\formation\NC\nc_parent_satellites.js → Module NC parent/satellites
+  C:\formation\NC\nc_parent_avance.js     → Rattachement tardif, post-clôture
+  C:\formation\NC\nc_droits_pilote.js     → Droits chef produit (bouton tb supprimé)
+  C:\formation\NC\nc_liste_accordeon.js   → Accordéon liste NC parent/satellites
+  C:\formation\NC\nc_stats.js             → Statistiques ISO §9.1 (exclusion satellites) + KPI §10.3
+  C:\formation\NC\synoptique.html         → Synoptique cycle de vie NC
+  C:\formation\NC\synoptique_nc_groupe.html → Documentation visuelle groupes parent 6 onglets
+  C:\formation\NC\index.html              → Formulaire public déclaration NC (champs dynamiques via API)
+  C:\formation\NC\presentation.html       → Notice d'utilisation (lien header)
+  C:\formation\NC\CAHIER_DES_CHARGES_NC.md → Cahier des charges v4.0 (29/05/2026) — partage développeurs
+  C:\formation\nc-parent-groups.json      → Persistance groupes (ne pas modifier manuellement)
+  C:\formation\nc-data.json               → ARCHIVE JSON — ne plus modifier (source = PostgreSQL)
+
+ÉTAT AU 29/05/2026 — MODE PRODUCTION POSTGRESQL :
+  DATA_SOURCE=postgres dans .env (bascule effectuée le 25/05/2026)
+    → Lecture et écriture exclusivement depuis PostgreSQL
+    → nc-data.json = archive historique uniquement (ne plus modifier manuellement)
+    → En cas d'erreur PG, l'application renvoie une erreur HTTP (plus de fallback JSON)
+  PostgreSQL 16 :
+    Service Windows : postgresql-x64-16 (démarrage automatique)
+    Base : nc_muller (12 tables, 3 vues)
+    User : postgres / MullerNC2026!
+    État validé 25/05/2026 : 8 fiches, 24 historiques, 4 actions, 5 réponses, 20 utilisateurs
+    plan_controle.js → TOUT VERT ✅ (25/05/2026)
+  Sécurité active (Phase 1 + compléments 29/05) :
+    - bcryptjs : lazy migration hash (verifyPass détecte $2b$/$2a$ ou legacy)
+    - rate-limit : 5 tentatives / 15 min / IP sur les 2 routes login
+    - trust proxy : app.set('trust proxy',1) ✅ ajouté 29/05 — rate-limit par vraie IP client
+    - JWT_SECRET : clé 64 chars aléatoire ✅ dans .env — 29/05 (plus de valeur par défaut)
+    - helmet : headers XSS, clickjacking, MIME sniffing
+    - JSON bloqués : users.json, nc-users.json, nc-data.json, nc-config.json, nc-parent-groups.json, data.json
+    - dotenv : .env chargé au démarrage
+  Secrets de déploiement :
+    C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt
+    → JWT_SECRET local + gabarit OVH (PG_*, SMTP) à compléter lors du déploiement
+
+================================================================================
+RETOUR ARRIÈRE (rollback) — À FAIRE EN CAS DE PROBLÈME POSTGRESQL
+================================================================================
+
+  PROCÉDURE RAPIDE (< 2 minutes) :
+  ─────────────────────────────────
+  1. Éditer C:\formation\.env :
+       DATA_SOURCE=postgres  →  DATA_SOURCE=dual
+  2. Relancer le serveur :
+       pm2 reload formation-sav --update-env
+  3. Vérifier les logs :
+       pm2 logs formation-sav --lines 10 --nostream
+       → doit afficher : [pg] connecté (DATA_SOURCE=dual)
+  4. Le système reprend JSON comme source de vérité, PG en écriture parallèle.
+
+  BACKUP COMPLET DISPONIBLE :
+  ───────────────────────────
+    D:\formation_backup_20260525_avant_postgres\
+    → 769 fichiers, 702 Mo, état au 25/05/2026 09:24
+    → Contient : server.js, nc-data.json, nc-users.json, nc-config.json,
+                 nc-parent-groups.json, tous les fichiers NC\, .env, migrate.js
+    → Pour restaurer un fichier : copier depuis ce dossier vers C:\formation\
+    → Pour restaurer tout : robocopy D:\formation_backup_20260525_avant_postgres C:\formation /MIR /XD node_modules
+
+  SCÉNARIOS ET RÉPONSES :
+  ───────────────────────
+  Symptôme                          → Action
+  ─────────────────────────────────────────────────────────────────────────────
+  API NC retourne des erreurs 500   → Vérifier pm2 logs, puis rollback si PG KO
+  Service PG arrêté                 → net start "postgresql-x64-16" (admin)
+  PG corrompu                       → Rollback dual + node migrate.js (rejoue tout)
+  Donnée absente après une écriture → node plan_controle.js → node migrate.js si écart
+  Redémarrage PC : données perdues  → Impossible — PG persiste, pm2 redémarre auto
+
+================================================================================
+CORRECTIONS CRITIQUES 12-15/05/2026
+================================================================================
+
+  BUG MAJEUR CORRIGÉ — pgSyncFiche (server.js) :
+    a.reponses → a.reponsesActions dans la boucle d'insertion nc_action_reponses
+    Impact : nc_action_reponses était toujours vide après tout saveNC() en mode dual
+    Fix : node migrate.js pour repopuler, puis plan_controle.js confirme ✅
+  migrate.js :
+    - Ajout require('dotenv').config() (manquant → SASL password error)
+    - ON CONFLICT DO UPDATE SET étendu (idempotent désormais)
+  NC parent/satellite :
+    - Satellite attaché → statut='rattachee' + _statut_avant + statutAvantRattachement sauvegardés
+    - Route DELETE /api/nc/:parentNumero/satellites/:nc_id → restaure statut précédent
+    - create-parent-group : famille auto-héritée des satellites, 400 si aucune famille
+    - Dashboard NC par famille : exclut les satellites (cohérent avec compteur TOTAL)
+  index.html :
+    - Tous les champs dropdown (famille, périmètre, source, typesCause) chargés dynamiquement
+      via GET /api/nc/config/listes-publiques avec fallback hardcodé si API indisponible
+
+CORRECTIF 25/05/2026 :
+  NC 260521-0007 absente de PG (dual-write raté à la création le 21/05)
+  260511-0005 et 260511-0006 : réponses désynchronisées (JSON > PG)
+  Fix : node migrate.js → TOUT VERT → bascule postgres validée
+
+CORRECTIF 29/05/2026 — Filtre "en retard réel" ISO §10.2.1 :
+  PROBLÈME : le dashboard comptait en retard toute action dont l'échéance était dépassée,
+  même si le pilote avait répondu dans les délais (action en attente de validation admin).
+  ANALYSE : distinction ISO entre responsabilité pilote (date_pilote_reponse <= echeance)
+  et responsabilité admin (validation). Anne-Sophie Costa : 2 actions répondues dans les délais
+  mais affichées en retard. Fabrice Simon : 1 action sans réponse = retard réel.
+  FIX (6 points dans console.html) :
+    const overdueActions = activeActions.filter(a =>
+      a.echeance && new Date(a.echeance) < now &&
+      (!a.datePiloteReponse || new Date(a.datePiloteReponse) > new Date(a.echeance))
+    );
+  Appliqué sur : stats widget, actions widget, pilote chart, actionPiloteCell (hasOverdue),
+                 renderDashboardPilote (overdue), fiche NC timeline (isLate).
+  RÈGLE : datePiloteReponse <= echeance → "En attente validation admin" (pas en retard)
+
+================================================================================
+RÈGLE CRITIQUE — "EN RETARD RÉEL" (ISO §10.2.1 — ajoutée 29/05/2026)
+================================================================================
+
+  Une action CAPA est "en retard" UNIQUEMENT si :
+    1. echeance < aujourd'hui
+    2. ET datePiloteReponse est null OU datePiloteReponse > echeance
+
+  Si datePiloteReponse <= echeance → le pilote a répondu dans les délais.
+  L'action est "En attente de validation admin" — non imputable au pilote.
+  NE PAS compter cette action dans les retards (dashboard, stats, fiche, timeline).
+
+  Champ JSON : datePiloteReponse (camelCase)
+  Champ PG   : date_pilote_reponse (snake_case)
+
+================================================================================
+RÈGLES INVARIANTES (toujours respecter)
+================================================================================
+
+  1. Jamais supprimer une entrée du journal d'audit — §10.2.2
+  2. Toujours tracer : { action, nc_id, by, ts } pour chaque modification
+  3. Droits vérifiés avant toute modification de données — §5.3
+  4. Routes spécifiques AVANT wildcards dans server.js
+     (ex: /api/nc/config AVANT /api/nc/:numero)
+  5. Jamais envoyer d'email au chef produit/pilote lors de la création du groupe parent
+  6. Les flags is_satellite/is_parent ET _statut_avant/statutAvantRattachement
+     sont persistés en JSON ET en PG via saveNC() + pgSyncFiche()
+  7. PM2 gère le redémarrage — ne jamais tuer node.exe sans vérifier PM2
+  8. Après toute modification de server.js :
+       pm2 reload formation-sav --update-env   (--update-env obligatoire)
+  9. En mode postgres : si nouveau champ ajouté à une fiche NC,
+     l'ajouter dans le schéma PG ET dans pgSyncFiche()
+
+================================================================================
+COMMANDES DE DIAGNOSTIC
+================================================================================
+
+  # Vérification complète JSON ↔ PG (8 sections) :
+  node plan_controle.js
+
+  # Resynchronisation complète JSON → PG (idempotent, safe) :
+  node migrate.js
+
+  # Statut serveur :
+  pm2 list
+  pm2 logs formation-sav --lines 20 --nostream
+
+  # Service PostgreSQL :
+  net start "postgresql-x64-16"         (si arrêté)
+  net stop  "postgresql-x64-16"         (arrêter proprement)
+
+  # Backup manuel vers D:\ :
+  robocopy C:\formation D:\formation /MIR /XD node_modules /XF "*.log" "*.tmp"
+
+  # Diagnostic si 404 sur /api/nc/* :
+  netstat -ano | findstr :3001           (→ un seul PID attendu)
+  pm2 list                               (→ formation-sav online)
+
+================================================================================
+API PUBLIQUES MODULES JS
+================================================================================
+
+  window.NcParent      → Store, Business, creerGroupe, ajouterSatellites, cloturerGroupe
+  window.NcDroits      → openDashboard (inutilisé), peutRepondreAction, assignerPilote
+  window.NcListe       → init, toggle(parentId), filter(type)
+  window.NCAide        → open, close, injectButtons, injectFicheButtons, openRef(code)
+  window.NcParentAvance → scanSimilarite, rattacherTardif, analyserPostCloture
+
+================================================================================
+SYSTÈME DE RÔLES ET DOUBLE PROFIL PILOTE
+================================================================================
+
+  session.role === 'nc_admin'         → tous les droits, onglets admin visibles
+  session.role === 'nc_chef_produit'  → Pilote : double profil via bouton ⇄
+  session.role === 'nc_lecteur'       → lecture seule
+
+  Double profil pilote :
+    renderHeader()          → badge + bouton ⇄ (affiché si session.role=nc_chef_produit)
+    renderModeBanner()      → bannière verte (Pilote) ou grise (Lecteur)
+    renderDashboardPilote() → section "Mes actions CAPA" sur dashboard
+    toggleViewRole()        → bascule _viewRole + recharge loadNC()
+    Mode Pilote  → GET /api/nc           → NC assignées seulement
+    Mode Lecteur → GET /api/nc?viewAll=1 → toutes les NC
+
+  Constantes globales console.html :
+    const SL          → labels statuts NC
+    const capaLabel   → { immediate, curative, corrective, preventive } (GLOBAL)
+    const ROLE_LABELS → { nc_admin, nc_chef_produit:'Pilote', nc_lecteur, nc_viewer }
+    const COLS        → définition colonnes tableau liste NC
+
+  Types de réponses actions :
+    reponse_pilote → 💬 vert   (réponse normale du pilote)
+    retour_admin   → ↩ violet  (retour admin au pilote)
+    reponse_admin  → 🔒 orange (réponse forcée admin si pilote absent, force:true)
+
+================================================================================
+POINTS LNE CRITIQUES (vérifier après chaque modification)
+================================================================================
+
+  LNE-1 : cause racine = facteur systémique actionnable (pas une catégorie)
+  LNE-2 : preuve efficacité = pièce jointe + réponse responsable tracée
+  LNE-4 : journal d'audit immuable — qui/quoi/quand sur chaque opération
+  LNE-5 : NC sans analyse > 5j (mineure) / 48h (majeure) = alerte obligatoire
+
+================================================================================
+PLANIFICATION — ÉTAT AU 29/05/2026
+================================================================================
+
+  ✅ 09/05 — Phase 1 sécurité + PostgreSQL dual-write
+  ✅ 10/05 — compare.js + validation dual-write 100% vert
+  ✅ 12-15/05 — Corrections critiques (pgSyncFiche bug, migrate.js, satellites,
+               dashboard famille, index.html dynamique) — plan_controle.js TOUT VERT
+  ✅ 16-25/05 — Contrôle renforcé dual-write + corrections désynchronisations
+               (260521-0007 absent PG, réponses 260511-0005/0006)
+               Backup : D:\formation_backup_20260525_avant_postgres (769 fichiers, 702 Mo)
+  ✅ 25/05   — Bascule DATA_SOURCE=postgres — lecture PG validée, TOUT VERT ✅
+  ✅ 29/05   — Correction filtre "en retard réel" ISO §10.2.1 (6 points console.html)
+               datePiloteReponse pris en compte — seul Fabrice Simon en retard réel
+  ✅ 29/05   — CAHIER_DES_CHARGES_NC.md → v4.0 (architecture PG, schéma, planification OVH)
+  ✅ 29/05   — trust proxy : app.set('trust proxy',1) dans server.js
+               Corrige ERR_ERL_UNEXPECTED_X_FORWARDED_FOR + rate-limit par vraie IP client
+  ✅ 29/05   — JWT_SECRET sécurisé : clé 64 chars dans .env (plus de valeur par défaut)
+               Sauvegarde : C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt
+
+  ☐ 25-31/05 — Phase 3 : vérification fonctionnelle continue en mode postgres
+               → Surveiller pm2 logs après chaque opération utilisateur
+               → Relancer node plan_controle.js si suspicion d'écart
+               → En cas d'anomalie : rollback dual (voir section RETOUR ARRIÈRE)
+
+  ☐ Fin mai / début juin — Phase 4 sécurité renforcée (reste à faire) :
+               → pg_dump automatique quotidien (tâche planifiée Windows)
+                 Script : pg_dump -U postgres -d nc_muller -F c -f D:\backups\pg\nc_muller_DATE.dump
+               → CORS : restreindre origins autorisées (enlever *)
+               → Helmet CSP : activer contentSecurityPolicy avec directives adaptées
+
+  ☐ Juin 2026 — Déploiement OVH final :
+               Voir D:\formation\RAPPORT_TECHNIQUE_IT_NC.html pour checklist complète
+               Voir D:\formation\NC\CAHIER_DES_CHARGES_NC.md §18.3 pour détail complet
+               Points restants :
+                 - PostgreSQL OVH (Managed DB ou VPS)
+                 - DATA_SOURCE=postgres en production OVH
+                 - SMTP @mullerautomotive.fr configuré
+                 - Compléter C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt (PG_*, SMTP OVH)
+                 - Supprimer nc-data.json, nc-users.json du dépôt OVH
+                 - Nginx reverse proxy + Let's Encrypt SSL
+
+================================================================================
+3 QUESTIONS AVANT TOUTE MODIFICATION
+================================================================================
+
+  1. Est-ce que cette modification préserve la traçabilité ISO §10.2.2 ?
+     → Toute action modifiant NC ou CAPA doit appeler _journal({ action, nc_id, by, ts })
+
+  2. Est-ce que cette modification respecte le principe de moindre privilège ?
+     → Vérifier le rôle EN PREMIER dans chaque fonction de modification
+     → peutRepondreAction(action, email) pour les CAPA
+
+  3. Est-ce que cette modification est cohérente avec le schéma PostgreSQL ?
+     → Si nouveau champ JSON → l'ajouter dans pgSyncFiche() ET schema_postgresql.sql
+     → Tester avec node plan_controle.js après chaque modification de données
+
+================================================================================
+FIN PROMPT MAINTENANCE — version 29/05/2026
+================================================================================

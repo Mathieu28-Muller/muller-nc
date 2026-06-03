@@ -1,0 +1,420 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║       SYNOPTIQUE DE FONCTIONNEMENT — MODULE NON-CONFORMITÉS (NC)            ║
+║       Muller Automotive — formation-sav.fr/NC/                              ║
+║       Document destiné aux utilisateurs et administrateurs                  ║
+║       Version 1 — 01/05/2026                                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. VUE D'ENSEMBLE — QU'EST-CE QU'UNE NC ?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Une Non-Conformité (NC) est signalée lorsqu'un produit ou service ne répond
+pas aux exigences attendues. Le module NC permet de :
+
+  ① Enregistrer le problème (qui, quoi, quand, quel produit)
+  ② Affecter des actions correctives à des pilotes responsables
+  ③ Suivre l'avancement jusqu'à clôture
+  ④ Garder un historique complet sur plusieurs années
+
+Toute NC reçoit un numéro unique au format :  AAMMJJ-NNNN
+  Exemple : 260501-0022 = 22e NC créée le 01/05/2026
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. CYCLE DE VIE D'UNE NC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  DÉCLARATION          → NC créée, statut "Réceptionné"                 │
+  │  (formulaire public)     Email automatique envoyé au service qualité    │
+  │         │                                                               │
+  │         ▼                                                               │
+  │  TRAITEMENT           → Admin affecte des actions correctives           │
+  │  (console admin)         Statut passe à "En traitement"                 │
+  │         │                Email automatique au(x) pilote(s) désigné(s)   │
+  │         │                                                               │
+  │         ▼                                                               │
+  │  RÉPONSE PILOTE       → Pilote poste sa réponse + pièces jointes       │
+  │  (console chef prod.)    L'admin voit la ligne en VERT (nouveauté)      │
+  │         │                                                               │
+  │         ▼                                                               │
+  │  VALIDATION ADMIN     → Admin examine les réponses                      │
+  │  (console admin)         Peut valider → statut "En att. validation"     │
+  │         │                Peut retourner des questions au pilote          │
+  │         │                                                               │
+  │         ▼                                                               │
+  │  CLÔTURE              → Admin complète les 4 champs obligatoires :      │
+  │  (console admin)         · Type de cause                                │
+  │                          · Coût NC (en euros, 0 accepté)               │
+  │                          · Commentaire interne (qualité)               │
+  │                          · Commentaire général (envoyé par email)       │
+  │                          Statut final → "Clos"                          │
+  │                          ou "Non pertinent" si NC annulée               │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  STATUTS POSSIBLES
+  ─────────────────
+    Réceptionné       (ouvert)        NC reçue, pas encore prise en charge
+    En traitement     (en_cours)      Actions affectées, pilotes notifiés
+    En att. validation (resolu)       Actions terminées, en attente de clôture
+    Clos                              NC traitée et clôturée
+    Non pertinent                     NC annulée (hors périmètre, erreur)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. RÔLES ET DROITS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ┌──────────────────┬──────────────────────────────────────────────────────┐
+  │ RÔLE             │ CE QU'IL PEUT FAIRE                                  │
+  ├──────────────────┼──────────────────────────────────────────────────────┤
+  │ nc_admin         │ Tout : créer/modifier/clôturer les NC                │
+  │ (qualité /       │ Affecter des actions correctives aux pilotes          │
+  │  responsable)    │ Gérer les utilisateurs (onglet Utilisateurs)          │
+  │                  │ Configurer le module (onglet Configuration)           │
+  │                  │ Exporter les données CSV, voir les archives           │
+  │                  │ Relancer les pilotes en retard                        │
+  ├──────────────────┼──────────────────────────────────────────────────────┤
+  │ nc_chef_produit  │ Voir toutes les NC de la liste                       │
+  │ (pilote)         │ Ouvrir ses fiches NC pour lire les actions assignées  │
+  │                  │ Poster une réponse + pièces jointes sur ses actions   │
+  │                  │ Changer le statut de ses propres actions              │
+  │                  │ Ne peut pas clôturer ni créer d'actions               │
+  ├──────────────────┼──────────────────────────────────────────────────────┤
+  │ nc_lecteur       │ Consultation uniquement — aucune modification         │
+  └──────────────────┴──────────────────────────────────────────────────────┘
+
+  Connexion : formation-sav.fr/NC/login.html
+  Durée de session : 8 heures — reconnexion nécessaire après expiration
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. DÉCLARER UNE NC (formulaire public)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+URL : formation-sav.fr/NC/   (aucune connexion requise)
+
+Champs du formulaire :
+  · Famille de produit (liste déroulante)
+  · Numéro de commande
+  · Référence produit / Numéro de série / Version programme / Code SAP
+  · Nom du client / Code postal / Ville / Pays
+  · Description du problème (champ texte libre)
+  · Photos ou documents (fichiers JPG, PDF, MP4…)
+
+À la validation :
+  → Un numéro NC est attribué automatiquement (AAMMJJ-NNNN)
+  → Un email de confirmation est envoyé au service qualité
+  → La NC apparaît immédiatement dans la console admin
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. CONSOLE ADMIN — ONGLET LISTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+URL : formation-sav.fr/NC/console.html
+
+À l'ouverture, l'onglet Liste affiche les NC de l'année en cours.
+
+  BANDEAU ANNÉES
+  ──────────────
+  Des boutons en haut de liste permettent de basculer entre les années
+  (2024 | 2025 | 2026 …). Seules les années ayant des NC sont affichées.
+
+  ALERTE NC OUVERTES ANNÉES PRÉCÉDENTES
+  ──────────────────────────────────────
+  Si des NC d'années précédentes ne sont pas encore clôturées, une
+  bannière orange apparaît automatiquement avec les numéros de NC concernés
+  (cliquables pour ouvrir directement la fiche).
+
+  RECHERCHE ET FILTRES
+  ────────────────────
+  · Champ de recherche : cherche dans tous les champs (client, N° commande,
+    référence, description, pilote, etc.)
+  · Filtre Statut : Tous / Réceptionné / En traitement / En att. validation
+                    / Clos / Non pertinent
+  · Filtre Famille : toutes les familles de produit configurées
+  · Filtre Machine  : par type de machine
+
+  PAGINATION
+  ──────────
+  · 20 NC par page — navigation ‹ Préc. [1][2][3]… Suiv. ›
+  · Indicateur : "Page 1 / 3 — NC 1 à 20 sur 51"
+
+  SURBRILLANCE (ligne verte)
+  ──────────────────────────
+  Une ligne apparaît en VERT lorsqu'il y a une nouveauté non vue :
+    · Pour un ADMIN : le pilote a posté une réponse depuis votre dernière
+                      consultation de cette NC
+    · Pour un CHEF PRODUIT : une nouvelle action vous a été assignée,
+                              ou l'admin a répondu à votre retour
+  La ligne repasse à la couleur normale dès que vous ouvrez la fiche NC.
+
+  EXPORT CSV
+  ──────────
+  Le bouton "Exporter CSV" génère un fichier nc-AAAA.csv avec les NC
+  de l'année affichée (filtres appliqués).
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. CONSOLE ADMIN — FICHE NC (détail)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cliquer sur une ligne ouvre la fiche NC en superposition (modal).
+
+  SECTIONS DE LA FICHE
+  ─────────────────────
+  · En-tête : numéro NC, statut, date de création, famille, machine, client
+  · Déclaration : tous les champs du formulaire + pièces jointes du déclarant
+  · Actions correctives : liste des actions avec statut, pilote, échéance,
+    badge J-/J+ (jours restants ou de retard)
+  · Pour chaque action : historique des échanges admin ↔ pilote
+  · Historique de statut de la NC
+  · Journal des modifications (échéances, etc.)
+
+  BADGE J-/J+
+  ────────────
+    J-5   Délai dans 5 jours — fond vert si proche, rouge si urgent
+    J+3   Retard de 3 jours  — fond rouge clignotant (alerte)
+  Le badge est cliquable (admin) pour modifier l'échéance directement.
+  Pour une NC close, le badge affiche la situation à la date de clôture
+  (il ne change plus avec le temps).
+
+  ACTIONS DISPONIBLES SELON RÔLE
+  ───────────────────────────────
+    Admin :
+      · Ajouter / modifier des actions correctives
+      · Changer le statut de la NC
+      · Valider ou retourner une réponse pilote
+      · Clôturer (4 champs obligatoires à remplir)
+      · Relancer le pilote par email
+      · Exporter la NC en PDF
+
+    Chef produit (sur ses propres actions) :
+      · Saisir une réponse + pièces jointes
+      · Changer le statut de l'action (en_cours / resolu)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. CONSOLE ADMIN — ONGLET STATISTIQUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Toutes les statistiques sont calculées sur l'année choisie via le
+bandeau de sélection (indépendant du bandeau de l'onglet Liste).
+
+  INDICATEURS AFFICHÉS
+  ─────────────────────
+  · Total NC de l'année / dont closes / dont en cours
+  · Durée moyenne de résolution des NC closes (en jours)
+  · Coût total et coût moyen des NC closes (en euros)
+  · Répartition par statut (camembert ou barres)
+  · Répartition par famille de produit
+  · Courbe mensuelle : créations vs clôtures (Jan → Déc)
+
+  RESPECT DES ÉCHÉANCES
+  ──────────────────────
+  Pour les NC closes de l'année :
+    ✓ Closes dans les délais    → compteur vert
+    ✗ Closes hors délais        → compteur rouge
+  Pour les NC encore ouvertes :
+    ⚠ Échéance dépassée         → compteur orange
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. CONSOLE ADMIN — ONGLET ARCHIVES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+L'onglet Archives permet de consulter le bilan complet d'une année passée.
+
+  SÉLECTEUR D'ANNÉE
+  ──────────────────
+  Boutons en haut : une année par bouton (toutes les années avec NC).
+  Cliquer sur une année affiche son bilan complet.
+
+  ALERTE NC ANNÉE N-1 ENCORE OUVERTES
+  ─────────────────────────────────────
+  Si des NC de l'année précédente ne sont pas closes, une bannière orange
+  les signale avec les numéros cliquables.
+
+  BILAN DE L'ANNÉE
+  ─────────────────
+  · Compteurs : NC créées / closes / en cours / non pertinentes
+  · Durée moyenne de résolution
+  · Coût total NC closes
+  · Indicateur de respect des échéances (barres proportionnelles)
+  · Courbe mensuelle créations vs clôtures
+
+  SUIVI INTERANNUEL
+  ──────────────────
+  Les NC créées dans cette année mais clôturées une autre année
+  sont signalées par un badge ↗AAAA (violet) dans la liste.
+  Exemple : NC créée en 2025 mais close en 2026 → badge ↗2026
+
+  LISTE NC DE L'ANNÉE
+  ────────────────────
+  · 20 NC par page, triées par date décroissante
+  · Colonnes : N° NC / Date / Client / Famille / Statut / Durée / Délai
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. CONSOLE ADMIN — ONGLET CONFIGURATION (nc_admin uniquement)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tous les paramètres sont modifiables sans toucher au code.
+
+  EMAIL(S) QUALITÉ
+  ─────────────────
+  Un ou plusieurs destinataires séparés par ";"
+  Ces adresses reçoivent les emails de création NC et de clôture.
+
+  NOTIFICATIONS EMAIL (5 scénarios)
+  ───────────────────────────────────
+  ┌────────────────────────────┬───────────────────┬────────────────────────┐
+  │ Événement                  │ Destinataire      │ Option CC qualité      │
+  ├────────────────────────────┼───────────────────┼────────────────────────┤
+  │ Création NC                │ Qualité           │ —                      │
+  │ Création action corrective │ Pilote désigné    │ Oui (défaut : actif)   │
+  │ Changement statut NC       │ Déclarant         │ Oui (défaut : inactif) │
+  │ Relance pilote             │ Pilote en retard  │ Oui (défaut : actif)   │
+  │ Clôture NC                 │ Qualité           │ —                      │
+  └────────────────────────────┴───────────────────┴────────────────────────┘
+  Chaque scénario peut être activé / désactivé indépendamment.
+
+  FAMILLES DE PRODUIT
+  ────────────────────
+  Liste des familles affichée dans le formulaire de déclaration.
+  Ajouter ou supprimer des familles sans redémarrer le serveur.
+
+  TYPES DE CAUSE
+  ───────────────
+  Liste utilisée lors de la clôture d'une NC (champ obligatoire).
+  Exemples : Erreur de conception, Défaut fournisseur, Erreur opérateur…
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. CONSOLE ADMIN — ONGLET UTILISATEURS (nc_admin uniquement)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Créer, modifier et supprimer les comptes utilisateurs du module NC.
+
+  Pour chaque compte :
+    · Identifiant (login)
+    · Mot de passe (hashé côté serveur — jamais visible en clair)
+    · Rôle : nc_admin / nc_chef_produit / nc_lecteur
+    · Nom affiché (utilisé dans les emails et comme identité pilote)
+    · Email (reçoit les notifications d'actions et relances)
+
+  Comptes actuels :
+    Matsupport      — nc_admin (compte support technique)
+    Estelle Gouache — nc_admin
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. NOTIFICATIONS EMAIL — FONCTIONNEMENT DÉTAILLÉ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  CRÉATION NC
+  ────────────
+  Dès qu'une NC est soumise via le formulaire public :
+  → Email automatique au(x) destinataire(s) qualité configurés
+  → Contenu : N° NC, famille produit, client, description, pièces jointes
+
+  CRÉATION D'UNE ACTION CORRECTIVE
+  ──────────────────────────────────
+  Quand un admin affecte une action à un pilote :
+  → Email au pilote avec : N° NC, description de l'action, échéance
+  → CC qualité optionnelle (configurable)
+
+  CHANGEMENT DE STATUT
+  ─────────────────────
+  Quand le statut d'une NC change (ex. "En traitement" → "En att. validation") :
+  → Email au déclarant de la NC
+  → CC qualité optionnelle (configurable)
+
+  RELANCE PILOTE
+  ───────────────
+  Quand l'admin clique "Relancer" sur une action en retard :
+  → Email de rappel au pilote avec les détails de l'action
+  → CC qualité optionnelle (configurable)
+
+  CLÔTURE NC
+  ───────────
+  Quand l'admin clôture une NC :
+  → Email à la qualité avec le résumé complet (cause, coût, commentaires)
+
+  Expéditeur de tous les emails : formations.muller@gmail.com (SMTP Gmail)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. GUIDE RAPIDE PAR RÔLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  POUR LE SERVICE QUALITÉ (nc_admin)
+  ────────────────────────────────────
+  1. Connexion : formation-sav.fr/NC/login.html
+  2. Vérifier la liste : lignes vertes = nouveauté à traiter
+  3. Bannière orange = NC d'années précédentes à clôturer
+  4. Ouvrir une NC verte → lire la réponse du pilote → valider ou retourner
+  5. Si tout est bon → Clôturer (4 champs à remplir)
+  6. Onglet Statistiques → choisir l'année → voir les KPIs
+  7. Onglet Archives → bilan des années passées
+
+  POUR LES PILOTES (nc_chef_produit)
+  ────────────────────────────────────
+  1. Vous recevez un email lors de chaque nouvelle action assignée
+  2. Connexion : formation-sav.fr/NC/login.html
+  3. Lignes vertes dans la liste = action à traiter
+  4. Ouvrir la NC → lire l'action → rédiger votre réponse + pièces jointes
+  5. Changer le statut de l'action si nécessaire (en_cours → resolu)
+  6. Si l'admin a des questions supplémentaires, la ligne redevient verte
+
+  POUR LES LECTEURS (nc_lecteur)
+  ────────────────────────────────
+  1. Connexion : formation-sav.fr/NC/login.html
+  2. Consultation libre de toutes les NC et statistiques
+  3. Aucune modification possible
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+13. QUESTIONS FRÉQUENTES UTILISATEURS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Q : Je suis déconnecté(e) automatiquement — pourquoi ?
+R : La session dure 8 heures. Reconnectez-vous sur /NC/login.html.
+
+Q : Je ne vois pas les NC de 2024 — où sont-elles ?
+R : Dans l'onglet Liste, cliquez sur le bouton "2024" dans le bandeau d'années.
+    Les NC de 2024 apparaissent. L'onglet Archives permet aussi de les consulter.
+
+Q : La ligne reste verte même après avoir ouvert la NC — est-ce normal ?
+R : Non. Ouvrir la fiche marque la NC comme vue. Si elle reste verte,
+    rechargez la page (Ctrl+F5). Si le problème persiste, contactez l'admin.
+
+Q : Je ne vois pas le bouton "Clôturer" — pourquoi ?
+R : La clôture est réservée aux comptes nc_admin. Contactez le service qualité.
+
+Q : Comment ajouter une nouvelle famille de produit ?
+R : Console NC → onglet ⚙ Configuration → section "Familles de produit"
+    → Ajouter (réservé nc_admin).
+
+Q : Je veux exporter toutes les NC 2025 en CSV — comment ?
+R : Dans l'onglet Liste, sélectionnez "2025" dans le bandeau d'années,
+    puis cliquez sur "Exporter CSV". Le fichier téléchargé s'appelle nc-2025.csv.
+
+Q : Que signifie la mention ↗2026 en violet sur une NC 2025 ?
+R : Cette NC a été créée en 2025 mais clôturée en 2026. Le badge indique
+    l'année réelle de clôture (visible dans l'onglet Archives).
+
+Q : Les emails n'arrivent pas — que faire ?
+R : Vérifier dans ⚙ Configuration que le scénario concerné est bien activé.
+    Vérifier l'adresse email du destinataire (qualité ou pilote).
+    En dernier recours, contacter le support technique.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Contact support technique : avet.mat@gmail.com
+  URL module NC              : formation-sav.fr/NC/
+  URL console admin          : formation-sav.fr/NC/console.html
+  Version                    : 1 — 01/05/2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

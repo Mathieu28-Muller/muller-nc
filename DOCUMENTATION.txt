@@ -1,0 +1,565 @@
+================================================================================
+  FORMATION-SAV.FR — DOCUMENTATION TECHNIQUE
+  Muller Automotive — Espace Formation SAV
+  Dernière mise à jour : 01/05/2026
+================================================================================
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. PRÉSENTATION GÉNÉRALE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le site formation-sav.fr est hébergé localement sur un PC Windows via un tunnel
+Cloudflare. L'architecture repose sur trois composants :
+
+  1. Nginx (port 80)       Serveur web principal — sert les fichiers statiques
+                           depuis C:\formation\ et proxy les APIs vers Node.js
+                           Géré comme service Windows via NSSM
+                           Exécutable : C:\tools\nginx-1.29.7\nginx.exe
+                           Config     : C:\tools\nginx-1.29.7\conf\nginx.conf
+
+  2. Node.js / PM2 (port 3001)   Serveur API principal
+                                 Fichier : C:\formation\server.js
+                                 Gère : authentification JWT, API Base de cas,
+                                        API Non-Conformités, envoi emails
+
+  3. Node.js / PM2 (port 3003)   Serveur Certificat de Conformité
+                                 Fichier : C:\formation\certificat-conformite\server.js
+                                 Gère : recherche OTCLAN, génération PDF,
+                                        validation admin, envoi emails
+
+RÈGLE IMPORTANTE :
+  C:\formation\ est la SOURCE UNIQUE de vérité pour tous les fichiers.
+  Ne jamais modifier des copies dans d'autres dossiers (ex: Documents).
+  Nginx sert directement depuis C:\formation\ — toute modification y est
+  immédiatement visible sans redémarrage de nginx.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. STRUCTURE DU DOSSIER C:\formation\
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+C:\formation\
+│
+├── server.js                  Serveur principal Node.js/Express (port 3001)
+│                              Gère : authentification JWT, base de cas,
+│                              non-conformités, emails automatiques
+│
+├── package.json               Dépendances npm du serveur principal
+├── package-lock.json
+├── node_modules\              Modules installés (ne pas modifier)
+│
+├── ecosystem.config.js        Configuration PM2 (démarrage des 2 serveurs Node.js)
+├── start.bat                  Double-clic pour démarrer les serveurs Node.js
+├── stop.bat                   Double-clic pour arrêter les serveurs Node.js
+├── DOCUMENTATION.txt          Ce fichier
+│
+├── index.html                 Page d'accueil (5 modules / cards)
+├── users.json                 Comptes utilisateurs Formation SAV
+├── data.json                  Données base de cas (gammes, machines, pannes)
+├── nc-data.json               Déclarations de non-conformité
+├── nc-users.json              Comptes utilisateurs module NC
+├── nc-config.json             Configuration module NC (emails qualité, familles
+│                              de produit, types de cause, options notifications)
+│
+├── CT\                        Module Formation CT (en cours de développement)
+│
+├── MRA\                       Module Formation MRA
+│   ├── index.html             Page principale MRA
+│   ├── GEO\                   Sous-module Géométrie (avec animations)
+│   └── Quiz\                  Sous-module Quiz interactif
+│
+├── NC\                        Module Non-Conformités
+│   ├── index.html             Formulaire de déclaration NC (public)
+│   │                          Champs : Famille de produit (liste dynamique),
+│   │                          N° commande, Référence produit, N° de série,
+│   │                          Version prog, Code SAP, Client, Problème, etc.
+│   ├── login.html             Connexion console NC (token JWT 8h)
+│   ├── console.html           Console admin NC — onglets :
+│   │                          · Liste NC : bandeau année, filtres, recherche,
+│   │                            pagination 20/page, export CSV/an, surbrillance
+│   │                            rôle-aware, alerte NC années préc. ouvertes
+│   │                          · Statistiques : sélecteur année, KPIs, courbe
+│   │                            mensuelle, indicateur respect des échéances
+│   │                          · Archives : bilan/an, suivi interannuel, liste
+│   │                            paginée 20/page
+│   │                          · Utilisateurs (nc_admin uniquement)
+│   │                          · Configuration (nc_admin uniquement)
+│   │                            — emails qualité, notifications, familles, causes
+│   └── media\                 Photos et fichiers joints aux NC
+│       ├── temp\              Uploads temporaires — nettoyage auto > 24h
+│       ├── {numero}\          Un dossier par NC (N° = AAMMJJ-XXXXX)
+│       │   └── actions\{id}\  Pièces jointes des actions correctives
+│       └── ...
+│
+├── Base de cas\               Module Base de Pannes Machines
+│   ├── index.html             Interface principale (CT/MRA, recherche)
+│   ├── admin.html             Console admin (ajout machines, upload médias)
+│   ├── login.html             Connexion
+│   ├── auth.js                Gestion authentification côté client
+│   ├── script.js              Logique interface
+│   ├── style.css
+│   ├── logo\                  Logo Muller
+│   ├── machine\               Fiches machines
+│   └── media\                 Vidéos et PDF par gamme/machine
+│       ├── CT\
+│       │   ├── ACTIGAS_AT505\
+│       │   ├── ECOSHIELD\
+│       │   └── ...
+│       └── MRA\
+│           └── ...
+│
+└── certificat-conformite\     Module Certificat de Conformité (serveur 3003)
+    ├── server.js              Serveur Node.js/Express (port 3003)
+    ├── package.json
+    ├── package-lock.json
+    ├── node_modules\
+    ├── db.json                Base de données des demandes (JSON)
+    ├── demarrer.bat           Démarrage manuel alternatif
+    │
+    ├── public\                Fichiers servis au navigateur
+    │   ├── index.html         Formulaire client (recherche + saisie)
+    │   ├── admin.html         Console admin (upload OTCLAN, validation)
+    │   ├── js\
+    │   │   ├── client.js
+    │   │   └── admin.js
+    │   └── css\
+    │       └── style.css
+    │
+    ├── data\                  Données métier (NE PAS SUPPRIMER)
+    │   ├── otclan_history.json              Historique cumulatif OTCLAN (CRITIQUE)
+    │   ├── suivi_otclan_vl_*.xlsx           Fichier OTCLAN VL (remplacé à chaque upload)
+    │   ├── suivi_otclan_pl_*.xlsx           Fichier OTCLAN PL
+    │   ├── suivi_otclan_cl_*.xlsx           Fichier OTCLAN CL
+    │   ├── Base_contrats.xlsx               Contrats équipements
+    │   ├── correspondance compte client - n° agrément.xlsx
+    │   └── 1 - DOC-A-31 V1  MODELE ATTESTATION DE CONFORMITE.xlsm
+    │                                        Template 75 feuilles (CRITIQUE)
+    │
+    ├── archives\              PDFs des certificats générés (ex: 260412A.pdf)
+    └── uploads\               Fichiers temporaires upload
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. MODULES ET URLS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  URL publique                                  Fichier local (C:\formation\)
+  ────────────────────────────────────────────────────────────────────────────
+  formation-sav.fr/                             index.html
+  formation-sav.fr/CT/                          CT\index.html
+  formation-sav.fr/MRA/                         MRA\index.html
+  formation-sav.fr/Base%20de%20cas/             Base de cas\index.html
+  formation-sav.fr/Base%20de%20cas/admin.html   Base de cas\admin.html
+  formation-sav.fr/NC/                          NC\index.html
+  formation-sav.fr/NC/login.html                NC\login.html
+  formation-sav.fr/NC/console.html              NC\console.html
+  formation-sav.fr/api/*                        → proxy nginx → port 3001 (server.js)
+  formation-sav.fr/certificat-conformite/       → proxy nginx → port 3003 → public\index.html
+  formation-sav.fr/certificat-conformite/admin.html  → proxy nginx → port 3003 → public\admin.html
+  formation-sav.fr/certificat-conformite/api/*  → proxy nginx → port 3003 → server.js routes
+
+  En local (test sans passer par Cloudflare) :
+  http://localhost/                    Page d'accueil (via nginx)
+  http://localhost/api/health          Vérifier que le serveur Node 3001 tourne
+  http://localhost:3001/api/health     Accès direct Node.js (bypass nginx)
+  http://localhost:3003/               Certificat (accès direct interne)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. COMPTES PAR DÉFAUT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  MODULE FORMATION SAV (Base de cas, MRA...)  — fichier : users.json
+    Rôles : admin / contributor / user
+    Gestion : via console admin ou en éditant users.json
+
+  MODULE NON-CONFORMITÉS  — fichier : nc-users.json
+    Rôles :
+      nc_admin        Accès total (créer/valider/clôturer, onglets Utilisateurs
+                      et Configuration)
+      nc_chef_produit Pilote d'actions : voir ses actions, poster réponses + PJ,
+                      changer statut de ses actions
+      nc_lecteur      Consultation uniquement (lecture seule)
+    Gestion : via console NC (onglet Utilisateurs) ou en éditant nc-users.json
+    Token JWT : durée de vie 8h — reconnexion nécessaire après expiration
+
+  MODULE CERTIFICAT DE CONFORMITÉ
+    Comptes gérés depuis la console admin du module
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. DÉMARRAGE DES SERVEURS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  NGINX (serveur web, port 80)
+  ─────────────────────────────
+  Nginx est installé comme service Windows (via NSSM) : il démarre
+  automatiquement à chaque reboot, sans intervention manuelle.
+
+  Vérifier qu'il tourne :
+    Services Windows → chercher "nginx" → statut "En cours d'exécution"
+    ou : curl http://localhost/api/health
+
+  Redémarrer nginx (terminal administrateur) :
+    net stop nginx
+    net start nginx
+
+  Recharger la config sans redémarrer (terminal administrateur) :
+    C:\tools\nginx-1.29.7\nginx.exe -s reload -p C:\tools\nginx-1.29.7\
+
+  Config nginx : C:\tools\nginx-1.29.7\conf\nginx.conf
+
+  SERVEURS NODE.JS / PM2
+  ───────────────────────
+  PM2 est configuré pour démarrer automatiquement au boot Windows.
+  Les deux processus (port 3001 et 3003) reprennent sans intervention.
+
+  MÉTHODE 1 — Double-clic sur start.bat (dans C:\formation\)
+
+  MÉTHODE 2 — Terminal
+    cd C:\formation
+    pm2 start ecosystem.config.js
+    pm2 save
+
+  VÉRIFICATION
+    pm2 list
+    → "formation-sav" et "certificat-conformite" doivent afficher "online"
+
+  ARRÊT
+    pm2 stop formation-sav
+    pm2 stop certificat-conformite
+    (ou double-clic sur stop.bat)
+
+  REDÉMARRAGE APRÈS CRASH
+    pm2 restart formation-sav
+    pm2 restart certificat-conformite
+
+  VOIR LES LOGS EN DIRECT
+    pm2 logs formation-sav
+    pm2 logs certificat-conformite
+
+  SI PM2 NE REDÉMARRE PAS AU BOOT
+    pm2 resurrect          ← restaure les processus depuis la dernière sauvegarde
+    pm2 save               ← resauvegarder après toute modification de la liste
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. MODIFIER LES FICHIERS DU SITE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Nginx sert les fichiers statiques (HTML, JS, CSS, médias) directement
+  depuis C:\formation\. Toute modification est immédiatement prise en compte
+  sans redémarrer nginx ni PM2.
+
+  Pour les APIs (routes /api/* et /certificat-conformite/api/*) :
+    → Modifier server.js puis redémarrer PM2 :
+       pm2 restart formation-sav
+       pm2 restart certificat-conformite
+
+  NE JAMAIS modifier des copies dans d'autres dossiers.
+  L'ancienne copie dans C:\Users\MULLER\Documents\ est obsolète et inutilisée.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. MIGRATION SUR UN AUTRE SERVEUR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  PRÉREQUIS SUR LE NOUVEAU SERVEUR
+  ─────────────────────────────────
+    - Node.js 18 ou supérieur         https://nodejs.org
+    - PM2                             npm install -g pm2
+    - Nginx                           https://nginx.org (Windows) ou apt/yum (Linux)
+    - NSSM (Windows uniquement)       https://nssm.cc (pour nginx comme service)
+    - LibreOffice                     https://www.libreoffice.org
+      (requis pour la génération PDF des certificats)
+
+  ÉTAPE 1 — Copier le dossier
+  ────────────────────────────
+    Copier intégralement C:\formation\ vers le nouveau serveur.
+    Chemin conseillé : C:\formation\ (Windows) ou /opt/formation/ (Linux)
+
+    Fichiers CRITIQUES à ne pas oublier :
+      - users.json                    (comptes utilisateurs)
+      - data.json                     (base de cas)
+      - nc-data.json                  (déclarations NC)
+      - nc-users.json                 (comptes NC)
+      - certificat-conformite\db.json (demandes certificat)
+      - certificat-conformite\data\otclan_history.json  (historique OTCLAN)
+      - certificat-conformite\data\*.xlsx               (fichiers OTCLAN)
+      - certificat-conformite\data\1 - DOC-A-31 *.xlsm  (template 75 feuilles)
+      - certificat-conformite\archives\                  (PDFs déjà générés)
+      - NC\media\                                        (photos et pièces jointes NC)
+      - Base de cas\media\                               (vidéos et PDF pannes)
+
+  ÉTAPE 2 — Installer les dépendances Node.js
+  ─────────────────────────────────────────────
+    cd C:\formation
+    npm install
+
+    cd C:\formation\certificat-conformite
+    npm install
+
+  ÉTAPE 3 — Configurer nginx
+  ───────────────────────────
+    Installer nginx et pointer le root vers C:\formation\ (ou le nouveau chemin).
+    Copier la configuration depuis C:\tools\nginx-1.29.7\conf\nginx.conf
+    en adaptant les chemins et ports si nécessaire.
+
+    Points clés de la config nginx :
+      root   C:/formation;          ← dossier source des fichiers statiques
+      /api/  → proxy 127.0.0.1:3001
+      /certificat-conformite/ → proxy 127.0.0.1:3003
+      client_max_body_size 200m;    ← pour upload de médias
+
+    Sur Windows : installer nginx comme service via NSSM pour le démarrage auto.
+
+  ÉTAPE 4 — Adapter l'ecosystem.config.js
+  ─────────────────────────────────────────
+    Modifier les deux lignes "cwd" :
+      cwd: 'C:\\formation'                          ← serveur principal
+      cwd: 'C:\\formation\\certificat-conformite'   ← serveur certificat
+    Sur Linux : '/opt/formation' etc.
+
+  ÉTAPE 5 — Démarrer PM2
+  ───────────────────────
+    cd C:\formation
+    pm2 start ecosystem.config.js
+    pm2 save
+
+  ÉTAPE 6 — Configurer Cloudflare
+  ────────────────────────────────
+    Cloudflare Tunnel doit pointer vers le port nginx (80), pas vers Node.js.
+    Config actuelle : C:\cloudflared\config.yml
+    Tunnel ID : fa618142-da5b-4c0d-9e6b-b412e2b7bbd7
+
+    Règle de routage dans config.yml :
+      - hostname: formation-sav.fr
+        service: http://localhost:80     ← nginx, qui proxy vers 3001/3003
+
+  ÉTAPE 7 — Vérifier
+  ────────────────────
+    curl http://localhost/api/health
+    → Doit retourner : {"ok":true, "users":N, ...}
+
+    curl http://localhost/NC/index.html | grep familleProduit
+    → Doit trouver des occurrences (formulaire NC à jour)
+
+    curl http://localhost:3003/api/search?q=test
+    → Doit retourner une liste JSON de clients
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  8. VARIABLES D'ENVIRONNEMENT (optionnel)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Serveur principal (C:\formation\server.js) :
+    PORT          Port d'écoute (défaut : 3001)
+    JWT_SECRET    Clé secrète JWT — CHANGER EN PRODUCTION
+    MAIL_PASS     Mot de passe SMTP Gmail (formations.muller@gmail.com)
+
+  Ces variables peuvent être définies dans ecosystem.config.js section "env".
+
+  Exemple ecosystem.config.js avec variables :
+    env: {
+      PORT: 3001,
+      JWT_SECRET: 'votre-cle-secrete-longue-et-aleatoire',
+      MAIL_PASS: 'votre-mot-de-passe-app-gmail',
+      NODE_ENV: 'production'
+    }
+
+  Email SMTP : smtp.gmail.com:587 (STARTTLS)
+    Expéditeur : formations.muller@gmail.com
+    Destinataire(s) NC qualité : configurables via console NC → ⚙ Configuration
+                                  stockés dans nc-config.json (clé emailsQualite)
+                                  Séparateur : point-virgule ";"
+    Destinataire Certificat    : mavet@mullerautomotive.fr (dans server.js)
+    Le mot de passe est un "mot de passe d'application" Google
+    (Compte Google > Sécurité > Mots de passe des applications)
+
+  NOTIFICATIONS EMAIL NC (configurables via console → ⚙ Configuration) :
+    Scénario                  Destinataire principal   Qualité incluse
+    ──────────────────────────────────────────────────────────────────
+    Création NC               Qualité (to)             — (est le destinataire)
+    Création action           Pilote (to)              CC optionnel (défaut : oui)
+    Changement statut NC      Rédacteur (to)           CC optionnel (défaut : non)
+    Relance pilote            Pilote (to)              CC optionnel (défaut : oui)
+    Clôture NC                Qualité (to)             — (est le destinataire)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  9. DÉPANNAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Le site externe ne répond plus
+    Vérifier nginx : Services Windows → nginx → "En cours d'exécution"
+    Vérifier PM2   : pm2 list → formation-sav et certificat-conformite "online"
+    Vérifier cloudflared : Services Windows → cloudflared → en cours
+
+  Le site affiche une ancienne version d'une page HTML
+    Les fichiers statiques sont dans C:\formation\ — modifier directement ici.
+    Vider le cache navigateur (Ctrl+Maj+R) ou ouvrir en navigation privée.
+
+  Les APIs ne fonctionnent plus (/api/health renvoie erreur)
+    pm2 restart formation-sav
+    Vérifier les logs : pm2 logs formation-sav
+
+  Port 3001 déjà utilisé au démarrage de PM2
+    netstat -ano | findstr :3001
+    Identifier le PID et le tuer (terminal administrateur) :
+    taskkill /PID <PID> /F
+    Puis relancer : pm2 start ecosystem.config.js
+
+  La page /certificat-conformite/ ne s'affiche pas
+    pm2 list → "certificat-conformite" doit être "online"
+    curl http://localhost:3003/ → doit retourner du HTML
+
+  Les PDFs certificat ne se génèrent pas
+    LibreOffice doit être installé et accessible en ligne de commande.
+    Tester : soffice --version
+
+  Les emails ne partent pas
+    Vérifier MAIL_PASS dans ecosystem.config.js ou dans server.js (EMAIL_CFG.pass)
+    Le compte Gmail doit avoir un "mot de passe d'application" actif.
+    Tester l'envoi depuis la console NC ou certificat.
+
+  PM2 ne redémarre pas au boot Windows
+    En terminal : pm2 resurrect
+    Si vide : pm2 start ecosystem.config.js && pm2 save
+    Installer le démarrage auto :
+      npm install -g pm2-windows-startup
+      pm2-startup install
+      pm2 save
+
+  Nginx ne redémarre pas au boot Windows
+    Vérifier dans Services Windows que nginx est en démarrage "Automatique".
+    Si absent : le réinstaller via NSSM.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10. ARCHITECTURE TECHNIQUE RÉSUMÉE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Internet
+      │
+  Cloudflare Tunnel (HTTPS)
+      │  config : C:\cloudflared\config.yml
+      │  tunnel : fa618142-da5b-4c0d-9e6b-b412e2b7bbd7
+      │
+  Nginx  port 80   (service Windows NSSM)
+  root : C:\formation\
+      │
+      ├── /                        index.html (page d'accueil, 5 modules)
+      ├── /CT/                     CT\ (en développement)
+      ├── /MRA/                    MRA\
+      ├── /Base%20de%20cas/        Base de cas\
+      ├── /NC/                     NC\
+      │
+      ├── /api/*          → PROXY → localhost:3001  [PM2: formation-sav]
+      │                             C:\formation\server.js
+      │                             Auth JWT, API NC, API Base de cas, emails
+      │
+      └── /certificat-conformite/* → PROXY → localhost:3003  [PM2: certificat-conformite]
+                                              C:\formation\certificat-conformite\server.js
+                                              OTCLAN, PDF, certificats, emails
+
+  Données (tout dans C:\formation\) :
+    users.json              Comptes Formation SAV
+    data.json               Structure gammes/machines/pannes
+    nc-data.json            Dossiers Non-Conformité  ⭐ sauvegarder régulièrement
+    nc-users.json           Comptes NC
+    nc-config.json          Configuration NC (emails, familles, causes, notifs)
+    NC\media\               Photos et pièces jointes NC  ⭐ sauvegarder régulièrement
+    NC\media\temp\          Uploads temporaires — nettoyage auto toutes les heures
+    Base de cas\media\      Vidéos et PDF pannes machines
+    certificat-conformite\db.json           Demandes certificat
+    certificat-conformite\data\*.xlsx       Fichiers OTCLAN
+    certificat-conformite\data\otclan_history.json   Historique cumulatif
+    certificat-conformite\archives\*.pdf    Certificats générés
+
+  Services Windows démarrés automatiquement au boot :
+    nginx          → sert le site (port 80)
+    cloudflared    → tunnel Cloudflare (exposition internet)
+    PM2            → via pm2-windows-startup (ports 3001 et 3003)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  11. HISTORIQUE DES MODIFICATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  01/05/2026 (v3 — module NC)
+    - Onglet "Archives" : bilan annuel, suivi NC interannuelles, alerte NC
+      années précédentes ouvertes, liste paginée 20/page par année
+    - Bandeau sélecteur d'année dans Liste et Statistiques
+      (toutes les années ayant des NC, filtre automatique sur l'année en cours)
+    - Alerte NC des années précédentes encore ouvertes dans l'onglet Liste
+      (bannière orange cliquable dès l'ouverture de la console)
+    - Export CSV filtré par année (fichier nc-AAAA.csv)
+    - Statistiques recalculées par année sélectionnée :
+      KPIs, courbe mensuelle créations/clôtures, indicateur respect des échéances
+    - Clôture NC : 4 champs obligatoires (type de cause, coût NC,
+      commentaire interne, commentaire général) — coût 0 accepté
+    - Surbrillance intelligente rôle-aware :
+      admin → vert si nouvelle réponse pilote non vue
+      chef produit → vert si nouvelle action assignée ou retour admin non vu
+    - Pagination 20 NC par page dans Liste (indicateur Page X/Y — NC n à m/total)
+    - Numérotation NC : format AAMMJJ-NNNN (4 chiffres), compteur/an,
+      remise à zéro automatique chaque année civile
+    - Correction chemin logo : Base de cas/logo/Logo.png
+    - Correction variable moisClos manquante dans renderArchive
+
+  01/05/2026 (v2 — module NC)
+    - Onglet "⚙ Configuration" dans console NC (visible nc_admin uniquement)
+        · Email(s) destinataire qualité : champ éditable, séparateur ";"
+          remplace l'adresse précédente — stocké dans nc-config.json
+        · Notifications email par scénario : 2 cases par ligne —
+          "Activer l'envoi" et "Qualité incluse (CC)" — indépendantes
+        · CRUD familles de produit : ajouter / supprimer dans la liste déroulante
+        · CRUD types de cause : ajouter / supprimer les causes de clôture
+    - Nouveau fichier nc-config.json (emails, familles, causes, notifications)
+    - Email de clôture envoyé au service qualité à chaque passage clos/non_pertinent
+    - Nettoyage automatique NC\media\temp\ : fichiers > 24h supprimés
+      au démarrage du serveur puis toutes les heures (log PM2)
+    - Correction ordre routes Express : /api/nc/config placé avant /api/nc/:numero
+    - Listes familles et types de cause chargées dynamiquement depuis l'API
+      (tous rôles) — nc-config.json fait référence, plus les tableaux codés en dur
+
+  30/04/2026
+    - Module NC : refonte architecture actions correctives
+        · Types d'action : curative, préventive, corrective
+        · Pilotes par action (vs pilote unique par NC)
+        · Tableau de bord / synoptique mis à jour
+    - Badge J-/J+ : signe corrigé (J- = délai restant, J+ = dépassement)
+    - Badge J- cliquable sur actions ouvertes → modification échéance inline
+      (enregistré dans le journal avec ancienne/nouvelle date)
+    - NC closes : calcul J+/J- figé à la date de clôture (pas à aujourd'hui)
+      affichage de l'échéance la plus défavorable parmi toutes les actions
+    - Card "Actions en retard" dans le tableau de bord : animation clignotante
+      si au moins 1 action est en retard
+    - Recherche NC étendue à tous les champs du formulaire (N° commande, réf,
+      N° série, version prog, code SAP, client, CP, ville, pays, pilote, etc.)
+    - Suppression du bouton "Archiver PDF" global (export individuel conservé)
+    - 5 NC de test avec problèmes techniques créées (NC00016 à NC00020)
+    - Sauvegarde complète D:\formation + documentation DOCUMENTATION.txt
+
+  28/04/2026
+    - Nginx identifié comme couche web (port 80) devant Node.js
+    - Root nginx migré de C:\Users\MULLER\Documents vers C:\formation\
+    - C:\formation\ devient la source unique pour tous les modules
+    - Formulaire NC : ajout du champ "Famille de produit" (29 familles)
+      (visible dans le PDF généré, dans l'email automatique et dans la console)
+    - Documentation mise à jour (sections architecture, démarrage, dépannage)
+
+  22/04/2026
+    - Ajout module Certificat de Conformité (port 3003)
+    - PM2 configuré avec ecosystem.config.js
+    - Génération du tableau Excel des 75 feuilles DOC-A-31
+
+  04/04/2026
+    - Mise en place initiale du projet
+    - Modules Base de cas et Non-Conformité opérationnels
+    - Tunnel Cloudflare configuré
+
+================================================================================
+  FIN DU DOCUMENT
+================================================================================

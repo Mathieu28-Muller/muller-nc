@@ -1,0 +1,310 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║          DOSSIER DE REPRISE — FORMATION-SAV.FR / MULLER AUTOMOTIVE          ║
+║          Sauvegarde du 06/05/2026 — Généré automatiquement                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Ce dossier contient l'intégralité du site formation-sav.fr prêt à être
+redémarré sur un nouveau PC Windows en cas de panne.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. ARCHITECTURE GLOBALE DU SITE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Internet
+     │
+     ▼
+  Cloudflare (proxy DNS + tunnel)
+     │
+     ▼ port 80
+  Nginx 1.29.7  (reverse proxy local — C:\tools\nginx-1.29.7\)
+     │
+     ├─► port 3001 ── Node.js / Express  (C:\formation\server.js)
+     │                 · Site formation-sav.fr (NC, certificats, accueil)
+     │                 · API REST + auth JWT
+     │                 · Gestion NC avec module NC Parent complet
+     │
+     ├─► port 3003 ── Node.js / Express  (C:\formation\certificat-conformite\server.js)
+     │                 · Module certificats de conformité
+     │
+     └─► port 3002 ── Node.js  (site Lilin'ART — dossier séparé)
+
+
+ROUTING NGINX (résumé) :
+  /api/*                     → localhost:3001  (API principale)
+  /NC/*                      → C:\formation\NC\  (fichiers statiques NC)
+  /certificat-conformite/*   → localhost:3003
+  /certificat-conformite/api/* → localhost:3003/api/
+  /*                         → C:\formation\  (fichiers statiques accueil)
+  lilin-art.fr               → localhost:3002  (virtual host séparé)
+
+DONNÉES IMPORTANTES (JSON — pas de base de données) :
+  C:\formation\nc-data.json            ← toutes les NC + NC Parents ⭐ CRITIQUE
+  C:\formation\nc-parent-groups.json   ← notifications/journal NC Parents
+  C:\formation\nc-users.json           ← utilisateurs du module NC
+  C:\formation\nc-config.json          ← configuration NC (emails, familles, causes)
+  C:\formation\users.json              ← utilisateurs certificats/accueil
+  C:\formation\data.json               ← données formations/sessions
+  C:\formation\NC\media\               ← pièces jointes NC (photos, PDF…) ⭐ CRITIQUE
+  C:\formation\certificat-conformite\db.json  ← base certificats
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. LOGICIELS REQUIS (à installer sur le nouveau PC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ① Node.js v25.x (ou LTS ≥ 20)
+      https://nodejs.org/en/download
+      → Cocher "Add to PATH" lors de l'installation
+
+  ② PM2 (gestionnaire de processus Node.js)
+      En invite de commande admin :
+        npm install -g pm2
+        npm install -g pm2-windows-startup
+        pm2-startup install     ← démarrage automatique avec Windows
+
+  ③ Nginx 1.29.7 (ou plus récent)
+      Copier le dossier C:\tools\nginx-1.29.7\ tel quel
+      (config incluse dans ce dossier de sauvegarde → _nginx_conf\)
+      Le fichier nginx.conf et conf.d\ sont pré-configurés.
+
+  ④ Cloudflare Tunnel (cloudflared)
+      Nécessaire pour exposer le serveur local sur Internet.
+      → Voir section 5 pour la configuration.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. PROCÉDURE DE REPRISE PAS À PAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ÉTAPE 1 — Copier les fichiers
+  Copier tout ce dossier D:\formation vers C:\formation
+
+  robocopy D:\formation C:\formation /MIR /XD node_modules
+
+ÉTAPE 2 — Installer les dépendances Node.js
+  cd C:\formation && npm install
+  cd C:\formation\certificat-conformite && npm install
+
+ÉTAPE 3 — Installer Nginx
+  Copier D:\formation\_nginx_conf\  →  C:\tools\nginx-1.29.7\conf\
+  Démarrer nginx :
+    nssm install nginx "C:\tools\nginx-1.29.7\nginx.exe"
+  Ou manuellement : C:\tools\nginx-1.29.7\nginx.exe
+
+ÉTAPE 4 — Démarrer les serveurs Node avec PM2
+  cd C:\formation
+  pm2 start ecosystem.config.js
+  pm2 save
+  pm2-startup install
+
+  Vérifier : pm2 list
+    formation-sav        → online  (port 3001)
+    certificat-conformite → online  (port 3003)
+
+ÉTAPE 5 — Vérifier en local
+  http://localhost/NC/console.html → console admin NC
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. PARAMÈTRES SERVEUR NODE.JS (server.js)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PORT              : 3001  (défini dans ecosystem.config.js → env.PORT)
+JWT_SECRET        : 'muller-automotive-secret-2026-changez-moi!'
+                    ⚠ À changer en production via ecosystem.config.js → env.JWT_SECRET
+TOKEN JWT NC      : durée de vie 8h
+
+EMAIL SMTP :
+  Serveur   : smtp.gmail.com  port 587  STARTTLS
+  Compte    : formations.muller@gmail.com
+  Mot passe : mot de passe d'application Gmail (server.js ligne ~45)
+
+PROTECTION ÉCRITURE JSON (depuis 06/05/2026) :
+  Toutes les sauvegardes utilisent atomicWriteSync() :
+    1. Écriture dans fichier .tmp
+    2. Rename atomique .tmp → fichier final (crash-safe)
+  Sérialise les écritures simultanées (2 admins en même temps).
+  atomicWriteAsync() disponible pour migration OVH async.
+
+  Fichiers protégés : nc-data.json, nc-parent-groups.json,
+                      nc-users.json, nc-config.json, users.json
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. CLOUDFLARE TUNNEL (accès Internet)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le site est exposé via Cloudflare Tunnel (cloudflared).
+
+Sur le nouveau PC :
+  ① Installer cloudflared
+  ② Se connecter au compte Cloudflare Muller Automotive
+  ③ Zero Trust → Networks → Tunnels → récupérer le token
+  ④ cloudflared service install <token>  &&  sc start cloudflared
+
+  Le tunnel pointe :  formation-sav.fr → localhost:80  (Nginx)
+                      lilin-art.fr     → localhost:80  (Nginx → 3002)
+
+NOTE CONNEXION ETHERNET (06/05/2026) :
+  PC connecté en ethernet filaire à la box fibre (performances supérieures).
+  Recommandé : assigner une IP locale fixe dans la box pour stabilité.
+
+⚠️  INCIDENT RÉSOLU (06/05/2026) — TÂCHE PLANIFIÉE PARASITE :
+  Après redémarrage PC, la console NC affichait 404 sur toutes les routes /api/nc*.
+  CAUSE : Une tâche planifiée Windows nommée "MullerAuthAPI" démarrait
+          C:\server-muller\server.js (ancien serveur de test) sur le port
+          127.0.0.1:3001, interceptant toutes les requêtes Nginx avant le
+          bon serveur PM2 (formation-sav, C:\formation\server.js).
+  RÉSOLUTION : Tâche "MullerAuthAPI" supprimée définitivement via PowerShell.
+               PM2 sauvegardé (pm2 save) — seuls 3 processus légitimes :
+               · formation-sav (port 3001)
+               · certificat-conformite (port 3003)
+               · lilinart-site (port 3002)
+  DOSSIER C:\server-muller\ : ancien serveur, NE PAS DÉMARRER, NE PAS recréer
+                               la tâche planifiée. Peut être archivé/supprimé.
+  DIAGNOSTIC FUTUR : si 404 sur /api/nc* → vérifier avec :
+    netstat -ano | findstr :3001   (doit n'afficher qu'un seul PID)
+    pm2 list                        (formation-sav doit être "online")
+    Get-ScheduledTask | Where-Object {$_.Actions.Execute -like '*node*'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. DÉMARRAGE / ARRÊT RAPIDE (PC opérationnel)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  DÉMARRER tout  : double-cliquer C:\formation\start.bat
+  ARRÊTER tout   : double-cliquer C:\formation\stop.bat
+  LOGS           : pm2 logs formation-sav --lines 50
+  REDÉMARRER API : pm2 restart formation-sav
+
+  Nginx :
+    Démarrer : C:\tools\nginx-1.29.7\nginx.exe
+    Arrêter  : C:\tools\nginx-1.29.7\nginx.exe -s stop
+    Recharger: C:\tools\nginx-1.29.7\nginx.exe -s reload
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. RÔLES ET COMPTES NC (nc-users.json)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  nc_admin        : accès total — créer/valider/clôturer NC et NC Parents,
+                    gérer utilisateurs, ⚙ Configuration
+  nc_chef_produit : pilote — répondre aux actions assignées (NC + NC Parents)
+  nc_lecteur      : consultation seule
+
+  Comptes admin actuels :
+    Matsupport       (admin — support technique)
+    Estelle Gouache  (admin)
+
+  Fichier : C:\formation\nc-users.json
+  Gestion : console NC → onglet Utilisateurs
+
+  CAPACITÉ SIMULTANÉE :
+    Field test local (appareils distincts via réseau) : 15-25 utilisateurs
+    Profil testé : 2 admins + 5 pilotes + 2 lecteurs → confort total
+    RAM serveur Node.js : ~50 MB (JWT stateless, pas de session stockée)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. MODULE NC PARENT (depuis 06/05/2026) — ISO 9001 §10.2.1 / LNE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  NC Parents = NC réelles dans nc-data.json (is_parent:true, satellites:[...])
+
+  CRÉATION : console NC → grouper 2+ NC → numéro NC-P-XXXXX
+  WORKFLOW  : ouvert → en_cours → resolu → clos (identique NC standard)
+  CLÔTURE   : déclenche fermeture cascade de tous les satellites + emails
+
+  OBLIGATIONS CLÔTURE NC PARENT (bloquant) :
+    · 5 Pourquoi : P1 + Cause racine                   (ISO §10.2.1e / LNE-1)
+    · Ishikawa : au moins une cause renseignée          (LNE diagnostic)
+    · Type de cause, Coût NC, Commentaire clôture       (standard)
+
+  FICHE SATELLITE :
+    · Bannière parent + fil de discussion enrichi (événements parent inclus)
+    · Badge 📋 NC-P-XXXXX sur chaque événement provenant du parent
+
+  STATISTIQUES :
+    · Coût NC Parent compté normalement
+    · Coût satellites EXCLU du total (pas de double-comptage)
+
+  LISTE NC : tous visibles (parents + satellites) avec badges dédiés
+    Filtre : Toutes NC / Standards / NC Parents / Satellites
+
+  MODULES JS (C:\formation\NC\) :
+    nc_parent_satellites.js   ← logique métier groupes
+    nc_parent_avance.js       ← scénarios avancés (résiduel, réouverture)
+    nc_liste_accordeon.js     ← liste accordéon + filtres
+    nc_droits_pilote.js       ← droits pilotes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. STRUCTURE DES DOSSIERS (sauvegarde)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  D:\formation\
+    server.js                 ← API Node.js principale (port 3001)
+    ecosystem.config.js       ← config PM2
+    package.json              ← dépendances npm
+    nc-data.json              ← ⭐ NC + NC Parents — sauvegarder régulièrement
+    nc-parent-groups.json     ← notifications et journal NC Parents
+    nc-users.json             ← comptes NC
+    nc-config.json            ← configuration NC
+    users.json / data.json    ← autres modules
+    start.bat / stop.bat      ← démarrage/arrêt rapide
+    DEMARRAGE_URGENCE.txt     ← ce fichier (mis à jour 06/05/2026)
+    NC\
+      console.html            ← console admin (NC + NC Parents)
+      index.html              ← formulaire déclaration
+      login.html              ← connexion NC
+      synoptique.html         ← synoptique utilisateurs
+      synoptique_nc_groupe.html ← synoptique NC Parents
+      nc_parent_satellites.js
+      nc_parent_avance.js
+      nc_liste_accordeon.js
+      nc_droits_pilote.js
+      media\                  ← ⭐ pièces jointes — sauvegarder régulièrement
+    certificat-conformite\    ← module certificats (port 3003)
+    _nginx_conf\              ← config nginx sauvegardée
+
+  ⭐ FICHIERS CRITIQUES à sauvegarder régulièrement :
+     nc-data.json, nc-parent-groups.json, nc-users.json,
+     nc-config.json, NC\media\, certificat-conformite\db.json
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. DÉPENDANCES NPM (pour npm install)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  C:\formation\ :
+    express, cors, jsonwebtoken, multer, nodemailer
+
+  C:\formation\certificat-conformite\ :
+    express, cors, multer, nodemailer, pdf-lib, pdfkit, xlsx, xlsx-populate
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. COMMANDES DE DIAGNOSTIC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  pm2 list                        → état des serveurs
+  pm2 logs formation-sav          → logs temps réel
+  pm2 restart all                 → redémarrer tout
+  pm2 monit                       → monitoring CPU/RAM
+
+  netstat -an | findstr ":80 "    → vérifier nginx
+  netstat -an | findstr ":3001"   → vérifier Node.js
+  curl http://localhost:3001/api/health → test API
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. DÉPLOIEMENT OVH (production future)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Serveur recommandé : VPS Value OVH — 2 vCPU / 4 GB RAM (~6 €/mois)
+  Capacité validée   : 2 admins + 15-20 pilotes simultanés
+  Stack              : Nginx (SSL Let's Encrypt) → Node.js (port 3001)
+
+  Écriture atomique déjà en place : atomicWriteSync() sur tous les save*
+  atomicWriteAsync() disponible pour migration async complète OVH.
+
+  Checklist avant déploiement OVH :
+    · Changer JWT_SECRET (ecosystem.config.js → env.JWT_SECRET)
+    · HTTPS via Nginx + Certbot (Let's Encrypt)
+    · Droits fichiers Linux : chmod 755 media/
+    · Chemins path.join() déjà compatibles Windows/Linux
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Contact support technique : avet.mat@gmail.com
+  Sauvegarde générée le     : 06/05/2026
+  Mises à jour v06/05 :     NC Parent complet, écriture atomique, ethernet
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

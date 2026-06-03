@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formation Règle-phare Smartlynx SRV042 — Muller Automotive</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;600&display=swap');
+:root{--red:#cd121d;--black:#0a0a0a;--dark:#111;--card:#1a1a1a;--card2:#222;--border:#2a2a2a;--white:#f0f0f0;--muted:#999;--green:#22c55e;--yellow:#eab308;--blue:#3b82f6;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--black);color:var(--white);min-height:100vh;}
+.app{display:flex;flex-direction:column;min-height:100vh;}
+.top-bar{background:var(--dark);border-bottom:3px solid var(--red);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;}
+.top-bar img{height:38px;object-fit:contain;}
+.top-bar h1{font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:5px;text-transform:uppercase;color:var(--muted);flex:1;}
+.back-btn{font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;white-space:nowrap;}
+.back-btn:hover{color:var(--red);}
+.progress-bar-wrap{background:#1a1a1a;height:4px;}
+.progress-bar{background:var(--red);height:4px;transition:width .4s ease;}
+.body-layout{display:flex;flex:1;}
+.sidebar{width:260px;flex-shrink:0;background:var(--dark);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto;}
+.sidebar-title{font-family:'Barlow Condensed',sans-serif;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:#444;padding:0 20px 12px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;font-size:0.83rem;color:var(--muted);transition:all .15s;border-left:3px solid transparent;}
+.nav-item:hover{background:#1e1e1e;color:var(--white);}
+.nav-item.active{background:#1e1e1e;color:var(--white);border-left-color:var(--red);}
+.nav-item.done{color:#555;}
+.nav-item.done .nav-check{color:var(--green);}
+.nav-num{font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;font-weight:700;color:#444;min-width:18px;}
+.nav-item.active .nav-num{color:var(--red);}
+.nav-check{font-size:0.9rem;margin-left:auto;}
+.main-content{flex:1;padding:40px 48px;max-width:860px;}
+.chapter{display:none;animation:fadeIn .35s ease;}
+.chapter.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.chapter-label{font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:10px;}
+.chapter-title{font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;line-height:1.1;margin-bottom:28px;}
+.chapter-title span{color:var(--red);}
+.lead{font-size:1rem;color:#ccc;line-height:1.85;margin-bottom:28px;}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin:32px 0 14px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:#222;}
+p{color:#bbb;line-height:1.85;margin-bottom:14px;font-size:0.9rem;}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:20px 0;}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:18px;}
+.info-card .ic-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;}
+.info-card .ic-value{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);}
+.info-card .ic-sub{font-size:0.75rem;color:#555;margin-top:3px;}
+.alert{border-radius:6px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.alert-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px;}
+.alert-body{font-size:0.87rem;line-height:1.7;color:#ccc;}
+.alert-body strong{display:block;margin-bottom:4px;font-size:0.9rem;}
+.alert.red{background:rgba(205,18,29,0.1);border:1px solid rgba(205,18,29,0.3);}
+.alert.yellow{background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);}
+.alert.green{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);}
+.alert.blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);}
+.steps{margin:20px 0;}
+.step{display:flex;gap:16px;margin-bottom:20px;}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-body{flex:1;padding-top:4px;}
+.step-title{font-weight:600;font-size:0.92rem;color:var(--white);margin-bottom:4px;}
+.step-desc{font-size:0.84rem;color:var(--muted);line-height:1.6;}
+.checklist{margin:14px 0;list-style:none;}
+.checklist li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:0.87rem;color:#bbb;line-height:1.5;}
+.checklist li::before{content:'☐';color:#444;font-size:1rem;flex-shrink:0;margin-top:1px;}
+.checklist li.important::before{content:'⚠';color:var(--yellow);}
+.checklist li.warn::before{content:'🔴';}
+.spec-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:0.86rem;}
+.spec-table tr{border-bottom:1px solid #1e1e1e;}
+.spec-table tr:hover td{background:#131313;}
+.spec-table td{padding:11px 14px;}
+.spec-table td:first-child{color:var(--muted);font-weight:600;width:50%;}
+.spec-table td:last-child{color:var(--white);}
+.img-block{margin:20px 0;}
+.img-block img{width:100%;border-radius:6px;border:1px solid var(--border);background:#fff;}
+.img-caption{font-size:0.78rem;color:var(--muted);margin-top:6px;text-align:center;font-style:italic;}
+.img-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:20px 0;}
+.img-row .img-block{margin:0;}
+.schema-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+.schema-item{text-align:center;}
+.schema-item img{width:100%;border-radius:6px;border:1px solid var(--border);background:#fff;}
+.schema-caption{font-size:0.78rem;color:var(--muted);margin-top:8px;font-style:italic;line-height:1.4;}
+.img-full{width:100%;border-radius:6px;border:1px solid var(--border);margin:16px 0;background:#fff;}
+@media(max-width:600px){.schema-2col{grid-template-columns:1fr;}}
+.formula-box{background:#0d0d0d;border:1px solid var(--red);border-radius:8px;padding:20px 24px;margin:20px 0;text-align:center;}
+.formula-box .formula-main{font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800;color:var(--white);letter-spacing:2px;}
+.formula-box .formula-main span{color:var(--red);}
+.formula-box .formula-legend{font-size:0.8rem;color:var(--muted);margin-top:12px;line-height:1.8;}
+.tol-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:0.86rem;}
+.tol-table th{background:#161616;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;text-transform:uppercase;font-size:0.72rem;padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);}
+.tol-table td{padding:11px 14px;border-bottom:1px solid #1a1a1a;color:#bbb;}
+.tol-table tr:hover td{background:#111;}
+.tol-table td:last-child{color:var(--green);font-weight:600;}
+/* ── EXERCICE ── */
+.exercice-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:28px;margin:20px 0;}
+.exo-data{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0;}
+.exo-val{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:14px 16px;text-align:center;}
+.exo-val .ev-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;}
+.exo-val .ev-num{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:var(--white);}
+.exo-val .ev-unit{font-size:0.75rem;color:#555;margin-top:2px;}
+.exo-step{display:flex;gap:14px;margin:14px 0;align-items:flex-start;}
+.exo-step-n{background:var(--red);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;flex-shrink:0;margin-top:2px;}
+.exo-step-body{font-size:0.88rem;color:#bbb;line-height:1.65;}
+.exo-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;}
+.exo-choice{background:#111;border:1.5px solid #2a2a2a;border-radius:6px;padding:12px 16px;cursor:pointer;font-size:0.9rem;color:#bbb;transition:all .15s;text-align:center;}
+.exo-choice:hover:not(.disabled){border-color:var(--red);color:var(--white);}
+.exo-choice.correct{border-color:var(--green);color:var(--green);background:rgba(34,197,94,0.07);}
+.exo-choice.wrong{border-color:#c00;color:#ff6b6b;background:rgba(200,0,0,0.07);}
+.exo-choice.disabled{pointer-events:none;}
+.exo-result{display:none;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:16px;margin-top:14px;font-size:0.87rem;color:#86efac;line-height:1.7;}
+.exo-result.show{display:block;}
+.exo-result.bad{background:rgba(205,18,29,0.08);border-color:rgba(205,18,29,0.3);color:#fca5a5;}
+/* ── FLASHCARDS ── */
+.flashcard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin:24px 0;}
+.flashcard{height:160px;perspective:1000px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;border-radius:8px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;backface-visibility:hidden;}
+.flashcard-front{background:var(--card);border:1px solid #333;}
+.flashcard-back{background:var(--red);border:1px solid var(--red);transform:rotateY(180deg);}
+.flashcard-front .fc-q{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;color:var(--white);line-height:1.4;}
+.flashcard-front .fc-hint{font-size:0.7rem;color:#555;margin-top:12px;letter-spacing:1px;text-transform:uppercase;}
+.flashcard-back .fc-a{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:1px;color:#fff;line-height:1.4;}
+.flashcard-back .fc-detail{font-size:0.78rem;color:rgba(255,255,255,0.75);margin-top:8px;line-height:1.5;}
+/* ── QCM ── */
+.quiz-wrap{max-width:680px;}
+.quiz-progress-text{font-size:0.78rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
+.question-block{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:28px;margin-bottom:20px;}
+.q-num{font-size:0.68rem;text-transform:uppercase;letter-spacing:3px;color:var(--red);margin-bottom:12px;}
+.q-text{font-size:1rem;font-weight:600;color:var(--white);line-height:1.6;margin-bottom:20px;}
+.choices{display:flex;flex-direction:column;gap:10px;}
+.choice{display:flex;align-items:center;gap:14px;padding:13px 16px;background:#161616;border:1.5px solid #2a2a2a;border-radius:6px;cursor:pointer;font-size:0.87rem;color:#bbb;transition:all .15s;}
+.choice:hover:not(.disabled){border-color:var(--red);color:var(--white);background:#1a1010;}
+.choice.selected{border-color:var(--red);color:var(--white);background:#1a0a0a;}
+.choice.correct{border-color:var(--green);color:var(--green);background:rgba(34,197,94,0.07);}
+.choice.wrong{border-color:#c00;color:#ff6b6b;background:rgba(200,0,0,0.07);}
+.choice.disabled{cursor:default;pointer-events:none;}
+.choice-letter{width:24px;height:24px;border-radius:50%;border:1.5px solid #333;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.8rem;flex-shrink:0;}
+.feedback{margin-top:16px;padding:12px 16px;border-radius:6px;font-size:0.85rem;line-height:1.6;display:none;}
+.feedback.show{display:block;}
+.feedback.ok{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#86efac;}
+.feedback.ko{background:rgba(205,18,29,0.1);border:1px solid rgba(205,18,29,0.3);color:#fca5a5;}
+.quiz-btn{background:var(--red);color:#fff;border:none;padding:12px 28px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:18px;display:none;transition:background .2s;}
+.quiz-btn:hover{background:#a00;}
+.quiz-btn.show{display:inline-flex;align-items:center;gap:8px;}
+.score-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;display:none;}
+.score-card.show{display:block;animation:fadeIn .4s ease;}
+.score-circle{width:120px;height:120px;border-radius:50%;margin:0 auto 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid;}
+.score-num{font-family:'Barlow Condensed',sans-serif;font-size:2.5rem;font-weight:800;}
+.score-total{font-size:0.9rem;color:var(--muted);}
+.score-title{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;}
+.score-msg{font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:24px;}
+.btn-retry{background:transparent;border:1.5px solid var(--red);color:var(--red);padding:10px 24px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-retry:hover{background:var(--red);color:#fff;}
+.chapter-nav{display:flex;justify-content:space-between;margin-top:48px;padding-top:24px;border-top:1px solid #1e1e1e;}
+.nav-btn{background:transparent;border:1.5px solid #333;color:var(--muted);padding:10px 22px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;}
+.nav-btn:hover{border-color:var(--red);color:var(--white);}
+.nav-btn.primary{background:var(--red);border-color:var(--red);color:#fff;}
+.nav-btn.primary:hover{background:#a00;}
+.nav-btn:disabled{opacity:0.2;pointer-events:none;}
+.badge{display:inline-block;font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-right:6px;}
+.badge-red{background:rgba(205,18,29,0.15);color:var(--red);border:1px solid rgba(205,18,29,0.3);}
+.badge-blue{background:rgba(59,130,246,0.12);color:#93c5fd;border:1px solid rgba(59,130,246,0.25);}
+.badge-green{background:rgba(34,197,94,0.1);color:#86efac;border:1px solid rgba(34,197,94,0.25);}
+.badge-yellow{background:rgba(234,179,8,0.1);color:#fde047;border:1px solid rgba(234,179,8,0.25);}
+.docs-list{margin:20px 0;display:flex;flex-direction:column;gap:10px;}
+.doc-item{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:6px;text-decoration:none;color:#bbb;font-size:0.85rem;transition:all .15s;}
+.doc-item:hover{border-color:var(--red);color:var(--white);}
+.doc-icon{font-size:1.2rem;flex-shrink:0;}
+.doc-name{flex:1;}
+.doc-tag{font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#444;}
+.panne-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-bottom:14px;}
+.panne-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.panne-body{font-size:0.86rem;color:#bbb;line-height:1.7;}
+.panne-sol{margin-top:8px;padding:10px 14px;background:#111;border-left:3px solid var(--green);border-radius:0 4px 4px 0;font-size:0.84rem;color:#86efac;}
+@media(max-width:768px){.sidebar{display:none;}.main-content{padding:24px 20px;}.chapter-title{font-size:1.8rem;}.exo-choices{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="top-bar">
+  <img src="https://www.mullerautomotive.fr/wp-content/uploads/2025/01/logo-Muller-automotive-full-1.png" alt="Muller">
+  <h1>Règle-phare Smartlynx — SRV 042</h1>
+  <a class="back-btn" href="/CT/">← Modules CT</a>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:8.33%"></div></div>
+
+<div class="body-layout">
+
+<nav class="sidebar">
+  <div class="sidebar-title">Sommaire</div>
+  <div class="nav-item active" onclick="goTo(0)"><span class="nav-num">01</span>Introduction<span class="nav-check" id="ck0"></span></div>
+  <div class="nav-item" onclick="goTo(1)"><span class="nav-num">02</span>Technologies de feux<span class="nav-check" id="ck1"></span></div>
+  <div class="nav-item" onclick="goTo(2)"><span class="nav-num">03</span>Méthode de mesure<span class="nav-check" id="ck2"></span></div>
+  <div class="nav-item" onclick="goTo(3)"><span class="nav-num">04</span>Exercice interactif<span class="nav-check" id="ck3"></span></div>
+  <div class="nav-item" onclick="goTo(4)"><span class="nav-num">05</span>Qualification<span class="nav-check" id="ck4"></span></div>
+  <div class="nav-item" onclick="goTo(5)"><span class="nav-num">06</span>Installation — Montage<span class="nav-check" id="ck5"></span></div>
+  <div class="nav-item" onclick="goTo(6)"><span class="nav-num">07</span>Installation — Zone<span class="nav-check" id="ck6"></span></div>
+  <div class="nav-item" onclick="goTo(7)"><span class="nav-num">08</span>Calibrage initial<span class="nav-check" id="ck7"></span></div>
+  <div class="nav-item" onclick="goTo(8)"><span class="nav-num">09</span>Maintenance<span class="nav-check" id="ck8"></span></div>
+  <div class="nav-item" onclick="goTo(9)"><span class="nav-num">10</span>Dépannage<span class="nav-check" id="ck9"></span></div>
+  <div class="nav-item" onclick="goTo(10)"><span class="nav-num">11</span>Flashcards<span class="nav-check" id="ck10"></span></div>
+  <div class="nav-item" onclick="goTo(11)"><span class="nav-num">12</span>QCM Final<span class="nav-check" id="ck11"></span></div>
+</nav>
+
+<div class="main-content">
+
+<!-- ═══ CH 0 : INTRODUCTION ═══ -->
+<div class="chapter active" id="ch0">
+  <div class="chapter-label">Chapitre 01 — Introduction</div>
+  <h2 class="chapter-title">Règle-phare <span>Smartlynx</span></h2>
+
+  <div class="img-block" style="max-width:480px;margin:0 auto 28px;">
+    <img src="images/image1.png" alt="Règle-phare Smartlynx">
+    <div class="img-caption">Règle-phare Smartlynx — dispositif de contrôle du réglage des feux de croisement</div>
+  </div>
+
+  <p class="lead">Le règle-phare Smartlynx est l'appareil de mesure utilisé dans les centres de contrôle technique pour vérifier le réglage des feux de croisement. Sa mise en service, son installation et sa maintenance sont encadrées par deux textes réglementaires : le <strong>CDC-3</strong> et le <strong>SRV 042</strong>.</p>
+
+  <div class="alert blue">
+    <div class="alert-icon">📋</div>
+    <div class="alert-body"><strong>Références réglementaires</strong>
+      CDC-3A — Contrôle des feux des véhicules · SRV 042 rev. C (29/06/2017) · INS-C-02 V3 — Installation et vérification des règles-phares des CCT
+    </div>
+  </div>
+
+  <div class="section-title">Enjeux de sécurité</div>
+  <p>Les feux servent à <strong>voir et à être vu</strong> dans toutes les circonstances de jour comme de nuit. Un phare mal réglé peut entraîner :</p>
+  <ul class="checklist">
+    <li>Un manque de visibilité et une réaction tardive du conducteur</li>
+    <li class="important">L'éblouissement des conducteurs venant en sens inverse — situation dangereuse</li>
+    <li>Un écart ou évitement de dernière seconde</li>
+    <li>Des conséquences graves en matière de sécurité routière</li>
+  </ul>
+
+  <div class="section-title">Objectifs de la formation</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Comprendre la réglementation</div><div class="step-desc">CDC-3 et SRV 042 : exigences de réglage, plages d'acceptation, polygone asymétrique.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Maîtriser la méthode de mesure</div><div class="step-desc">Formule de rabattement, préparation du véhicule, plages d'acceptation par hauteur.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Installer le Smartlynx</div><div class="step-desc">Montage, zone de déplacement, zone véhicule, marquage, contrôle altimétrique.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Calibrer et maintenir</div><div class="step-desc">Ajustage initial, vérifications semestrielles, dépannage des pannes courantes.</div></div></div>
+  </div>
+
+  <div class="section-title">Programme de la journée</div>
+  <table class="spec-table">
+    <tr><td>Accueil / présentation</td><td>15 min — Tour de table</td></tr>
+    <tr><td>Principe de fonctionnement</td><td>30 min — Support PowerPoint</td></tr>
+    <tr><td>Installation</td><td>1h — PowerPoint + démonstration</td></tr>
+    <tr><td>Calibration & étalonnage</td><td>1h30 — PowerPoint + démonstration</td></tr>
+    <tr><td>Maintenance</td><td>1h — PowerPoint + démonstration</td></tr>
+    <tr><td>Dépannage</td><td>1h — PowerPoint + démonstration</td></tr>
+    <tr><td>QCM / correction</td><td>45 min</td></tr>
+  </table>
+
+  <div class="section-title">Documents associés</div>
+  <div class="docs-list">
+    <a class="doc-item" href="docs/SRV%20042_C_29062017.pdf" target="_blank"><span class="doc-icon">📄</span><span class="doc-name">SRV 042 Rev. C — 29/06/2017</span><span class="doc-tag">Texte réglementaire</span></a>
+    <a class="doc-item" href="docs/CDC%203A-REGLOPHARES_020518.pdf" target="_blank"><span class="doc-icon">📄</span><span class="doc-name">CDC 3A — Réglophares (02/05/2018)</span><span class="doc-tag">Texte réglementaire</span></a>
+    <a class="doc-item" href="docs/INS-C-02%20V3%20Installation%20et%20v%C3%A9rification%20des%20r%C3%A8gles%20phares%20destin%C3%A9s%20au%20contr%C3%B4le%20technique%20VL%20et%20PL.pdf" target="_blank"><span class="doc-icon">📄</span><span class="doc-name">INS-C-02 V3 — Installation & vérification des règles-phares VL et PL</span><span class="doc-tag">Mode opératoire</span></a>
+    <a class="doc-item" href="docs/AMDOC-M3-SLYNX%20ind%206_MULLER_AUTOMOTIVE.pdf" target="_blank"><span class="doc-icon">📄</span><span class="doc-name">AMDOC-M3-SLYNX ind 6 — Carnet métrologique</span><span class="doc-tag">Métrologie</span></a>
+    <a class="doc-item" href="docs/Notice%20de%20maintenance%20Smartlynx.pdf" target="_blank"><span class="doc-icon">📄</span><span class="doc-name">Notice de maintenance Smartlynx</span><span class="doc-tag">Maintenance</span></a>
+    <a class="doc-item" href="docs/Support%20papier%20SRV%20042%20V-05-24.pdf" target="_blank"><span class="doc-icon">📄</span><span class="doc-name">Support papier SRV 042 V-05-24</span><span class="doc-tag">Support formation</span></a>
+    <a class="doc-item" href="docs/salle%20de%20formation%20%20r%C3%A9gle%20phare%20selon%20SRV042%20C%20%E2%80%93%20Copie.pdf" target="_blank"><span class="doc-icon">📄</span><span class="doc-name">Fiche salle de formation — Règle phare SRV042</span><span class="doc-tag">Formation</span></a>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" disabled>← Précédent</button>
+    <button class="nav-btn primary" onclick="goTo(1)">Technologies →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 1 : TECHNOLOGIES ═══ -->
+<div class="chapter" id="ch1">
+  <div class="chapter-label">Chapitre 02 — Technologies de feux</div>
+  <h2 class="chapter-title">Technologies <span>de feux</span></h2>
+
+  <p class="lead">Il existe plusieurs technologies de feux dont le réglage est important. Chaque technologie présente une portée différente et des caractéristiques optiques spécifiques.</p>
+
+  <div class="section-title">Les 4 grandes technologies</div>
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="ic-label">Halogène</div>
+      <div class="ic-value">≥ 100 m</div>
+      <div class="ic-sub">Ampoule à filament de tungstène — technologie traditionnelle</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-label">Xénon (HID)</div>
+      <div class="ic-value">≈ 220 m</div>
+      <div class="ic-sub">Arc électrique à gaz xenon — lumière blanche intense</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-label">LED</div>
+      <div class="ic-value">≈ 300 m</div>
+      <div class="ic-sub">Diodes électroluminescentes — faible consommation</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-label">Laser</div>
+      <div class="ic-value">≈ 600 m</div>
+      <div class="ic-sub">Diodes laser — technologie haute performance</div>
+    </div>
+  </div>
+
+  <div class="alert yellow">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body"><strong>Types de feux concernés par le réglage</strong>
+      Les feux de position (veilleuses), les <strong>feux de croisement</strong>, les feux de route et les feux de brouillard. Le contrôle porte principalement sur les <strong>feux de croisement</strong>.
+    </div>
+  </div>
+
+  <div class="section-title">Polygone asymétrique — image du faisceau</div>
+  <p>Pour être correct, l'image de chaque faisceau doit représenter un <strong>polygone asymétrique à 5 côtés</strong> respectant les caractéristiques suivantes :</p>
+
+  <div class="img-block">
+    <img src="images/image2.png" alt="Polygone asymétrique faisceau phare">
+    <div class="img-caption">Polygone asymétrique à 5 côtés — caractéristiques de la ligne de coupure</div>
+  </div>
+
+  <ul class="checklist">
+    <li>L'oblique supérieure du polygone ne dépasse pas la ligne horizontale passant par le point <strong>A</strong></li>
+    <li>La ligne horizontale inférieure du polygone ne dépasse pas la ligne horizontale passant par le point <strong>B</strong></li>
+    <li>Le point central de chaque faisceau correspond aux points <strong>C₁</strong> (projecteur gauche) et <strong>C₂</strong> (projecteur droit)</li>
+  </ul>
+
+  <div class="section-title">Schéma — vue du panneau de lecture</div>
+  <div class="img-block">
+    <img src="images/image3.png" alt="Vue panneau lecture Smartlynx">
+    <div class="img-caption">Vue du panneau de lecture du règle-phare Smartlynx — ligne de coupure et repères de mesure</div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(0)">← Introduction</button>
+    <button class="nav-btn primary" onclick="goTo(2)">Méthode de mesure →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 2 : MÉTHODE DE MESURE ═══ -->
+<div class="chapter" id="ch2">
+  <div class="chapter-label">Chapitre 03 — Méthode de mesure</div>
+  <h2 class="chapter-title">Méthode de <span>mesure</span></h2>
+
+  <div class="section-title">Préparation du véhicule</div>
+  <ul class="checklist">
+    <li>Contrôler la pression des pneus</li>
+    <li>Véhicule à vide (sans chargement supplémentaire)</li>
+    <li>Surface au sol bien plane</li>
+    <li class="important">Dispositif de correction manuelle d'assiette réglé à 0 (position standard)</li>
+    <li>Moteur en marche pour éviter la décharge de batterie</li>
+  </ul>
+
+  <div class="section-title">Méthode de substitution</div>
+  <p>Placez le véhicule sur un sol plat, perpendiculairement face à un mur, à une distance de <strong>5 mètres ou 10 mètres</strong> afin de faciliter les calculs.</p>
+
+  <div class="img-block">
+    <img src="images/image4.png" alt="Méthode de mesure substitution">
+    <div class="img-caption">Positionnement du véhicule — méthode de substitution à 5m ou 10m du mur</div>
+  </div>
+
+  <div class="section-title">Mesures à réaliser</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Mesurer OB</div><div class="step-desc">Hauteur par rapport au sol, en mètres, de la partie horizontale de la ligne de coupure projetée sur le mur.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Mesurer OA</div><div class="step-desc">Hauteur par rapport au sol, en mètres, de l'axe optique du feu (partie inférieure du réflecteur).</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Mesurer L</div><div class="step-desc">Distance en millimètres entre le mur et le centre de la glace de l'optique.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Calculer le rabattement</div><div class="step-desc">Appliquer la formule ci-dessous.</div></div></div>
+  </div>
+
+  <div class="section-title">Formule de calcul</div>
+  <div class="formula-box">
+    <div class="formula-main">Rabattement = <span>[ ( OB − OA ) / L ]</span> × 100</div>
+    <div class="formula-legend">
+      <strong>OB</strong> = hauteur de la ligne de coupure au mur (m) &nbsp;|&nbsp;
+      <strong>OA</strong> = hauteur de l'axe optique (m) &nbsp;|&nbsp;
+      <strong>L</strong> = distance au mur (mm)<br>
+      Résultat en % — valeur négative = faisceau rabattu vers le bas (normal)
+    </div>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">ℹ️</div>
+    <div class="alert-body"><strong>Hauteur de l'axe optique</strong>
+      La hauteur OA correspond à la hauteur de la partie inférieure du réflecteur par rapport au sol. Selon la hauteur du phare, la tolérance est légèrement différente.
+    </div>
+  </div>
+
+  <div class="section-title">Plages d'acceptation — Rabattement de la ligne de coupure</div>
+  <table class="tol-table">
+    <tr><th>Hauteur OA (axe optique)</th><th>Rabattement minimum</th><th>Rabattement maximum</th></tr>
+    <tr><td>Inférieure à 0,8 m (exclue)</td><td>- 0,5 %</td><td>- 2,5 %</td></tr>
+    <tr><td>Entre 0,8 m (inclus) et 1,0 m (inclus)</td><td>- 0,5 %</td><td>- 3,0 %</td></tr>
+    <tr><td>Entre 1,0 m (exclus) et 1,2 m (inclus)</td><td>- 1,0 %</td><td>- 3,0 %</td></tr>
+  </table>
+
+  <div class="alert red">
+    <div class="alert-icon">🔴</div>
+    <div class="alert-body"><strong>Attention — Sens des valeurs</strong>
+      Les valeurs de rabattement sont négatives (ex. -1,5%). Un faisceau réglé trop bas = valeur trop négative. Un faisceau trop haut = valeur proche de 0 ou positive → risque d'éblouissement.
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(1)">← Technologies</button>
+    <button class="nav-btn primary" onclick="goTo(3)">Exercice →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 3 : EXERCICE ═══ -->
+<div class="chapter" id="ch3">
+  <div class="chapter-label">Chapitre 04 — Exercice interactif</div>
+  <h2 class="chapter-title">Exercice <span>calcul de rabattement</span></h2>
+
+  <p class="lead">Appliquez la formule de rabattement avec les données réelles d'un véhicule. Calculez et déterminez si le réglage est conforme à la réglementation.</p>
+
+  <div class="section-title">Données de l'exercice</div>
+  <div class="exercice-box">
+    <div class="exo-data">
+      <div class="exo-val">
+        <div class="ev-label">OA — Hauteur axe optique</div>
+        <div class="ev-num">82 cm</div>
+        <div class="ev-unit">0,82 m du sol</div>
+      </div>
+      <div class="exo-val">
+        <div class="ev-label">OB — Hauteur feu au mur</div>
+        <div class="ev-num">52 cm</div>
+        <div class="ev-unit">0,52 m du sol</div>
+      </div>
+      <div class="exo-val">
+        <div class="ev-label">L — Distance au mur</div>
+        <div class="ev-num">5 000 mm</div>
+        <div class="ev-unit">véhicule à 5 m</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:20px;">Étape 1 — Calculer le rabattement</div>
+    <div class="exo-step">
+      <div class="exo-step-n">?</div>
+      <div class="exo-step-body">Appliquez la formule : <strong>[ (OB − OA) / L ] × 100</strong><br>
+      Soit : [ (0,52 − 0,82) / 5 ] × 100 = ?</div>
+    </div>
+
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Quelle est la valeur de rabattement calculée ?</p>
+    <div class="exo-choices" id="exo-q1">
+      <div class="exo-choice" onclick="exoCheck(this,'wrong','q1')">− 3,0 %</div>
+      <div class="exo-choice" onclick="exoCheck(this,'wrong','q1')">− 2,5 %</div>
+      <div class="exo-choice" onclick="exoCheck(this,'correct','q1')">− 6,0 %</div>
+      <div class="exo-choice" onclick="exoCheck(this,'wrong','q1')">− 4,0 %</div>
+    </div>
+    <div class="exo-result" id="exo-r1">
+      ✅ Bonne réponse ! [ (0,52 − 0,82) / 5 ] × 100 = (−0,30 / 5) × 100 = <strong>−6,0 %</strong>
+    </div>
+    <div class="exo-result bad" id="exo-r1b">
+      ❌ Recalculez : OB − OA = 0,52 − 0,82 = −0,30 m. Divisé par L = 5 m, multiplié par 100 = <strong>−6,0 %</strong>
+    </div>
+
+    <div class="section-title" style="margin-top:28px;">Étape 2 — Conformité réglementaire</div>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">OA = 0,82 m → plage 0,8 m à 1,0 m : acceptable entre −0,5% et −3,0%. La valeur calculée est-elle conforme ?</p>
+    <div class="exo-choices" id="exo-q2">
+      <div class="exo-choice" onclick="exoCheck(this,'wrong','q2')">✅ Oui, conforme</div>
+      <div class="exo-choice" onclick="exoCheck(this,'correct','q2')">❌ Non, hors tolérance</div>
+    </div>
+    <div class="exo-result" id="exo-r2">
+      ✅ Correct ! −6,0% est HORS de la plage admise [−0,5% ; −3,0%] pour un phare à 0,82 m. Le véhicule est <strong>non-conforme</strong> : le phare pointe trop bas.
+    </div>
+    <div class="exo-result bad" id="exo-r2b">
+      ❌ Non ! Pour OA = 0,82 m (entre 0,8 m et 1,0 m), la plage est [−0,5% ; −3,0%]. −6,0% est HORS tolérance → <strong>non-conforme</strong>.
+    </div>
+  </div>
+
+  <div class="alert green">
+    <div class="alert-icon">💡</div>
+    <div class="alert-body"><strong>Rappel des plages</strong>
+      OA &lt; 0,8 m : entre −0,5% et −2,5% &nbsp;|&nbsp; OA 0,8–1,0 m : entre −0,5% et −3,0% &nbsp;|&nbsp; OA 1,0–1,2 m : entre −1,0% et −3,0%
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(2)">← Méthode</button>
+    <button class="nav-btn primary" onclick="goTo(4)">Qualification →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 4 : QUALIFICATION ═══ -->
+<div class="chapter" id="ch4">
+  <div class="chapter-label">Chapitre 05 — Qualification</div>
+  <h2 class="chapter-title">Qualification <span>des intervenants</span></h2>
+
+  <p class="lead">Trois niveaux de qualification sont exigés par le SRV 042 avant toute intervention sur un règle-phare en centre de contrôle technique.</p>
+
+  <div class="img-block">
+    <img src="images/image5.png" alt="Qualification techniciens">
+    <div class="img-caption">Qualification — Titre remis au technicien à l'issue de la formation</div>
+  </div>
+
+  <div class="section-title">1 — Qualification des techniciens</div>
+  <div class="alert blue">
+    <div class="alert-icon">🎓</div>
+    <div class="alert-body"><strong>Formation obligatoire</strong>
+      Les techniciens réalisant les opérations d'installation, d'étalonnage et de maintenance doivent être formés. La formation est sanctionnée par un <strong>titre de qualification</strong> remis au technicien à l'issue de la formation. Lors de chaque intervention, le technicien doit être en mesure de présenter son titre de qualification au représentant de l'installation ou de l'administration.
+    </div>
+  </div>
+
+  <div class="section-title">2 — Qualification des méthodes</div>
+  <div class="alert green">
+    <div class="alert-icon">📋</div>
+    <div class="alert-body"><strong>Modes opératoires Muller Automotive</strong>
+      Les techniciens doivent appliquer les méthodes définies par Muller Automotive et décrites dans les modes opératoires pour le matériel concerné. <strong>Document de référence : INS-C-02</strong>
+    </div>
+  </div>
+
+  <div class="section-title">3 — Qualification des moyens</div>
+  <p>Les techniciens doivent réaliser les vérifications en utilisant exclusivement les <strong>étalons définis et vérifiés par le laboratoire métrologique de Muller Automotive</strong>.</p>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="ic-label">Étalon 1</div>
+      <div class="ic-value">Étalon règle-phares</div>
+      <div class="ic-sub">Avec projecteur étalon feu de croisement</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-label">Étalon 2</div>
+      <div class="ic-value">Inclinomètre</div>
+      <div class="ic-sub">Vérifié métrологiquement</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-label">Étalon 3</div>
+      <div class="ic-value">Mètre à ruban</div>
+      <div class="ic-sub">Pour mesures altimétriques</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-label">Moyen compl.</div>
+      <div class="ic-value">Laser</div>
+      <div class="ic-sub">Pour alignement et marquage</div>
+    </div>
+  </div>
+
+  <div class="alert red">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body"><strong>Identification obligatoire des étalons</strong>
+      Tous les étalons doivent être <strong>identifiés et marqués</strong> avec une étiquette indiquant la date de fin de validité, et accompagnés de leur <strong>constat de vérification</strong>.
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(3)">← Exercice</button>
+    <button class="nav-btn primary" onclick="goTo(5)">Installation →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 5 : INSTALLATION MONTAGE ═══ -->
+<div class="chapter" id="ch5">
+  <div class="chapter-label">Chapitre 06 — Installation</div>
+  <h2 class="chapter-title">Installation <span>Montage Smartlynx</span></h2>
+
+  <p class="lead">L'installation du règle-phare Smartlynx suit un protocole précis défini dans l'INS-C-02. Les étapes doivent être réalisées dans l'ordre indiqué.</p>
+
+  <div class="section-title">Étapes d'installation</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Montage du règle-phares</div><div class="step-desc">Se reporter à la notice du règle-phares (voir ci-dessous).</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Identification zone de déplacement</div><div class="step-desc">Contrôle de planéité et marquage de la zone de déplacement du règle-phares.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Identification zone de positionnement véhicule</div><div class="step-desc">Contrôle altimétrique et marquage des points de la zone véhicule.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Marquage du point de référence</div><div class="step-desc">Marquage du point de référence règle-phares (intersection lignes de référence et ligne A).</div></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Ajustage initial</div><div class="step-desc">Calibrage du bloc optique par rapport à la pente moyenne de la zone véhicule.</div></div></div>
+  </div>
+
+  <div class="section-title">Procédure de montage détaillée</div>
+  <div class="img-row">
+    <div class="img-block">
+      <img src="images/image6.png" alt="Montage règle-phares">
+      <div class="img-caption">Montage roues et embase — excentrique en partie arrière</div>
+    </div>
+    <div class="img-block">
+      <img src="images/image7.png" alt="Montage colonne">
+      <div class="img-caption">Montage colonne — positionnement galets de guidage</div>
+    </div>
+  </div>
+
+  <ul class="checklist">
+    <li>Monter les roues sur l'embase (excentrique en partie arrière)</li>
+    <li>Positionner le sticker sur la colonne — appliquer la différence de hauteur si nivellement différent entre zones</li>
+    <li>Positionner le bloc optique sur l'embase</li>
+    <li>Descendre la colonne dans le tube de l'embase en veillant au positionnement des galets de guidage</li>
+    <li>Coucher la colonne au sol</li>
+    <li>Insérer le contre-poids dans la colonne et attacher le câble métallique</li>
+    <li>Monter la poulie, puis le capuchon</li>
+    <li>Fixer la butée caoutchouc haute et la butée caoutchouc basse</li>
+    <li class="important">Serrer modérément les vis de réglage de dureté</li>
+    <li>Fixer le module d'alignement laser et procéder à son réglage</li>
+  </ul>
+
+  <div class="img-block">
+    <img src="images/image8.png" alt="Règle-phares monté">
+    <div class="img-caption">Vue d'ensemble — règle-phare Smartlynx monté et prêt pour le réglage de zone</div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(4)">← Qualification</button>
+    <button class="nav-btn primary" onclick="goTo(6)">Zone & marquage →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 6 : ZONE ═══ -->
+<div class="chapter" id="ch6">
+  <div class="chapter-label">Chapitre 07 — Installation</div>
+  <h2 class="chapter-title">Zone de déplacement <span>& zone véhicule</span></h2>
+
+  <div class="section-title">Zone de déplacement du règle-phares</div>
+  <p>La zone de déplacement est identifiée au sol par des <strong>traits pleins</strong>. Son contrôle de planéité dépend de l'équipement.</p>
+
+  <table class="spec-table">
+    <tr><td>Sans rail et sans inclinomètre</td><td><span class="badge badge-yellow">18 points de mesure</span> — voir SRV042</td></tr>
+    <tr><td>Avec rail et sans inclinomètre</td><td><span class="badge badge-yellow">6 points de mesure</span> — voir SRV042</td></tr>
+    <tr><td>Avec inclinomètre (Smartlynx)</td><td><span class="badge badge-green">Zone non qualifiée</span> — non obligatoire</td></tr>
+  </table>
+
+  <div class="alert green">
+    <div class="alert-icon">✅</div>
+    <div class="alert-body"><strong>Tolérance de planéité</strong>
+      La tolérance de planéité de la zone de déplacement du dispositif de contrôle est de <strong>+/− 0,2 %</strong>.
+    </div>
+  </div>
+
+  <div class="img-block">
+    <img src="images/image9.png" alt="Zone de déplacement règle-phares">
+    <div class="img-caption">Zone de déplacement — marquage sol, ligne A et points de référence</div>
+  </div>
+
+  <div class="section-title">Zone de positionnement — Véhicule VL</div>
+  <div class="img-block">
+    <img src="images/image17.png" alt="Zone positionnement VL">
+    <div class="img-caption">Zone de positionnement du véhicule VL — points AVGx, ARGx, AVDx, ARDx et ligne de guidage</div>
+  </div>
+
+  <table class="spec-table">
+    <tr><td>Vérification périodique (sol)</td><td>Tous les <strong>5 ans</strong></td></tr>
+    <tr><td>Vérification périodique (pont élévateur)</td><td>Tous les <strong>3 ans</strong></td></tr>
+    <tr><td>Implantation sur pont élévateur</td><td>Possible si tous les points matérialisés sur le pont et rampes sans obstacle</td></tr>
+  </table>
+
+  <div class="section-title">Zone de positionnement — Véhicule PL</div>
+  <div class="img-block">
+    <img src="images/image18.png" alt="Zone positionnement PL">
+    <div class="img-caption">Zone de positionnement du véhicule PL — vérification tous les 3 ans, utiliser DOC-C15-V6 pour calcul de pente</div>
+  </div>
+
+  <div class="alert yellow">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body"><strong>Véhicules hors gabarit</strong>
+      Si le centre ne permet pas de réaliser tous les points, il devra <strong>refuser</strong> les véhicules dont l'empattement et/ou la longueur excède(nt) la capacité de la zone.
+    </div>
+  </div>
+
+  <div class="section-title">Contrôle altimétrique des points de référence</div>
+  <p>Le contrôle altimétrique permet de calculer la <strong>pente moyenne</strong>, utilisée pour le réglage de l'inclinaison du bloc optique.</p>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tracer les points de référence</div><div class="step-desc">Tracer provisoirement AVG, ARG, AVD, ARD avant marquage définitif.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Prendre les mesures</div><div class="step-desc">Mètre à ruban sur semelle carrée 15×15 cm, centrée sur chaque point. Laser réglé à l'horizontale, visible sur la pige.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Renseigner DOC-C-15</div><div class="step-desc">Document Excel pour vérifier la conformité et obtenir les valeurs de pente gauche, droite et moyenne.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Marquer définitivement</div><div class="step-desc">Si conforme : chevilles indémontables avec vis serrées. Enregistrer les pentes dans le carnet métrologique.</div></div></div>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">📐</div>
+    <div class="alert-body"><strong>Tolérance altimétrique</strong>
+      Écart maximal toléré entre les points de référence et la droite de régression linéaire : <strong>+/− 7 mm</strong> jusqu'à 3 m à partir de AVG1 ou AVD1. Au-delà : <strong>+/− 12 mm</strong>.
+    </div>
+  </div>
+
+  <div class="section-title">Matérialisation des points de référence</div>
+  <p>Les points de référence sont constitués idéalement par des <strong>chevilles indémontables après blocage</strong> avec une vis montée. Il faut respecter les dimensions mentionnées à <strong>+/− 5 cm</strong>.</p>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="ic-label">Ligne de guidage VL</div>
+      <div class="ic-value">0 à 30 cm</div>
+      <div class="ic-sub">Côté gauche de la bande de roulement gauche</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-label">Ligne de guidage PL</div>
+      <div class="ic-value">0 à 40 cm</div>
+      <div class="ic-sub">Côté gauche de la bande de roulement gauche</div>
+    </div>
+    <div class="info-card">
+      <div class="ic-label">Côté de référence</div>
+      <div class="ic-value">Gauche</div>
+      <div class="ic-sub">Pour reproductibilité des mesures entre techniciens</div>
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(5)">← Montage</button>
+    <button class="nav-btn primary" onclick="goTo(7)">Calibrage →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 7 : CALIBRAGE ═══ -->
+<div class="chapter" id="ch7">
+  <div class="chapter-label">Chapitre 08 — Calibrage initial</div>
+  <h2 class="chapter-title">Calibrage <span>initial</span></h2>
+
+  <p class="lead">À la mise en service, le bloc optique du règle-phares doit être calibré par rapport à l'inclinaison moyenne de la zone véhicule. Cette opération est fondamentale pour la fiabilité des mesures.</p>
+
+  <div class="section-title">Ajustage du bloc optique</div>
+  <div class="img-block">
+    <img src="images/image15.png" alt="Ajustage bloc optique">
+    <div class="img-caption">Ajustage initial — positionnement étalon règle-phares à 400 mm de la lentille</div>
+  </div>
+
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Centrer le règle-phares</div><div class="step-desc">Centrer au point de référence de la zone règle-phares.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Positionner la lentille</div><div class="step-desc">Placer le centre de la lentille de l'appareil à une hauteur de <strong>800 mm du sol</strong>.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Positionner l'étalon</div><div class="step-desc">Placer l'étalon sur trépied, à <strong>400 mm de la lentille</strong> du règle-phares.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Aligner l'étalon</div><div class="step-desc">Aligner l'étalon avec le règle-phares à l'aide du miroir ou du laser.</div></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Allumer le laser ligne</div><div class="step-desc">Allumer le laser ligne de l'étalon. Régler la hauteur pour que le laser passe par le centre de la lentille.</div></div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Régler le dévers</div><div class="step-desc">Régler le dévers de l'étalon pour que le trait laser passe par les mêmes graduations du panneau de lecture.</div></div></div>
+  </div>
+
+  <div class="section-title">Réglage de l'inclinomètre</div>
+  <div class="img-block">
+    <img src="images/image16.png" alt="Réglage inclinomètre">
+    <div class="img-caption">Réglage inclinomètre étalon — pied arrière, bulle à 0%, puis inclinaison = pente moyenne zone véhicule</div>
+  </div>
+
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Régler le niveau à bulle à 0%</div><div class="step-desc">Le réglage s'effectue avec le <strong>pied arrière</strong> de l'étalon.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Placer l'inclinomètre étalon</div><div class="step-desc">Placer l'inclinomètre étalon sur la platine à côté du niveau à bulle « 0% ».</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Effectuer le zéro</div><div class="step-desc">Appuyer sur la touche « Zéro » (plusieurs fois si nécessaire).</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Régler l'inclinaison</div><div class="step-desc">Régler avec la vis arrière jusqu'à lire la <strong>valeur de pente moyenne</strong> calculée sur DOC-C-15.</div></div></div>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">📐</div>
+    <div class="alert-body"><strong>Sens de l'inclinomètre</strong>
+      Bulle à gauche : étalon RPH avec rabattement (−) pour une pente (+) sur DOC-C-15<br>
+      Bulle à droite : étalon RPH avec rabattement (+) pour une pente (−) sur DOC-C-15
+    </div>
+  </div>
+
+  <div class="section-title">Contrôle du rabattement avec projecteur étalon</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Allumer le feu de croisement</div><div class="step-desc">Sans modifier les réglages du projecteur étalon après le calibrage du bloc optique.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Relever la valeur à 0%</div><div class="step-desc">Passer en mode mesure et relever. La valeur doit être entre <strong>+0,2% et −0,2%</strong>. Enregistrer dans le carnet métrologique.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Test à −1% d'inclinaison</div><div class="step-desc">Monter l'arrière de l'étalon pour générer −1% d'inclinaison. La valeur lue doit être entre <strong>−0,8% et −1,2%</strong>.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Réaliser l'alignement laser</div><div class="step-desc">Aligner le laser selon la procédure capot 1ère ou 2ème génération.</div></div></div>
+  </div>
+
+  <div class="alert red">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body"><strong>Réglage avec les pieds avant</strong>
+      Le réglage initial du bloc optique s'effectue avec les <strong>pieds avant</strong> de l'étalon — pas les pieds arrière qui servent au réglage de l'inclinomètre.
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(6)">← Zone</button>
+    <button class="nav-btn primary" onclick="goTo(8)">Maintenance →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 8 : MAINTENANCE ═══ -->
+<div class="chapter" id="ch8">
+  <div class="chapter-label">Chapitre 09 — Maintenance</div>
+  <h2 class="chapter-title">Maintenance & <span>vérifications semestrielles</span></h2>
+
+  <p class="lead">La vérification semestrielle est obligatoire pour maintenir la conformité métrologique du règle-phares. Elle couvre les aspects mécaniques, optiques et électroniques.</p>
+
+  <div class="section-title">Checklist de vérification semestrielle</div>
+  <ul class="checklist">
+    <li>Vérifier la version de programme</li>
+    <li>Vérifier le bon déplacement du règle-phares — jeu des roulettes</li>
+    <li>Vérifier l'état des lentilles : propreté, fissures, rayures</li>
+    <li>Vérifier le déplacement du bloc optique, jeux des roulettes de guidage et leurs bonnes rotations</li>
+    <li class="important">Vérifier le jeu de colonne avec l'inclinomètre sur différentes hauteurs de bas en haut — la valeur ne doit pas varier de <strong>+/− 0,15%</strong></li>
+    <li>Vérifier le calibrage du bloc optique</li>
+    <li>Vérifier la valeur de rabattement à 0 et −1% — tolérance <strong>+/− 0,2%</strong></li>
+    <li>Vérifier la calibration de l'inclinomètre du règle-phares</li>
+    <li>Vérifier l'aide au positionnement</li>
+    <li>Vérifier l'alignement laser</li>
+    <li>Renseigner la date de maintenance</li>
+    <li class="warn">Renseigner le carnet métrologique, liste étalons, habilitation technicien</li>
+  </ul>
+
+  <div class="section-title">Vérification de la calibration de l'inclinomètre</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Positionner le règle-phares</div><div class="step-desc">Placer le règle-phares sur son point de référence.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Régler la hauteur</div><div class="step-desc">Placer le centre de la lentille du règle-phare à une hauteur de <strong>800 mm du sol</strong>.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Vérifier dans le menu</div><div class="step-desc">Dans le menu calibration inclinomètre : vérifier le 0 de l'angle de tangage et de la déviation verticale.</div></div></div>
+  </div>
+
+  <div class="section-title">Vérification de l'aide au positionnement</div>
+  <p>Positionner l'étalon règle-phares à <strong>50 cm de la lentille</strong>. Vérifier que le maximum de lumière est centré sur la lentille, lorsque la zone éclairée du feu étalon est encadrée par les repères visuels rouges et centrée sur la croix rouge.</p>
+
+  <div class="section-title">Vérification de l'alignement laser</div>
+  <div class="schema-2col">
+    <div class="schema-item">
+      <div style="background:#111;border:1px solid var(--border);border-radius:6px;padding:20px;text-align:center;color:var(--muted);font-size:0.85rem;">
+        <div style="font-size:2rem;margin-bottom:10px;">1️⃣</div>
+        <strong>Capot 1ère génération</strong><br>
+        Allumer le laser et le pivoter pour faire coïncider le trait laser avec la ligne en renfoncement (marque de moulage) à l'arrière du capot
+      </div>
+    </div>
+    <div class="schema-item">
+      <div style="background:#111;border:1px solid var(--border);border-radius:6px;padding:20px;text-align:center;color:var(--muted);font-size:0.85rem;">
+        <div style="font-size:2rem;margin-bottom:10px;">2️⃣</div>
+        <strong>Capot 2ème génération</strong><br>
+        Même procédure : faire coïncider le trait laser avec la ligne en renfoncement (marque de moulage) à l'arrière du capot de visualisation
+      </div>
+    </div>
+  </div>
+
+  <div class="alert blue">
+    <div class="alert-icon">🔧</div>
+    <div class="alert-body"><strong>En cas d'écart lors du jeu de colonne</strong>
+      Si la valeur varie de plus de +/− 0,15% sur différentes hauteurs : régler l'excentrique, vérifier la poulie, le câble et le contre-poids.
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(7)">← Calibrage</button>
+    <button class="nav-btn primary" onclick="goTo(9)">Dépannage →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 9 : DÉPANNAGE ═══ -->
+<div class="chapter" id="ch9">
+  <div class="chapter-label">Chapitre 10 — Dépannage</div>
+  <h2 class="chapter-title">Cas de <span>pannes</span></h2>
+
+  <p class="lead">Inventaire des problèmes courants rencontrés sur le Smartlynx et leurs solutions. En cas de doute, contacter le support technique Muller Automotive.</p>
+
+  <div class="section-title">Pannes connues et solutions</div>
+
+  <div class="panne-item">
+    <div class="panne-title">⚠️ Figeage des mesures (version BSP 16.1.0)</div>
+    <div class="panne-body">Les mesures se figent et ne se mettent plus à jour pendant l'utilisation.</div>
+    <div class="panne-sol">Solution : Mise à jour de la carte CPU (version BSP 16.1.2) ou remplacement par nouveau modèle (version BSP 20.1.0)</div>
+  </div>
+
+  <div class="panne-item">
+    <div class="panne-title">⏰ Décalage d'horaires (heure de début/fin de contrôle)</div>
+    <div class="panne-body">
+      <strong>Si décalage d'1 heure :</strong> réglage du fuseau horaire incorrect.<br>
+      <strong>Si décalage de secondes ou minutes :</strong> problème de perte de Wifi. Les premiers modèles n'avaient pas d'antenne Wifi.
+    </div>
+    <div class="panne-sol">Solution décalage heure : corriger le fuseau horaire dans les paramètres système.<br>
+    Solution perte Wifi : améliorer le signal, rapprocher la borne Wifi, ou installer une antenne externe.</div>
+  </div>
+
+  <div class="panne-item">
+    <div class="panne-title">📷 Problème visuel caméra — trait qui défile ou image instable</div>
+    <div class="panne-body">Par forte chaleur, les connectiques de la caméra ont tendance à bouger et créer des artefacts visuels.</div>
+    <div class="panne-sol">Solution : Contrôler les connectiques caméra — les reconnecter fermement</div>
+  </div>
+
+  <div class="panne-item">
+    <div class="panne-title">🔋 Batterie indique pleine et vide en alternance</div>
+    <div class="panne-body">Indication erratique du niveau de charge de la batterie pendant l'utilisation.</div>
+    <div class="panne-sol">
+      Solution :<br>
+      1. Contrôler la connectique de charge sur le bloc<br>
+      2. Contrôler le bloc alimentation<br>
+      3. Contrôler la batterie elle-même<br>
+      4. En dernier recours : remplacement de la carte CPU
+    </div>
+  </div>
+
+  <div class="alert yellow">
+    <div class="alert-icon">📞</div>
+    <div class="alert-body"><strong>Support technique</strong>
+      Pour tout problème non listé ici, contacter le support technique Muller Automotive avec : numéro de série de l'appareil, version du logiciel (BSP), description détaillée du problème et contexte d'apparition.
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(8)">← Maintenance</button>
+    <button class="nav-btn primary" onclick="goTo(10)">Flashcards →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 10 : FLASHCARDS ═══ -->
+<div class="chapter" id="ch10">
+  <div class="chapter-label">Chapitre 11 — Mémorisation</div>
+  <h2 class="chapter-title">Flash<span>cards</span></h2>
+  <p class="lead">Cliquez sur chaque carte pour révéler la réponse. Idéal pour mémoriser les valeurs clés avant l'examen.</p>
+
+  <div class="flashcard-grid">
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-front"><div class="fc-q">Que représente OB dans la formule de rabattement ?</div><div class="fc-hint">Cliquez pour la réponse</div></div>
+        <div class="flashcard-back"><div class="fc-a">Hauteur de la ligne de coupure</div><div class="fc-detail">Hauteur par rapport au sol de la partie horizontale de la ligne de coupure, mesurée sur le mur</div></div>
+      </div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-front"><div class="fc-q">Que représente OA dans la formule de rabattement ?</div><div class="fc-hint">Cliquez pour la réponse</div></div>
+        <div class="flashcard-back"><div class="fc-a">Hauteur de l'axe optique</div><div class="fc-detail">Hauteur de la partie inférieure du réflecteur par rapport au sol</div></div>
+      </div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-front"><div class="fc-q">Plage de rabattement pour OA &lt; 0,8 m ?</div><div class="fc-hint">Cliquez pour la réponse</div></div>
+        <div class="flashcard-back"><div class="fc-a">−0,5 % à −2,5 %</div><div class="fc-detail">Phares de faible hauteur — tolérance réduite côté bas</div></div>
+      </div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-front"><div class="fc-q">Plage de rabattement pour OA entre 0,8 m et 1,0 m ?</div><div class="fc-hint">Cliquez pour la réponse</div></div>
+        <div class="flashcard-back"><div class="fc-a">−0,5 % à −3,0 %</div><div class="fc-detail">Plage la plus courante — véhicules VL standards</div></div>
+      </div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-front"><div class="fc-q">Plage de rabattement pour OA entre 1,0 m et 1,2 m ?</div><div class="fc-hint">Cliquez pour la réponse</div></div>
+        <div class="flashcard-back"><div class="fc-a">−1,0 % à −3,0 %</div><div class="fc-detail">Phares hauts (SUV, camions légers) — décalage du minimum</div></div>
+      </div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-front"><div class="fc-q">Tolérance de planéité de la zone de déplacement ?</div><div class="fc-hint">Cliquez pour la réponse</div></div>
+        <div class="flashcard-back"><div class="fc-a">+/− 0,2 %</div><div class="fc-detail">Exigence SRV 042 — s'applique aux installations sans inclinomètre</div></div>
+      </div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-front"><div class="fc-q">Hauteur lentille lors du calibrage initial ?</div><div class="fc-hint">Cliquez pour la réponse</div></div>
+        <div class="flashcard-back"><div class="fc-a">800 mm du sol</div><div class="fc-detail">Distance étalon règle-phares : 400 mm de la lentille</div></div>
+      </div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-front"><div class="fc-q">Fréquence de vérification zone VL sur sol vs pont ?</div><div class="fc-hint">Cliquez pour la réponse</div></div>
+        <div class="flashcard-back"><div class="fc-a">Sol : 5 ans / Pont : 3 ans</div><div class="fc-detail">Zone PL : tous les 3 ans dans les deux cas</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-nav">
+    <button class="nav-btn" onclick="goTo(9)">← Dépannage</button>
+    <button class="nav-btn primary" onclick="goTo(11)">QCM Final →</button>
+  </div>
+</div>
+
+<!-- ═══ CH 11 : QCM ═══ -->
+<div class="chapter" id="ch11">
+  <div class="chapter-label">Chapitre 12 — Évaluation</div>
+  <h2 class="chapter-title">QCM <span>Final</span></h2>
+
+  <div class="quiz-wrap">
+    <div class="quiz-progress-text" id="quizProg">Question 1 / 10</div>
+
+    <!-- Q1 -->
+    <div class="question-block" id="qblock0">
+      <div class="q-num">Question 01</div>
+      <div class="q-text">La formule de calcul du rabattement de la ligne de coupure est :</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(0,0,false)"><span class="choice-letter">A</span>[ (OA − OB) / L ] × 100</div>
+        <div class="choice" onclick="answer(0,1,true)"><span class="choice-letter">B</span>[ (OB − OA) / L ] × 100</div>
+        <div class="choice" onclick="answer(0,2,false)"><span class="choice-letter">C</span>(OA × OB) / L</div>
+        <div class="choice" onclick="answer(0,3,false)"><span class="choice-letter">D</span>[ (OA + OB) / 2L ] × 100</div>
+      </div>
+      <div class="feedback ok" id="fb0ok">✅ Correct ! OB − OA donne une valeur négative lorsque le faisceau est rabattu vers le bas, divisée par L et multipliée par 100 pour obtenir le pourcentage.</div>
+      <div class="feedback ko" id="fb0ko">❌ La bonne formule est B : [(OB − OA) / L] × 100. OB est la hauteur du feu mesuré au mur, OA la hauteur de l'axe optique.</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" id="qblock1" style="display:none">
+      <div class="q-num">Question 02</div>
+      <div class="q-text">Pour un phare dont l'axe optique OA est à 0,9 m du sol, la plage de rabattement acceptable est :</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(1,0,false)"><span class="choice-letter">A</span>Entre −0,5 % et −2,5 %</div>
+        <div class="choice" onclick="answer(1,1,true)"><span class="choice-letter">B</span>Entre −0,5 % et −3,0 %</div>
+        <div class="choice" onclick="answer(1,2,false)"><span class="choice-letter">C</span>Entre −1,0 % et −3,0 %</div>
+        <div class="choice" onclick="answer(1,3,false)"><span class="choice-letter">D</span>Entre −0,5 % et −1,5 %</div>
+      </div>
+      <div class="feedback ok" id="fb1ok">✅ Correct ! Pour 0,8 m ≤ OA ≤ 1,0 m, la plage est −0,5 % à −3,0 %.</div>
+      <div class="feedback ko" id="fb1ko">❌ Pour OA entre 0,8 m et 1,0 m inclus, la plage est B : −0,5 % à −3,0 %.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" id="qblock2" style="display:none">
+      <div class="q-num">Question 03</div>
+      <div class="q-text">La tolérance de planéité de la zone de déplacement du règle-phares est de :</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(2,0,false)"><span class="choice-letter">A</span>+/− 0,1 %</div>
+        <div class="choice" onclick="answer(2,1,true)"><span class="choice-letter">B</span>+/− 0,2 %</div>
+        <div class="choice" onclick="answer(2,2,false)"><span class="choice-letter">C</span>+/− 0,5 %</div>
+        <div class="choice" onclick="answer(2,3,false)"><span class="choice-letter">D</span>+/− 1,0 %</div>
+      </div>
+      <div class="feedback ok" id="fb2ok">✅ Correct ! La tolérance SRV 042 est de +/− 0,2 %.</div>
+      <div class="feedback ko" id="fb2ko">❌ La tolérance de planéité est B : +/− 0,2 %, selon SRV 042.</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" id="qblock3" style="display:none">
+      <div class="q-num">Question 04</div>
+      <div class="q-text">Sans rail et sans inclinomètre, combien de points de mesure sont nécessaires pour le contrôle de planéité ?</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(3,0,false)"><span class="choice-letter">A</span>6 points</div>
+        <div class="choice" onclick="answer(3,1,false)"><span class="choice-letter">B</span>12 points</div>
+        <div class="choice" onclick="answer(3,2,true)"><span class="choice-letter">C</span>18 points</div>
+        <div class="choice" onclick="answer(3,3,false)"><span class="choice-letter">D</span>24 points</div>
+      </div>
+      <div class="feedback ok" id="fb3ok">✅ Correct ! Sans rail ni inclinomètre : 18 points. Avec rail sans inclinomètre : 6 points.</div>
+      <div class="feedback ko" id="fb3ko">❌ Sans rail et sans inclinomètre : 18 points. Avec rail sans inclinomètre : 6 points seulement.</div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-block" id="qblock4" style="display:none">
+      <div class="q-num">Question 05</div>
+      <div class="q-text">Pour le Smartlynx équipé d'un inclinomètre, la zone de déplacement du règle-phares est :</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(4,0,false)"><span class="choice-letter">A</span>Vérifiée avec 6 points de mesure</div>
+        <div class="choice" onclick="answer(4,1,false)"><span class="choice-letter">B</span>Vérifiée avec 18 points de mesure</div>
+        <div class="choice" onclick="answer(4,2,true)"><span class="choice-letter">C</span>Non qualifiée — zone non obligatoire</div>
+        <div class="choice" onclick="answer(4,3,false)"><span class="choice-letter">D</span>Vérifiée par contrôle laser uniquement</div>
+      </div>
+      <div class="feedback ok" id="fb4ok">✅ Exact ! Avec inclinomètre (Smartlynx), la zone de déplacement n'est pas qualifiée — le dispositif de correction angulaire compense les irrégularités.</div>
+      <div class="feedback ko" id="fb4ko">❌ Avec inclinomètre : zone NON qualifiée. Le Smartlynx corrige automatiquement les irrégularités grâce à son inclinomètre intégré.</div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-block" id="qblock5" style="display:none">
+      <div class="q-num">Question 06</div>
+      <div class="q-text">À quelle hauteur faut-il positionner la lentille du règle-phares lors du calibrage initial ?</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(5,0,false)"><span class="choice-letter">A</span>600 mm</div>
+        <div class="choice" onclick="answer(5,1,true)"><span class="choice-letter">B</span>800 mm</div>
+        <div class="choice" onclick="answer(5,2,false)"><span class="choice-letter">C</span>1 000 mm</div>
+        <div class="choice" onclick="answer(5,3,false)"><span class="choice-letter">D</span>1 200 mm</div>
+      </div>
+      <div class="feedback ok" id="fb5ok">✅ Correct ! La lentille doit être placée à 800 mm du sol. L'étalon est positionné à 400 mm de la lentille.</div>
+      <div class="feedback ko" id="fb5ko">❌ La hauteur correcte est B : 800 mm du sol. L'étalon se positionne ensuite à 400 mm de la lentille.</div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-block" id="qblock6" style="display:none">
+      <div class="q-num">Question 07</div>
+      <div class="q-text">Lors du contrôle avec projecteur étalon à l'inclinaison 0%, la valeur lue sur le règle-phares doit être :</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(6,0,false)"><span class="choice-letter">A</span>Entre +0,5 % et −0,5 %</div>
+        <div class="choice" onclick="answer(6,1,true)"><span class="choice-letter">B</span>Entre +0,2 % et −0,2 %</div>
+        <div class="choice" onclick="answer(6,2,false)"><span class="choice-letter">C</span>Exactement 0 %</div>
+        <div class="choice" onclick="answer(6,3,false)"><span class="choice-letter">D</span>Entre 0 % et −0,2 %</div>
+      </div>
+      <div class="feedback ok" id="fb6ok">✅ Correct ! La tolérance à 0% est de +/− 0,2 %, soit entre +0,2% et −0,2%.</div>
+      <div class="feedback ko" id="fb6ko">❌ La tolérance correcte est B : entre +0,2% et −0,2%. À −1% d'inclinaison, la valeur doit être entre −0,8% et −1,2%.</div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-block" id="qblock7" style="display:none">
+      <div class="q-num">Question 08</div>
+      <div class="q-text">Lors d'une vérification semestrielle, le jeu de colonne mesuré à différentes hauteurs ne doit pas varier de plus de :</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(7,0,false)"><span class="choice-letter">A</span>+/− 0,05 %</div>
+        <div class="choice" onclick="answer(7,1,false)"><span class="choice-letter">B</span>+/− 0,10 %</div>
+        <div class="choice" onclick="answer(7,2,true)"><span class="choice-letter">C</span>+/− 0,15 %</div>
+        <div class="choice" onclick="answer(7,3,false)"><span class="choice-letter">D</span>+/− 0,30 %</div>
+      </div>
+      <div class="feedback ok" id="fb7ok">✅ Correct ! La tolérance du jeu de colonne est de +/− 0,15 % mesurée de bas en haut.</div>
+      <div class="feedback ko" id="fb7ko">❌ La tolérance correcte est C : +/− 0,15 % sur l'ensemble de la course verticale.</div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-block" id="qblock8" style="display:none">
+      <div class="q-num">Question 09</div>
+      <div class="q-text">À quelle fréquence doit-on vérifier la zone de positionnement du véhicule VL implantée au sol ?</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(8,0,false)"><span class="choice-letter">A</span>Tous les 2 ans</div>
+        <div class="choice" onclick="answer(8,1,false)"><span class="choice-letter">B</span>Tous les 3 ans</div>
+        <div class="choice" onclick="answer(8,2,true)"><span class="choice-letter">C</span>Tous les 5 ans</div>
+        <div class="choice" onclick="answer(8,3,false)"><span class="choice-letter">D</span>Tous les 10 ans</div>
+      </div>
+      <div class="feedback ok" id="fb8ok">✅ Exact ! Zone VL sur sol : tous les 5 ans. Sur pont élévateur : tous les 3 ans. Zone PL : tous les 3 ans.</div>
+      <div class="feedback ko" id="fb8ko">❌ Zone VL sur sol : tous les 5 ans (C). Sur pont élévateur : tous les 3 ans.</div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-block" id="qblock9" style="display:none">
+      <div class="q-num">Question 10</div>
+      <div class="q-text">En cas de figeage des mesures sur un Smartlynx version BSP 16.1.0, quelle est la solution recommandée ?</div>
+      <div class="choices">
+        <div class="choice" onclick="answer(9,0,false)"><span class="choice-letter">A</span>Redémarrer le Smartlynx et recalibrer l'inclinomètre</div>
+        <div class="choice" onclick="answer(9,1,false)"><span class="choice-letter">B</span>Vérifier la connexion Wifi et rapprocher la borne</div>
+        <div class="choice" onclick="answer(9,2,true)"><span class="choice-letter">C</span>Mise à jour ou remplacement de la carte CPU</div>
+        <div class="choice" onclick="answer(9,3,false)"><span class="choice-letter">D</span>Nettoyer les lentilles et recalibrer le bloc optique</div>
+      </div>
+      <div class="feedback ok" id="fb9ok">✅ Correct ! Pour le figeage BSP 16.1.0 : mettre à jour en 16.1.2, ou remplacer la carte CPU par le nouveau modèle (BSP 20.1.0).</div>
+      <div class="feedback ko" id="fb9ko">❌ La solution correcte est C : mise à jour de la carte CPU en version BSP 16.1.2 ou remplacement par le nouveau modèle BSP 20.1.0.</div>
+    </div>
+
+    <button class="quiz-btn" id="quizNextBtn" onclick="nextQuestion()">Question suivante →</button>
+
+    <!-- Score final -->
+    <div class="score-card" id="scoreCard">
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-num" id="scoreNum">0</div>
+        <div class="score-total">/ 10</div>
+      </div>
+      <div class="score-title" id="scoreTitle"></div>
+      <div class="score-msg" id="scoreMsg"></div>
+      <button class="btn-retry" onclick="resetQuiz()">↺ Recommencer le QCM</button>
+    </div>
+  </div>
+
+  <div class="chapter-nav" style="margin-top:24px;">
+    <button class="nav-btn" onclick="goTo(10)">← Flashcards</button>
+    <button class="nav-btn" onclick="goTo(0)">↺ Recommencer</button>
+  </div>
+</div>
+
+</div><!-- /main-content -->
+</div><!-- /body-layout -->
+</div><!-- /app -->
+
+<script>
+const TOTAL = 12;
+let visited = new Set([0]);
+let currentQ = 0, score = 0, answered = [];
+
+function goTo(n) {
+  document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+  document.getElementById('ch' + n).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', i === n);
+  });
+  visited.add(n);
+  visited.forEach(i => {
+    const ck = document.getElementById('ck' + i);
+    if (ck && i !== n) ck.textContent = '✓';
+  });
+  document.getElementById('progressBar').style.width = (Math.round((visited.size / TOTAL) * 100)) + '%';
+  window.scrollTo(0, 0);
+}
+
+// ── Exercice ──
+function exoCheck(el, type, qid) {
+  const container = document.getElementById('exo-' + qid);
+  container.querySelectorAll('.exo-choice').forEach(c => c.classList.add('disabled'));
+  if (type === 'correct') {
+    el.classList.add('correct');
+    document.getElementById('exo-r' + qid.slice(1)).classList.add('show');
+  } else {
+    el.classList.add('wrong');
+    document.getElementById('exo-r' + qid.slice(1) + 'b').classList.add('show');
+  }
+}
+
+// ── QCM ──
+function answer(qIndex, choiceIndex, isCorrect) {
+  if (answered[qIndex]) return;
+  answered[qIndex] = true;
+  const block = document.getElementById('qblock' + qIndex);
+  const choices = block.querySelectorAll('.choice');
+  choices.forEach(c => c.classList.add('disabled'));
+  choices[choiceIndex].classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    choices.forEach((c, i) => {
+      if (c.querySelector('.choice-letter').textContent === ['A','B','C','D'].find((_, j) => {
+        return block.querySelectorAll('.choice')[j] && block.querySelectorAll('.choice')[j].onclick.toString().includes(',true)');
+      })) c.classList.add('correct');
+    });
+    // Mark correct answer
+    choices.forEach(c => {
+      if (c.onclick && c.onclick.toString().includes(',true)')) c.classList.add('correct');
+    });
+  }
+  if (isCorrect) score++;
+  document.getElementById('fb' + qIndex + (isCorrect ? 'ok' : 'ko')).classList.add('show');
+
+  const btn = document.getElementById('quizNextBtn');
+  btn.classList.add('show');
+  if (qIndex === 9) btn.textContent = 'Voir les résultats →';
+  document.getElementById('quizProg').textContent = 'Question ' + (qIndex + 1) + ' / 10 — ' + score + ' bonne(s) réponse(s)';
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= 10) { showScore(); return; }
+  document.getElementById('qblock' + (currentQ - 1)).style.display = 'none';
+  document.getElementById('qblock' + currentQ).style.display = 'block';
+  document.getElementById('quizNextBtn').classList.remove('show');
+  document.getElementById('quizProg').textContent = 'Question ' + (currentQ + 1) + ' / 10';
+}
+
+function showScore() {
+  document.getElementById('quizNextBtn').classList.remove('show');
+  document.getElementById('qblock9').style.display = 'none';
+  const sc = document.getElementById('scoreCard');
+  sc.classList.add('show');
+  document.getElementById('scoreNum').textContent = score;
+  const pct = score / 10;
+  const circle = document.getElementById('scoreCircle');
+  let title, msg, color;
+  if (pct >= 0.8) {
+    title = 'Excellent !'; msg = 'Vous maîtrisez les points essentiels du SRV 042 et du règle-phare Smartlynx. Vous êtes prêt(e) pour l\'intervention.'; color = '#22c55e';
+  } else if (pct >= 0.6) {
+    title = 'Bon résultat'; msg = 'Quelques points à revoir. Relisez les chapitres sur la méthode de mesure, les plages de tolérance et la maintenance.'; color = '#eab308';
+  } else {
+    title = 'À retravailler'; msg = 'Prenez le temps de relire les chapitres clés : méthode de mesure, zones, calibrage et maintenance avant de retenter.'; color = '#cd121d';
+  }
+  circle.style.borderColor = color;
+  circle.querySelector('.score-num').style.color = color;
+  document.getElementById('scoreTitle').textContent = title;
+  document.getElementById('scoreMsg').textContent = msg;
+}
+
+function resetQuiz() {
+  currentQ = 0; score = 0; answered = [];
+  document.querySelectorAll('.question-block').forEach((b, i) => {
+    b.style.display = i === 0 ? 'block' : 'none';
+    b.querySelectorAll('.choice').forEach(c => c.classList.remove('selected','correct','wrong','disabled'));
+    b.querySelectorAll('.feedback').forEach(f => f.classList.remove('show'));
+  });
+  document.getElementById('scoreCard').classList.remove('show');
+  document.getElementById('quizNextBtn').classList.remove('show');
+  document.getElementById('quizProg').textContent = 'Question 1 / 10';
+}
+</script>
+</body>
+</html>

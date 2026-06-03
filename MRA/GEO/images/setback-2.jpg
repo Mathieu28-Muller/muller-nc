@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#f0f0f0"/>
+  <rect x="2" y="2" width="796" height="496" fill="none" stroke="#ccc" stroke-width="2" stroke-dasharray="12,6"/>
+  <text x="400" y="220" fill="#999" font-size="48" font-family="Arial" text-anchor="middle">📷</text>
+  <text x="400" y="270" fill="#888" font-size="22" font-family="Arial,sans-serif" text-anchor="middle" font-weight="bold">Setback — Vue dessus</text>
+  <text x="400" y="302" fill="#aaa" font-size="14" font-family="Arial,sans-serif" text-anchor="middle">Remplacez ce fichier par votre image</text>
+  <text x="400" y="322" fill="#bbb" font-size="13" font-family="Arial,sans-serif" text-anchor="middle">setback-2.jpg</text>
+</svg>

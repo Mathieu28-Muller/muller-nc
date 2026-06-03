@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inclusion & Handicap — Sensibilisation Muller Automotive</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{--rouge:#1e3a8a;--rouge-cl:#2563eb;--vert:#059669;--jaune:#d97706;--gris-f:#1c1c1c;--gris-m:#444;--gris-cl:#777;--bg:#f8fafc;--blanc:#fff;--trait:#e2e8f0;}
+*{box-sizing:border-box;margin:0;padding:0;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--gris-f);font-family:'Lato',sans-serif;font-size:16px;line-height:1.7;min-height:100vh;}
+h1,h2,h3,h4{font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;line-height:1.2;}
+h1{font-size:2.8rem;font-weight:800;}h2{font-size:2rem;font-weight:700;}h3{font-size:1.4rem;font-weight:700;}
+
+/* HEADER */
+.site-header{background:#fff;border-bottom:3px solid var(--rouge);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.header-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;padding:12px 24px;gap:20px;}
+.header-logo-box{background:var(--rouge);padding:10px 20px;}
+.header-logo-box img{height:42px;object-fit:contain;display:block;}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gris-m);}
+.header-back{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gris-cl);text-decoration:none;transition:color .2s;}
+.header-back:hover{color:var(--rouge);}
+
+/* PROGRESS */
+.progress-wrap{background:#e2e8f0;height:5px;}
+.progress-bar{background:var(--rouge);height:5px;transition:width .4s ease;}
+
+/* SCREEN */
+.screen{display:none;max-width:860px;margin:0 auto;padding:40px 24px 60px;}
+.screen.active{display:block;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO SCREEN */
+.hero-screen{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%);color:#fff;padding:60px 32px;text-align:center;}
+.hero-icon{font-size:4rem;margin-bottom:16px;}
+.hero-screen h1{font-size:2.5rem;color:#fff;margin-bottom:12px;}
+.hero-screen p{font-size:1rem;color:rgba(255,255,255,.8);max-width:560px;margin:0 auto 32px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 16px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin:6px;color:rgba(255,255,255,.8);}
+
+/* FORM */
+.form-card{background:#fff;border-radius:10px;padding:36px;max-width:560px;margin:0 auto;box-shadow:0 4px 24px rgba(0,0,0,.1);}
+.form-card h2{margin-bottom:8px;color:var(--rouge);}
+.form-card p{color:var(--gris-cl);margin-bottom:24px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gris-m);margin-bottom:6px;}
+.field input{width:100%;padding:11px 14px;border:2px solid var(--trait);border-radius:6px;font-family:'Lato',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;}
+.field input:focus{border-color:var(--rouge-cl);}
+.field input.error{border-color:#ef4444;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-primary{background:var(--rouge);color:#fff;}
+.btn-primary:hover{background:var(--rouge-cl);}
+.btn-secondary{background:#fff;color:var(--rouge);border:2px solid var(--rouge);}
+.btn-secondary:hover{background:#eff6ff;}
+.btn-success{background:var(--vert);color:#fff;}
+.btn-success:hover{background:#047857;}
+.btn-lg{padding:14px 36px;font-size:1.1rem;}
+.btn-full{width:100%;justify-content:center;}
+
+/* QUIZ */
+.quiz-card{background:#fff;border-radius:10px;padding:28px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--rouge);}
+.quiz-card.initial-card{border-left-color:var(--rouge);}
+.quiz-card.final-card{border-left-color:var(--vert);}
+.q-label{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--gris-cl);margin-bottom:8px;}
+.q-text{font-size:1rem;font-weight:700;color:var(--gris-f);margin-bottom:16px;line-height:1.5;}
+.q-options{display:flex;flex-direction:column;gap:8px;}
+.q-opt{display:flex;align-items:center;gap:12px;padding:11px 16px;background:#f8fafc;border:1.5px solid var(--trait);border-radius:6px;cursor:pointer;font-size:.9rem;transition:all .15s;}
+.q-opt:hover:not(.locked){border-color:var(--rouge-cl);background:#eff6ff;}
+.q-opt.selected{border-color:var(--rouge);background:#eff6ff;color:var(--rouge);}
+.q-opt.correct{border-color:var(--vert);background:#ecfdf5;color:#065f46;}
+.q-opt.wrong{border-color:#ef4444;background:#fef2f2;color:#991b1b;}
+.q-opt.locked{cursor:default;pointer-events:none;}
+.q-opt-letter{width:26px;height:26px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;flex-shrink:0;}
+.q-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:.85rem;line-height:1.6;display:none;}
+.q-feedback.show{display:block;}
+.q-feedback.ok{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;}
+.q-feedback.ko{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+
+/* MODULES DE FORMATION */
+.module-header{background:linear-gradient(135deg,var(--rouge) 0%,var(--rouge-cl) 100%);color:#fff;border-radius:10px;padding:24px 28px;margin-bottom:24px;}
+.module-header h2{color:#fff;margin-bottom:4px;}
+.module-header p{color:rgba(255,255,255,.8);font-size:.9rem;margin:0;}
+.content-card{background:#fff;border-radius:10px;padding:24px 28px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.content-card h3{color:var(--rouge);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.content-card h4{color:var(--rouge-cl);font-size:1rem;margin:14px 0 8px;}
+.content-card p{color:var(--gris-m);font-size:.9rem;margin-bottom:10px;}
+.info-box{background:#eff6ff;border-left:4px solid var(--rouge);border-radius:0 6px 6px 0;padding:14px 18px;margin:12px 0;font-size:.88rem;color:var(--gris-f);}
+.warn-box{background:#fef3c7;border-left:4px solid var(--jaune);border-radius:0 6px 6px 0;padding:14px 18px;margin:12px 0;font-size:.88rem;color:#92400e;}
+.success-box{background:#ecfdf5;border-left:4px solid var(--vert);border-radius:0 6px 6px 0;padding:14px 18px;margin:12px 0;font-size:.88rem;color:#065f46;}
+.tag-list{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.tag{display:inline-block;padding:4px 12px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.tag-blue{background:#dbeafe;color:#1d4ed8;}
+.tag-green{background:#d1fae5;color:#065f46;}
+.tag-orange{background:#fde68a;color:#92400e;}
+.tag-red{background:#fee2e2;color:#991b1b;}
+
+/* MODULE NAV */
+.module-nav{display:flex;justify-content:space-between;margin-top:28px;padding-top:20px;border-top:1px solid var(--trait);}
+
+/* SCORE */
+.score-wrap{text-align:center;max-width:480px;margin:0 auto;}
+.score-circle{width:140px;height:140px;border-radius:50%;margin:0 auto 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:5px solid;}
+.score-num{font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:800;}
+.score-pct{font-size:.85rem;color:var(--gris-cl);}
+.score-msg{font-size:1.05rem;font-weight:700;margin:12px 0;}
+
+/* DIPLÔME */
+.diplome-section{max-width:860px;margin:20px auto;}
+.diplome-card{position:relative;background:#fff;border-radius:4px;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.2);aspect-ratio:1.414/1;width:100%;font-family:Georgia,'Times New Roman',serif;}
+.diplome-border{position:absolute;inset:12px;border:2.5px solid #1e3a8a;pointer-events:none;z-index:2;}
+.diplome-border::before{content:'';position:absolute;inset:5px;border:1px solid rgba(30,58,138,.2);border-radius:1px;}
+.diplome-corner{position:absolute;width:50px;height:50px;z-index:4;}
+.diplome-corner::before,.diplome-corner::after{content:'';position:absolute;background:#1e3a8a;}
+.diplome-corner.tl{top:12px;left:12px;}.diplome-corner.tl::before{top:0;left:0;width:28px;height:2.5px;}.diplome-corner.tl::after{top:0;left:0;width:2.5px;height:28px;}
+.diplome-corner.tr{top:12px;right:12px;}.diplome-corner.tr::before{top:0;right:0;width:28px;height:2.5px;}.diplome-corner.tr::after{top:0;right:0;width:2.5px;height:28px;}
+.diplome-corner.bl{bottom:12px;left:12px;}.diplome-corner.bl::before{bottom:0;left:0;width:28px;height:2.5px;}.diplome-corner.bl::after{bottom:0;left:0;width:2.5px;height:28px;}
+.diplome-corner.br{bottom:12px;right:12px;}.diplome-corner.br::before{bottom:0;right:0;width:28px;height:2.5px;}.diplome-corner.br::after{bottom:0;right:0;width:2.5px;height:28px;}
+.diplome-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;pointer-events:none;opacity:.04;}
+.diplome-wm-icon{font-size:240px;}
+.diplome-inner{position:relative;z-index:3;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:7% 8%;}
+.diplome-top{text-align:center;}
+.diplome-top img{height:48px;margin-bottom:8px;}
+.diplome-attestation{font-family:'Barlow Condensed',sans-serif;font-size:clamp(.7rem,1.2vw,1rem);font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#1e3a8a;margin-bottom:4px;}
+.diplome-mid{text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
+.diplome-certifie{font-size:clamp(.65rem,.9vw,.8rem);letter-spacing:2px;text-transform:uppercase;color:#777;margin-bottom:4px;}
+.diplome-name{font-size:clamp(1.4rem,3.5vw,2.8rem);font-weight:700;font-style:italic;color:#1e3a8a;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;}
+.diplome-pour{font-size:clamp(.6rem,.85vw,.78rem);letter-spacing:2px;text-transform:uppercase;color:#777;margin:8px 0 4px;}
+.diplome-titre{font-size:clamp(1rem,2vw,1.5rem);font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1c1c1c;text-align:center;}
+.diplome-score{font-size:clamp(.7rem,1.1vw,.9rem);color:#555;margin-top:4px;}
+.diplome-bottom{width:100%;display:flex;justify-content:space-between;align-items:flex-end;font-size:clamp(.55rem,.75vw,.72rem);color:#888;}
+.diplome-bottom .sig{text-align:center;}
+.diplome-bottom .sig div:first-child{border-top:1px solid #ccc;padding-top:4px;margin-top:20px;}
+
+.btn-print{background:#1e3a8a;color:#fff;border:none;padding:12px 28px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-right:10px;}
+.btn-email{background:var(--vert);color:#fff;border:none;padding:12px 28px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+
+@media print{.site-header,.progress-wrap,.screen:not(.active){display:none!important;}.screen.active{padding:0!important;max-width:100%!important;}.diplome-card{box-shadow:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="header-inner">
+    <div class="header-logo-box"><img src="https://www.mullerautomotive.fr/wp-content/uploads/2025/01/logo-Muller-automotive-full-1.png" alt="Muller Automotive"></div>
+    <div class="header-title">Inclusion & Handicap</div>
+    <a class="header-back" href="/SENSIBILISATION/">← Modules sensibilisation</a>
+  </div>
+</div>
+<div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+
+<!-- ═══ ÉCRAN 0 : ACCUEIL ═══ -->
+<div class="screen active hero-screen" id="s0">
+  <div style="max-width:700px;margin:0 auto;">
+    <div class="hero-icon">♿</div>
+    <h1>Inclusion & Handicap</h1>
+    <p>Comprenez vos obligations légales, apprenez à adopter les bons réflexes et devenez acteur d'un environnement de travail inclusif.</p>
+    <div style="margin-bottom:28px;">
+      <span class="hero-badge">⏱ 45 minutes</span>
+      <span class="hero-badge">📋 4 modules</span>
+      <span class="hero-badge">🎯 Quiz + Diplôme</span>
+    </div>
+    <button class="btn btn-primary btn-lg" onclick="goTo(1)" style="background:#fff;color:#1e3a8a;">Commencer ma formation →</button>
+  </div>
+</div>
+
+<!-- ═══ ÉCRAN 1 : INSCRIPTION ═══ -->
+<div class="screen" id="s1">
+  <div class="form-card" style="margin-top:20px;">
+    <h2>Votre inscription</h2>
+    <p>Ces informations apparaîtront sur votre attestation de formation et seront transmises au service formation.</p>
+    <div class="field"><label>Prénom</label><input type="text" id="inp-prenom" placeholder="Votre prénom"></div>
+    <div class="field"><label>Nom</label><input type="text" id="inp-nom" placeholder="Votre nom de famille"></div>
+    <div class="field"><label>Adresse email</label><input type="email" id="inp-email" placeholder="votre@email.com"></div>
+    <div class="field"><label>Société / Service</label><input type="text" id="inp-societe" placeholder="Muller Automotive / Service..."></div>
+    <div id="form-error" style="color:#ef4444;font-size:.85rem;margin-bottom:12px;display:none;">Veuillez remplir tous les champs obligatoires.</div>
+    <button class="btn btn-primary btn-full" onclick="validateForm()">Continuer vers le questionnaire initial →</button>
+  </div>
+</div>
+
+<!-- ═══ ÉCRAN 2 : PRÉ-QUIZ ═══ -->
+<div class="screen" id="s2">
+  <h2 style="margin-bottom:6px;">Questionnaire initial</h2>
+  <p style="color:var(--gris-cl);margin-bottom:28px;">Ces 5 questions évaluent vos connaissances <em>avant</em> la formation. Les réponses ne comptent pas dans votre score final.</p>
+
+  <div id="prequiz-container"></div>
+  <div style="margin-top:20px;"><button class="btn btn-primary btn-full" id="btn-prequiz" onclick="submitPrequiz()" disabled>Voir mes résultats et démarrer la formation →</button></div>
+</div>
+
+<!-- ═══ ÉCRAN 3 : RÉSULTAT PRÉ-QUIZ ═══ -->
+<div class="screen" id="s3">
+  <div style="text-align:center;max-width:500px;margin:0 auto;">
+    <div style="font-size:3rem;margin-bottom:12px;">📊</div>
+    <h2>Résultat initial</h2>
+    <p id="prequiz-result-text" style="color:var(--gris-m);margin:12px 0 24px;"></p>
+    <div class="success-box" style="text-align:left;"><strong>La formation commence maintenant.</strong> À l'issue des 4 modules, vous passerez le quiz final pour obtenir votre attestation.</div>
+    <br><button class="btn btn-primary btn-lg btn-full" onclick="goTo(4)">Démarrer le Module 1 →</button>
+  </div>
+</div>
+
+<!-- ═══ ÉCRAN 4 : MODULE 1 ═══ -->
+<div class="screen" id="s4">
+  <div class="module-header"><h2>📋 Module 1 — Cadre légal & Obligations</h2><p>L'obligation d'emploi, la RQTH et le rôle du Référent Handicap</p></div>
+
+  <div class="content-card">
+    <h3>⚖️ L'Obligation d'Emploi (OETH)</h3>
+    <div class="info-box"><strong>Quota légal — Code du Travail Art. L5212-2 :</strong><br>Toute entreprise ou organisme d'au moins <strong>20 salariés</strong> doit employer des bénéficiaires de l'obligation d'emploi (BOETH) dans une proportion de <strong>6 %</strong> de son effectif total.</div>
+    <p>En cas de non-respect, l'entreprise doit verser une <strong>contribution financière</strong> à l'Agefiph (secteur privé) ou au FIPHFP (secteur public).</p>
+    <div class="tag-list"><span class="tag tag-blue">20 salariés minimum</span><span class="tag tag-red">6% de l'effectif</span><span class="tag tag-orange">Agefiph / FIPHFP</span></div>
+  </div>
+
+  <div class="content-card">
+    <h3>🪪 La RQTH — Reconnaissance de la Qualité de Travailleur Handicapé</h3>
+    <p>La RQTH est la démarche officielle qui ouvre droit aux aides et aménagements.</p>
+    <div class="warn-box">⚠ La RQTH est <strong>confidentielle</strong>. Le salarié n'est pas obligé de la déclarer à son employeur. C'est la seule preuve légale permettant à l'entreprise de comptabiliser un salarié dans son quota de 6 %.</div>
+    <p>Elle est accordée par la <strong>MDPH</strong> (Maison Départementale des Personnes Handicapées) pour une durée de 1 à 5 ans, renouvelable.</p>
+  </div>
+
+  <div class="content-card">
+    <h3>👤 Le Référent Handicap</h3>
+    <p>Depuis 2020, les entreprises d'au moins <strong>250 salariés</strong> doivent désigner un Référent Handicap. C'est le point de contact clé pour :</p>
+    <ul style="list-style:disc;padding-left:20px;color:var(--gris-m);font-size:.9rem;margin-top:8px;line-height:1.8;">
+      <li>Coordonner la politique handicap de l'entreprise</li>
+      <li>Accompagner les salariés dans leurs démarches (RQTH, aménagement de poste)</li>
+      <li>Assurer le lien avec les organismes externes (Agefiph, MDPH, Cap Emploi)</li>
+      <li>Sensibiliser et former les équipes managériales</li>
+    </ul>
+    <div class="success-box" style="margin-top:12px;">Chez Muller Automotive, le Référent Handicap est votre interlocuteur privilégié pour toute question relative au handicap au travail.</div>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(3)">← Retour</button>
+    <button class="btn btn-primary" onclick="goTo(5)">Module 2 →</button>
+  </div>
+</div>
+
+<!-- ═══ ÉCRAN 5 : MODULE 2 ═══ -->
+<div class="screen" id="s5">
+  <div class="module-header"><h2>👁 Module 2 — Typologie du handicap</h2><p>Les 6 familles de handicap et la réalité du handicap invisible</p></div>
+
+  <div class="content-card">
+    <h3>🔍 Le Handicap Invisible — 80% des cas</h3>
+    <div class="warn-box">La majorité des handicaps ne se voient pas. Une personne qui n'utilise pas de fauteuil roulant peut être en grande difficulté.</div>
+    <p>Les handicaps invisibles comprennent :</p>
+    <ul style="list-style:disc;padding-left:20px;color:var(--gris-m);font-size:.9rem;line-height:1.8;">
+      <li><strong>Handicaps psychiques</strong> — troubles anxieux, dépression, schizophrénie</li>
+      <li><strong>Troubles cognitifs</strong> — Dyslexie, Dyspraxie, TDAH, troubles de l'attention</li>
+      <li><strong>Maladies invalidantes</strong> — diabète sévère, sclérose en plaques, cancer, insuffisance cardiaque</li>
+    </ul>
+  </div>
+
+  <div class="content-card">
+    <h3>📚 Les 6 Familles de Handicap (Agefiph)</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+      <div style="background:#eff6ff;border-radius:8px;padding:14px;"><h4 style="color:#1e3a8a;margin-bottom:6px;">🦽 Moteur</h4><p style="font-size:.83rem;margin:0;color:var(--gris-m);">Difficulté à se déplacer, à manipuler. Fauteuil roulant, prothèse. Nécessite accès et ergonomie.</p></div>
+      <div style="background:#ecfdf5;border-radius:8px;padding:14px;"><h4 style="color:#065f46;margin-bottom:6px;">👂 Auditif</h4><p style="font-size:.83rem;margin:0;color:var(--gris-m);">Surdité partielle ou totale. Appareils auditifs, LSF (Langue des Signes), LPC.</p></div>
+      <div style="background:#fef3c7;border-radius:8px;padding:14px;"><h4 style="color:#92400e;margin-bottom:6px;">👁 Visuel</h4><p style="font-size:.83rem;margin:0;color:var(--gris-m);">Malvoyance, cécité. Braille, outils vocaux, agrandissement.</p></div>
+      <div style="background:#fce7f3;border-radius:8px;padding:14px;"><h4 style="color:#9d174d;margin-bottom:6px;">🧠 Mental/Cognitif</h4><p style="font-size:.83rem;margin:0;color:var(--gris-m);">Difficulté à comprendre, apprendre. Supports FALC, temps supplémentaire.</p></div>
+      <div style="background:#f0fdf4;border-radius:8px;padding:14px;"><h4 style="color:#14532d;margin-bottom:6px;">💬 Psychique</h4><p style="font-size:.83rem;margin:0;color:var(--gris-m);">Organisation difficile, gestion des émotions. Stabilité et accompagnement nécessaires.</p></div>
+      <div style="background:#fff7ed;border-radius:8px;padding:14px;"><h4 style="color:#9a3412;margin-bottom:6px;">🏥 Maladies invalidantes</h4><p style="font-size:.83rem;margin:0;color:var(--gris-m);">Impact sur énergie, concentration. Horaires aménagés, pauses adaptées.</p></div>
+    </div>
+    <div class="info-box" style="margin-top:14px;">FALC = <strong>Facile à Lire et à Comprendre</strong> — méthode de simplification des documents pour les personnes ayant un handicap cognitif ou mental.</div>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(4)">← Module 1</button>
+    <button class="btn btn-primary" onclick="goTo(6)">Module 3 →</button>
+  </div>
+</div>
+
+<!-- ═══ ÉCRAN 6 : MODULE 3 ═══ -->
+<div class="screen" id="s6">
+  <div class="module-header"><h2>🔧 Module 3 — Aménagements raisonnables</h2><p>Adapter l'environnement de travail et de formation</p></div>
+
+  <div class="content-card">
+    <h3>🎓 En Formation Professionnelle</h3>
+    <p>L'aménagement raisonnable est une <strong>obligation légale</strong> de l'organisme de formation pour compenser le handicap.</p>
+    <ul style="list-style:disc;padding-left:20px;color:var(--gris-m);font-size:.9rem;line-height:1.9;">
+      <li><strong>Cognitif/Dys :</strong> Supports FALC, temps supplémentaire pour les évaluations, police sans-serif, grande taille</li>
+      <li><strong>Auditif :</strong> Boucle magnétique, transcription écrite, prise de notes par un tiers, sous-titres vidéos</li>
+      <li><strong>Moteur :</strong> Accès aux locaux, tables réglables, utilisation d'ordinateur si écriture difficile</li>
+      <li><strong>Psychique :</strong> Environnement calme, évaluations fractionnées, salle à l'écart si besoin</li>
+    </ul>
+  </div>
+
+  <div class="content-card">
+    <h3>💼 Au Poste de Travail</h3>
+    <ul style="list-style:disc;padding-left:20px;color:var(--gris-m);font-size:.9rem;line-height:1.9;">
+      <li><strong>Ergonomie :</strong> Clavier adapté, souris ergonomique, écran grossissant, fauteuil spécifique</li>
+      <li><strong>Organisation :</strong> Horaires aménagés, temps partiel thérapeutique, télétravail</li>
+      <li><strong>Environnement :</strong> Réduction du bruit, espaces de pause, accompagnement par le Référent</li>
+    </ul>
+    <div class="success-box" style="margin-top:14px;"><strong>Principe clé — La compensation :</strong> L'objectif n'est pas de créer des privilèges, mais d'offrir les mêmes chances de réussite en neutralisant l'impact du handicap.</div>
+  </div>
+
+  <div class="content-card">
+    <h3>📞 Les Acteurs du Maintien en Emploi</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+      <div style="background:#f8fafc;border-radius:6px;padding:12px;border:1px solid var(--trait);"><strong>Agefiph</strong><p style="font-size:.82rem;color:var(--gris-cl);margin:4px 0 0;">Financement aménagements secteur privé</p></div>
+      <div style="background:#f8fafc;border-radius:6px;padding:12px;border:1px solid var(--trait);"><strong>MDPH</strong><p style="font-size:.82rem;color:var(--gris-cl);margin:4px 0 0;">Reconnaissance RQTH, droits et prestations</p></div>
+      <div style="background:#f8fafc;border-radius:6px;padding:12px;border:1px solid var(--trait);"><strong>Cap Emploi</strong><p style="font-size:.82rem;color:var(--gris-cl);margin:4px 0 0;">Accompagnement insertion professionnelle</p></div>
+      <div style="background:#f8fafc;border-radius:6px;padding:12px;border:1px solid var(--trait);"><strong>Médecin du travail</strong><p style="font-size:.82rem;color:var(--gris-cl);margin:4px 0 0;">Préconisations aménagement de poste</p></div>
+    </div>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(5)">← Module 2</button>
+    <button class="btn btn-primary" onclick="goTo(7)">Module 4 →</button>
+  </div>
+</div>
+
+<!-- ═══ ÉCRAN 7 : MODULE 4 ═══ -->
+<div class="screen" id="s7">
+  <div class="module-header"><h2>💬 Module 4 — Communication inclusive</h2><p>Le lexique de l'inclusion et les bons réflexes au quotidien</p></div>
+
+  <div class="content-card">
+    <h3>📖 Le Lexique de l'Inclusion</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
+      <div style="background:#ecfdf5;border-radius:8px;padding:16px;"><h4 style="color:#065f46;margin-bottom:8px;">✅ À privilégier</h4><ul style="list-style:disc;padding-left:16px;font-size:.85rem;color:#065f46;line-height:1.8;"><li>« Personne en situation de handicap »</li><li>« Personne à mobilité réduite »</li><li>« Utilise un fauteuil roulant »</li><li>« Personne malvoyante »</li></ul></div>
+      <div style="background:#fef2f2;border-radius:8px;padding:16px;"><h4 style="color:#991b1b;margin-bottom:8px;">❌ À éviter</h4><ul style="list-style:disc;padding-left:16px;font-size:.85rem;color:#991b1b;line-height:1.8;"><li>« Handicapé », « Infirme »</li><li>« Liée à son fauteuil »</li><li>« Malade »</li><li>« Normal » (vs handicapé)</li></ul></div>
+    </div>
+    <div class="info-box" style="margin-top:12px;">Concentrez-vous sur la <strong>personne</strong>, pas sur le handicap. Mettez en avant les compétences.</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🤝 Conseils Pratiques par Situation</h3>
+    <ul style="list-style:none;padding:0;font-size:.9rem;color:var(--gris-m);">
+      <li style="padding:10px 0;border-bottom:1px solid var(--trait);"><strong>Avec une personne malvoyante :</strong> Annoncez votre présence. Proposez votre aide sans l'imposer. Parlez normalement.</li>
+      <li style="padding:10px 0;border-bottom:1px solid var(--trait);"><strong>Avec une personne sourde :</strong> Regardez-la, articulez clairement, phrases courtes. Ne criez pas. Utilisez l'écrit si besoin.</li>
+      <li style="padding:10px 0;border-bottom:1px solid var(--trait);"><strong>Avec une PMR :</strong> Si conversation prolongée, placez-vous à sa hauteur. Ne poussez jamais un fauteuil sans demander.</li>
+      <li style="padding:10px 0;"><strong>Règle d'or :</strong> Demandez toujours <em>« Comment puis-je vous aider ? »</em> avant d'agir.</li>
+    </ul>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(6)">← Module 3</button>
+    <button class="btn btn-primary" onclick="goTo(8)">Passer au Quiz final →</button>
+  </div>
+</div>
+
+<!-- ═══ ÉCRAN 8 : QUIZ FINAL ═══ -->
+<div class="screen" id="s8">
+  <h2 style="margin-bottom:6px;">Quiz final</h2>
+  <p style="color:var(--gris-cl);margin-bottom:28px;">10 questions pour valider votre sensibilisation. Un score ≥ 70% est requis pour obtenir l'attestation.</p>
+  <div id="finalquiz-container"></div>
+  <div style="margin-top:20px;"><button class="btn btn-success btn-full" id="btn-final" onclick="submitFinal()" disabled>Voir mon score et obtenir mon attestation →</button></div>
+</div>
+
+<!-- ═══ ÉCRAN 9 : RÉSULTATS + DIPLÔME ═══ -->
+<div class="screen" id="s9">
+  <div class="score-wrap" style="margin-bottom:40px;">
+    <div class="score-circle" id="score-circle">
+      <div class="score-num" id="score-num">0/10</div>
+      <div class="score-pct" id="score-pct">0%</div>
+    </div>
+    <div class="score-msg" id="score-msg"></div>
+    <div id="score-detail"></div>
+  </div>
+
+  <div class="diplome-section" id="diplome-section">
+    <h3 style="text-align:center;margin-bottom:20px;color:var(--rouge);">🎓 Votre attestation de formation</h3>
+
+    <div class="diplome-card" id="diplome-card">
+      <div class="diplome-border"></div>
+      <div class="diplome-corner tl"></div><div class="diplome-corner tr"></div>
+      <div class="diplome-corner bl"></div><div class="diplome-corner br"></div>
+      <div class="diplome-wm"><div class="diplome-wm-icon">♿</div></div>
+      <div class="diplome-inner">
+        <div class="diplome-top">
+          <img src="https://www.mullerautomotive.fr/wp-content/uploads/2025/01/logo-Muller-automotive-full-1.png" alt="Muller Automotive">
+          <div class="diplome-attestation">Attestation de Sensibilisation</div>
+        </div>
+        <div class="diplome-mid">
+          <div class="diplome-certifie">certifie que</div>
+          <div class="diplome-name" id="d-name">Prénom Nom</div>
+          <div class="diplome-pour">a suivi et validé le module de formation</div>
+          <div class="diplome-titre">Inclusion & Handicap en Entreprise</div>
+          <div class="diplome-score" id="d-score">Score : — / 10</div>
+        </div>
+        <div class="diplome-bottom">
+          <div><div id="d-date">Date : —</div><div id="d-societe" style="margin-top:2px;">—</div></div>
+          <div class="sig"><div>Responsable Formation</div><div>Muller Automotive</div></div>
+          <div style="text-align:right;"><div id="d-ref" style="font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:1px;">Réf. : SENS-HANDI-2026</div><div>formation-sav.fr</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-print" onclick="window.print()">🖨 Imprimer / Sauvegarder PDF</button>
+      <button class="btn-email" id="btn-send-email" onclick="sendResultEmail()">📧 Envoyer mes résultats à la formation</button>
+    </div>
+    <div id="email-confirm" style="text-align:center;margin-top:12px;color:var(--vert);font-size:.88rem;display:none;">✅ Email envoyé à formation@mullerautomotive.fr</div>
+    <div style="text-align:center;margin-top:16px;"><button class="btn btn-secondary" onclick="goTo(0)" style="font-size:.85rem;">↺ Recommencer</button></div>
+  </div>
+</div>
+
+<script>
+// ═══ STATE ═══
+let state={prenom:'',nom:'',email:'',societe:'',preScore:0,finalScore:0,finalAnswers:[]};
+const TOTAL_SCREENS=10;
+const SCREENS_LABELS=['Accueil','Inscription','Pré-quiz','Résultat initial','Module 1','Module 2','Module 3','Module 4','Quiz final','Résultats'];
+
+function goTo(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  document.getElementById('progressBar').style.width=Math.round((n/(TOTAL_SCREENS-1))*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===2)renderPrequiz();
+  if(n===8)renderFinalQuiz();
+  if(n===9)renderResults();
+}
+
+// ═══ INSCRIPTION ═══
+function validateForm(){
+  const p=document.getElementById('inp-prenom').value.trim();
+  const n=document.getElementById('inp-nom').value.trim();
+  const e=document.getElementById('inp-email').value.trim();
+  const s=document.getElementById('inp-societe').value.trim();
+  const err=document.getElementById('form-error');
+  if(!p||!n||!e){err.style.display='block';return;}
+  if(!e.includes('@')){err.style.display='block';err.textContent='Email invalide.';return;}
+  err.style.display='none';
+  state.prenom=p;state.nom=n;state.email=e;state.societe=s;
+  goTo(2);
+}
+
+// ═══ PRÉ-QUIZ ═══
+const preQuestions=[
+  {q:"Quel pourcentage des handicaps est considéré comme invisible ?",opts:["Moins de 30 %","Environ 50 %","Environ 80 %"],correct:2},
+  {q:"Quel est le quota légal de travailleurs handicapés pour une entreprise de 20 salariés et plus ?",opts:["3 %","6 %","10 %"],correct:1},
+  {q:"Que signifie RQTH ?",opts:["Registre Qualité Travail Humain","Reconnaissance de la Qualité de Travailleur Handicapé","Référentiel Qualité Traitement Handicap"],correct:1},
+  {q:"À partir de combien de salariés un Référent Handicap est-il obligatoire ?",opts:["50 salariés","100 salariés","250 salariés"],correct:2},
+  {q:"Quelle expression est correcte selon le lexique de l'inclusion ?",opts:["Personne handicapée","Infirme","Personne en situation de handicap"],correct:2}
+];
+let preAnswers=new Array(preQuestions.length).fill(null);
+
+function renderPrequiz(){
+  const c=document.getElementById('prequiz-container');
+  c.innerHTML=preQuestions.map((q,i)=>`
+    <div class="quiz-card initial-card" id="pq${i}">
+      <div class="q-label">Question ${i+1} / ${preQuestions.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">${q.opts.map((o,j)=>`<div class="q-opt" id="pq${i}-${j}" onclick="selectPre(${i},${j})"><div class="q-opt-letter">${'ABCD'[j]}</div>${o}</div>`).join('')}</div>
+    </div>`).join('');
+}
+function selectPre(qi,oi){
+  if(preAnswers[qi]!==null)return;
+  preAnswers[qi]=oi;
+  ['A','B','C'].forEach((_,j)=>{const el=document.getElementById(`pq${qi}-${j}`);if(el){el.classList.remove('selected');el.classList.add('locked');}});
+  document.getElementById(`pq${qi}-${oi}`).classList.add('selected');
+  if(preAnswers.every(a=>a!==null))document.getElementById('btn-prequiz').disabled=false;
+}
+function submitPrequiz(){
+  state.preScore=preAnswers.filter((a,i)=>a===preQuestions[i].correct).length;
+  document.getElementById('prequiz-result-text').textContent=
+    `Vous avez obtenu ${state.preScore} / ${preQuestions.length} bonne${state.preScore>1?'s':''} réponse${state.preScore>1?'s':''} au questionnaire initial. Ces résultats ne sont pas comptabilisés dans votre note finale.`;
+  goTo(3);
+}
+
+// ═══ QUIZ FINAL ═══
+const finalQuestions=[
+  {q:"Quelle est la principale obligation légale pour les entreprises d'au moins 20 salariés concernant le handicap ?",opts:["Avoir un référent handicap obligatoirement","Atteindre un quota de 6 % de travailleurs handicapés (OETH)","Verser une contribution à l'Agefiph uniquement"],correct:1,exp:"La loi impose un quota de 6 % (OETH). La contribution est l'alternative si ce quota n'est pas atteint."},
+  {q:"Quel terme légal désigne l'adaptation du poste ou de la formation pour compenser un handicap ?",opts:["Une faveur exceptionnelle","Un aménagement raisonnable","Un privilège d'ancienneté"],correct:1,exp:"L'aménagement raisonnable est une obligation légale définie par la loi de 2005."},
+  {q:"Quel pourcentage des handicaps sont invisibles ?",opts:["Moins de 10 %","Environ 30 %","Environ 80 %"],correct:2,exp:"Environ 80 % des handicaps sont invisibles (maladies invalidantes, troubles psychiques, troubles cognitifs, etc.)."},
+  {q:"Quel impact a un trouble cognitif (Dyslexie) sur une formation ?",opts:["Besoin d'outils ergonomiques uniquement","Besoin de supports FALC et de temps supplémentaire","Besoin d'un traducteur en LSF"],correct:1,exp:"Les troubles cognitifs affectent l'apprentissage. Les supports FALC (Facile à Lire et à Comprendre) et le temps supplémentaire sont essentiels."},
+  {q:"La RQTH est-elle obligatoire pour signer un contrat de travail ?",opts:["Oui, c'est indispensable","Non, c'est une démarche volontaire et confidentielle","Oui, mais uniquement pour les entreprises de plus de 250 salariés"],correct:1,exp:"La RQTH est une démarche strictement volontaire et confidentielle. Le salarié n'est pas obligé d'en informer son employeur."},
+  {q:"Qui est le point de contact obligatoire pour le handicap dans les entreprises d'au moins 250 salariés ?",opts:["Le service de santé au travail","Le Référent Handicap","Le Délégué Syndical"],correct:1,exp:"Le Référent Handicap est la personne dédiée à la coordination de la politique handicap (obligatoire dès 250 salariés, depuis 2020)."},
+  {q:"Quel est le bon réflexe avec une personne utilisant un fauteuil roulant lors d'une conversation prolongée ?",opts:["Toujours pousser son fauteuil","Se mettre à sa hauteur (s'asseoir ou s'accroupir)","Parler très fort"],correct:1,exp:"Se placer à la même hauteur permet un contact visuel égal et évite à la personne de lever la tête continuellement."},
+  {q:"Que signifie l'acronyme FALC ?",opts:["Formation Aménagée Longue et Certifiante","Facile à Lire et à Comprendre","Fiches d'Adaptation Légale et Contextuelle"],correct:1,exp:"FALC = Facile à Lire et à Comprendre. Méthode de simplification des documents pour les personnes ayant un handicap cognitif."},
+  {q:"Quel aménagement privilégie-t-on pour une maladie invalidante avec fatigue chronique ?",opts:["Un matériel de levage lourd","Un horaire aménagé ou le télétravail","L'accès à un traducteur en LSF"],correct:1,exp:"Les maladies invalidantes requièrent souvent des aménagements d'horaires ou d'organisation pour gérer la fatigue."},
+  {q:"Quelle phrase est la plus appropriée selon le lexique de l'inclusion ?",opts:["La personne est liée à son fauteuil","Une personne en situation de handicap","Une personne handicapée"],correct:1,exp:"« Personne en situation de handicap » met l'accent sur la personne, pas sur la déficience."}
+];
+let finalAnswers=new Array(finalQuestions.length).fill(null);
+
+function renderFinalQuiz(){
+  const c=document.getElementById('finalquiz-container');
+  c.innerHTML=finalQuestions.map((q,i)=>`
+    <div class="quiz-card final-card" id="fq${i}">
+      <div class="q-label">Question ${i+1} / ${finalQuestions.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">${q.opts.map((o,j)=>`<div class="q-opt" id="fq${i}-${j}" onclick="selectFinal(${i},${j})"><div class="q-opt-letter">${'ABCD'[j]}</div>${o}</div>`).join('')}</div>
+    </div>`).join('');
+}
+function selectFinal(qi,oi){
+  if(finalAnswers[qi]!==null)return;
+  finalAnswers[qi]=oi;
+  finalQuestions[qi].opts.forEach((_,j)=>{const el=document.getElementById(`fq${qi}-${j}`);if(el)el.classList.add('locked');});
+  document.getElementById(`fq${qi}-${oi}`).classList.add('selected');
+  if(finalAnswers.every(a=>a!==null))document.getElementById('btn-final').disabled=false;
+}
+function submitFinal(){
+  state.finalScore=finalAnswers.filter((a,i)=>a===finalQuestions[i].correct).length;
+  state.finalAnswers=[...finalAnswers];
+  goTo(9);
+}
+
+// ═══ RÉSULTATS ═══
+function renderResults(){
+  const sc=state.finalScore;const tot=finalQuestions.length;const pct=Math.round(sc/tot*100);
+  const circle=document.getElementById('score-circle');
+  const color=pct>=70?'#059669':pct>=50?'#d97706':'#dc2626';
+  circle.style.borderColor=color;
+  document.getElementById('score-num').style.color=color;
+  document.getElementById('score-num').textContent=`${sc}/${tot}`;
+  document.getElementById('score-pct').textContent=`${pct}%`;
+  const msgs={ok:'🎉 Félicitations ! Votre sensibilisation est validée.',mid:'⚠️ Score suffisant mais des points sont à revoir.',ko:'❌ Score insuffisant. Nous vous invitons à reprendre les modules.'};
+  const msg=pct>=70?msgs.ok:pct>=50?msgs.mid:msgs.ko;
+  document.getElementById('score-msg').style.color=color;
+  document.getElementById('score-msg').textContent=msg;
+  const date=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('d-name').textContent=`${state.prenom} ${state.nom.toUpperCase()}`;
+  document.getElementById('d-score').textContent=`Score : ${sc} / ${tot} — ${pct}%`;
+  document.getElementById('d-date').textContent=`Le ${date}`;
+  document.getElementById('d-societe').textContent=state.societe||'Muller Automotive';
+}
+
+// ═══ EMAIL ═══
+async function sendResultEmail(){
+  const sc=state.finalScore;const tot=finalQuestions.length;const pct=Math.round(sc/tot*100);
+  const date=new Date().toLocaleString('fr-FR');
+  const token=localStorage.getItem('ma_jwt')||'';
+  try{
+    const r=await fetch('/api/send-sensibilisation',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        prenom:state.prenom,nom:state.nom,email:state.email,
+        societe:state.societe,module:'Inclusion & Handicap',
+        score:sc,total:tot,pct,date,
+        preScore:state.preScore
+      })
+    });
+    if(r.ok){
+      document.getElementById('email-confirm').style.display='block';
+      document.getElementById('btn-send-email').disabled=true;
+      document.getElementById('btn-send-email').textContent='✅ Envoyé';
+    } else { throw new Error(); }
+  } catch {
+    // Fallback mailto
+    const subj=encodeURIComponent(`[Sensibilisation] Inclusion & Handicap — ${state.prenom} ${state.nom} — ${pct}%`);
+    const body=encodeURIComponent(`Résultats de sensibilisation — Inclusion & Handicap\n\nParticipant : ${state.prenom} ${state.nom}\nEmail : ${state.email}\nSociété : ${state.societe||'—'}\n\nScore quiz initial : ${state.preScore} / ${preQuestions.length}\nScore quiz final : ${sc} / ${tot} (${pct}%)\nDate : ${date}\n\nStatut : ${pct>=70?'VALIDÉ':'NON VALIDÉ'}`);
+    window.open(`mailto:formation@mullerautomotive.fr?subject=${subj}&body=${body}`);
+    document.getElementById('email-confirm').style.display='block';
+    document.getElementById('email-confirm').textContent='📧 Votre client mail a été ouvert.';
+  }
+}
+</script>
+</body>
+</html>

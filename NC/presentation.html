@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Notice complète — Système NC Muller Automotive</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#c0392b;--dark:#1a1a1a;--border:#e0e0e0;--bg:#f4f4f6;
+  --blue:#1a6fa0;--orange:#e67e22;--green:#27ae60;--purple:#8e44ad;
+  --gray:#7f8c8d;--teal:#17a2b8;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222;font-size:15px;line-height:1.6}
+
+/* ── NAV LATÉRALE ── */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:260px;flex-shrink:0;background:var(--dark);color:#ccc;position:sticky;top:0;height:100vh;overflow-y:auto;padding:0 0 30px}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:2px solid var(--red);margin-bottom:10px}
+.sidebar-logo h2{color:#fff;font-size:0.88rem;font-weight:700;line-height:1.3}
+.sidebar-logo small{color:#888;font-size:0.7rem}
+.nav-group{padding:6px 0}
+.nav-label{font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#555;padding:8px 16px 4px}
+.nav-item{display:block;padding:7px 16px 7px 22px;font-size:0.78rem;color:#aaa;text-decoration:none;border-left:3px solid transparent;transition:all .15s;cursor:pointer}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.05);border-left-color:#555}
+.nav-item.active{color:#fff;border-left-color:var(--red);background:rgba(192,57,43,.12)}
+.nav-item.sub{padding-left:32px;font-size:0.74rem;color:#777}
+.nav-item.sub:hover,.nav-item.sub.active{color:#ddd}
+
+/* ── CONTENU PRINCIPAL ── */
+.main{flex:1;min-width:0}
+.page-header{background:var(--dark);padding:22px 40px;border-bottom:3px solid var(--red);display:flex;align-items:center;justify-content:space-between}
+.page-header h1{color:#fff;font-size:1.15rem;font-weight:700}
+.page-header small{color:#666;font-size:0.75rem}
+.badge-ver{background:rgba(192,57,43,.2);color:#e07070;border:1px solid rgba(192,57,43,.4);border-radius:12px;font-size:0.7rem;font-weight:700;padding:3px 12px;letter-spacing:.5px}
+
+.content{padding:32px 40px;max-width:1040px}
+
+/* ── TITRES CHAPITRES ── */
+.chapter{margin-bottom:50px;scroll-margin-top:20px}
+.chapter-title{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:12px;border-bottom:2px solid var(--border)}
+.chapter-number{background:var(--dark);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;flex-shrink:0}
+.chapter-title h2{font-size:1.25rem;font-weight:700;color:var(--dark)}
+.chapter-title .chapter-iso{font-size:0.7rem;color:#888;margin-left:auto;font-weight:400}
+h3{font-size:1rem;font-weight:700;color:var(--dark);margin:24px 0 12px;padding-left:10px;border-left:3px solid var(--red)}
+h4{font-size:0.88rem;font-weight:700;color:#444;margin:16px 0 8px}
+
+/* ── BADGES ISO / LNE / OBLIGATOIRE ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:.3px;vertical-align:middle;margin-left:4px}
+.iso{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.lne{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.oblig{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.facul{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db}
+.info{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.profile-badge{padding:3px 10px;border-radius:12px;font-size:0.7rem;font-weight:700;letter-spacing:.3px}
+.pb-public{background:#f3f4f6;color:#374151;border:1px solid #d1d5db}
+.pb-lecteur{background:#dbeafe;color:#1e40af}
+.pb-pilote{background:#fef3c7;color:#92400e}
+.pb-admin{background:#fee2e2;color:#991b1b}
+
+/* ── CARDS & SECTIONS ── */
+.card{background:#fff;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;overflow:hidden}
+.card-head{background:#2b2b2b;color:#fff;padding:10px 16px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:10px}
+.card-body{padding:18px}
+.note{background:#fff8e1;border-left:4px solid #f59e0b;border-radius:0 6px 6px 0;padding:12px 16px;margin:12px 0;font-size:0.83rem;color:#78350f}
+.alert-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 6px 6px 0;padding:12px 16px;margin:12px 0;font-size:0.83rem;color:#7f1d1d}
+.tip{background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 6px 6px 0;padding:12px 16px;margin:12px 0;font-size:0.83rem;color:#14532d}
+.norm-ref{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:0.82rem;color:#1e3a5f}
+.norm-ref strong{display:block;font-size:0.75rem;text-transform:uppercase;letter-spacing:.4px;color:#3b82f6;margin-bottom:4px}
+
+/* ── CHAMPS DOCUMENTÉS ── */
+.field-doc{border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.field-doc-head{background:#f8f8f8;padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.field-doc-name{font-weight:700;font-size:0.88rem;color:var(--dark)}
+.field-doc-body{padding:12px 14px;font-size:0.83rem;color:#444;line-height:1.6}
+.field-doc-body .ex{margin-top:6px;font-style:italic;color:#888;font-size:0.8rem;background:#f9f9f9;border-radius:4px;padding:4px 8px}
+.field-doc-body .norme{margin-top:6px;font-size:0.75rem;color:#1e40af}
+
+/* ── STATUTS ── */
+.status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0}
+.status-card{border-radius:8px;padding:12px 14px;text-align:center;border:2px solid}
+.s-ouvert{background:#fef3e8;border-color:#e67e22;color:#b45309}
+.s-encours{background:#e8f4fd;border-color:#2980b9;color:#1e40af}
+.s-resolu{background:#e8f8ef;border-color:#27ae60;color:#065f46}
+.s-clos{background:#f4f4f4;border-color:#7f8c8d;color:#374151}
+.s-nonpert{background:#f5eef8;border-color:#8e44ad;color:#6b21a8}
+.status-card .s-icon{font-size:1.5rem;display:block;margin-bottom:4px}
+.status-card .s-name{font-weight:700;font-size:0.82rem;display:block;margin-bottom:2px}
+.status-card .s-desc{font-size:0.72rem;line-height:1.4}
+
+/* ── FLUX WORKFLOW ── */
+.workflow{display:flex;align-items:center;gap:0;margin:16px 0;flex-wrap:wrap}
+.wf-step{background:#fff;border:2px solid var(--border);border-radius:8px;padding:10px 14px;text-align:center;min-width:110px;font-size:0.78rem}
+.wf-step strong{display:block;font-size:0.82rem;margin-bottom:2px}
+.wf-arrow{color:#999;font-size:1.2rem;padding:0 6px;flex-shrink:0}
+.wf-step.wf-create{border-color:#e67e22;background:#fef3e8;color:#b45309}
+.wf-step.wf-qualify{border-color:#2980b9;background:#e8f4fd;color:#1e40af}
+.wf-step.wf-treat{border-color:#8e44ad;background:#f5eef8;color:#6b21a8}
+.wf-step.wf-close{border-color:#27ae60;background:#e8f8ef;color:#065f46}
+
+/* ── CAPA TYPES ── */
+.capa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.capa-card{border-radius:8px;padding:12px 14px;font-size:0.82rem}
+.capa-imm{background:#e0f7fa;border:2px solid #17a2b8;color:#0e4c5c}
+.capa-cur{background:#e0f7fa;border:2px solid #00bcd4;color:#006064}
+.capa-cor{background:#fef3e8;border:2px solid #e67e22;color:#7c3400}
+.capa-prev{background:#f3e8ff;border:2px solid #8e44ad;color:#4a1272}
+.capa-card strong{display:block;margin-bottom:4px;font-size:0.85rem}
+
+/* ── INDICATEURS KPI ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0}
+.kpi-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;border-top:3px solid var(--dark)}
+.kpi-card .kv{font-size:1.6rem;font-weight:800;color:var(--dark)}
+.kpi-card .kl{font-size:0.7rem;color:#888;text-transform:uppercase;letter-spacing:.3px;margin-top:4px}
+.kpi-card .kb{font-size:0.72rem;color:var(--blue);margin-top:4px}
+.kpi-card.kpi-alert{border-top-color:var(--red)}
+.kpi-card.kpi-warn{border-top-color:var(--orange)}
+.kpi-card.kpi-ok{border-top-color:var(--green)}
+
+/* ── TABLE NORMES ── */
+.norm-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin:12px 0}
+.norm-table th{background:#2b2b2b;color:#fff;padding:9px 12px;text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:.4px}
+.norm-table td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.norm-table tr:hover td{background:#fafafa}
+.norm-table .ref{font-family:monospace;font-weight:700;color:var(--blue);font-size:0.78rem}
+.norm-table .lne-ref{color:#065f46;font-weight:700}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:relative;padding-bottom:10px}
+  .content{padding:20px 18px}
+}
+@media print{
+  .sidebar{display:none}
+  .main{width:100%}
+  .content{padding:20px}
+  .chapter{page-break-inside:avoid}
+}
+
+/* ── COUVERTURE ── */
+.cover{background:linear-gradient(135deg,#1a1a1a 60%,#2b2b2b 100%);color:#fff;padding:60px 40px;text-align:center;border-bottom:4px solid var(--red)}
+.cover h1{font-size:2rem;font-weight:800;margin-bottom:8px;line-height:1.2}
+.cover h1 span{color:var(--red)}
+.cover .cover-sub{font-size:1rem;color:#aaa;margin-bottom:30px}
+.cover-meta{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;font-size:0.82rem;color:#666}
+.cover-meta div{text-align:center}
+.cover-meta strong{display:block;color:#ccc;margin-bottom:2px}
+.profiles-row{display:flex;justify-content:center;gap:10px;margin-top:24px;flex-wrap:wrap}
+.profiles-row .pr{padding:8px 20px;border-radius:20px;font-size:0.8rem;font-weight:700;border:2px solid}
+.pr-pub{background:rgba(255,255,255,.08);border-color:#666;color:#aaa}
+.pr-lec{background:rgba(26,111,160,.15);border-color:#2980b9;color:#7ec8f0}
+.pr-pil{background:rgba(230,126,34,.15);border-color:#e67e22;color:#f0c070}
+.pr-adm{background:rgba(192,57,43,.15);border-color:#c0392b;color:#f07070}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h2>🔧 Muller Automotive</h2>
+    <small>Système NC — Notice complète v1 · 2026</small>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Sommaire</div>
+    <a class="nav-item" href="#ch0">📄 Introduction & accès</a>
+    <a class="nav-item" href="#ch1">1 · Vue d'ensemble</a>
+    <a class="nav-item" href="#ch2">2 · Formulaire de déclaration</a>
+    <a class="nav-item sub" href="#ch2-ident">Identification</a>
+    <a class="nav-item sub" href="#ch2-produit">Produit</a>
+    <a class="nav-item sub" href="#ch2-client">Client</a>
+    <a class="nav-item sub" href="#ch2-probleme">Problème</a>
+    <a class="nav-item sub" href="#ch2-traitement">Traitement</a>
+    <a class="nav-item sub" href="#ch2-suivi">Suivi public</a>
+    <a class="nav-item" href="#ch3">3 · Profil Lecteur</a>
+    <a class="nav-item sub" href="#ch3-dashboard">Tableau de bord</a>
+    <a class="nav-item sub" href="#ch3-liste">Liste NC</a>
+    <a class="nav-item sub" href="#ch3-fiche">Fiche NC (lecture)</a>
+    <a class="nav-item" href="#ch4">4 · Profil Chef Produit</a>
+    <a class="nav-item sub" href="#ch4-dashboard">Tableau de bord pilote</a>
+    <a class="nav-item sub" href="#ch4-capa">Actions CAPA</a>
+    <a class="nav-item sub" href="#ch4-5p">5 Pourquoi</a>
+    <a class="nav-item sub" href="#ch4-ishi">Ishikawa</a>
+    <a class="nav-item" href="#ch5">5 · Profil Administrateur</a>
+    <a class="nav-item sub" href="#ch5-dashboard">Tableau de bord</a>
+    <a class="nav-item sub" href="#ch5-liste">Liste & filtres</a>
+    <a class="nav-item sub" href="#ch5-fiche">Fiche NC complète</a>
+    <a class="nav-item sub" href="#ch5-cloture">Clôture NC</a>
+    <a class="nav-item sub" href="#ch5-stats">Statistiques avancées</a>
+    <a class="nav-item sub" href="#ch5-users">Gestion utilisateurs</a>
+    <a class="nav-item sub" href="#ch5-config">Configuration</a>
+    <a class="nav-item" href="#ch6">6 · NC Parents (groupement)</a>
+    <a class="nav-item" href="#ch7">7 · Tableau normatif ISO/LNE</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- COUVERTURE -->
+<div class="cover" id="ch0">
+  <h1>Système de gestion des<br><span>Non-Conformités</span></h1>
+  <div class="cover-sub">Muller Automotive — Notice utilisateur, audit ISO 9001:2015 &amp; LNE</div>
+  <div class="cover-meta">
+    <div><strong>Version</strong>v1 — 01/05/2026</div>
+    <div><strong>Référentiel</strong>ISO 9001:2015 · LNE</div>
+    <div><strong>Portée</strong>SAV / Qualité / Terrain</div>
+    <div><strong>URL production</strong>formation-sav.fr</div>
+  </div>
+  <div class="profiles-row">
+    <div class="pr pr-pub">👤 Déclarant public</div>
+    <div class="pr pr-lec">👁 Lecteur</div>
+    <div class="pr pr-pil">🔧 Chef Produit / Pilote</div>
+    <div class="pr pr-adm">⚙ Administrateur</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══════════════════ CH 1 — VUE D'ENSEMBLE ══════════════════ -->
+<div class="chapter" id="ch1">
+  <div class="chapter-title">
+    <div class="chapter-number">1</div>
+    <h2>Vue d'ensemble du système NC</h2>
+    <div class="chapter-iso">ISO 9001:2015 §8.7 · §10.2</div>
+  </div>
+
+  <div class="norm-ref">
+    <strong>Exigences normatives couvertes par ce système</strong>
+    <b>ISO 9001:2015 §8.7</b> — Maîtrise des éléments de sortie non conformes : identifier, documenter, décider du traitement.<br>
+    <b>ISO 9001:2015 §10.2</b> — Non-conformité et actions correctives : réagir, analyser, agir, vérifier l'efficacité, conserver les preuves.<br>
+    <b>ISO 9001:2015 §10.2.2</b> — Informations documentées : conserver la nature de la NC, les actions menées, les résultats obtenus.<br>
+    <b>LNE</b> — Traçabilité des défauts sur équipements de mesure/contrôle certifiés ; documentation des actions correctives pour maintien d'accréditation.
+  </div>
+
+  <h3>Flux global d'une non-conformité</h3>
+  <div class="workflow">
+    <div class="wf-step wf-create"><strong>1. Déclaration</strong>Formulaire public<br><small>→ statut OUVERT</small></div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step wf-qualify"><strong>2. Qualification</strong>Admin reçoit &amp; traite<br><small>→ statut EN COURS</small></div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step wf-treat"><strong>3. Traitement CAPA</strong>Pilote répond aux actions<br><small>→ 5P · Ishikawa</small></div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step wf-close"><strong>4. Clôture</strong>Admin valide &amp; clôture<br><small>→ statut CLOS</small></div>
+  </div>
+
+  <h3>Les 5 statuts NC</h3>
+  <div class="status-grid">
+    <div class="status-card s-ouvert"><span class="s-icon">🟠</span><span class="s-name">OUVERT</span><span class="s-desc">Déclaration reçue, non encore prise en charge</span></div>
+    <div class="status-card s-encours"><span class="s-icon">🔵</span><span class="s-name">EN COURS</span><span class="s-desc">Qualification faite, traitement en cours</span></div>
+    <div class="status-card s-resolu"><span class="s-icon">🟢</span><span class="s-name">RÉSOLU</span><span class="s-desc">Solution apportée, en attente de validation</span></div>
+    <div class="status-card s-clos"><span class="s-icon">⚫</span><span class="s-name">CLOS</span><span class="s-desc">Validé définitivement, archivé ISO §10.2.2</span></div>
+    <div class="status-card s-nonpert"><span class="s-icon">🟣</span><span class="s-name">NON PERTINENT</span><span class="s-desc">NC écartée après examen — tracée au journal</span></div>
+  </div>
+
+  <h3>Accès et URL</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px;width:40%"><strong>Formulaire de déclaration</strong> <span class="profile-badge pb-public">Public</span></td><td style="padding:8px;font-family:monospace;color:var(--blue)">https://formation-sav.fr/NC/index.html</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px"><strong>Console de suivi</strong> <span class="profile-badge pb-lecteur">Lecteur</span> <span class="profile-badge pb-pilote">Pilote</span> <span class="profile-badge pb-admin">Admin</span></td><td style="padding:8px;font-family:monospace;color:var(--blue)">https://formation-sav.fr/NC/console.html</td></tr>
+        <tr><td style="padding:8px"><strong>Connexion console</strong></td><td style="padding:8px;font-family:monospace;color:var(--blue)">https://formation-sav.fr/NC/login.html</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="note">📧 À chaque étape clé du cycle de vie, le système envoie automatiquement un email : au pôle qualité (création, clôture), au pilote assigné (nouvelle action), au rédacteur (changement de statut). Les notifications sont configurables par l'administrateur.</div>
+</div>
+
+<!-- ══════════════════ CH 2 — FORMULAIRE ══════════════════ -->
+<div class="chapter" id="ch2">
+  <div class="chapter-title">
+    <div class="chapter-number">2</div>
+    <h2>Formulaire de déclaration <span class="profile-badge pb-public" style="margin-left:8px">Public — sans connexion</span></h2>
+    <div class="chapter-iso">ISO §8.7.1 · §10.2.1</div>
+  </div>
+
+  <p style="margin-bottom:16px;font-size:0.88rem;color:#555">Le formulaire est accessible sans authentification. Il constitue le point d'entrée de toute non-conformité dans le système. Chaque soumission crée une NC au statut <strong>Ouvert</strong> et envoie un email de notification au pôle qualité.</p>
+
+  <div class="norm-ref">
+    <strong>ISO 9001:2015 §10.2.1 — Obligation</strong>
+    L'organisme doit <em>réagir à la non-conformité, en maîtrise les conséquences</em> et <em>évaluer le besoin d'actions pour en éliminer la cause</em>. La déclaration documentée est la première étape de cette réaction.
+  </div>
+
+  <!-- IDENTIFICATION -->
+  <h3 id="ch2-ident">Section Identification</h3>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Rédacteur</span><span class="badge oblig">Obligatoire</span></div>
+    <div class="field-doc-body">
+      Prénom et nom de la personne qui déclare la NC. Permet de contacter le déclarant pour précisions. Ce champ est conservé dans le journal d'audit horodaté.
+      <div class="ex">Ex : Jean Dupont · Anne-Sophie Martin</div>
+      <div class="norme">ISO §10.2.2 — Informations documentées : qui a déclaré, quand, quoi.</div>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Date de découverte</span><span class="badge oblig">Obligatoire</span></div>
+    <div class="field-doc-body">
+      Date réelle à laquelle le problème a été constaté (peut différer de la date de saisie). Utilisée pour calculer les délais de traitement et alimenter les statistiques mensuelles.
+      <div class="ex">Ex : 05/05/2026 (jour de la constatation terrain, même si la saisie est faite 2 jours plus tard)</div>
+      <div class="norme">ISO §10.2.2 — Traçabilité temporelle obligatoire.</div>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Email rédacteur</span><span class="badge oblig">Obligatoire</span></div>
+    <div class="field-doc-body">
+      Adresse email du déclarant. Utilisée pour lui envoyer les notifications de changement de statut (prise en charge, résolution, clôture). Permet de maintenir le lien entre qualité et terrain.
+      <div class="ex">Ex : j.dupont@clientxyz.fr</div>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Périmètre concerné</span><span class="badge oblig">Obligatoire</span><span class="badge iso">ISO §8.7</span></div>
+    <div class="field-doc-body">
+      Zone de l'organisation où la NC est apparue. Permet d'orienter le traitement vers le bon responsable et d'alimenter les statistiques par périmètre.
+      <table style="width:100%;font-size:0.78rem;margin-top:8px;border-collapse:collapse">
+        <thead><tr style="background:#f5f5f5"><th style="padding:5px 8px;text-align:left">Valeur</th><th style="padding:5px 8px;text-align:left">Cas d'usage typique</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:5px 8px"><strong>SAV / Installation terrain</strong></td><td style="padding:5px 8px">Technicien constate un défaut chez le client</td></tr>
+          <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:5px 8px"><strong>Garantie / Retour client</strong></td><td style="padding:5px 8px">Produit retourné avec défaut constaté client</td></tr>
+          <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:5px 8px"><strong>Fabrication / Production</strong></td><td style="padding:5px 8px">Défaut détecté en atelier avant expédition</td></tr>
+          <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:5px 8px"><strong>Logistique / Transport</strong></td><td style="padding:5px 8px">Colis endommagé, erreur d'envoi</td></tr>
+          <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:5px 8px"><strong>Approvisionnement / Réception</strong></td><td style="padding:5px 8px">Pièce reçue non conforme fournisseur</td></tr>
+          <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:5px 8px"><strong>Bureau d'études / Développement</strong></td><td style="padding:5px 8px">Erreur de conception ou de spécification</td></tr>
+          <tr><td style="padding:5px 8px"><strong>Logistique / Entrepôt</strong></td><td style="padding:5px 8px">Erreur de préparation, inventaire</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Source de détection</span><span class="badge oblig">Obligatoire</span><span class="badge lne">LNE</span></div>
+    <div class="field-doc-body">
+      Comment le problème a été découvert. Donnée clé pour l'analyse LNE et ISO : permet d'évaluer l'efficacité du système de contrôle interne versus les remontées clients.
+      <div class="ex">Signalement client → détection externe (à réduire) · Contrôle final avant expédition → détection interne (à augmenter)</div>
+      <div class="norme">LNE — Traçabilité du mode de détection pour analyse d'efficacité du contrôle qualité.</div>
+    </div>
+  </div>
+
+  <!-- PRODUIT -->
+  <h3 id="ch2-produit">Section Produit</h3>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Référence produit</span><span class="badge oblig">Obligatoire</span></div>
+    <div class="field-doc-body">Référence interne Muller du produit concerné. Permet la recherche et le regroupement de NC par référence dans les statistiques.<div class="ex">Ex : XG_VL · BF_PL_PRO · GEO_3D</div></div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Famille de produit</span><span class="badge oblig">Obligatoire</span><span class="badge iso">ISO §9.1.3</span></div>
+    <div class="field-doc-body">
+      Catégorie technologique du produit. Utilisée pour toutes les statistiques agrégées (NC par famille, coûts par famille). La liste est configurable par l'administrateur.
+      <div class="ex">Familles disponibles : BANC FREINAGE VL · GÉOMÉTRIE · PONT · DIAG · CLIMATISATION · OPACIMÈTRE · BANC TACHY · (28 familles total)</div>
+      <div class="norme">ISO §9.1.3 — Analyse et évaluation des données : répartition des NC par produit.</div>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">N° de série</span><span class="badge oblig">Obligatoire</span><span class="badge lne">LNE</span></div>
+    <div class="field-doc-body">
+      Numéro de série de l'équipement concerné. <strong>Critique pour la LNE</strong> : en cas d'accréditation, chaque équipement certifié doit avoir ses NC tracées individuellement par n° de série.
+      <div class="ex">Ex : MA-2024-00342 · BF-VL-0892</div>
+      <div class="norme">LNE — Identification univoque de l'équipement pour traçabilité métrologique.</div>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">N° de commande</span><span class="badge facul">Facultatif</span></div>
+    <div class="field-doc-body">Référence de la commande d'achat liée. Utile pour le suivi commercial et la garantie.<div class="ex">Ex : CMD-2026-01872</div></div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Version programme</span><span class="badge facul">Facultatif</span></div>
+    <div class="field-doc-body">Version du logiciel embarqué si le produit en possède un. Essentiel pour les familles SOFT LCT, SOFT POLL, DIAG.<div class="ex">Ex : v2.4.1 · v3.0.0-beta</div></div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Quantité d'unités concernées</span><span class="badge facul">Facultatif</span></div>
+    <div class="field-doc-body">Nombre d'équipements affectés par ce défaut. Si plusieurs équipements présentent le même problème, renseignez le total — déclenche l'analyse NC Parent.<div class="ex">Ex : 3 (si 3 bancs de freinage présentent le même défaut)</div></div>
+  </div>
+
+  <!-- CLIENT -->
+  <h3 id="ch2-client">Section Client</h3>
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Nom client</span><span class="badge oblig">Obligatoire</span></div>
+    <div class="field-doc-body">Raison sociale du client chez qui le problème est apparu. Permet le suivi client et les statistiques par compte.<div class="ex">Ex : Garage Central Lyon · CT Rennes Nord · Auto-École Bordeaux</div></div>
+  </div>
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Code SAP</span><span class="badge facul">Facultatif</span></div>
+    <div class="field-doc-body">Code client dans l'ERP SAP. Permet le lien avec les systèmes de gestion interne Muller.<div class="ex">Ex : FR001234</div></div>
+  </div>
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Code postal / Ville / Pays</span><span class="badge facul">Facultatif</span></div>
+    <div class="field-doc-body">Localisation du client. Utile pour planifier les interventions terrain et les statistiques géographiques.<div class="ex">Ex : 69001 · Lyon · France</div></div>
+  </div>
+
+  <!-- PROBLÈME -->
+  <h3 id="ch2-probleme">Section Caractérisation du problème</h3>
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Description du problème</span><span class="badge oblig">Obligatoire</span><span class="badge iso">ISO §10.2.2</span></div>
+    <div class="field-doc-body">
+      <strong>Champ le plus critique du formulaire.</strong> Décrire avec précision : symptôme observé, conditions d'apparition (fréquence, conditions environnementales), impact sur l'utilisation du produit.<br><br>
+      <strong>À renseigner :</strong>
+      <ul style="margin:6px 0 6px 20px;font-size:0.82rem">
+        <li>Quel est exactement le symptôme ? (message d'erreur, mesure fausse, composant cassé…)</li>
+        <li>Quand apparaît-il ? (systématiquement, aléatoirement, sous quelle condition)</li>
+        <li>Depuis quand ? Quel impact opérationnel ?</li>
+      </ul>
+      <div class="ex">Ex : "Le banc de freinage VL affiche une erreur E304 lors de chaque test au-delà de 120 km/h simulé. Le problème est apparu après la mise à jour v2.4.1 il y a 3 semaines. Le centre technique ne peut plus effectuer ses contrôles techniques sur les véhicules rapides."</div>
+      <div class="norme">ISO §10.2.2 — Conserver informations documentées sur la <em>nature de la non-conformité</em>.</div>
+    </div>
+  </div>
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Photos / Vidéos du problème</span><span class="badge facul">Facultatif</span><span class="badge info">Fortement recommandé</span></div>
+    <div class="field-doc-body">
+      Pièces jointes multimédias illustrant le problème. Le système accepte JPG, PNG, MP4, MOV jusqu'à 200 Mo par fichier. Depuis mobile, le bouton "📸 Prendre une photo" active directement l'appareil photo.
+      <div class="tip" style="margin-top:8px">💡 Une photo vaut mieux qu'un long texte. Photographiez l'écran d'erreur, le composant défaillant, le résultat de mesure aberrant.</div>
+    </div>
+  </div>
+
+  <!-- TRAITEMENT -->
+  <h3 id="ch2-traitement">Section Traitement (optionnel à la déclaration)</h3>
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Description de la réparation</span><span class="badge facul">Facultatif</span></div>
+    <div class="field-doc-body">Si le technicien terrain a déjà effectué une réparation ou un contournement, le décrire ici. Ces informations aident le pôle qualité à évaluer si la solution est pérenne ou si une action corrective formelle est nécessaire.<div class="ex">Ex : "Remplacement du capteur de vitesse ref. CA-892. Équipement fonctionnel après remplacement."</div></div>
+  </div>
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Suggestion d'amélioration</span><span class="badge facul">Facultatif</span></div>
+    <div class="field-doc-body">Proposition du déclarant pour éviter la récurrence. Toute suggestion est précieuse et sera examinée lors de l'analyse CAPA.<div class="ex">Ex : "Prévoir une vérification automatique du capteur lors de la mise à jour logicielle."</div></div>
+  </div>
+
+  <!-- SUIVI PUBLIC -->
+  <h3 id="ch2-suivi">Suivi d'une NC existante (sans connexion)</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      Le formulaire intègre un module de suivi public. En saisissant son numéro de NC (format <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px">260405-00001</code>), tout déclarant peut consulter :
+      <ul style="margin:8px 0 0 20px">
+        <li>Le statut actuel (Ouvert / En cours / Résolu / Clos)</li>
+        <li>L'historique des changements de statut avec dates</li>
+        <li>Les commentaires publics ajoutés par l'équipe qualité</li>
+      </ul>
+      <div class="note" style="margin-top:10px">Les informations sensibles (analyse cause racine, coûts, actions internes) ne sont jamais visibles en accès public. Seul le statut et l'historique public sont exposés.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ CH 3 — LECTEUR ══════════════════ -->
+<div class="chapter" id="ch3">
+  <div class="chapter-title">
+    <div class="chapter-number">3</div>
+    <h2>Profil Lecteur <span class="profile-badge pb-lecteur" style="margin-left:8px">Lecture seule</span></h2>
+  </div>
+
+  <p style="margin-bottom:16px;font-size:0.88rem;color:#555">Le lecteur accède à la console NC après connexion. Il peut consulter toutes les NC, les statistiques et les fiches, mais ne peut effectuer aucune modification. Idéal pour les managers, responsables de site, auditeurs en lecture.</p>
+
+  <h3 id="ch3-dashboard">Onglet Tableau de bord</h3>
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-alert"><div class="kv">N</div><div class="kl">NC ouvertes</div><div class="kb">À traiter en priorité</div></div>
+    <div class="kpi-card kpi-warn"><div class="kv">N</div><div class="kl">En cours</div><div class="kb">En traitement actif</div></div>
+    <div class="kpi-card kpi-ok"><div class="kv">N</div><div class="kl">Résolues</div><div class="kb">En attente validation</div></div>
+    <div class="kpi-card"><div class="kv">N</div><div class="kl">Closes</div><div class="kb">Archivées §10.2.2</div></div>
+    <div class="kpi-card"><div class="kv">X €</div><div class="kl">Coût total NC closes</div><div class="kb">Hors satellites</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">📊 Graphiques du tableau de bord</div>
+    <div class="card-body" style="font-size:0.85rem">
+      <table style="width:100%;border-collapse:collapse;font-size:0.83rem">
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px;width:35%"><strong>NC par famille de produit</strong></td><td style="padding:8px">Barres horizontales — identifie les produits les plus touchés</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px"><strong>NC par mois</strong></td><td style="padding:8px">Histogramme mensuel — détecte les tendances et saisonnalités</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px"><strong>NC par périmètre</strong></td><td style="padding:8px">Répartition SAV / Fabrication / Logistique / etc.</td></tr>
+        <tr><td style="padding:8px"><strong>NC récentes (liste rapide)</strong></td><td style="padding:8px">5 dernières NC reçues — accès direct à la fiche</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3 id="ch3-liste">Onglet Liste des NC</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      <strong>Filtres disponibles :</strong>
+      <ul style="margin:8px 0 0 20px">
+        <li>Sélection de l'année (2024 / 2025 / 2026 / Toutes)</li>
+        <li>Statut (Ouvert / En cours / Résolu / Clos / Non pertinent)</li>
+        <li>Famille de produit</li>
+        <li>Périmètre</li>
+        <li>Recherche texte libre (numéro, client, référence)</li>
+        <li>Filtre type NC : Standards / NC Parents / Satellites / Toutes</li>
+      </ul>
+      <br>
+      <strong>Colonnes affichées :</strong> Numéro · Date · Client · Famille · Périmètre · Statut · Durée<br><br>
+      <strong>Numérotation NC :</strong> Format <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px">AAMMJJ-NNNNN</code> — ex : <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px">260405-00001</code> = 1ère NC du 5 avril 2026.<br>
+      <strong>NC Parents :</strong> préfixe <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px">NC-P-</code> · Satellites affichent un badge 📋 avec le numéro parent.
+    </div>
+  </div>
+
+  <h3 id="ch3-fiche">Fiche NC (lecture)</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      En cliquant sur une ligne de la liste, la fiche complète s'affiche en panneau latéral. Le lecteur voit :<br><br>
+      <ul style="margin:0 0 0 20px">
+        <li>Toutes les informations de déclaration (identification, produit, client, problème)</li>
+        <li>L'historique complet (journal d'audit horodaté ISO §10.2.2)</li>
+        <li>Les actions CAPA définies et leur statut (répondu / en attente)</li>
+        <li>L'analyse 5 Pourquoi et la cause racine (si renseignée)</li>
+        <li>Les pièces jointes photos/vidéos</li>
+        <li>Le commentaire et type de cause de clôture</li>
+      </ul>
+      <div class="note" style="margin-top:10px">Le lecteur ne voit PAS les boutons d'action (changer statut, assigner pilote, ajouter action). Les champs sont en lecture seule.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ CH 4 — CHEF PRODUIT ══════════════════ -->
+<div class="chapter" id="ch4">
+  <div class="chapter-title">
+    <div class="chapter-number">4</div>
+    <h2>Profil Chef Produit / Pilote <span class="profile-badge pb-pilote" style="margin-left:8px">Rôle nc_chef_produit</span></h2>
+    <div class="chapter-iso">ISO §10.2.1c · §10.2.1d · LNE</div>
+  </div>
+
+  <div class="norm-ref">
+    <strong>ISO 9001:2015 §10.2.1c — Obligation du pilote</strong>
+    <em>«Mettre en œuvre les actions nécessaires, y compris les actions correctives»</em> — Le chef produit est responsable de la réponse aux actions CAPA qui lui sont assignées. Sa réponse documentée constitue une preuve d'audit.
+  </div>
+
+  <h3 id="ch4-dashboard">Tableau de bord personnalisé du pilote</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      Le pilote dispose d'un tableau de bord filtré sur <strong>ses NC assignées uniquement</strong>. Il voit :
+      <ul style="margin:8px 0 0 20px">
+        <li>Le nombre d'actions CAPA en attente de sa réponse</li>
+        <li>Les NC où il est assigné comme pilote responsable</li>
+        <li>Les alertes de retard sur les actions non répondues</li>
+      </ul>
+      <div class="alert-box" style="margin-top:10px">⚠️ Le pilote ne peut PAS créer de NC, changer les statuts, modifier la qualification, accéder à la configuration ou gérer les utilisateurs. Son périmètre est limité à la réponse aux actions qui lui sont assignées.</div>
+    </div>
+  </div>
+
+  <h3 id="ch4-capa">Répondre à une action CAPA</h3>
+  <p style="font-size:0.88rem;color:#555;margin-bottom:12px">L'administrateur crée des actions et les assigne au pilote. Le pilote reçoit un email, accède à la fiche NC, et doit renseigner sa réponse.</p>
+
+  <div class="capa-grid">
+    <div class="capa-card capa-imm">
+      <strong>⚡ Action Immédiate</strong>
+      Réaction rapide pour contenir le problème. À effectuer dans les heures/jours suivant la NC.<br>
+      <small style="margin-top:4px;display:block">Ex : mise en quarantaine du lot, retrait du produit, contournement provisoire</small>
+    </div>
+    <div class="capa-card capa-cur">
+      <strong>🔧 Action Curative</strong>
+      Correction du problème sur le produit/client affecté. Traitement direct de la NC déclarée.<br>
+      <small style="margin-top:4px;display:block">Ex : remplacement de pièce, mise à jour logicielle, recalibration</small>
+    </div>
+    <div class="capa-card capa-cor">
+      <strong>🔄 Action Corrective</strong>
+      Élimination de la cause racine pour éviter la récurrence. Action la plus importante ISO.<br>
+      <small style="margin-top:4px;display:block">Ex : modification du process de test, mise à jour procédure, formation</small>
+    </div>
+    <div class="capa-card capa-prev">
+      <strong>🛡 Action Préventive</strong>
+      Prévention d'une NC potentielle identifiée par l'analyse. ISO §10.2.1e.<br>
+      <small style="margin-top:4px;display:block">Ex : révision des points de contrôle, ajout d'un test automatisé</small>
+    </div>
+  </div>
+
+  <div class="norm-ref">
+    <strong>Champs obligatoires de réponse CAPA — ISO §10.2.2</strong>
+    Chaque réponse doit contenir : <em>la description détaillée de l'action effectuée</em>, la <em>date de réalisation</em>, et optionnellement des <em>pièces jointes justificatives</em>. Ces éléments sont conservés horodatés dans le journal d'audit.
+  </div>
+
+  <h3 id="ch4-5p">Analyse 5 Pourquoi <span class="badge iso">ISO §10.2.1b</span></h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      <p>La méthode des 5 Pourquoi permet d'atteindre la <strong>cause racine</strong> d'une NC en remontant la chaîne causale. Elle est accessible dans la fiche NC et peut être renseignée par le pilote ou l'admin.</p>
+      <br>
+      <table style="width:100%;border-collapse:collapse;font-size:0.82rem">
+        <tr style="background:#f5f5f5;font-weight:700"><td style="padding:7px 10px">Niveau</td><td style="padding:7px 10px">Question</td><td style="padding:7px 10px">Exemple (banc freinage)</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>P1</strong></td><td style="padding:7px 10px">Pourquoi le problème est-il apparu ?</td><td style="padding:7px 10px">Le capteur de vitesse retourne une valeur erronée</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>P2</strong></td><td style="padding:7px 10px">Pourquoi le capteur retourne une valeur erronée ?</td><td style="padding:7px 10px">Sa plage de mesure est dépassée à haute vitesse</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>P3</strong></td><td style="padding:7px 10px">Pourquoi sa plage est dépassée ?</td><td style="padding:7px 10px">La mise à jour v2.4.1 a modifié l'échelle sans validation</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>P4</strong></td><td style="padding:7px 10px">Pourquoi sans validation ?</td><td style="padding:7px 10px">Pas de test automatisé sur les cas extrêmes</td></tr>
+        <tr><td style="padding:7px 10px"><strong>P5</strong></td><td style="padding:7px 10px">Pourquoi pas de test extrême ?</td><td style="padding:7px 10px">Les plans de test ne couvrent pas les vitesses > 100 km/h</td></tr>
+      </table>
+      <div style="background:#1a1a1a;color:#fff;border-radius:6px;padding:10px 14px;margin-top:10px;font-size:0.82rem">
+        <strong>→ Cause racine identifiée :</strong> Plans de test incomplets, absence de couverture haute vitesse<br>
+        <strong>→ Action corrective :</strong> Mettre à jour le plan de tests pour couvrir 0-180 km/h
+      </div>
+      <div class="norme" style="margin-top:8px;color:var(--blue)">ISO §10.2.1b — Évaluer le besoin d'actions pour éliminer la cause de la NC.</div>
+    </div>
+  </div>
+
+  <h3 id="ch4-ishi">Diagramme Ishikawa (5M) <span class="badge lne">LNE</span></h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      <p>Le diagramme causes-effet (Ishikawa) structure l'analyse en 5 familles de causes. Au moins une cause doit être renseignée pour valider l'analyse (obligation LNE).</p>
+      <br>
+      <table style="width:100%;border-collapse:collapse;font-size:0.82rem">
+        <tr style="background:#2b2b2b;color:#fff"><th style="padding:7px 10px">Catégorie</th><th style="padding:7px 10px">Description</th><th style="padding:7px 10px">Exemple NC équipement</th></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>🧑 Homme</strong></td><td style="padding:7px 10px">Compétences, formation, erreur humaine</td><td style="padding:7px 10px">Technicien non formé sur la nouvelle version</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>🔩 Machine</strong></td><td style="padding:7px 10px">Équipement, outil, maintenance</td><td style="padding:7px 10px">Capteur hors plage, usure prématurée</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>📦 Matière</strong></td><td style="padding:7px 10px">Composants, matériaux, qualité fournisseur</td><td style="padding:7px 10px">Pièce de rechange non conforme fournisseur</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>📋 Méthode</strong></td><td style="padding:7px 10px">Procédure, processus, instruction</td><td style="padding:7px 10px">Procédure de mise à jour sans test validation</td></tr>
+        <tr><td style="padding:7px 10px"><strong>🌡 Milieu</strong></td><td style="padding:7px 10px">Environnement, conditions d'utilisation</td><td style="padding:7px 10px">Température excessive dans le local de contrôle</td></tr>
+      </table>
+      <div class="norm-ref" style="margin-top:10px">
+        <strong>LNE — Exigence diagnostic</strong>
+        L'analyse Ishikawa documentée constitue la preuve que l'organisme a <em>recherché et identifié les causes systémiques</em>, non seulement le symptôme. Obligatoire pour le maintien des accréditations LNE sur équipements de mesure.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ CH 5 — ADMIN ══════════════════ -->
+<div class="chapter" id="ch5">
+  <div class="chapter-title">
+    <div class="chapter-number">5</div>
+    <h2>Profil Administrateur <span class="profile-badge pb-admin" style="margin-left:8px">Rôle nc_admin — Accès total</span></h2>
+    <div class="chapter-iso">ISO §10.2 complet · §9.1.3 · LNE</div>
+  </div>
+
+  <p style="font-size:0.88rem;color:#555;margin-bottom:16px">L'administrateur dispose de tous les droits : qualification des NC, gestion du cycle de vie, statistiques avancées, gestion des utilisateurs et configuration du système. Comptes admin actuels : <strong>Matsupport</strong>, <strong>Estelle Gouache</strong>.</p>
+
+  <!-- DASHBOARD ADMIN -->
+  <h3 id="ch5-dashboard">Onglet 📊 Tableau de bord (admin)</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      Identique à celui du lecteur, mais avec en plus :
+      <ul style="margin:8px 0 0 20px">
+        <li>Accès aux boutons d'action rapide sur les NC urgentes</li>
+        <li>Indicateur des actions CAPA en retard (toutes NC, tous pilotes)</li>
+        <li>Coût total des NC closes de l'année (satellites exclus pour éviter le double-comptage)</li>
+        <li>Vue des 5 NC les plus récentes avec accès direct à la fiche</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LISTE ADMIN -->
+  <h3 id="ch5-liste">Onglet 📋 Liste des NC</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      <strong>Fonctions supplémentaires admin (vs lecteur) :</strong>
+      <ul style="margin:8px 0 0 20px">
+        <li>Bouton <strong>+ Nouvelle NC</strong> — créer une NC directement depuis la console</li>
+        <li>Accès complet à la fiche avec tous les champs éditables</li>
+        <li>Clic sur une ligne → panneau fiche complète en mode édition</li>
+        <li>Export PDF de la fiche NC</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FICHE NC ADMIN -->
+  <h3 id="ch5-fiche">Fiche NC complète (vue admin)</h3>
+  <p style="font-size:0.88rem;color:#555;margin-bottom:12px">La fiche NC est le cœur du système. L'administrateur peut agir sur tous les blocs suivants :</p>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Changement de statut</span><span class="badge oblig">Action admin</span><span class="badge iso">ISO §10.2</span></div>
+    <div class="field-doc-body">
+      Boutons de transition : <strong>OUVERT → EN COURS → RÉSOLU → CLOS</strong>. Chaque changement est horodaté et enregistré dans le journal d'audit, avec l'identité de l'admin qui l'a effectué.<br><br>
+      Le passage en <strong>Clos</strong> nécessite de renseigner le commentaire de clôture et le type de cause (champs obligatoires pour la clôture).<br>
+      Le passage en <strong>Non pertinent</strong> est possible à tout moment — la NC reste dans l'historique (jamais supprimée, ISO §10.2.2).
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Assignation du pilote</span><span class="badge oblig">Requis pour CAPA</span><span class="badge iso">ISO §10.2.1c</span></div>
+    <div class="field-doc-body">
+      Sélection du chef produit responsable du traitement parmi la liste des utilisateurs nc_chef_produit. L'assignation déclenche un email de notification au pilote. Un pilote peut être réassigné à tout moment.
+      <div class="ex">Pilotes disponibles : anne.sophie.costa · emilie.legros · Estelle G</div>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Type de cause (qualification)</span><span class="badge oblig">Obligatoire à la clôture</span><span class="badge iso">ISO §10.2.1b</span></div>
+    <div class="field-doc-body">
+      Classification de la cause principale identifiée. Utilisée dans les statistiques avancées (répartition des types de cause, analyse de récurrence).
+      <div class="ex">Types disponibles : Qualité produit · Fournisseur · Manque formation · Délai livraison · Image disque non conforme · Logistique - erreur envoi · Exception - rupture stock · (26 types configurables)</div>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Création d'actions CAPA</span><span class="badge oblig">ISO §10.2.1c</span><span class="badge lne">LNE</span></div>
+    <div class="field-doc-body">
+      L'admin crée les actions correctives/préventives et les assigne aux pilotes. Pour chaque action :<br><br>
+      <table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+        <tr style="background:#f5f5f5"><th style="padding:5px 8px;text-align:left">Champ</th><th style="padding:5px 8px;text-align:left">Obligatoire</th><th style="padding:5px 8px;text-align:left">Explication</th></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:5px 8px"><strong>Type CAPA</strong></td><td style="padding:5px 8px"><span class="badge oblig">Oui</span></td><td style="padding:5px 8px">Immédiate / Curative / Corrective / Préventive</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:5px 8px"><strong>Description</strong></td><td style="padding:5px 8px"><span class="badge oblig">Oui</span></td><td style="padding:5px 8px">Intitulé précis de l'action à mener</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:5px 8px"><strong>Pilote assigné</strong></td><td style="padding:5px 8px"><span class="badge oblig">Oui</span></td><td style="padding:5px 8px">Chef produit responsable de l'exécution</td></tr>
+        <tr><td style="padding:5px 8px"><strong>Date cible</strong></td><td style="padding:5px 8px"><span class="badge facul">Recommandé</span></td><td style="padding:5px 8px">Délai d'exécution souhaité</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="field-doc">
+    <div class="field-doc-head"><span class="field-doc-name">Coût de la NC</span><span class="badge facul">Facultatif</span><span class="badge iso">ISO §9.1.3</span></div>
+    <div class="field-doc-body">
+      Champ numérique en euros. Représente le coût total engendré par cette NC (main d'œuvre, pièces, transport, pénalités). Alimentent les indicateurs économiques du tableau de bord et les statistiques.<br><br>
+      <strong>Règle de comptage NC Parent :</strong> Le coût est saisi sur la NC Parent uniquement. Les satellites n'ont pas de coût propre pour éviter le double-comptage.
+      <div class="ex">Ex : 1 250,00 € (2h technicien + pièce + déplacement)</div>
+      <div class="norme">ISO §9.1.3 — Analyse économique des non-conformités pour pilotage par la donnée.</div>
+    </div>
+  </div>
+
+  <!-- CLÔTURE -->
+  <h3 id="ch5-cloture">Clôture d'une NC — Champs obligatoires</h3>
+  <div class="alert-box">
+    ⛔ La clôture est irréversible (statut Clos). S'assurer que toutes les actions CAPA ont été répondues et que l'analyse cause racine est documentée avant de clôturer.
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="card-head">✅ Checklist de clôture — Obligations ISO / LNE</div>
+    <div class="card-body" style="font-size:0.85rem">
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="background:#f5f5f5"><th style="padding:8px;text-align:left">Élément</th><th style="padding:8px;text-align:center">Obligatoire</th><th style="padding:8px;text-align:left">Norme</th></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px">Commentaire de clôture (explication)</td><td style="padding:8px;text-align:center"><span class="badge oblig">Oui</span></td><td style="padding:8px">ISO §10.2.2</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px">Type de cause sélectionné</td><td style="padding:8px;text-align:center"><span class="badge oblig">Oui</span></td><td style="padding:8px">ISO §10.2.1b</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px">Analyse 5 Pourquoi (P1 + cause racine)</td><td style="padding:8px;text-align:center"><span class="badge oblig">Oui (NC Parent)</span></td><td style="padding:8px">ISO §10.2.1b · LNE-1</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px">Ishikawa — au moins 1 cause renseignée</td><td style="padding:8px;text-align:center"><span class="badge oblig">Oui (NC Parent)</span></td><td style="padding:8px">LNE diagnostic</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:8px">Au moins 1 action CAPA créée et répondue</td><td style="padding:8px;text-align:center"><span class="badge info">Recommandé</span></td><td style="padding:8px">ISO §10.2.1c</td></tr>
+        <tr><td style="padding:8px">Coût NC renseigné</td><td style="padding:8px;text-align:center"><span class="badge facul">Facultatif</span></td><td style="padding:8px">ISO §9.1.3</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- STATS ADMIN -->
+  <h3 id="ch5-stats">Onglet 📈 Statistiques avancées</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="background:#f5f5f5"><th style="padding:7px 10px;text-align:left">Indicateur</th><th style="padding:7px 10px;text-align:left">Calcul</th><th style="padding:7px 10px;text-align:left">Norme</th></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>Taux de récurrence</strong></td><td style="padding:7px 10px">NC rouvertes / Total closes × 100</td><td style="padding:7px 10px">ISO §10.2.1d</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>Efficacité CAPA</strong></td><td style="padding:7px 10px">NC closes sans réouverture / Total closes × 100</td><td style="padding:7px 10px">ISO §10.2.1d · LNE</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>Coût total annuel</strong></td><td style="padding:7px 10px">Somme des coûts NC closes (hors satellites)</td><td style="padding:7px 10px">ISO §9.1.3</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>Coût moyen / NC</strong></td><td style="padding:7px 10px">Coût total / Nb NC closes avec coût</td><td style="padding:7px 10px">ISO §9.1.3</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>Coût par famille</strong></td><td style="padding:7px 10px">Agrégat par famille de produit</td><td style="padding:7px 10px">ISO §9.1.3</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>Coût par type de cause</strong></td><td style="padding:7px 10px">Agrégat par type de cause</td><td style="padding:7px 10px">ISO §9.1.3</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>Délai moyen de traitement</strong></td><td style="padding:7px 10px">Durée moyenne ouverture → clôture</td><td style="padding:7px 10px">ISO §10.2</td></tr>
+        <tr><td style="padding:7px 10px"><strong>NC par source de détection</strong></td><td style="padding:7px 10px">Répartition Signalement client vs Contrôle interne</td><td style="padding:7px 10px">LNE · ISO §9.1.3</td></tr>
+      </table>
+      <div class="tip" style="margin-top:12px">💡 L'objectif qualité LNE est : Efficacité CAPA ≥ 85% · Taux récurrence ≤ 10% · NC détectées en interne > 70%</div>
+    </div>
+  </div>
+
+  <!-- USERS ADMIN -->
+  <h3 id="ch5-users">Onglet 👥 Gestion des utilisateurs</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      <strong>Rôles disponibles :</strong>
+      <table style="width:100%;border-collapse:collapse;margin-top:8px">
+        <tr style="background:#2b2b2b;color:#fff"><th style="padding:7px 10px">Rôle</th><th style="padding:7px 10px">Droits</th><th style="padding:7px 10px">Usage</th></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><code>nc_admin</code></td><td style="padding:7px 10px">Accès total — toutes fonctions</td><td style="padding:7px 10px">Responsable qualité, support technique</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><code>nc_chef_produit</code></td><td style="padding:7px 10px">Tableau de bord personnel + réponse actions assignées</td><td style="padding:7px 10px">Chefs produit, techniciens référents</td></tr>
+        <tr><td style="padding:7px 10px"><code>nc_lecteur</code></td><td style="padding:7px 10px">Consultation seule, aucune modification</td><td style="padding:7px 10px">Managers, auditeurs, direction</td></tr>
+      </table>
+      <br>
+      <strong>Actions admin utilisateurs :</strong> Créer un compte · Modifier le rôle · Changer le mot de passe · Désactiver un compte<br><br>
+      <div class="note">Les mots de passe sont stockés sous forme de hash (algorithme propriétaire base-36). Ils ne sont jamais visibles, y compris pour les admins. Seule la réinitialisation est possible.</div>
+    </div>
+  </div>
+
+  <!-- CONFIG ADMIN -->
+  <h3 id="ch5-config">Onglet ⚙ Configuration</h3>
+  <div class="card">
+    <div class="card-body" style="font-size:0.85rem">
+      <strong>Sections de configuration :</strong>
+      <table style="width:100%;border-collapse:collapse;margin-top:8px">
+        <tr style="background:#f5f5f5"><th style="padding:7px 10px;text-align:left">Section</th><th style="padding:7px 10px;text-align:left">Contenu</th><th style="padding:7px 10px;text-align:left">Impact</th></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>📧 Emails qualité</strong></td><td style="padding:7px 10px">Adresses destinataires (séparées par ;)</td><td style="padding:7px 10px">Notifications création NC et clôture</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>🔔 Notifications</strong></td><td style="padding:7px 10px">Activer/désactiver 5 scénarios d'envoi email</td><td style="padding:7px 10px">Réduit le bruit ou garantit la traçabilité</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>🏷 Familles produit</strong></td><td style="padding:7px 10px">Liste des familles (30 actuellement)</td><td style="padding:7px 10px">Formulaire déclaration + filtres + stats</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>⚠ Types de cause</strong></td><td style="padding:7px 10px">Liste des causes de clôture (26 actuellement)</td><td style="padding:7px 10px">Qualification clôture + stats par cause</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:7px 10px"><strong>📍 Périmètres</strong></td><td style="padding:7px 10px">Zones de l'organisation (7 actuellement)</td><td style="padding:7px 10px">Formulaire + filtres + stats périmètre</td></tr>
+        <tr><td style="padding:7px 10px"><strong>🔍 Sources de détection</strong></td><td style="padding:7px 10px">Modes de découverte (8 actuellement)</td><td style="padding:7px 10px">Formulaire + analyse efficacité contrôle</td></tr>
+      </table>
+      <div class="note" style="margin-top:10px">Toutes les modifications de configuration sont sauvegardées en écriture atomique (crash-safe). Un test d'envoi email SMTP est disponible pour valider la configuration avant usage.</div>
+    </div>
+  </div>
+
+  <!-- ARCHIVES -->
+  <div style="background:#f8f8f8;border:1px solid #e0e0e0;border-radius:8px;padding:14px 16px;margin-top:16px;font-size:0.85rem">
+    <strong>📁 Onglet Archives</strong> — Consulter et rechercher dans les NC closes de toutes les années. Export PDF disponible. Les NC archivées ne peuvent plus être modifiées mais restent accessibles pour audit. <span class="badge iso">ISO §10.2.2</span>
+  </div>
+</div>
+
+<!-- ══════════════════ CH 6 — NC PARENTS ══════════════════ -->
+<div class="chapter" id="ch6">
+  <div class="chapter-title">
+    <div class="chapter-number">6</div>
+    <h2>NC Parents — Groupement de non-conformités <span class="profile-badge pb-admin" style="margin-left:8px">Admin uniquement</span></h2>
+    <div class="chapter-iso">ISO §10.2.1 · LNE — Analyse systémique</div>
+  </div>
+
+  <div class="norm-ref">
+    <strong>Pourquoi les NC Parents ?</strong>
+    Lorsque plusieurs NC distinctes partagent la même cause racine, les traiter isolément conduit à des actions correctives redondantes et à une vision fragmentée. La NC Parent permet de <em>regrouper</em> les NC liées sous une <em>analyse unifiée</em> — une seule cause racine documentée, un seul plan CAPA, une clôture cascade. Exigence implicite ISO §10.2.1e : <em>«mettre à jour les risques et opportunités»</em> en vision systémique.
+  </div>
+
+  <h3>Cycle de vie d'un groupe NC Parent</h3>
+  <div class="workflow" style="flex-wrap:wrap;gap:6px">
+    <div class="wf-step wf-create" style="min-width:130px"><strong>1. Créer le groupe</strong>Sélectionner ≥ 2 NC<br>→ NC-P-XXXXX créée</div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step wf-qualify" style="min-width:130px"><strong>2. Rattacher</strong>Ajouter satellites<br>tardifs si nécessaire</div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step wf-treat" style="min-width:130px"><strong>3. Analyser</strong>5 Pourquoi + Ishikawa<br>sur la NC Parent</div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step wf-close" style="min-width:130px"><strong>4. Clôturer</strong>Fermeture cascade<br>de tous les satellites</div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-body" style="font-size:0.85rem">
+      <strong>Règles invariantes (ISO §10.2.2) :</strong>
+      <ul style="margin:8px 0 0 20px">
+        <li>Numérotation NC Parent : <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px">NC-P-XXXXX</code> (préfixe distinct)</li>
+        <li>Les NC satellites restent visibles dans la liste avec badge <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px">📋 NC-P-XXXXX</code></li>
+        <li>La clôture du Parent clôture automatiquement tous les satellites (clôture cascade)</li>
+        <li>Le coût est porté par la NC Parent uniquement — les satellites n'ont pas de coût propre (éviter double-comptage)</li>
+        <li>L'email n'est PAS envoyé au pilote lors de la création du groupe (pas de spam sur regroupement)</li>
+        <li>L'historique (journal d'audit) de chaque satellite intègre les événements Parent (badge 📋)</li>
+        <li>Un satellite peut être rattaché tardivement à un groupe existant (fonction rattachement tardif)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Obligations clôture NC Parent <span class="badge oblig">Bloquant</span></h3>
+  <div class="alert-box">
+    Les champs suivants sont <strong>obligatoires et bloquants</strong> pour clôturer une NC Parent (contraintes plus strictes que les NC standards) :
+    <ul style="margin:8px 0 0 20px">
+      <li><strong>5 Pourquoi</strong> : P1 renseigné + Cause racine explicite</li>
+      <li><strong>Ishikawa</strong> : au moins une cause dans une des 5 catégories (5M)</li>
+      <li><strong>Type de cause</strong> : sélectionné parmi la liste configurée</li>
+      <li><strong>Coût NC</strong> : renseigné (obligatoire sur NC Parent)</li>
+      <li><strong>Commentaire de clôture</strong> : synthèse des actions menées</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════ CH 7 — TABLEAU NORMATIF ══════════════════ -->
+<div class="chapter" id="ch7">
+  <div class="chapter-title">
+    <div class="chapter-number">7</div>
+    <h2>Tableau de correspondance normatif ISO 9001:2015 &amp; LNE</h2>
+  </div>
+
+  <p style="font-size:0.88rem;color:#555;margin-bottom:16px">Ce tableau établit la correspondance entre chaque exigence normative et les fonctionnalités du système NC Muller Automotive. À destination des auditeurs ISO et LNE.</p>
+
+  <table class="norm-table">
+    <thead>
+      <tr><th>Référence</th><th>Exigence</th><th>Couverture dans le système NC</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="ref">ISO §8.7.1</td><td>Identifier et maîtriser les éléments non conformes</td><td>Formulaire de déclaration public → création immédiate, numérotation automatique, statut Ouvert</td></tr>
+      <tr><td class="ref">ISO §8.7.2</td><td>Conserver informations documentées sur les NC</td><td>Chaque NC conserve : nature, rédacteur, date, produit, client, pièces jointes — non modifiable après horodatage</td></tr>
+      <tr><td class="ref">ISO §10.2.1a</td><td>Réagir à la NC et maîtriser ses conséquences</td><td>Actions CAPA immédiates/curatives assignées au pilote avec notification email automatique</td></tr>
+      <tr><td class="ref">ISO §10.2.1b</td><td>Évaluer le besoin d'actions pour éliminer la cause</td><td>Analyse 5 Pourquoi + sélection type de cause + diagramme Ishikawa 5M</td></tr>
+      <tr><td class="ref">ISO §10.2.1c</td><td>Mettre en œuvre les actions nécessaires</td><td>Actions CAPA correctives/préventives créées par admin, répondues par pilote avec date et preuve</td></tr>
+      <tr><td class="ref">ISO §10.2.1d</td><td>Examiner l'efficacité des actions correctives</td><td>Indicateur Efficacité CAPA (% NC closes sans réouverture) — onglet Statistiques</td></tr>
+      <tr><td class="ref">ISO §10.2.1e</td><td>Mettre à jour risques et opportunités</td><td>NC Parents — analyse systémique multi-NC avec cause racine commune et plan d'action unifié</td></tr>
+      <tr><td class="ref">ISO §10.2.2</td><td>Conserver informations documentées (nature, actions, résultats)</td><td>Journal d'audit horodaté, immuable, sur chaque NC — toute modification est tracée (qui, quand, quoi)</td></tr>
+      <tr><td class="ref">ISO §9.1.3</td><td>Analyse et évaluation des données qualité</td><td>Statistiques avancées : NC/famille, NC/mois, coûts, délais, efficacité CAPA, récurrence — onglet Statistiques</td></tr>
+      <tr><td class="ref">ISO §6.1</td><td>Actions face aux risques et opportunités</td><td>Actions préventives CAPA + analyse NC Parents pour identification des risques systémiques</td></tr>
+      <tr><td class="ref">ISO §7.4</td><td>Communication</td><td>Notifications email automatiques : création NC, changement statut, assignation pilote, relance, clôture</td></tr>
+      <tr><td class="ref lne-ref">LNE — Traçabilité équipements</td><td>Identification et traçabilité des défauts sur équipements certifiés</td><td>N° de série obligatoire + famille produit + source détection → traçabilité individuelle par équipement</td></tr>
+      <tr><td class="ref lne-ref">LNE — Diagnostic cause</td><td>Analyse documentée de la cause racine</td><td>Ishikawa 5M obligatoire sur NC Parents + 5 Pourquoi avec cause racine explicite</td></tr>
+      <tr><td class="ref lne-ref">LNE — Plan d'actions</td><td>Actions correctives documentées et suivies</td><td>CAPA avec pilote, type, description, date — suivi de réponse avec preuve — indicateur efficacité</td></tr>
+      <tr><td class="ref lne-ref">LNE — Archivage</td><td>Conservation des enregistrements qualité</td><td>Onglet Archives — NC closes conservées indéfiniment, jamais supprimées — export PDF disponible</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip" style="margin-top:20px">
+    ✅ <strong>Pour un audit ISO ou LNE</strong>, les éléments de preuve à présenter sont : le journal d'audit d'une NC (traçabilité §10.2.2), les statistiques Efficacité CAPA (§10.2.1d), les analyses 5P + Ishikawa d'une NC Parent (§10.2.1b + LNE), et la liste des NC de l'année avec statuts (§8.7).
+  </div>
+
+  <div style="margin-top:30px;padding-top:20px;border-top:1px solid var(--border);font-size:0.78rem;color:#aaa;text-align:center">
+    Système NC Muller Automotive · Version v1 · 06/05/2026<br>
+    Contact support technique : <a href="mailto:avet.mat@gmail.com" style="color:#888">avet.mat@gmail.com</a><br>
+    Notice générée pour validation client, utilisateur, ISO 9001:2015 et LNE
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// Highlight nav item on scroll
+const items = document.querySelectorAll('.nav-item[href]');
+const chapters = [...items].map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  chapters.forEach((ch, i) => {
+    if (ch.getBoundingClientRect().top <= 80) current = items[i]?.getAttribute('href');
+  });
+  items.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === current);
+  });
+}, { passive: true });
+</script>
+</body>
+</html>

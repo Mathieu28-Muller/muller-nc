@@ -1,0 +1,226 @@
+/* --- Base --- */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    background: #f4f4f4;
+}
+
+header {
+    background: #2b2b2b;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.btn-home {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #c00000;
+    color: white;
+    border: none;
+    padding: 8px 22px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+.btn-home:hover { background: #a00000; }
+
+.logo { height: 50px; margin-right: 20px; }
+
+/* --- Navigation Gammes --- */
+.nav-gamme {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    background: #ececec;
+}
+
+.btn-cat {
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid #c00000;
+    background: white;
+    color: #c00000;
+    border-radius: 5px;
+}
+
+.btn-cat.active {
+    background: #c00000;
+    color: white;
+}
+
+/* --- Recherche --- */
+#search {
+    display: block;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+    padding: 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+}
+/* --- Style de la barre de recherche (Accueil et Machine) --- */
+#search, .search-style {
+    display: block;
+    margin: 20px auto;      /* Centre la barre horizontalement */
+    width: 80%;             /* Largeur identique à l'accueil */
+    max-width: 600px;       /* Limite la largeur sur grand écran */
+    padding: 12px;
+    border-radius: 20px;    /* Donne l'aspect arrondi */
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    outline: none;
+}
+
+#search:focus, .search-style:focus {
+    border-color: #c00000;  /* Devient rouge Muller quand on clique dessus */
+}
+
+/* --- Ajustement du décalage des cartes --- */
+#files {
+    padding-left: 40px;     /* Décale les fichiers de la marge comme sur l'accueil */
+    margin-top: 20px;       /* Ajoute un peu d'espace sous la recherche */
+}
+/* --- MISE EN PAGE DES SECTIONS --- */
+#machines {
+    display: flex;
+    flex-direction: column; /* Les titres de catégories restent les uns sous les autres */
+    padding: 0 20px;
+}
+
+.category-section {
+    margin-bottom: 30px;
+}
+
+.category-header {
+    background: #e0e0e0;
+    padding: 10px 20px;
+    border-left: 8px solid #c00000;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    margin-bottom: 20px; /* Plus d'espace sous le titre pour descendre les cartes */
+}
+/* --- GRILLE DES MACHINES --- */
+.grid {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 15px;
+    padding-left: 20px; /* Décalage supplémentaire des cartes vers la droite par rapport au titre */
+}
+
+/* --- CARTES MACHINES (BOUTONS) --- */
+.card {
+    background: white;
+    border-left: 8px solid #c00000;
+    padding: 15px;
+    cursor: pointer;
+    width: 140px; /* Largeur fixe pour l'effet bouton */
+    
+    /* AJOUTEZ CES LIGNES : */
+    display: flex;
+    flex-direction: column; /* Aligne le titre et la panne l'un sous l'autre */
+    align-items: center;    /* Centre horizontalement le contenu */
+    justify-content: flex-start;
+    min-height: 25px;      /* Donne de la hauteur à la carte pour voir le décalage */
+}
+
+.card h3 { 
+    margin: 0; 
+    font-size: 0.9rem; 
+    color: #333;
+}
+
+
+/* --- LES PANNES EN PETITS BOUTONS (ex: Cadenas) --- */
+.resultat-recherche {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: white;
+    background-color: #c00000; /* Fond rouge Muller */
+    
+    /* On augmente cette valeur pour faire descendre le bouton */
+    margin-top: 105px; 
+    
+    padding: 7px 15px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+/* Texte rouge pour les résultats de recherche */
+.resultat-recherche {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: white;
+    background-color: #c00000;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+
+    /* MODIFICATION ICI : */
+    margin-top: 25px !important; /* Le !important force le navigateur à obéir */
+    margin-bottom: 5px;
+}
+/* --- ADAPTATION MOBILE (< 600px) --- */
+@media (max-width: 600px) {
+    /* On réduit les marges latérales pour gagner de la place */
+    #machines, #files, .grid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    /* La barre de recherche prend plus de place */
+    #search, .search-style {
+        width: 95%;
+    }
+
+    /* Les cartes deviennent flexibles pour s'adapter à la largeur de l'écran */
+    .grid {
+        justify-content: center; /* Centre les cartes sur la ligne */
+        gap: 10px;
+    }
+
+    .card {
+        width: calc(50% - 20px); /* Affiche 2 cartes par ligne proprement */
+        min-width: 130px;
+        padding: 10px;
+    }
+
+    .card h3 {
+        font-size: 0.8rem; /* Texte légèrement plus petit pour éviter les coupures */
+    }
+
+    /* Ajustement de l'en-tête pour le tactile */
+    header {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px;
+    }
+    .btn-home {
+        position: static;
+        transform: none;
+        margin: 8px 0 0;
+    }
+
+    .logo {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    /* Boutons de navigation plus gros pour les pouces */
+    .btn-cat {
+        padding: 12px 10px;
+        font-size: 0.8rem;
+        flex: 1; /* Les boutons prennent toute la largeur disponible */
+    }
+}

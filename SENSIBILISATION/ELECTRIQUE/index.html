@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risques Électriques — Sensibilisation Muller Automotive</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bleu:#1e3a8a; --bleu-cl:#2563eb; --bleu-pale:#eff6ff;
+  --vert:#059669;  --vert-pale:#ecfdf5;
+  --rouge:#dc2626; --rouge-pale:#fef2f2;
+  --orange:#d97706;--orange-pale:#fef3c7;
+  --gris-f:#1c1c1c;--gris-m:#444;--gris-cl:#777;
+  --bg:#f8fafc;--blanc:#fff;--trait:#e2e8f0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--gris-f);font-family:'Lato',sans-serif;font-size:16px;line-height:1.7;min-height:100vh;}
+h1,h2,h3,h4{font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;line-height:1.2;}
+h1{font-size:2.8rem;font-weight:800;}h2{font-size:2rem;font-weight:700;}h3{font-size:1.4rem;font-weight:700;}
+
+/* ── HEADER ── */
+.site-header{background:#fff;border-bottom:3px solid var(--bleu);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.header-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;padding:12px 24px;gap:20px;}
+.header-inner img{height:44px;object-fit:contain;display:block;}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gris-m);}
+.header-back{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gris-cl);text-decoration:none;transition:color .2s;}
+.header-back:hover{color:var(--bleu);}
+
+/* ── PROGRESS ── */
+.progress-wrap{background:#e2e8f0;height:5px;}
+.progress-bar{background:var(--bleu);height:5px;transition:width .4s ease;}
+
+/* ── SCREENS ── */
+.screen{display:none;max-width:860px;margin:0 auto;padding:40px 24px 60px;}
+.screen.active{display:block;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO ── */
+.hero-screen{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%);color:#fff;padding:60px 32px;text-align:center;max-width:100%;}
+.hero-screen h1{color:#fff;margin-bottom:12px;}
+.hero-icon{font-size:4rem;margin-bottom:16px;}
+.hero-screen p{font-size:1rem;color:rgba(255,255,255,.8);max-width:560px;margin:0 auto 32px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 16px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin:5px;color:rgba(255,255,255,.85);}
+
+/* ── FORM ── */
+.form-card{background:#fff;border-radius:10px;padding:36px;max-width:560px;margin:0 auto;box-shadow:0 4px 24px rgba(0,0,0,.1);}
+.form-card h2{margin-bottom:8px;color:var(--bleu);}
+.form-card p{color:var(--gris-cl);margin-bottom:24px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gris-m);margin-bottom:6px;}
+.field input{width:100%;padding:11px 14px;border:2px solid var(--trait);border-radius:6px;font-family:'Lato',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;}
+.field input:focus{border-color:var(--bleu-cl);}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-primary{background:var(--bleu);color:#fff;}.btn-primary:hover{background:var(--bleu-cl);}
+.btn-secondary{background:#fff;color:var(--bleu);border:2px solid var(--bleu);}.btn-secondary:hover{background:var(--bleu-pale);}
+.btn-success{background:var(--vert);color:#fff;}.btn-success:hover{background:#047857;}
+.btn-lg{padding:14px 36px;font-size:1.1rem;}.btn-full{width:100%;justify-content:center;}
+
+/* ── MODULE HEADER ── */
+.module-header{background:linear-gradient(135deg,var(--bleu) 0%,var(--bleu-cl) 100%);color:#fff;border-radius:10px;padding:24px 28px;margin-bottom:24px;}
+.module-header h2{color:#fff;margin-bottom:4px;}
+.module-header p{color:rgba(255,255,255,.8);font-size:.9rem;margin:0;}
+.point-tag{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 12px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;margin:3px 3px 0 0;color:rgba(255,255,255,.9);}
+
+/* ── CONTENT CARDS ── */
+.content-card{background:#fff;border-radius:10px;padding:24px 28px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.content-card h3{color:var(--bleu);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.content-card h4{color:var(--bleu-cl);font-size:1rem;margin:14px 0 8px;}
+.content-card p{color:var(--gris-m);font-size:.9rem;margin-bottom:10px;}
+
+/* ── ALERT BOXES ── */
+.alert-box{border-radius:0 6px 6px 0;padding:14px 18px;margin:12px 0;font-size:.88rem;}
+.alert-blue{background:var(--bleu-pale);border-left:4px solid var(--bleu);color:#1e40af;}
+.alert-green{background:var(--vert-pale);border-left:4px solid var(--vert);color:#065f46;}
+.alert-red{background:var(--rouge-pale);border-left:4px solid var(--rouge);color:#991b1b;}
+.alert-orange{background:var(--orange-pale);border-left:4px solid var(--orange);color:#92400e;}
+
+/* ── TABLEAUX ── */
+.data-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.86rem;}
+.data-table th{background:#f1f5f9;color:var(--gris-m);padding:10px 12px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;border-bottom:2px solid var(--trait);}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--trait);color:var(--gris-m);}
+.data-table tr:hover td{background:#f8fafc;}
+.cell-danger{color:var(--rouge);font-weight:700;}
+.cell-warn{color:var(--orange);font-weight:700;}
+.cell-ok{color:var(--vert);font-weight:700;}
+
+/* ── CARDS GRILLE ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0;}
+.info-card{background:#f8fafc;border:1px solid var(--trait);border-radius:8px;padding:14px;text-align:center;}
+.info-card .ic-val{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:4px;}
+.info-card .ic-lab{font-size:.78rem;color:var(--gris-cl);line-height:1.4;}
+.hab-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0;}
+.hab-card{background:#f8fafc;border:1px solid var(--trait);border-radius:6px;padding:10px;text-align:center;}
+.hab-code{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:var(--bleu);margin-bottom:3px;}
+.hab-label{font-size:.74rem;color:var(--gris-m);line-height:1.3;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+.col-card{border-radius:8px;padding:14px;}
+.col-card h4{margin-bottom:8px;font-size:.95rem;}
+.col-card ul{list-style:disc;padding-left:16px;font-size:.83rem;color:var(--gris-m);line-height:1.7;}
+
+/* ── ÉTAPES NUMÉROTÉES ── */
+.steps{display:flex;flex-direction:column;gap:10px;margin:12px 0;}
+.step-row{display:flex;gap:12px;padding:12px;border-radius:8px;border:1px solid var(--trait);}
+.step-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.88rem;flex-shrink:0;color:#fff;}
+.step-body strong{display:block;margin-bottom:2px;font-size:.9rem;}
+.step-body span{font-size:.84rem;color:var(--gris-m);}
+
+/* ── MODULE NAV ── */
+.module-nav{display:flex;justify-content:space-between;margin-top:28px;padding-top:20px;border-top:1px solid var(--trait);}
+
+/* ── QUIZ ── */
+.quiz-card{background:#fff;border-radius:10px;padding:26px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.quiz-card.pre{border-left:4px solid var(--bleu);}
+.quiz-card.final{border-left:4px solid var(--vert);}
+.q-label{font-family:'Barlow Condensed',sans-serif;font-size:.67rem;letter-spacing:3px;text-transform:uppercase;color:var(--gris-cl);margin-bottom:8px;}
+.q-text{font-size:.97rem;font-weight:700;color:var(--gris-f);margin-bottom:14px;line-height:1.5;}
+.q-options{display:flex;flex-direction:column;gap:7px;}
+.q-opt{display:flex;align-items:center;gap:11px;padding:10px 15px;background:#f8fafc;border:1.5px solid var(--trait);border-radius:6px;cursor:pointer;font-size:.88rem;transition:all .15s;}
+.q-opt:hover:not(.locked){border-color:var(--bleu-cl);background:var(--bleu-pale);}
+.q-opt.selected{border-color:var(--bleu);background:var(--bleu-pale);color:var(--bleu);}
+.q-opt.correct{border-color:var(--vert);background:var(--vert-pale);color:#065f46;}
+.q-opt.wrong{border-color:var(--rouge);background:var(--rouge-pale);color:#991b1b;}
+.q-opt.locked{cursor:default;pointer-events:none;}
+.q-letter{width:25px;height:25px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;flex-shrink:0;}
+.q-fb{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:.83rem;line-height:1.6;display:none;}
+.q-fb.show{display:block;}
+.q-fb.ok{background:var(--vert-pale);border:1px solid #6ee7b7;color:#065f46;}
+.q-fb.ko{background:var(--rouge-pale);border:1px solid #fca5a5;color:#991b1b;}
+.quiz-action-btn{background:var(--vert);color:#fff;border:none;padding:12px 28px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.92rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:16px;transition:background .2s;width:100%;display:flex;justify-content:center;align-items:center;}
+.quiz-action-btn:hover{background:#047857;}
+.quiz-action-btn:disabled{opacity:.4;cursor:default;}
+
+/* ── SCORE ── */
+.score-wrap{text-align:center;max-width:480px;margin:0 auto 40px;}
+.score-circle{width:140px;height:140px;border-radius:50%;margin:0 auto 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:5px solid;}
+.score-num{font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:800;}
+.score-pct{font-size:.85rem;color:var(--gris-cl);}
+.score-msg{font-size:1.05rem;font-weight:700;margin:10px 0 20px;}
+
+/* ── DIPLÔME ── */
+.diplome-card{position:relative;background:#fff;border-radius:4px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2);aspect-ratio:1.414/1;width:100%;font-family:Georgia,'Times New Roman',serif;}
+.diplome-border{position:absolute;inset:12px;border:2.5px solid var(--bleu);pointer-events:none;z-index:2;}
+.diplome-border::before{content:'';position:absolute;inset:5px;border:1px solid rgba(30,58,138,.2);}
+.diplome-corner{position:absolute;width:50px;height:50px;z-index:4;}
+.diplome-corner::before,.diplome-corner::after{content:'';position:absolute;background:var(--bleu);}
+.diplome-corner.tl{top:12px;left:12px;}.diplome-corner.tl::before{top:0;left:0;width:28px;height:2.5px;}.diplome-corner.tl::after{top:0;left:0;width:2.5px;height:28px;}
+.diplome-corner.tr{top:12px;right:12px;}.diplome-corner.tr::before{top:0;right:0;width:28px;height:2.5px;}.diplome-corner.tr::after{top:0;right:0;width:2.5px;height:28px;}
+.diplome-corner.bl{bottom:12px;left:12px;}.diplome-corner.bl::before{bottom:0;left:0;width:28px;height:2.5px;}.diplome-corner.bl::after{bottom:0;left:0;width:2.5px;height:28px;}
+.diplome-corner.br{bottom:12px;right:12px;}.diplome-corner.br::before{bottom:0;right:0;width:28px;height:2.5px;}.diplome-corner.br::after{bottom:0;right:0;width:2.5px;height:28px;}
+.diplome-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;pointer-events:none;opacity:.04;font-size:240px;}
+.diplome-inner{position:relative;z-index:3;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:7% 8%;}
+.diplome-top{text-align:center;}
+.diplome-top img{height:48px;object-fit:contain;display:block;margin:0 auto 6px;}
+.diplome-attestation{font-family:'Barlow Condensed',sans-serif;font-size:clamp(.7rem,1.2vw,1rem);font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--bleu);}
+.diplome-mid{text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
+.diplome-certifie{font-size:clamp(.6rem,.9vw,.8rem);letter-spacing:2px;text-transform:uppercase;color:#888;}
+.diplome-name{font-size:clamp(1.4rem,3.5vw,2.8rem);font-weight:700;font-style:italic;color:var(--bleu);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;}
+.diplome-pour{font-size:clamp(.6rem,.85vw,.78rem);letter-spacing:2px;text-transform:uppercase;color:#888;margin:8px 0 4px;}
+.diplome-titre{font-size:clamp(.95rem,2vw,1.5rem);font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1c1c1c;text-align:center;}
+.diplome-score-d{font-size:clamp(.68rem,1.1vw,.88rem);color:#666;margin-top:4px;}
+.diplome-bottom{width:100%;display:flex;justify-content:space-between;align-items:flex-end;font-size:clamp(.55rem,.75vw,.72rem);color:#999;}
+.diplome-bottom .sig{text-align:center;}
+.diplome-bottom .sig .sig-line{border-top:1px solid #ccc;padding-top:4px;margin-top:22px;}
+.btn-print{background:var(--bleu);color:#fff;border:none;padding:12px 26px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-right:10px;}
+.btn-email{background:var(--vert);color:#fff;border:none;padding:12px 26px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+.email-ok{text-align:center;margin-top:10px;color:var(--vert);font-size:.88rem;display:none;}
+
+/* PRE-QUIZ BANNER */
+.quiz-banner{background:linear-gradient(135deg,#0f172a,var(--bleu));border-radius:10px;padding:22px 26px;margin-bottom:24px;text-align:center;}
+.quiz-banner h3{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#fff;margin-bottom:6px;}
+.quiz-banner p{color:rgba(255,255,255,.75);font-size:.87rem;margin:0;}
+.ti-score{background:#fff;border:2px solid var(--bleu);border-radius:8px;padding:20px;text-align:center;margin-top:20px;display:none;}
+.ti-score.show{display:block;}
+.ti-score-num{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:var(--bleu);}
+.ti-score-txt{font-size:.86rem;color:var(--gris-cl);margin-top:4px;}
+
+@media print{.site-header,.progress-wrap,.screen:not(.active){display:none!important;}.screen.active{padding:0!important;max-width:100%!important;}}
+@media(max-width:640px){.two-col{grid-template-columns:1fr;}.card-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="header-inner">
+    <img src="https://www.mullerautomotive.fr/wp-content/uploads/2025/01/logo-Muller-automotive-full-1.png" alt="Muller Automotive">
+    <div class="header-title">Risques Électriques</div>
+    <a class="header-back" href="/SENSIBILISATION/">← Modules sensibilisation</a>
+  </div>
+</div>
+<div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+
+<!-- ═══════════════════════ S0 : ACCUEIL ═══════════════════════ -->
+<div class="screen active hero-screen" id="s0">
+  <div style="max-width:700px;margin:0 auto;">
+    <div class="hero-icon">⚡</div>
+    <h1>Prévention des risques électriques</h1>
+    <p>Formation préparatoire à l'habilitation électrique — 15 points réglementaires issus de la norme NF C 18-510 et du Code du Travail.</p>
+    <div style="margin-bottom:28px;">
+      <span class="hero-badge">⏱ 60 minutes</span>
+      <span class="hero-badge">📋 5 modules — 15 points</span>
+      <span class="hero-badge">🏛 NF C 18-510</span>
+      <span class="hero-badge">🎯 Quiz + Attestation</span>
+    </div>
+    <button class="btn btn-lg" onclick="goTo(1)" style="background:#fff;color:var(--bleu);font-weight:800;">Commencer la formation →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ S1 : INSCRIPTION ═══════════════════════ -->
+<div class="screen" id="s1">
+  <div class="form-card" style="margin-top:20px;">
+    <h2>Votre inscription</h2>
+    <p>Ces informations figureront sur votre attestation et seront transmises au service formation.</p>
+    <div class="field"><label>Prénom *</label><input type="text" id="inp-prenom" placeholder="Votre prénom"></div>
+    <div class="field"><label>Nom *</label><input type="text" id="inp-nom" placeholder="Votre nom de famille"></div>
+    <div class="field"><label>Adresse email *</label><input type="email" id="inp-email" placeholder="votre@email.com"></div>
+    <div class="field"><label>Société / Service</label><input type="text" id="inp-societe" placeholder="Muller Automotive / Service..."></div>
+    <div id="form-err" style="color:var(--rouge);font-size:.85rem;margin-bottom:10px;display:none;">Veuillez remplir les champs obligatoires (*).</div>
+    <button class="btn btn-primary btn-full" onclick="validateForm()">Accéder au questionnaire initial →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ S2 : PRÉ-QUIZ ═══════════════════════ -->
+<div class="screen" id="s2">
+  <div class="quiz-banner">
+    <h3>Questionnaire initial</h3>
+    <p>5 questions pour évaluer votre niveau avant la formation. Ce score ne compte pas dans votre résultat final.</p>
+  </div>
+  <div id="prequiz-container"></div>
+  <button class="quiz-action-btn" id="btn-pre" onclick="submitPre()" disabled>Voir mes résultats →</button>
+</div>
+
+<!-- ═══════════════════════ S3 : RÉSULTAT PRÉ ═══════════════════════ -->
+<div class="screen" id="s3">
+  <div style="text-align:center;max-width:500px;margin:0 auto;">
+    <div style="font-size:3rem;margin-bottom:12px;">📊</div>
+    <h2 style="color:var(--bleu);">Résultat initial</h2>
+    <p id="pre-result-txt" style="color:var(--gris-m);margin:12px 0 24px;font-size:.95rem;"></p>
+    <div class="alert-green"><strong>La formation commence maintenant.</strong> 5 modules couvrent les 15 points réglementaires obligatoires de la norme NF C 18-510. À l'issue, le quiz final conditionne l'obtention de votre attestation.</div>
+    <br><button class="btn btn-primary btn-lg btn-full" onclick="goTo(4)">Démarrer le Module 1 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ S4 : MODULE 1 ═══════════════════════ -->
+<div class="screen" id="s4">
+  <div class="module-header">
+    <h2>⚙️ Module 1 — Fondamentaux</h2>
+    <p>Mécanisme d'apparition du dommage · Cadre réglementaire · Grandeurs physiques</p>
+    <div style="margin-top:10px;">
+      <span class="point-tag">Point 1</span><span class="point-tag">Point 2</span><span class="point-tag">Point 3</span>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>⚠️ 1 — Mécanisme d'apparition du dommage</h3>
+    <p>Un accident électrique suit toujours une séquence logique appelée <strong>systémique</strong> :</p>
+    <div class="steps">
+      <div class="step-row" style="background:#fff7ed;">
+        <div class="step-num" style="background:var(--orange);">1</div>
+        <div class="step-body"><strong>Phénomène dangereux</strong><span> — Source potentielle du dommage (l'électricité, l'arc électrique, etc.)</span></div>
+      </div>
+      <div class="step-row" style="background:#fef2f2;">
+        <div class="step-num" style="background:var(--rouge);">2</div>
+        <div class="step-body"><strong>Situation de danger</strong><span> — Personne exposée + phénomène dangereux (ex: technicien au voisinage d'une PNST)</span></div>
+      </div>
+      <div class="step-row" style="background:var(--rouge-pale);">
+        <div class="step-num" style="background:#991b1b;">3</div>
+        <div class="step-body"><strong>Événement déclenchant</strong><span> — L'acte ou la circonstance qui provoque le contact (geste mal maîtrisé, outil lâché, inattention)</span></div>
+      </div>
+      <div class="step-row" style="background:#1c1c1c;">
+        <div class="step-num" style="background:#000;">💥</div>
+        <div class="step-body" style="color:#fff;"><strong>DOMMAGE</strong><span style="color:#ccc;"> — Accident du Travail (AT) ou Maladie Professionnelle (MP)</span></div>
+      </div>
+    </div>
+    <div class="alert-blue" style="margin-top:12px;"><strong>Démarche préventive :</strong> Art. L4121-2 du Code du Travail — 9 principes généraux de prévention, du chef d'établissement responsable de la politique de prévention de son personnel.</div>
+  </div>
+
+  <div class="content-card">
+    <h3>⚖️ 2 — Cadre réglementaire</h3>
+    <p>L'habilitation électrique est la <strong>reconnaissance par l'employeur</strong> de la capacité d'une personne à accomplir en sécurité les tâches électriques qui lui sont confiées.</p>
+    <div class="alert-red"><strong>Obligatoire depuis le 1er juillet 2011</strong> — Décret n°2010-1118 du 22 septembre 2010 — Articles R4544-9 à R4544-11 du Code du Travail.<br>
+    <em>Article R4544-9 :</em> « Les opérations sur les installations électriques ou dans leur voisinage ne peuvent être effectuées que par des travailleurs habilités. »</div>
+    <div class="two-col" style="margin-top:12px;">
+      <div class="col-card" style="background:var(--bleu-pale);">
+        <h4 style="color:var(--bleu);">Délégation de pouvoirs</h4>
+        <ul><li>Compétences du collaborateur</li><li>Autorité et moyens conférés</li><li>Délégation <strong>écrite obligatoire</strong></li></ul>
+        <p style="font-size:.8rem;margin-top:6px;color:var(--gris-cl);">→ Effet parapluie : responsabilité transférée</p>
+      </div>
+      <div class="col-card" style="background:#fef2f2;">
+        <h4 style="color:var(--rouge);">Code pénal — Art. 221-6</h4>
+        <p style="font-size:.84rem;color:var(--gris-m);margin:0;">Homicide involontaire par maladresse, imprudence ou manquement à une obligation de sécurité.<br><strong>TOUS RESPONSABLES.</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>⚡ 3 — Grandeurs physiques mesurables et quantifiables</h3>
+    <div class="card-grid">
+      <div class="info-card"><div class="ic-val" style="color:var(--bleu);">U — Volt</div><div class="ic-lab"><strong>Tension</strong> (ou différence de potentiel) — Force qui permet aux électrons de se mouvoir</div></div>
+      <div class="info-card"><div class="ic-val" style="color:var(--rouge);">I — Ampère</div><div class="ic-lab"><strong>Intensité</strong> — Flux de charges électriques traversant la section d'un conducteur</div></div>
+      <div class="info-card"><div class="ic-val" style="color:var(--orange);">R — Ohm (Ω)</div><div class="ic-lab"><strong>Résistance</strong> — Opposition que rencontre le courant dans un milieu conducteur</div></div>
+      <div class="info-card"><div class="ic-val" style="color:var(--vert);">P — Watt</div><div class="ic-lab"><strong>Puissance</strong> — Quantité d'énergie transportée par seconde</div></div>
+    </div>
+    <table class="data-table" style="margin-top:12px;">
+      <thead><tr><th>Type de courant</th><th>Sigle</th><th>Applications</th></tr></thead>
+      <tbody>
+        <tr><td>Courant alternatif</td><td><strong>CA / AC</strong></td><td>Réseau EDF, appareils quotidiens (230V/400V)</td></tr>
+        <tr><td>Courant continu</td><td><strong>CC / DC</strong></td><td>Batteries, véhicules électriques, tramways</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(3)">← Retour</button>
+    <button class="btn btn-primary" onclick="goTo(5)">Module 2 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ S5 : MODULE 2 ═══════════════════════ -->
+<div class="screen" id="s5">
+  <div class="module-header">
+    <h2>🔬 Module 2 — Physique & Dangers</h2>
+    <p>Varistance des matériaux · Tension de pas · Dangers de l'électricité · Effets physiopathologiques</p>
+    <div style="margin-top:10px;">
+      <span class="point-tag">Point 4</span><span class="point-tag">Point 5</span><span class="point-tag">Point 6</span><span class="point-tag">Point 7</span>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>🧱 4 — Varistance universelle des matériaux</h3>
+    <p>La résistance d'un matériau varie selon la tension qui lui est appliquée. La <strong>tension disruptive (ou de claquage)</strong> est la tension minimale qui rend conductrice une portion d'un isolant électrique.</p>
+    <div class="alert-orange">Un isolant soumis à une tension supérieure à sa tension de claquage devient conducteur — il "claque" de façon souvent irréversible. Ce phénomène est à l'origine de nombreux accidents par contact indirect.</div>
+    <p>Les matériaux semi-conducteurs, comme la résistance du corps humain, varient aussi selon l'humidité, la pression, la température.</p>
+  </div>
+
+  <div class="content-card">
+    <h3>👣 5 — Tension de pas</h3>
+    <p>Phénomène qui survient lors de la chute d'une ligne HT au sol ou d'un contact d'engin avec une ligne : le courant se diffuse dans le sol en cercles concentriques avec un gradient décroissant.</p>
+    <div class="alert-red"><strong>Si les pieds sont écartés :</strong> chaque pied est à une tension différente → courant traverse le corps. Les animaux (pattes écartées) sont les plus vulnérables.</div>
+    <div class="two-col" style="margin-top:12px;">
+      <div class="col-card" style="background:var(--vert-pale);">
+        <h4 style="color:var(--vert);">✅ Réflexe de survie</h4>
+        <ul><li><strong>Pieds joints</strong> — un seul point de contact → différence de potentiel nulle</li><li>Si immobile : ne pas bouger</li><li>Pour s'éloigner : <strong>petits pas en traînant les pieds</strong></li></ul>
+      </div>
+      <div class="col-card" style="background:var(--bleu-pale);">
+        <h4 style="color:var(--bleu);">🚗 Cage de Faraday</h4>
+        <ul><li>Une carrosserie métallique protège ses occupants des décharges extérieures</li><li>En cas de contact engin/ligne HT : <strong>rester dans le véhicule</strong></li><li>Ne sortir que si risque d'incendie, et alors sauter loin avec pieds joints</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>☠️ 6 — Les dangers de l'électricité</h3>
+    <p>Toute personne intervenant sur un ouvrage électrique est soumise à <strong>3 risques principaux</strong> :</p>
+    <div class="three-risks" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:12px 0;">
+      <div style="background:var(--rouge-pale);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:1.8rem;margin-bottom:6px;">🤚</div>
+        <strong style="color:var(--rouge);font-family:'Barlow Condensed',sans-serif;font-size:.95rem;">Risque de contact</strong>
+        <p style="font-size:.78rem;color:var(--gris-m);margin-top:4px;">Direct (PNST) ou indirect (masse sous tension par défaut d'isolement)</p>
+      </div>
+      <div style="background:var(--orange-pale);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:1.8rem;margin-bottom:6px;">🔥</div>
+        <strong style="color:var(--orange);font-family:'Barlow Condensed',sans-serif;font-size:.95rem;">Risque de brûlure</strong>
+        <p style="font-size:.78rem;color:var(--gris-m);margin-top:4px;">Arc électrique, flash électrique, court-circuit (sublimation à 4 000°C)</p>
+      </div>
+      <div style="background:#faf5ff;border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:1.8rem;margin-bottom:6px;">⚠️</div>
+        <strong style="color:#7c3aed;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;">Risque spécifique</strong>
+        <p style="font-size:.78rem;color:var(--gris-m);margin-top:4px;">Départ d'incendie, électrisation par défaut d'isolement</p>
+      </div>
+    </div>
+    <div class="alert-blue"><strong>En BT :</strong> le danger survient lors du <em>toucher</em> d'une PNST. <strong>En HT :</strong> le danger commence dès l'<em>approche</em> d'une PNST (amorçage sans contact).</div>
+    <table class="data-table" style="margin-top:12px;">
+      <thead><tr><th>Terme</th><th>Définition</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Électrisation</strong></td><td>Accident électrique sans décès — avec séquelles possibles (brûlures, troubles cardiaques, neurologiques)</td></tr>
+        <tr><td><strong>Électrocution</strong></td><td>Accident électrique mortel</td></tr>
+        <tr><td><strong>PNST</strong></td><td>Pièce Nue Sous Tension — conducteur accessible sous tension sans protection contre le contact direct</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-card">
+    <h3>🏥 7 — Effets physiopathologiques de l'électrisation</h3>
+    <table class="data-table">
+      <thead><tr><th>Intensité (AC 50Hz)</th><th>Effets sur le corps humain</th></tr></thead>
+      <tbody>
+        <tr><td class="cell-ok">1 mA</td><td>Seuil de perception — léger picotement</td></tr>
+        <tr><td class="cell-warn">10 mA</td><td><strong>Tétanisation musculaire</strong> — incapacité à lâcher le conducteur</td></tr>
+        <tr><td class="cell-danger">50 mA</td><td><strong>Fibrillation ventriculaire</strong> — risque d'arrêt cardiaque</td></tr>
+        <tr><td style="background:#1c1c1c;color:#fff;font-weight:700;">500 mA+</td><td style="background:#1c1c1c;color:#fff;">Arrêt cardiaque certain + brûlures internes graves</td></tr>
+      </tbody>
+    </table>
+    <div class="two-col" style="margin-top:12px;">
+      <div class="col-card" style="background:var(--bleu-pale);">
+        <h4 style="color:var(--bleu);">Tensions de sécurité</h4>
+        <table style="width:100%;font-size:.8rem;border-collapse:collapse;">
+          <tr style="font-weight:700;color:var(--gris-m);"><td></td><td>AC</td><td>DC</td></tr>
+          <tr><td>Milieu sec</td><td class="cell-ok">50V</td><td class="cell-ok">120V</td></tr>
+          <tr><td>Milieu humide</td><td class="cell-warn">25V</td><td class="cell-warn">60V</td></tr>
+          <tr><td>Milieu immergé</td><td class="cell-danger">12V</td><td class="cell-danger">30V</td></tr>
+        </table>
+      </div>
+      <div class="col-card" style="background:var(--rouge-pale);">
+        <h4 style="color:var(--rouge);">TRIPTYQUE conventionnel</h4>
+        <p style="font-size:.84rem;color:var(--gris-m);margin-bottom:6px;">La gravité dépend de :</p>
+        <ul style="font-size:.84rem;color:var(--gris-m);"><li><strong>Temps</strong> de contact</li><li><strong>Intensité</strong> traversant le corps</li><li><strong>Tension</strong> de contact</li></ul>
+      </div>
+    </div>
+    <div class="alert-orange" style="margin-top:12px;"><strong>Fibrillation ventriculaire ≠ arrêt du cœur</strong> — C'est une désorganisation du rythme ventriculaire qui entraîne l'arrêt en 3 à 5 minutes. Seul un défibrillateur peut la corriger. Si le défibrillateur ne choque pas → massage cardiaque immédiat. <strong>Ne jamais abandonner les soins, même en cas de mort apparente.</strong></div>
+    <p style="font-size:.84rem;color:var(--gris-m);margin-top:10px;">Lésions possibles : brûlures cutanées (entrée/sortie courant), arc électrique, lésions musculaires (rhabdomyolyse), lésions cardiaques, neurologiques, rénales (à partir de 1 000V), psychologiques.</p>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(4)">← Module 1</button>
+    <button class="btn btn-primary" onclick="goTo(6)">Module 3 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ S6 : MODULE 3 ═══════════════════════ -->
+<div class="screen" id="s6">
+  <div class="module-header">
+    <h2>🏷 Module 3 — Habilitations, Domaines & Zones</h2>
+    <p>Ventilation des niveaux · Domaines de tension · Zones d'environnement</p>
+    <div style="margin-top:10px;">
+      <span class="point-tag">Point 8</span><span class="point-tag">Point 9</span><span class="point-tag">Point 10</span>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>🎫 8 — Ventilation des niveaux d'habilitations</h3>
+    <div class="alert-blue"><strong>Système de classification NF C 18-510 :</strong> 1er caractère = B (BT) ou H (HT) · 2e caractère = 0/1/2/C/R/S/E/P/F · 3e caractère = T/V/N/X (attributs spéciaux)</div>
+    <h4>Habilitations Non-Électriciens</h4>
+    <div class="hab-grid">
+      <div class="hab-card"><div class="hab-code" style="color:var(--vert);">B0/H0</div><div class="hab-label">Accès zones — aucune opération électrique</div></div>
+      <div class="hab-card"><div class="hab-code" style="color:var(--vert);">H0V</div><div class="hab-label">Accès voisinage HT</div></div>
+      <div class="hab-card"><div class="hab-code">BS</div><div class="hab-label">Interventions simples BT (max 32A, 400V) — remplacement identique</div></div>
+      <div class="hab-card"><div class="hab-code">BE Manœuvre</div><div class="hab-label">Manœuvres : réarmement, branchement, consignation pour soi</div></div>
+    </div>
+    <h4>Habilitations Électriciens</h4>
+    <div class="hab-grid">
+      <div class="hab-card"><div class="hab-code">BR</div><div class="hab-label">Intervention BT courte durée, non planifiée (max 500V, 63A)</div></div>
+      <div class="hab-card"><div class="hab-code">B1V/B2V</div><div class="hab-label">Travaux hors tension mais voisinage BT (exécutant/chargé)</div></div>
+      <div class="hab-card"><div class="hab-code">BC/HC</div><div class="hab-label">Chargé de consignation BT/HT</div></div>
+      <div class="hab-card"><div class="hab-code">BE Mesure</div><div class="hab-label">Mesures électriques — approche à moins de 30 cm d'une PNST</div></div>
+    </div>
+    <div class="alert-orange" style="margin-top:12px;"><strong>Important :</strong> L'employeur habilite en fonction des tâches, de l'environnement de travail et de la hiérarchisation de son entreprise. L'habilitation n'est pas un diplôme — c'est une autorisation.
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>⚡ 9 — Domaines de tension</h3>
+    <table class="data-table">
+      <thead><tr><th>Domaine</th><th>Courant Alternatif (AC)</th><th>Courant Continu (DC)</th><th>Exemples</th></tr></thead>
+      <tbody>
+        <tr><td class="cell-ok"><strong>TBT</strong><br>Très Basse Tension</td><td>≤ 50V</td><td>≤ 120V</td><td>Sonnettes, éclairage LED, 12V/24V</td></tr>
+        <tr><td class="cell-warn"><strong>BT</strong><br>Basse Tension</td><td>50V &lt; U ≤ 1 000V</td><td>120V &lt; U ≤ 1 500V</td><td>230V (monophasé), 400V (triphasé)</td></tr>
+        <tr><td><strong>HTA</strong><br>Haute Tension A</td><td>1 kV &lt; U ≤ 50 kV</td><td>1,5 kV &lt; U ≤ 75 kV</td><td>Réseaux de distribution (20 kV)</td></tr>
+        <tr><td class="cell-danger"><strong>HTB</strong><br>Haute Tension B</td><td>U &gt; 50 kV</td><td>U &gt; 75 kV</td><td>Réseaux de transport (63/225/400 kV)</td></tr>
+      </tbody>
+    </table>
+    <div class="alert-blue"><strong>Rappel :</strong> La basse tension, c'est jusqu'à <strong>1 000V</strong> — pas 230V ! Un tableau 400V triphasé est en BT. Un réseau de distribution 20kV est en HTA.</div>
+  </div>
+
+  <div class="content-card">
+    <h3>📍 10 — Zones d'environnement</h3>
+    <p>Il y a naissance de zones d'environnement dès qu'il y a présence de <strong>PNST (Pièces Nues Sous Tension)</strong>.</p>
+    <h4>Zones en Basse Tension</h4>
+    <table class="data-table">
+      <thead><tr><th>Zone</th><th>Nom</th><th>Distance / PNST</th><th>Qui peut y accéder</th></tr></thead>
+      <tbody>
+        <tr><td class="cell-danger"><strong>Zone 4 (ZVR)</strong></td><td>Voisinage Renforcé</td><td>&lt; 30 cm</td><td>BR, BE, BC, B2V, B1V uniquement</td></tr>
+        <tr><td class="cell-warn"><strong>Zone 1 (ZVS)</strong></td><td>Voisinage Simple</td><td>30 cm à 3 m</td><td>Toutes personnes habilitées + personnes averties accompagnées</td></tr>
+        <tr><td class="cell-ok"><strong>Zone 0</strong></td><td>Zone d'Investigation</td><td>3 m à 50 m</td><td>Tous (habilitées, averties, ordinaires)</td></tr>
+      </tbody>
+    </table>
+    <h4>Zones en Haute Tension</h4>
+    <table class="data-table">
+      <thead><tr><th>Zone</th><th>Distance</th><th>Accès</th></tr></thead>
+      <tbody>
+        <tr><td class="cell-danger"><strong>Zone 3 (TST)</strong></td><td>&lt; DMA (Variable)</td><td>H1T/H2T/H1N/H2N uniquement (travail sous tension)</td></tr>
+        <tr><td class="cell-warn"><strong>Zone 2 (ZVR-HT)</strong></td><td>DMA à 2 m (20kV: 60cm)</td><td>H1, H2, H0V et personnes averties accompagnées</td></tr>
+        <tr><td><strong>Zone 1 (ZVS-HT)</strong></td><td>2 m à 3 m</td><td>H0, H1, H2 et personnes averties accompagnées</td></tr>
+        <tr><td class="cell-ok"><strong>Zone 0</strong></td><td>3 m à 50 m</td><td>Tous</td></tr>
+      </tbody>
+    </table>
+    <div class="alert-orange">Dans la Zone de Voisinage Renforcé BT, le port des EPI (gants + surgants + écran facial) est <strong>obligatoire</strong>.</div>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(5)">← Module 2</button>
+    <button class="btn btn-primary" onclick="goTo(7)">Module 4 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ S7 : MODULE 4 ═══════════════════════ -->
+<div class="screen" id="s7">
+  <div class="module-header">
+    <h2>🛡 Module 4 — Prévention, Consignation & EPI</h2>
+    <p>Principes de prévention · Consignation & mise hors tension · EPI-EPC</p>
+    <div style="margin-top:10px;">
+      <span class="point-tag">Point 11</span><span class="point-tag">Point 12</span><span class="point-tag">Point 13</span>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>🔐 11 — Principes généraux de la prévention</h3>
+    <p>Protection contre les contacts directs — <strong>3 familles</strong> :</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0;">
+      <div style="background:var(--bleu-pale);border-radius:8px;padding:14px;text-align:center;"><strong style="color:var(--bleu);display:block;font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;margin-bottom:4px;">ISOLATION</strong><p style="font-size:.8rem;color:var(--gris-m);">Conducteurs isolés (câbles, gaines)</p></div>
+      <div style="background:var(--bleu-pale);border-radius:8px;padding:14px;text-align:center;"><strong style="color:var(--bleu);display:block;font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;margin-bottom:4px;">ÉLOIGNEMENT</strong><p style="font-size:.8rem;color:var(--gris-m);">Distance suffisante pour éviter tout contact</p></div>
+      <div style="background:var(--bleu-pale);border-radius:8px;padding:14px;text-align:center;"><strong style="color:var(--bleu);display:block;font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;margin-bottom:4px;">OBSTACLE</strong><p style="font-size:.8rem;color:var(--gris-m);">Armoires fermées, protecteurs isolants, barrières</p></div>
+    </div>
+    <h4>Protection contre les contacts indirects</h4>
+    <p>Le <strong>disjoncteur différentiel résiduel (DDR)</strong> surveille en permanence la différence de courant entre phase et neutre. Toute fuite vers la terre déclenche l'ouverture instantanée du circuit, protégeant les personnes.</p>
+    <div class="alert-green">La prise de terre associée au DDR est essentielle : elle évacue dans le sol les fuites accidentelles. La résistance de terre doit être <strong>≤ 100 Ω</strong> (NF C 15-100).</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🔒 12 — Consignation — Mise hors tension — Mise hors de portée</h3>
+    <p>La consignation est la procédure réglementaire obligatoire avant toute intervention sur une installation électrique. Elle comprend <strong>5 étapes dans un ordre précis</strong> :</p>
+    <div class="steps">
+      <div class="step-row" style="background:var(--rouge-pale);">
+        <div class="step-num" style="background:var(--rouge);">1</div>
+        <div class="step-body"><strong>SÉPARATION</strong><span> — Ouvrir le sectionneur ou disjoncteur de la source d'alimentation</span></div>
+      </div>
+      <div class="step-row" style="background:var(--orange-pale);">
+        <div class="step-num" style="background:var(--orange);">2</div>
+        <div class="step-body"><strong>CONDAMNATION</strong><span> — Cadenasser en position ouverte + pancarte "Travaux en cours — Ne pas manœuvrer"</span></div>
+      </div>
+      <div class="step-row" style="background:var(--orange-pale);">
+        <div class="step-num" style="background:var(--orange);">3</div>
+        <div class="step-body"><strong>IDENTIFICATION</strong><span> — Identifier clairement le circuit consigné (balisage, étiquette)</span></div>
+      </div>
+      <div class="step-row" style="background:#fef3c7;border:2px solid var(--orange);">
+        <div class="step-num" style="background:#92400e;">4</div>
+        <div class="step-body"><strong>VAT — Vérification d'Absence de Tension</strong><span> — Avec un VAT homologué certifié. <em>Étape obligatoire — la confiance n'est pas une procédure !</em></span></div>
+      </div>
+      <div class="step-row" style="background:var(--bleu-pale);">
+        <div class="step-num" style="background:var(--bleu);">5</div>
+        <div class="step-body"><strong>MALT — Mise à la Terre et en Court-Circuit</strong><span> — Obligatoire uniquement en HT · Protège contre les remises en tension accidentelles et les charges résiduelles</span></div>
+      </div>
+    </div>
+    <div class="alert-red" style="margin-top:8px;"><strong>⛔ La VAT est obligatoire avant CHAQUE intervention,</strong> même si l'on vient de couper soi-même. Un circuit peut être remis sous tension par quelqu'un d'autre ou contenir de l'énergie stockée (condensateurs).</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🦺 13 — EPI & EPC (Équipements de Protection Individuelle et Collective)</h3>
+    <div class="two-col">
+      <div>
+        <h4>EPI — Protection Individuelle</h4>
+        <ul style="list-style:disc;padding-left:16px;font-size:.88rem;color:var(--gris-m);line-height:1.8;">
+          <li><strong>Gants isolants</strong> (classe 00 à 4 selon tension) — vérifier avant chaque use</li>
+          <li><strong>Surgants</strong> (sur les gants isolants en Zone 4)</li>
+          <li><strong>Écran facial / visière</strong> anti-arc électrique</li>
+          <li><strong>Casque isolant</strong> (protection chocs + contact)</li>
+          <li><strong>Vêtements anti-arc</strong> (EN 61482)</li>
+          <li><strong>Outils isolés 1 000V</strong> (marqués IEC)</li>
+          <li><strong>Tapis isolant</strong> (en ZVR)</li>
+        </ul>
+      </div>
+      <div>
+        <h4>EPC — Protection Collective</h4>
+        <ul style="list-style:disc;padding-left:16px;font-size:.88rem;color:var(--gris-m);line-height:1.8;">
+          <li><strong>Balisage / consignation</strong> de la zone de travail</li>
+          <li><strong>Capuchons protecteurs</strong> sur PNST</li>
+          <li><strong>Nappe isolante</strong> (recouvrement PNST)</li>
+          <li><strong>Protecteurs rigides</strong> (éloignement PNST)</li>
+          <li><strong>VAT homologué</strong> (outil de vérification)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert-orange"><strong>⚠ Date de péremption :</strong> Chaque EPI possède une durée de vie limitée. Un gant isolant percé ou craquelé = aucune protection. Vérifier systématiquement avant usage.</div>
+    <div class="alert-blue">Art. R4321-4 du Code du Travail : <em>« L'employeur met à la disposition des travailleurs les EPI appropriés et veille à leur utilisation effective. »</em></div>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(6)">← Module 3</button>
+    <button class="btn btn-primary" onclick="goTo(8)">Module 5 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ S8 : MODULE 5 ═══════════════════════ -->
+<div class="screen" id="s8">
+  <div class="module-header">
+    <h2>🚨 Module 5 — Conduite à tenir</h2>
+    <p>Incendie électrique · Accident électrique</p>
+    <div style="margin-top:10px;">
+      <span class="point-tag">Point 14</span><span class="point-tag">Point 15</span>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>🔥 14 — Conduite à tenir en cas d'incendie électrique</h3>
+    <div class="alert-red"><strong>⛔ RÈGLE ABSOLUE — Ne jamais utiliser de l'eau sur un feu d'origine électrique</strong><br>L'eau est conductrice d'électricité. Projeter de l'eau sur un équipement sous tension peut provoquer une électrocution et propager l'incendie.</div>
+    <h4>Extincteurs autorisés sur feu électrique</h4>
+    <div class="two-col">
+      <div class="col-card" style="background:var(--vert-pale);">
+        <h4 style="color:var(--vert);">✅ CO₂ (dioxyde de carbone)</h4>
+        <ul><li>Non conducteur</li><li>Sans résidu — idéal matériel sensible</li><li>Reconnaissable : bouteille noire</li><li>⚠ Effet de choc thermique à courte distance</li></ul>
+      </div>
+      <div class="col-card" style="background:var(--vert-pale);">
+        <h4 style="color:var(--vert);">✅ Poudre ABC (avec précaution)</h4>
+        <ul><li>Non conductrice</li><li>Résidu corrosif pour équipements</li><li>Utiliser à distance minimum 1m en BT</li><li>Reconnaissable : bouteille rouge</li></ul>
+      </div>
+    </div>
+    <h4>Procédure en cas d'incendie électrique</h4>
+    <div class="steps">
+      <div class="step-row" style="background:var(--rouge-pale);">
+        <div class="step-num" style="background:var(--rouge);">1</div>
+        <div class="step-body"><strong>Donner l'alarme</strong><span> — Déclencher le signal d'alarme, prévenir les collègues</span></div>
+      </div>
+      <div class="step-row" style="background:var(--orange-pale);">
+        <div class="step-num" style="background:var(--orange);">2</div>
+        <div class="step-body"><strong>Couper l'alimentation</strong><span> — Disjoncteur général, tableau électrique — si possible sans danger</span></div>
+      </div>
+      <div class="step-row" style="background:var(--bleu-pale);">
+        <div class="step-num" style="background:var(--bleu);">3</div>
+        <div class="step-body"><strong>Attaquer le feu</strong><span> — CO₂ ou poudre uniquement. Si feu maîtrisable — sinon évacuer immédiatement</span></div>
+      </div>
+      <div class="step-row" style="background:var(--vert-pale);">
+        <div class="step-num" style="background:var(--vert);">4</div>
+        <div class="step-body"><strong>Évacuer et appeler les secours</strong><span> — 18 (pompiers) ou 112. Guider les secours à l'entrée</span></div>
+      </div>
+    </div>
+    <div class="alert-orange">En cas d'incendie électrique avec personne impliquée — <strong>BE Manœuvre :</strong> coupure d'urgence possible (action ON/OFF) même sans habilitation spécifique.</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🩺 15 — Conduite à tenir en cas d'accident électrique</h3>
+    <div class="alert-red" style="font-size:1rem;font-weight:700;"><strong>⛔ RÈGLE ABSOLUE — Ne JAMAIS toucher une victime en contact avec un conducteur sous tension.</strong><br>Vous deviendriez électrisé(e) à votre tour.</div>
+    <h4>Méthode PEAS — dans l'ordre impératif</h4>
+    <div class="steps">
+      <div class="step-row" style="background:var(--rouge-pale);border:2px solid var(--rouge);">
+        <div class="step-num" style="background:var(--rouge);font-size:1.1rem;">P</div>
+        <div class="step-body"><strong style="color:var(--rouge);">PROTÉGER — Couper l'alimentation en PREMIER</strong><span> — Disjoncteur, sectionneur, bouton d'arrêt d'urgence. Condamner pour éviter toute remise en tension. SEULE action possible avant de toucher la victime.</span></div>
+      </div>
+      <div class="step-row" style="background:var(--orange-pale);">
+        <div class="step-num" style="background:var(--orange);">E</div>
+        <div class="step-body"><strong>EXAMINER</strong><span> — Apprécier l'état de la victime : consciente ? Respire-t-elle ? Cela conditionne les étapes suivantes.</span></div>
+      </div>
+      <div class="step-row" style="background:var(--bleu-pale);">
+        <div class="step-num" style="background:var(--bleu);">A</div>
+        <div class="step-body"><strong>ALERTER</strong><span> — Appeler le 15 (SAMU), 18 (pompiers) ou 112. Préciser : lieu exact, nature accident, état victimes, nombre de blessés.</span></div>
+      </div>
+      <div class="step-row" style="background:var(--vert-pale);">
+        <div class="step-num" style="background:var(--vert);">S</div>
+        <div class="step-body"><strong>SECOURIR</strong><span> — Inconsciente + respire → PLS. Pas de respiration → RCP (30 compressions / 2 insufflations). Brûlures → eau courante 15 min min. Défibrillateur si disponible.</span></div>
+      </div>
+    </div>
+    <div class="alert-blue" style="margin-top:10px;"><strong>Ne jamais abandonner les soins</strong> — même en cas de mort apparente. La fibrillation ventriculaire peut être réversible avec un défibrillateur et une RCP maintenue jusqu'à l'arrivée des secours.</div>
+    <div class="two-col" style="margin-top:12px;">
+      <div class="col-card" style="background:var(--orange-pale);">
+        <h4 style="color:var(--orange);">Brûlures électriques</h4>
+        <ul><li>Eau courante tempérée (15-25°C) — <strong>15 min minimum</strong></li><li>Ne pas percer les cloques</li><li>Pas de corps gras (beurre, huile)</li><li>Couvrir avec compresse stérile</li><li><strong>Toujours consulter un médecin</strong> — lésions internes possibles même si brûlure superficielle</li></ul>
+      </div>
+      <div class="col-card" style="background:var(--bleu-pale);">
+        <h4 style="color:var(--bleu);">Numéros d'urgence</h4>
+        <ul><li><strong>15</strong> — SAMU (urgence médicale)</li><li><strong>18</strong> — Pompiers</li><li><strong>112</strong> — Numéro européen unique</li><li><strong>114</strong> — Personnes sourdes/malentendantes</li></ul>
+        <p style="font-size:.78rem;color:var(--gris-m);margin-top:6px;">Les 3 premiers permettent d'accéder aux secours médicalisés.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="module-nav">
+    <button class="btn btn-secondary" onclick="goTo(7)">← Module 4</button>
+    <button class="btn btn-success btn-lg" onclick="goTo(9)">🎯 Passer au Quiz final →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ S9 : QUIZ FINAL ═══════════════════════ -->
+<div class="screen" id="s9">
+  <div class="quiz-banner">
+    <h3>Quiz final — 10 questions</h3>
+    <p>Validez vos connaissances sur les 15 points réglementaires. Score minimum requis : <strong>70%</strong> pour l'attestation.</p>
+  </div>
+  <div id="finalquiz-container"></div>
+  <button class="quiz-action-btn" id="btn-final" onclick="submitFinal()" disabled>Obtenir mon score et mon attestation →</button>
+</div>
+
+<!-- ═══════════════════════ S10 : RÉSULTATS + DIPLÔME ═══════════════════════ -->
+<div class="screen" id="s10">
+  <div class="score-wrap">
+    <div class="score-circle" id="score-circle">
+      <div class="score-num" id="score-num">0/10</div>
+      <div class="score-pct" id="score-pct">0%</div>
+    </div>
+    <div class="score-msg" id="score-msg"></div>
+  </div>
+
+  <div style="max-width:860px;margin:0 auto;">
+    <h3 style="text-align:center;margin-bottom:20px;color:var(--bleu);">🎓 Votre attestation de formation</h3>
+    <div class="diplome-card">
+      <div class="diplome-border"></div>
+      <div class="diplome-corner tl"></div><div class="diplome-corner tr"></div>
+      <div class="diplome-corner bl"></div><div class="diplome-corner br"></div>
+      <div class="diplome-wm">⚡</div>
+      <div class="diplome-inner">
+        <div class="diplome-top">
+          <img src="https://www.mullerautomotive.fr/wp-content/uploads/2025/01/logo-Muller-automotive-full-1.png" alt="Muller Automotive">
+          <div class="diplome-attestation">Attestation de Sensibilisation</div>
+        </div>
+        <div class="diplome-mid">
+          <div class="diplome-certifie">certifie que</div>
+          <div class="diplome-name" id="d-name">Prénom Nom</div>
+          <div class="diplome-pour">a suivi et validé le module de formation</div>
+          <div class="diplome-titre">Prévention des Risques Électriques</div>
+          <div class="diplome-score-d">15 points réglementaires — NF C 18-510</div>
+          <div class="diplome-score-d" id="d-score">Score : — / 10</div>
+        </div>
+        <div class="diplome-bottom">
+          <div><div id="d-date">—</div><div id="d-societe" style="margin-top:2px;"></div></div>
+          <div class="sig"><div class="sig-line">Responsable Formation<br>Muller Automotive</div></div>
+          <div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:1px;">Réf. SENS-ELEC-2026</div><div>formation-sav.fr</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-print" onclick="window.print()">🖨 Imprimer / Sauvegarder PDF</button>
+      <button class="btn-email" id="btn-email" onclick="sendEmail()">📧 Envoyer mes résultats</button>
+    </div>
+    <div class="email-ok" id="email-ok">✅ Résultats envoyés à formation@mullerautomotive.fr</div>
+    <div style="text-align:center;margin-top:18px;">
+      <button class="btn btn-secondary" onclick="goTo(0)" style="font-size:.85rem;">↺ Recommencer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let S={prenom:'',nom:'',email:'',societe:'',preScore:0,finalScore:0};
+const TOTAL=11;
+
+function goTo(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  document.getElementById('progressBar').style.width=Math.round((n/(TOTAL-1))*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===2)renderPre();
+  if(n===9)renderFinal();
+  if(n===10)renderResults();
+}
+
+// ── INSCRIPTION ──
+function validateForm(){
+  const p=document.getElementById('inp-prenom').value.trim();
+  const n=document.getElementById('inp-nom').value.trim();
+  const e=document.getElementById('inp-email').value.trim();
+  const err=document.getElementById('form-err');
+  if(!p||!n||!e||!e.includes('@')){err.style.display='block';return;}
+  err.style.display='none';
+  S.prenom=p;S.nom=n;S.email=e;S.societe=document.getElementById('inp-societe').value.trim();
+  goTo(2);
+}
+
+// ── PRÉ-QUIZ ──
+const preQ=[
+  {q:"Quelle est la tension conventionnelle de sécurité en courant alternatif en milieu sec ?",opts:["12V","50V","230V"],correct:1},
+  {q:"Que signifie PNST ?",opts:["Protection Naturelle Sur le Terrain","Pièce Nue Sous Tension","Prise Non Soumise à la Tension"],correct:1},
+  {q:"Que signifie l'acronyme PEAS en cas d'accident électrique ?",opts:["Prévenir, Évaluer, Agir, Soigner","Protéger, Examiner, Alerter, Secourir","Parer, Examiner, Appeler, Sauver"],correct:1},
+  {q:"Quelle est la première action à effectuer face à une victime d'électrisation ?",opts:["La toucher pour l'éloigner du conducteur","Couper l'alimentation électrique","Lui donner de l'eau"],correct:1},
+  {q:"Qu'est-ce que la fibrillation ventriculaire ?",opts:["Un spasme musculaire des bras","Une désorganisation du rythme cardiaque pouvant entraîner l'arrêt du cœur","Une brûlure interne grave"],correct:1}
+];
+let preAns=new Array(preQ.length).fill(null);
+
+function renderPre(){
+  document.getElementById('prequiz-container').innerHTML=preQ.map((q,i)=>`
+    <div class="quiz-card pre" id="pq${i}">
+      <div class="q-label">Question ${i+1} / ${preQ.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">${q.opts.map((o,j)=>`<div class="q-opt" id="pq${i}o${j}" onclick="selPre(${i},${j})"><div class="q-letter">${'ABCD'[j]}</div>${o}</div>`).join('')}</div>
+    </div>`).join('');
+}
+function selPre(qi,oi){
+  if(preAns[qi]!==null)return;
+  preAns[qi]=oi;
+  preQ[qi].opts.forEach((_,j)=>{const el=document.getElementById(`pq${qi}o${j}`);if(el)el.classList.add('locked');});
+  document.getElementById(`pq${qi}o${oi}`).classList.add('selected');
+  if(preAns.every(a=>a!==null))document.getElementById('btn-pre').disabled=false;
+}
+function submitPre(){
+  S.preScore=preAns.filter((a,i)=>a===preQ[i].correct).length;
+  document.getElementById('pre-result-txt').textContent=`Score : ${S.preScore} / ${preQ.length} bonne${S.preScore>1?'s':''} réponse${S.preScore>1?'s':''} au questionnaire initial. Aucune incidence sur votre résultat final.`;
+  goTo(3);
+}
+
+// ── QUIZ FINAL ──
+const finalQ=[
+  {q:"Quelle est la séquence correcte de la consignation électrique ?",opts:["VAT → Séparation → Condamnation → Identification → MALT","Séparation → Condamnation → Identification → VAT → MALT","Condamnation → Séparation → VAT → MALT → Identification"],correct:1,exp:"L'ordre réglementaire est : Séparation (couper) → Condamnation (cadenasser) → Identification (baliser) → VAT (vérifier absence tension) → MALT (mise à la terre, HT uniquement)."},
+  {q:"Depuis quand l'habilitation électrique est-elle obligatoire en France ?",opts:["1er janvier 2005","1er juillet 2011","1er mars 2016"],correct:1,exp:"L'habilitation électrique est obligatoire depuis le 1er juillet 2011 (Décret n°2010-1118 du 22 septembre 2010 — Articles R4544-9 à R4544-11 du Code du Travail)."},
+  {q:"Quel est l'effet du courant à 10 mA sur le corps humain ?",opts:["Simple picotement — pas de danger","Tétanisation musculaire — incapacité à lâcher le conducteur","Fibrillation ventriculaire immédiate"],correct:1,exp:"À 10 mA, les muscles se contractent involontairement (tétanisation). La victime ne peut plus lâcher le conducteur, ce qui prolonge le temps de contact et aggrave les lésions."},
+  {q:"Qu'est-ce que la tension de pas ?",opts:["La tension mesurée aux bornes d'un pas de vis","La différence de potentiel entre deux points du sol, créant un courant dans les jambes écartées","La tension limite de sécurité pour marcher en zone électrique"],correct:1,exp:"Quand une ligne HT tombe au sol, le courant se diffuse concentriquement. Les pieds écartés se trouvent à des tensions différentes → courant dans le corps. Réflexe : pieds joints, petits pas traînants."},
+  {q:"Quelle est la distance limite de la Zone de Voisinage Renforcé (Zone 4) en Basse Tension ?",opts:["10 cm","30 cm","1 m"],correct:1,exp:"La Zone de Voisinage Renforcé (DLVR) en BT est à moins de 30 cm d'une PNST. Seuls les BR, BE, BC, B2V, B1V peuvent y accéder. Port des EPI obligatoire (gants + surgants + écran facial)."},
+  {q:"Quelle est la tension maximale du domaine Basse Tension en courant alternatif ?",opts:["230V","400V","1 000V"],correct:2,exp:"Le domaine BT va jusqu'à 1 000V en AC (et 1 500V en DC). Un tableau 400V triphasé est donc en BT. La TBT est ≤ 50V AC. L'HTA commence au-delà de 1 000V AC."},
+  {q:"Quel extincteur est interdit sur un feu d'origine électrique ?",opts:["CO₂","Eau pulvérisée/jet","Poudre ABC"],correct:1,exp:"L'eau est conductrice d'électricité. Projeter de l'eau sur un équipement sous tension peut provoquer une électrocution. Seuls le CO₂ et la poudre ABC (avec précaution) sont autorisés sur feux électriques."},
+  {q:"Que signifie le TRIPTYQUE conventionnel déterminant la gravité d'une électrisation ?",opts:["Tension, Résistance, Fréquence","Temps de contact, Intensité, Tension de contact","Intensité, Puissance, Résistance"],correct:1,exp:"Le triptyque conventionnel est : Temps de contact × Intensité traversant le corps × Tension de contact. Ces trois facteurs combinés déterminent la gravité des lésions."},
+  {q:"Qu'est-ce que l'habilitation B0 ?",opts:["Exécutant de travaux électriques en BT","Non-électricien autorisé à accéder à des zones avec PNST sans effectuer d'opérations électriques","Chargé de consignation en BT"],correct:1,exp:"B0 est l'habilitation pour les non-électriciens pouvant accéder à des zones électriques (pour des travaux non électriques, peinture, nettoyage, etc.) sans toucher aux conducteurs."},
+  {q:"En cas de découverte d'un électrisé conscient, quelle est votre PREMIÈRE action ?",opts:["Le toucher pour apprécier son état","Couper l'alimentation électrique — PROTÉGER avant tout","L'arroser d'eau froide pour le refroidir"],correct:1,exp:"La règle absolue : PROTÉGER en premier. Couper l'alimentation avant tout contact avec la victime. Toucher un électrisé encore en contact avec la source électrique vous met en danger de mort immédiat."}
+];
+let finalAns=new Array(finalQ.length).fill(null);
+
+function renderFinal(){
+  document.getElementById('finalquiz-container').innerHTML=finalQ.map((q,i)=>`
+    <div class="quiz-card final" id="fq${i}">
+      <div class="q-label">Question ${i+1} / ${finalQ.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">${q.opts.map((o,j)=>`<div class="q-opt" id="fq${i}o${j}" onclick="selFinal(${i},${j})"><div class="q-letter">${'ABCD'[j]}</div>${o}</div>`).join('')}</div>
+    </div>`).join('');
+}
+function selFinal(qi,oi){
+  if(finalAns[qi]!==null)return;
+  finalAns[qi]=oi;
+  finalQ[qi].opts.forEach((_,j)=>{const el=document.getElementById(`fq${qi}o${j}`);if(el)el.classList.add('locked');});
+  document.getElementById(`fq${qi}o${oi}`).classList.add('selected');
+  if(finalAns.every(a=>a!==null))document.getElementById('btn-final').disabled=false;
+}
+function submitFinal(){
+  S.finalScore=finalAns.filter((a,i)=>a===finalQ[i].correct).length;
+  goTo(10);
+}
+
+// ── RÉSULTATS ──
+function renderResults(){
+  const sc=S.finalScore,tot=finalQ.length,pct=Math.round(sc/tot*100);
+  const color=pct>=70?'#059669':pct>=50?'#d97706':'#dc2626';
+  const circle=document.getElementById('score-circle');
+  circle.style.borderColor=color;
+  document.getElementById('score-num').style.color=color;
+  document.getElementById('score-num').textContent=`${sc}/${tot}`;
+  document.getElementById('score-pct').textContent=`${pct}%`;
+  const msg=pct>=70?'🎉 Formation validée — Attestation disponible.':pct>=50?'⚠️ Quelques points à consolider avant intervention.':'❌ Score insuffisant — reprenez les modules avant de retenter.';
+  document.getElementById('score-msg').style.color=color;
+  document.getElementById('score-msg').textContent=msg;
+  const date=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('d-name').textContent=`${S.prenom} ${S.nom.toUpperCase()}`;
+  document.getElementById('d-score').textContent=`Score : ${sc} / ${tot} — ${pct}%`;
+  document.getElementById('d-date').textContent=`Le ${date}`;
+  document.getElementById('d-societe').textContent=S.societe||'Muller Automotive';
+}
+
+// ── EMAIL ──
+async function sendEmail(){
+  const sc=S.finalScore,tot=finalQ.length,pct=Math.round(sc/tot*100),date=new Date().toLocaleString('fr-FR');
+  try{
+    const r=await fetch('/api/send-sensibilisation',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prenom:S.prenom,nom:S.nom,email:S.email,societe:S.societe,
+        module:'Prévention des Risques Électriques — 15 points NF C 18-510',
+        score:sc,total:tot,pct,date,preScore:S.preScore})});
+    if(r.ok){document.getElementById('email-ok').style.display='block';document.getElementById('btn-email').disabled=true;document.getElementById('btn-email').textContent='✅ Envoyé';}
+    else throw new Error();
+  }catch{
+    const subj=encodeURIComponent(`[Sensibilisation] Risques Électriques — ${S.prenom} ${S.nom} — ${pct}%`);
+    const body=encodeURIComponent(`Résultats — Prévention des Risques Électriques (NF C 18-510)\n\nParticipant : ${S.prenom} ${S.nom}\nEmail : ${S.email}\nSociété : ${S.societe||'—'}\n\nScore questionnaire initial : ${S.preScore}/5\nScore quiz final : ${sc}/${tot} (${pct}%)\nDate : ${date}\nStatut : ${pct>=70?'VALIDÉ':'NON VALIDÉ'}`);
+    window.open(`mailto:formation@mullerautomotive.fr?subject=${subj}&body=${body}`);
+    document.getElementById('email-ok').style.display='block';
+    document.getElementById('email-ok').textContent='📧 Client mail ouvert — envoyez le message pour valider.';
+  }
+}
+</script>
+</body>
+</html>

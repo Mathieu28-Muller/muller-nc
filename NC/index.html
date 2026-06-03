@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="/NC/favicon.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Déclaration Non-Conformité — Muller Automotive</title>
+<!-- v20260428 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#c0392b;--dark:#1a1a1a;--card:#fff;--border:#e0e0e0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f2f2f2;color:#222;min-height:100vh}
+header{background:var(--dark);padding:14px 20px;display:flex;align-items:center;gap:14px;border-bottom:3px solid var(--red);position:relative}
+header h1{color:#fff;font-size:1rem;font-weight:600}
+header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
+.btn-accueil{display:flex;align-items:center;gap:6px;text-decoration:none;color:#999;font-size:0.82rem;transition:color 0.2s}
+.btn-accueil:hover{color:#fff}
+.btn-accueil svg{flex-shrink:0}
+.container{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+.nc-numero-bar{background:var(--dark);color:#fff;border-radius:8px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:0.85rem}
+.nc-numero-bar strong{color:#ff9999;font-size:1rem;letter-spacing:1px}
+.section{background:#fff;border-radius:10px;margin-bottom:16px;overflow:hidden;border:1px solid var(--border)}
+.section-title{background:#2b2b2b;color:#fff;padding:10px 16px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.section-body{padding:16px}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.row:last-child{margin-bottom:0}
+.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:180px}
+.field label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#777}
+.field input,.field textarea,.field select{padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:0.88rem;background:#fafafa;font-family:inherit;transition:border-color .2s;width:100%}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--red);background:#fff}
+.field textarea{resize:vertical;min-height:90px}
+.field.full{min-width:100%;flex:1 0 100%}
+.code-inter{display:flex;gap:8px;align-items:center}
+.code-inter input{width:46px;text-align:center;font-weight:700;font-size:1rem;padding:8px 4px}
+/* DROP ZONE */
+.drop-zone{border:2.5px dashed #ccc;border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;background:#fafafa;position:relative;transition:all .2s}
+.drop-zone.hover{border-color:var(--red);background:#fff5f5}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-zone-icon{font-size:2rem;display:block;margin-bottom:8px}
+.drop-zone p{font-size:0.85rem;color:#888;margin-bottom:4px}
+.drop-zone small{font-size:0.72rem;color:#bbb}
+.camera-btn{display:inline-block;margin-top:10px;background:var(--dark);color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:0.8rem;cursor:pointer;position:relative;overflow:hidden}
+.camera-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:12px}
+.preview-item{position:relative;border-radius:6px;overflow:hidden;background:#eee;aspect-ratio:1}
+.preview-item img,.preview-item video{width:100%;height:100%;object-fit:cover}
+.preview-item .del-btn{position:absolute;top:4px;right:4px;background:rgba(192,57,43,.85);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.preview-item .file-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:0.6rem;padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upload-progress{font-size:0.75rem;color:#888;margin-top:6px;text-align:center}
+/* SUBMIT */
+.btn-submit{width:100%;background:var(--red);color:#fff;border:none;padding:15px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s;margin-top:8px}
+.btn-submit:hover{background:#a93226}
+.btn-submit:disabled{background:#ccc;cursor:default}
+/* SUCCESS */
+#success-screen{display:none;text-align:center;padding:40px 20px}
+.success-icon{font-size:4rem;margin-bottom:16px}
+#success-numero{font-size:1.5rem;font-weight:700;color:var(--red);letter-spacing:2px;margin:12px 0}
+.success-msg{color:#555;font-size:0.9rem;line-height:1.7}
+.btn-new{background:var(--dark);color:#fff;border:none;padding:12px 28px;border-radius:7px;font-size:0.9rem;cursor:pointer;margin-top:20px}
+/* Toast */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:#222;color:#fff;padding:10px 20px;border-radius:8px;font-size:0.84rem;opacity:0;transition:all .3s;z-index:999;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* SUIVI NC */
+.suivi-bloc{background:#fff;border-radius:10px;margin-bottom:16px;border:1px solid var(--border);overflow:hidden}
+.suivi-title{background:#2b2b2b;color:#fff;padding:10px 16px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.suivi-title:hover{background:#3a3a3a}
+.suivi-body{padding:16px;display:none}
+.suivi-body.open{display:block}
+.suivi-row{display:flex;gap:10px;margin-bottom:10px}
+.suivi-input{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:0.9rem;background:#fafafa;font-family:inherit;text-transform:uppercase;letter-spacing:1px}
+.suivi-input:focus{outline:none;border-color:var(--red);background:#fff}
+.btn-suivi{background:var(--dark);color:#fff;border:none;padding:10px 18px;border-radius:7px;font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn-suivi:hover{background:#333}
+.suivi-result{margin-top:12px}
+.suivi-card{background:#f8f8f8;border-radius:8px;padding:14px;border:1px solid var(--border)}
+.suivi-num{font-size:0.95rem;font-weight:700;font-family:monospace;color:var(--dark);margin-bottom:6px}
+.suivi-meta{font-size:0.78rem;color:#888;margin-bottom:12px}
+.s-pill{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:12px}
+.s-pill.ouvert{background:#fdebd0;color:#d35400}
+.s-pill.en_cours{background:#d6eaf8;color:#1a6fa0}
+.s-pill.resolu{background:#d5f5e3;color:#1e8449}
+.s-pill.clos{background:#e8e8e8;color:#666}.s-pill.non_pertinent{background:#f5eef8;color:#8e44ad}
+.s-timeline{list-style:none;padding:0;border-top:1px solid #eee;padding-top:10px}
+.s-timeline li{display:flex;gap:10px;padding-bottom:12px;position:relative}
+.s-timeline li:not(:last-child)::before{content:'';position:absolute;left:11px;top:22px;bottom:0;width:2px;background:#eee}
+.s-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.62rem;margin-top:1px}
+.s-dot.init{background:#2b2b2b;color:#fff}
+.s-dot.ouvert{background:#e67e22;color:#fff}
+.s-dot.en_cours{background:#2980b9;color:#fff}
+.s-dot.resolu{background:#27ae60;color:#fff}
+.s-dot.clos{background:#7f8c8d;color:#fff}.s-dot.non_pertinent{background:#8e44ad;color:#fff}
+.s-info strong{font-size:0.8rem;display:block}
+.s-info small{font-size:0.7rem;color:#999}
+.s-info p{font-size:0.78rem;color:#555;margin-top:2px;font-style:italic;background:#fff;border-radius:4px;padding:4px 8px;border:1px solid #e8e8e8}
+.suivi-error{color:#c0392b;font-size:0.83rem;padding:8px 0}
+/* PDF print zone */
+#pdf-zone{position:fixed;left:-9999px;top:0;width:794px;padding:30px;background:#fff;font-family:Arial,sans-serif;font-size:11px;color:#222}
+.pdf-header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #c0392b;padding-bottom:10px;margin-bottom:16px}
+.pdf-title{font-size:18px;font-weight:700;color:#c0392b}
+.pdf-num{font-size:13px;font-weight:700;background:#c0392b;color:#fff;padding:4px 12px;border-radius:4px}
+.pdf-section{margin-bottom:14px}
+.pdf-section-title{background:#2b2b2b;color:#fff;padding:5px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border-radius:4px;margin-bottom:8px}
+.pdf-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pdf-field{border:1px solid #e0e0e0;border-radius:4px;padding:5px 8px}
+.pdf-label{font-size:8px;color:#999;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.pdf-value{font-size:10px;font-weight:600}
+.pdf-problem{border:1px solid #f5c6c6;background:#fff9f9;border-radius:4px;padding:8px;margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <button id="ver-badge-form" onclick="openChangelog()" style="position:absolute;left:50%;transform:translateX(-50%);background:rgba(230,126,34,.13);color:#e67e22;border:1px solid rgba(230,126,34,.38);border-radius:12px;font-size:0.67rem;font-weight:700;padding:3px 11px;letter-spacing:.6px;white-space:nowrap;cursor:pointer;font-family:inherit">⚙ v… — chargement</button>
+  <div>
+    <a class="btn-accueil" href="/">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Accueil
+    </a>
+    <small>Muller Automotive — SAV</small>
+  </div>
+  <div style="margin-left:auto;font-size:0.75rem;color:#555">
+    <a href="console.html" style="color:#888;text-decoration:none">→ Console suivi</a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="nc-numero-bar" id="nc-info-bar">
+    <span>🗓 <span id="nc-date-bar"></span></span>
+    <span style="margin-left:auto;color:#888">Le numéro sera attribué à la validation</span>
+  </div>
+
+  <!-- SUIVI D'UNE NC EXISTANTE -->
+  <div class="suivi-bloc">
+    <div class="suivi-title" onclick="toggleSuivi(this)">
+      🔍 Suivre une non-conformité existante
+      <span id="suivi-arrow">▼</span>
+    </div>
+    <div class="suivi-body" id="suivi-body">
+      <div class="suivi-row">
+        <input class="suivi-input" type="text" id="suivi-numero" placeholder="Ex : 260405-00001" maxlength="14"
+               oninput="this.value=this.value.toUpperCase()"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();rechercherNC();}">
+        <button type="button" class="btn-suivi" onclick="rechercherNC()">Rechercher</button>
+      </div>
+      <div class="suivi-result" id="suivi-result"></div>
+    </div>
+  </div>
+
+  <form id="nc-form">
+
+    <!-- IDENTIFICATION -->
+    <div class="section">
+      <div class="section-title">🧑 Identification</div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field"><label>Rédacteur *</label><input type="text" id="redacteur" placeholder="Prénom Nom" required autocomplete="name"></div>
+          <div class="field"><label>Date de découverte *</label><input type="date" id="dateDecouverte" required></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Email rédacteur <span style="color:#c0392b">*</span></label><input type="email" id="emailRedacteur" placeholder="votre@email.fr" required autocomplete="email"></div>
+          <div class="field"><label>Périmètre concerné <span style="color:#c0392b">*</span></label>
+            <select id="perimetre" name="perimetre" required style="width:100%;padding:9px 10px;border:1.5px solid #ddd;border-radius:6px;font-size:0.9rem;font-family:inherit;background:#fafafa">
+              <option value="">— Sélectionner —</option>
+            </select>
+          </div>
+          <div class="field"><label>Source de détection <span style="color:#c0392b">*</span></label>
+            <select id="sourceDetection" name="sourceDetection" required style="width:100%;padding:9px 10px;border:1.5px solid #ddd;border-radius:6px;font-size:0.9rem;font-family:inherit;background:#fafafa">
+              <option value="">— Sélectionner —</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUIT -->
+    <div class="section">
+      <div class="section-title">🔧 Produit</div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field"><label>N° de Commande</label><input type="text" id="noCommande" placeholder="Ex: CMD-2026-001"></div>
+          <div class="field"><label>Référence produit <span style="color:#c0392b">*</span></label><input type="text" id="refProduit" placeholder="Ex: XG_VL" required></div>
+          <div class="field"><label>Famille de produit <span style="color:#c0392b">*</span></label>
+            <select id="familleProduit" onchange="this.style.borderColor=this.value?'':'#c0392b'" style="border:1.5px solid #e0e0e0;border-radius:6px;padding:8px 10px;font-size:0.87rem;background:#fafafa;font-family:inherit;width:100%">
+              <option value="">— Sélectionner —</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field"><label>N° de série <span style="color:#c0392b">*</span></label><input type="text" id="noSerie" placeholder="Ex : SN-12345 — saisir NS si non sérialisé" required><div style="font-size:0.72rem;color:#888;margin-top:3px">Produit non sérialisé → saisir <strong>NS</strong></div></div>
+          <div class="field"><label>Version programme <span style="color:#999;font-weight:400">(facultatif)</span></label><input type="text" id="versionProg" placeholder="Ex: v2.4.1"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Quantité d'unités concernées <span style="color:#999;font-weight:400">(facultatif)</span></label><input type="number" id="quantiteUnites" min="1" step="1" placeholder="Ex: 3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT -->
+    <div class="section">
+      <div class="section-title">🏢 Client</div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field"><label>Code SAP <span style="color:#c0392b">*</span></label><input type="text" id="sapCode" placeholder="Code client SAP" required></div>
+          <div class="field"><label>Nom client *</label><input type="text" id="nomClient" placeholder="Raison sociale" required></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Code postal</label><input type="text" id="cp" placeholder="75000 / SW1A 1AA / ..."></div>
+          <div class="field"><label>Ville</label><input type="text" id="ville" placeholder="Paris, London, ..."></div>
+          <div class="field"><label>Pays</label><input type="text" id="pays" placeholder="France"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROBLÈME -->
+    <div class="section">
+      <div class="section-title">⚠️ Caractérisation du problème</div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field full"><label>Description du problème *</label>
+            <textarea id="probleme" rows="4" placeholder="Décrire précisément le problème observé, les conditions d'apparition, la fréquence…" required></textarea>
+          </div>
+        </div>
+        <!-- MÉDIAS -->
+        <div class="row" style="margin-top:8px">
+          <div class="field full">
+            <label>Photos / Vidéos</label>
+            <div class="drop-zone" id="drop-zone">
+              <input type="file" id="file-input" multiple accept="image/*,video/*" onchange="handleFiles(this.files)">
+              <span class="drop-zone-icon">📷</span>
+              <p>Glissez vos photos ou vidéos ici</p>
+              <small>JPG, PNG, MP4, MOV… jusqu'à 200 Mo par fichier</small>
+            </div>
+            <button type="button" class="camera-btn" style="margin-top:8px">
+              📸 Prendre une photo
+              <input type="file" accept="image/*" capture="environment" onchange="handleFiles(this.files)">
+            </button>
+            <div class="preview-grid" id="preview-grid"></div>
+            <div class="upload-progress" id="upload-progress"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAITEMENT -->
+    <div class="section">
+      <div class="section-title">🛠 Traitement</div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field full"><label>Description de la réparation</label>
+            <textarea id="reparation" rows="3" placeholder="Solution apportée ou envisagée…"></textarea>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field full"><label>Suggestion d'amélioration</label>
+            <textarea id="suggestion" rows="2" placeholder="Piste d'amélioration pour éviter la récurrence…"></textarea>
+          </div>
+        </div>
+        <!-- MÉDIAS TRAITEMENT -->
+        <div class="row" style="margin-top:8px">
+          <div class="field full">
+            <label>Photos / Vidéos du traitement</label>
+            <div class="drop-zone" id="drop-zone-traitement">
+              <input type="file" id="file-input-traitement" multiple accept="image/*,video/*" onchange="handleFilesTraitement(this.files)">
+              <span class="drop-zone-icon">🔧</span>
+              <p>Photos de la réparation effectuée</p>
+              <small>JPG, PNG, MP4, MOV…</small>
+            </div>
+            <button type="button" class="camera-btn" style="margin-top:8px">
+              📸 Prendre une photo
+              <input type="file" accept="image/*" capture="environment" onchange="handleFilesTraitement(this.files)">
+            </button>
+            <div class="preview-grid" id="preview-grid-traitement"></div>
+            <div class="upload-progress" id="upload-progress-traitement"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="btn-submit">✅ Valider la déclaration</button>
+  </form>
+
+  <!-- SUCCESS -->
+  <div id="success-screen">
+    <div class="success-icon">✅</div>
+    <div style="font-size:1rem;color:#555">Non-conformité enregistrée</div>
+    <div id="success-numero"></div>
+    <div class="success-msg">Le formulaire a été envoyé par email au pôle SAV.<br>Conservez ce numéro pour le suivi.</div>
+    <button class="btn-new" onclick="nouvelleNC()">+ Nouvelle déclaration</button>
+  </div>
+</div>
+
+<!-- Zone PDF cachée -->
+<div id="pdf-zone">
+  <div class="pdf-header">
+    <div><div class="pdf-title">Fiche Non-Conformité</div><div style="font-size:10px;color:#888;margin-top:3px">Muller Automotive</div></div>
+    <div class="pdf-num" id="pdf-numero">En cours…</div>
+  </div>
+  <div class="pdf-section">
+    <div class="pdf-section-title">Identification</div>
+    <div class="pdf-grid">
+      <div class="pdf-field"><div class="pdf-label">Rédacteur</div><div class="pdf-value" id="pdf-redacteur">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Email rédacteur</div><div class="pdf-value" id="pdf-email-redacteur">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Date découverte</div><div class="pdf-value" id="pdf-date">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Périmètre</div><div class="pdf-value" id="pdf-perimetre">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Source détection</div><div class="pdf-value" id="pdf-source">—</div></div>
+    </div>
+  </div>
+  <div class="pdf-section">
+    <div class="pdf-section-title">Produit</div>
+    <div class="pdf-grid">
+      <div class="pdf-field"><div class="pdf-label">N° Commande</div><div class="pdf-value" id="pdf-cmd">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Référence produit</div><div class="pdf-value" id="pdf-ref">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Famille de produit</div><div class="pdf-value" id="pdf-famille">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">N° série</div><div class="pdf-value" id="pdf-serie">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Version</div><div class="pdf-value" id="pdf-ver">—</div></div>
+    </div>
+  </div>
+  <div class="pdf-section">
+    <div class="pdf-section-title">Client</div>
+    <div class="pdf-grid">
+      <div class="pdf-field"><div class="pdf-label">Code SAP</div><div class="pdf-value" id="pdf-sap">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Nom client</div><div class="pdf-value" id="pdf-client">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">CP</div><div class="pdf-value" id="pdf-cp">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Ville</div><div class="pdf-value" id="pdf-ville">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Pays</div><div class="pdf-value" id="pdf-pays">—</div></div>
+    </div>
+  </div>
+  <div class="pdf-section">
+    <div class="pdf-section-title">Problème</div>
+    <div class="pdf-problem"><div class="pdf-label">Caractérisation</div><div id="pdf-probleme" style="margin-top:4px;white-space:pre-wrap"></div></div>
+  </div>
+  <div class="pdf-section" id="pdf-traitement-section">
+    <div class="pdf-section-title">Traitement</div>
+    <div class="pdf-field"><div class="pdf-label">Réparation</div><div class="pdf-value" id="pdf-reparation" style="white-space:pre-wrap"></div></div>
+    <div class="pdf-field" style="margin-top:6px"><div class="pdf-label">Suggestion</div><div class="pdf-value" id="pdf-suggestion" style="white-space:pre-wrap"></div></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const uploadedFiles = [];           // photos du PROBLÈME
+const uploadedFilesTraitement = []; // photos du TRAITEMENT
+
+// Date du jour
+document.getElementById('nc-date-bar').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+document.getElementById('dateDecouverte').valueAsDate = new Date();
+
+// ── Familles fallback (utilisé si l'API est indisponible) ──
+const FAMILLES_FALLBACK = [
+  'ANALYSEUR DE GAZ','BANC EXPERT','BANC FREINAGE MOTO','BANC FREINAGE PL','BANC FREINAGE VL',
+  'BANC SUSPENSION','BANC TACHY','CELEROMETRE','CLIMATISATION','DECELEROMETRE','DIAG',
+  'EQUILIBREUSE','GEOMETRIE','KIT SECURITE','MONTE DEMONTE PNEUS','OBD','OPACIMETRE',
+  'PAJ PL','PAJ VL','PONT','PUPITRE LCT','PUPITRE POLLUTION','REGLE PHARES','RIPAGE',
+  'SOFT LCT','SOFT POLL','SOFT RPH','SONOMETRE','SPEEDOMETRE','STATION MOBILE','SYSTÈME'
+];
+
+// ── Chargement dynamique périmètre, source & famille ──
+(async function chargerListesFormulaire() {
+  try {
+    const r = await fetch('/api/nc/config/listes-publiques');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const selP = document.getElementById('perimetre');
+    const selS = document.getElementById('sourceDetection');
+    const selF = document.getElementById('familleProduit');
+    (data.perimetres||[]).forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;selP.appendChild(o);});
+    (data.sourcesDetection||[]).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;selS.appendChild(o);});
+    const familles = (data.famillesProduit&&data.famillesProduit.length) ? data.famillesProduit : FAMILLES_FALLBACK;
+    familles.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;selF.appendChild(o);});
+  } catch(e){
+    console.warn('Chargement listes dynamiques échoué — utilisation du fallback',e);
+    const selF = document.getElementById('familleProduit');
+    FAMILLES_FALLBACK.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;selF.appendChild(o);});
+  }
+})();
+
+// Drag & drop — Problème
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('hover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('hover'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('hover'); handleFiles(e.dataTransfer.files); });
+
+// Drag & drop — Traitement
+const dzt = document.getElementById('drop-zone-traitement');
+dzt.addEventListener('dragover', e => { e.preventDefault(); dzt.classList.add('hover'); });
+dzt.addEventListener('dragleave', () => dzt.classList.remove('hover'));
+dzt.addEventListener('drop', e => { e.preventDefault(); dzt.classList.remove('hover'); handleFilesTraitement(e.dataTransfer.files); });
+
+async function uploadFile(file) {
+  const fd = new FormData();
+  fd.append('file', file, file.name);
+  const r = await fetch('/api/nc/upload-temp', { method:'POST', body:fd });
+  return r.json();
+}
+
+async function handleFiles(files) {
+  const prog = document.getElementById('upload-progress');
+  for (const file of files) {
+    prog.textContent = `⏳ Upload de ${file.name}…`;
+    try {
+      const data = await uploadFile(file);
+      if (data.fileId) {
+        uploadedFiles.push({ fileId:data.fileId, originalName:file.name, url:data.url, type:file.type });
+        addPreview(data.fileId, file.name, data.url, file.type);
+      } else toast('Erreur upload : '+file.name, true);
+    } catch(e) { toast('Upload échoué : '+file.name, true); }
+  }
+  prog.textContent = uploadedFiles.length ? `✓ ${uploadedFiles.length} fichier(s)` : '';
+}
+
+async function handleFilesTraitement(files) {
+  const prog = document.getElementById('upload-progress-traitement');
+  for (const file of files) {
+    prog.textContent = `⏳ Upload de ${file.name}…`;
+    try {
+      const data = await uploadFile(file);
+      if (data.fileId) {
+        uploadedFilesTraitement.push({ fileId:data.fileId, originalName:file.name, url:data.url, type:file.type });
+        addPreviewTraitement(data.fileId, file.name, data.url, file.type);
+      } else toast('Erreur upload : '+file.name, true);
+    } catch(e) { toast('Upload échoué : '+file.name, true); }
+  }
+  prog.textContent = uploadedFilesTraitement.length ? `✓ ${uploadedFilesTraitement.length} fichier(s)` : '';
+}
+
+function addPreview(fileId, name, url, type) {
+  _addPreviewTo('preview-grid', fileId, name, url, type,
+    `removeFileProbleme('${fileId}',this.closest('.preview-item'))`);
+}
+function addPreviewTraitement(fileId, name, url, type) {
+  _addPreviewTo('preview-grid-traitement', fileId, name, url, type,
+    `removeFileTraitement('${fileId}',this.closest('.preview-item'))`);
+}
+function _addPreviewTo(gridId, fileId, name, url, type, onclickStr) {
+  const grid = document.getElementById(gridId);
+  const div = document.createElement('div'); div.className='preview-item'; div.dataset.fileId=fileId;
+  if (type && type.startsWith('video')) {
+    div.innerHTML = `<video src="${url}" muted playsinline style="width:100%;height:100%;object-fit:cover"></video>`;
+  } else {
+    div.innerHTML = `<img src="${url}" alt="${name}" loading="lazy">`;
+  }
+  div.innerHTML += `<div class="file-name">${name}</div>
+    <button class="del-btn" onclick="${onclickStr}">✕</button>`;
+  grid.appendChild(div);
+}
+function removeFileProbleme(fileId, el) {
+  const i = uploadedFiles.findIndex(f=>f.fileId===fileId);
+  if (i>=0) uploadedFiles.splice(i,1);
+  el.remove();
+  document.getElementById('upload-progress').textContent = uploadedFiles.length ? `✓ ${uploadedFiles.length} fichier(s)` : '';
+}
+function removeFileTraitement(fileId, el) {
+  const i = uploadedFilesTraitement.findIndex(f=>f.fileId===fileId);
+  if (i>=0) uploadedFilesTraitement.splice(i,1);
+  el.remove();
+  document.getElementById('upload-progress-traitement').textContent = uploadedFilesTraitement.length ? `✓ ${uploadedFilesTraitement.length} fichier(s)` : '';
+}
+
+// ── SUBMIT ──
+document.getElementById('nc-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  // Famille de produit obligatoire
+  const famSel = document.getElementById('familleProduit');
+  if (!famSel.value) {
+    famSel.style.borderColor = '#c0392b';
+    famSel.scrollIntoView({ behavior:'smooth', block:'center' });
+    famSel.focus();
+    return;
+  }
+  const selPerimetre = document.getElementById('perimetre');
+  if (!selPerimetre.value) {
+    selPerimetre.style.borderColor = '#c0392b';
+    selPerimetre.scrollIntoView({ behavior:'smooth', block:'center' });
+    selPerimetre.focus();
+    return;
+  }
+  const selSource = document.getElementById('sourceDetection');
+  if (!selSource.value) {
+    selSource.style.borderColor = '#c0392b';
+    selSource.scrollIntoView({ behavior:'smooth', block:'center' });
+    selSource.focus();
+    return;
+  }
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = '⏳ Génération du PDF…';
+
+  // Remplir la zone PDF
+  const v = id => document.getElementById(id)?.value?.trim()||'';
+  document.getElementById('pdf-redacteur').textContent        = v('redacteur');
+  document.getElementById('pdf-email-redacteur').textContent  = v('emailRedacteur');
+  document.getElementById('pdf-date').textContent             = v('dateDecouverte');
+  document.getElementById('pdf-perimetre').textContent = document.getElementById('perimetre').value||'—';
+  document.getElementById('pdf-source').textContent    = document.getElementById('sourceDetection').value||'—';
+  document.getElementById('pdf-cmd').textContent        = v('noCommande');
+  document.getElementById('pdf-ref').textContent        = v('refProduit');
+  document.getElementById('pdf-famille').textContent    = v('familleProduit');
+  document.getElementById('pdf-serie').textContent      = v('noSerie');
+  document.getElementById('pdf-ver').textContent        = v('versionProg');
+  document.getElementById('pdf-sap').textContent        = v('sapCode');
+  document.getElementById('pdf-client').textContent     = v('nomClient');
+  document.getElementById('pdf-cp').textContent         = v('cp');
+  document.getElementById('pdf-ville').textContent      = v('ville');
+  document.getElementById('pdf-pays').textContent       = v('pays');
+  document.getElementById('pdf-probleme').textContent   = v('probleme');
+  document.getElementById('pdf-reparation').textContent = v('reparation');
+  document.getElementById('pdf-suggestion').textContent = v('suggestion');
+  document.getElementById('pdf-numero').textContent     = 'À définir';
+
+  let pdfBase64 = null;
+  try {
+    const canvas = await Promise.race([
+      html2canvas(document.getElementById('pdf-zone'),{scale:2,backgroundColor:'#fff',logging:false,x:0,y:0,useCORS:true}),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('html2canvas timeout')),8000))
+    ]);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const W=210, H=297, pad=10;
+    const ratio = canvas.width/canvas.height;
+    const imgH = Math.min(H-pad*2, (W-pad*2)/ratio);
+    pdf.addImage(canvas.toDataURL('image/jpeg',.92),'JPEG',pad,pad,W-pad*2,imgH);
+    pdfBase64 = pdf.output('datauristring').split(',')[1];
+  } catch(err) { console.warn('PDF non généré (ignoré):', err); }
+
+  btn.textContent = '📤 Envoi en cours…';
+
+  const payload = {
+    redacteur:v('redacteur'), emailRedacteur:v('emailRedacteur'),
+    dateDecouverte:v('dateDecouverte'),
+    perimetre: document.getElementById('perimetre').value,
+    sourceDetection: document.getElementById('sourceDetection').value,
+    noCommande:v('noCommande'), refProduit:v('refProduit'), familleProduit:v('familleProduit'), noSerie:v('noSerie'), versionProg:v('versionProg'),
+    quantiteUnites: document.getElementById('quantiteUnites').value ? parseInt(document.getElementById('quantiteUnites').value, 10) : null,
+    sapCode:v('sapCode'), nomClient:v('nomClient'), cp:v('cp'), ville:v('ville'), pays:v('pays'),
+    probleme:v('probleme'),
+    reparation:v('reparation'), suggestion:v('suggestion'),
+    mediaFiles: uploadedFiles,
+    mediaFilesTraitement: uploadedFilesTraitement,
+    pdfBase64
+  };
+
+  try {
+    const r = await fetch('/api/nc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data = await r.json();
+    if (data.ok) {
+      document.getElementById('nc-form').style.display = 'none';
+      document.getElementById('nc-info-bar').style.display = 'none';
+      const suc = document.getElementById('success-screen');
+      suc.style.display = 'block';
+      document.getElementById('success-numero').textContent = data.numero;
+    } else { toast('Erreur : '+(data.error||'?'), true); btn.disabled=false; btn.textContent='✅ Valider la déclaration'; }
+  } catch(err) { toast('Serveur inaccessible.', true); btn.disabled=false; btn.textContent='✅ Valider la déclaration'; }
+});
+
+function nouvelleNC() {
+  document.getElementById('nc-form').reset();
+  document.getElementById('nc-form').style.display = '';
+  document.getElementById('nc-info-bar').style.display = '';
+  document.getElementById('success-screen').style.display = 'none';
+  document.getElementById('preview-grid').innerHTML = '';
+  document.getElementById('upload-progress').textContent = '';
+  document.getElementById('preview-grid-traitement').innerHTML = '';
+  document.getElementById('upload-progress-traitement').textContent = '';
+  uploadedFiles.length = 0;
+  uploadedFilesTraitement.length = 0;
+  document.getElementById('dateDecouverte').valueAsDate = new Date();
+  document.getElementById('btn-submit').disabled = false;
+  document.getElementById('btn-submit').textContent = '✅ Valider la déclaration';
+  window.scrollTo(0,0);
+}
+
+/* ── SUIVI NC ── */
+function toggleSuivi(el) {
+  const body = document.getElementById('suivi-body');
+  const arrow = document.getElementById('suivi-arrow');
+  const open = body.classList.toggle('open');
+  arrow.textContent = open ? '▲' : '▼';
+  if (open) setTimeout(() => document.getElementById('suivi-numero').focus(), 80);
+}
+
+async function rechercherNC() {
+  const numero = document.getElementById('suivi-numero').value.trim();
+  const result = document.getElementById('suivi-result');
+  if (!numero) { result.innerHTML = '<div class="suivi-error">Veuillez saisir un numéro de NC.</div>'; return; }
+
+  result.innerHTML = '<div style="color:#aaa;font-size:0.82rem;padding:8px 0">⏳ Recherche…</div>';
+
+  try {
+    const res = await fetch('/api/nc/public/' + encodeURIComponent(numero));
+    if (res.status === 404) { result.innerHTML = '<div class="suivi-error">Numéro introuvable. Vérifiez le format (ex : 260405-00001).</div>'; return; }
+    if (!res.ok) throw new Error('Erreur serveur');
+    const nc = await res.json();
+
+    const SL = { ouvert:'Réceptionné', en_cours:'En traitement', resolu:'Résolu', clos:'Clos', non_pertinent:'Non pertinent' };
+    const s = nc.statut || 'ouvert';
+    const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+    const fmtDT   = iso => iso ? new Date(iso).toLocaleString('fr-FR') : '—';
+
+    const hist = nc.historique || [];
+    const timelineHtml = `<ul class="s-timeline">
+      <li>
+        <div class="s-dot init">✦</div>
+        <div class="s-info"><strong>Déclaration créée</strong><small>${fmtDT(nc.createdAt)}</small></div>
+      </li>
+      ${hist.map(h => `<li>
+        <div class="s-dot ${h.statut||'ouvert'}">▸</div>
+        <div class="s-info">
+          <strong>→ ${SL[h.statut]||h.statut}</strong>
+          <small>${fmtDT(h.date)}</small>
+          ${h.commentaire ? `<p>${h.commentaire.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>` : ''}
+        </div>
+      </li>`).join('')}
+    </ul>`;
+
+    result.innerHTML = `<div class="suivi-card">
+      <div class="suivi-num">NC N° ${nc.numero}</div>
+      <div class="suivi-meta">Déclarée le ${fmtDate(nc.createdAt)}${nc.nomClient?' — Client : '+nc.nomClient:''}</div>
+      <div><span class="s-pill ${s}">${SL[s]||s}</span></div>
+      ${timelineHtml}
+    </div>`;
+  } catch(e) {
+    result.innerHTML = '<div class="suivi-error">Impossible de récupérer les informations.</div>';
+  }
+}
+
+let toastTimer;
+function toast(msg, warn=false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = warn ? '#c0392b' : '#222';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+/* ════ AIDE FORMULAIRE DÉCLARANT (guide simplifié — aucune norme visible) ════ */
+(function () {
+  'use strict';
+
+  // Guide de remplissage — langage simple, sans références normatives
+  const GUIDE = [
+    {
+      id: 'redacteur',
+      nom: 'Rédacteur',
+      quoi: "Indiquez votre <strong>prénom et nom complet</strong>. C'est la personne qui signale le problème.",
+      exemple: "Jean Dupont"
+    },
+    {
+      id: 'date',
+      nom: 'Date de découverte',
+      quoi: "Indiquez la <strong>date à laquelle vous avez constaté le problème</strong> pour la première fois — même si vous le signalez plus tard. Ne pas mettre la date du jour si le problème est plus ancien.",
+      exemple: "15/04/2026"
+    },
+    {
+      id: 'emailRedacteur',
+      nom: 'Email rédacteur',
+      quoi: "Votre adresse email professionnelle. Elle servira uniquement à vous transmettre le <strong>numéro de suivi</strong> de votre déclaration et les éventuelles questions.",
+      exemple: "jean.dupont@muller-auto.fr"
+    },
+    {
+      id: 'perimetre',
+      nom: 'Périmètre concerné',
+      quoi: "Choisissez <strong>où le problème a été constaté</strong>, dans quel service ou étape du processus :<ul style='margin:6px 0 0 16px;line-height:2'><li><strong>Production</strong> — problème découvert en atelier, fabrication</li><li><strong>SAV</strong> — problème constaté chez un client lors d'une intervention</li><li><strong>Approvisionnement</strong> — pièce ou produit défectueux reçu d'un fournisseur</li><li><strong>Contrôle final</strong> — détecté avant expédition</li><li><strong>Garantie</strong> — retour client après vente</li></ul>",
+      exemple: "SAV — si un technicien constate le défaut chez un client"
+    },
+    {
+      id: 'sourceDetection',
+      nom: 'Source de détection',
+      quoi: "Indiquez <strong>comment le problème a été découvert</strong> :<ul style='margin:6px 0 0 16px;line-height:2'><li><strong>Réclamation client</strong> — le client vous a contacté</li><li><strong>Contrôle qualité</strong> — détecté lors d'un contrôle interne</li><li><strong>Retour produit</strong> — produit renvoyé en réparation</li><li><strong>Audit interne</strong> — découvert lors d'un audit</li></ul>",
+      exemple: "Réclamation client"
+    },
+    {
+      id: 'refProduit',
+      nom: 'Référence produit',
+      quoi: "Le <strong>code ou référence du produit</strong> concerné, tel qu'il apparaît sur l'étiquette, la boîte ou le bon de livraison.",
+      exemple: "XG_VL-2024 ou BC-0042A"
+    },
+    {
+      id: 'noSerie',
+      nom: 'Numéro de série',
+      quoi: "Le <strong>numéro de série unique</strong> du produit défectueux, gravé ou imprimé sur l'appareil. Si plusieurs unités sont concernées, indiquez le premier et le dernier numéro.",
+      exemple: "SN240301-0042"
+    },
+    {
+      id: 'nomClient',
+      nom: 'Nom client',
+      quoi: "La <strong>raison sociale complète</strong> du client chez qui le problème a été constaté, ou du client qui a signalé le défaut.",
+      exemple: "Garage Martin SAS"
+    },
+    {
+      id: 'description',
+      nom: 'Description du problème',
+      quoi: "Décrivez <strong>ce que vous avez constaté</strong>, de façon factuelle et précise.<br><br>✅ Décrivez le défaut visible, la panne, le dysfonctionnement.<br>✅ Précisez sur quelle pièce, dans quelles circonstances.<br>❌ N'expliquez pas pourquoi — dites ce que vous avez vu.<br>❌ Évitez les suppositions.",
+      exemple: "Le boîtier présente une fissure sur la face avant, côté droit. Découvert lors de la mise en route chez le client. 3 unités concernées sur le lot."
+    },
+    {
+      id: 'reparation',
+      nom: 'Description de la réparation effectuée',
+      quoi: "Si vous avez déjà effectué une <strong>réparation ou un dépannage provisoire</strong>, décrivez ce que vous avez fait pour remédier au problème immédiatement.",
+      exemple: "Remplacement du boîtier sur site. Produit défectueux rapatrié pour analyse."
+    },
+    {
+      id: 'suggestion',
+      nom: "Suggestion d'amélioration",
+      quoi: "Si vous avez une <strong>idée pour éviter que ce problème se reproduise</strong>, partagez-la ici. Ce champ est facultatif mais précieux.",
+      exemple: "Ajouter un contrôle visuel systématique avant emballage."
+    }
+  ];
+
+  const CSS = `
+    #fg-aide-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:10000;display:flex;align-items:flex-start;justify-content:flex-end}
+    #fg-aide-panel{width:460px;max-width:96vw;height:100vh;background:#fff;border-left:3px solid #c0392b;display:flex;flex-direction:column;overflow:hidden;box-shadow:-4px 0 24px rgba(0,0,0,.15)}
+    #fg-aide-panel *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+    .fga-header{padding:18px 20px 14px;border-bottom:1px solid #eee;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;background:#fff}
+    .fga-title{font-size:16px;font-weight:800;color:#1a1a1a}
+    .fga-sub{font-size:12px;color:#888;margin-top:3px}
+    .fga-close{background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;line-height:1;padding:2px 4px;flex-shrink:0}
+    .fga-close:hover{color:#333}
+    .fga-search-wrap{padding:12px 16px;border-bottom:1px solid #eee;flex-shrink:0}
+    .fga-search{width:100%;padding:8px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:13px;background:#fafafa}
+    .fga-search:focus{outline:none;border-color:#c0392b;background:#fff}
+    .fga-body{flex:1;overflow-y:auto;padding:14px 16px}
+    .fga-intro{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:#5d4037;line-height:1.6}
+    .fga-intro strong{font-weight:700}
+    .fga-card{border:1px solid #e8e8e8;border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fff;transition:border-color .15s}
+    .fga-card:hover{border-color:#bbb}
+    .fga-card.focus{border:2px solid #c0392b;background:#fff8f8}
+    .fga-card-name{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+    .fga-card-name::before{content:'';display:inline-block;width:4px;height:16px;background:#c0392b;border-radius:2px;flex-shrink:0}
+    .fga-card-quoi{font-size:12.5px;color:#333;line-height:1.65}
+    .fga-card-quoi strong{font-weight:700;color:#1a1a1a}
+    .fga-card-quoi ul{margin:6px 0 0 16px}
+    .fga-card-quoi li{margin-bottom:2px}
+    .fga-exemple{margin-top:10px;background:#f0f4ff;border-radius:6px;padding:8px 12px;font-size:11.5px;color:#1a3a6c}
+    .fga-exemple::before{content:"Exemple : ";font-weight:700}
+    .fga-empty{text-align:center;padding:40px 20px;color:#aaa;font-size:13px}
+    .fga-trigger{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:#fff3e0;border:1px solid #ffb74d;color:#e65100;font-size:10px;font-weight:800;cursor:pointer;margin-left:5px;vertical-align:middle;flex-shrink:0;transition:all .15s}
+    .fga-trigger:hover{background:#ffe0b2;border-color:#ff8f00}
+  `;
+
+  function openPanel(champId) {
+    if(document.getElementById('fg-aide-overlay')) closePanel();
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<div id="fg-aide-overlay"><div id="fg-aide-panel">
+      <div class="fga-header">
+        <div><div class="fga-title">Comment remplir ce formulaire ?</div><div class="fga-sub">Guide de déclaration — Muller Automotive</div></div>
+        <button class="fga-close" id="fg-aide-close">&#x2715;</button>
+      </div>
+      <div class="fga-search-wrap"><input class="fga-search" type="text" id="fg-aide-search" placeholder="Chercher un champ..."></div>
+      <div class="fga-body" id="fg-aide-body"></div>
+    </div></div>`;
+    document.body.appendChild(wrap.firstElementChild);
+    document.getElementById('fg-aide-close').addEventListener('click', closePanel);
+    document.getElementById('fg-aide-overlay').addEventListener('click', function(e){ if(e.target===this) closePanel(); });
+    document.getElementById('fg-aide-search').addEventListener('input', function(){ renderGuide(this.value, champId); });
+    renderGuide('', champId);
+  }
+
+  function renderGuide(query, focusId) {
+    const body = document.getElementById('fg-aide-body');
+    let items = GUIDE;
+    if(query) {
+      const q = query.toLowerCase();
+      items = GUIDE.filter(g => g.nom.toLowerCase().includes(q) || g.quoi.toLowerCase().includes(q));
+    }
+    if(items.length === 0){ body.innerHTML='<div class="fga-empty">Aucun champ correspondant.</div>'; return; }
+    const intro = query ? '' : `<div class="fga-intro">Cliquez sur le <strong>?</strong> à côté d'un champ pour afficher directement son aide, ou parcourez tous les champs ci-dessous.</div>`;
+    body.innerHTML = intro + items.map(g => `
+      <div class="fga-card${g.id===focusId?' focus':''}" data-id="${g.id}">
+        <div class="fga-card-name">${g.nom}</div>
+        <div class="fga-card-quoi">${g.quoi}</div>
+        <div class="fga-exemple">${g.exemple}</div>
+      </div>`).join('');
+    if(focusId && !query) {
+      const t = body.querySelector(`.fga-card[data-id="${focusId}"]`);
+      if(t) t.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  }
+
+  function closePanel() {
+    const o = document.getElementById('fg-aide-overlay');
+    if(o) o.remove();
+  }
+
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePanel(); });
+
+  const LABEL_MAP = {
+    'rédacteur':'redacteur',
+    'date de découv':'date',
+    'email':'emailRedacteur',
+    'périmètre':'perimetre',
+    'source de déte':'sourceDetection',
+    'référence produit':'refProduit',
+    'numéro de série':'noSerie',
+    'nom client':'nomClient',
+    'description du problème':'description',
+    'description de la répar':'reparation',
+    "suggestion d'amélio":'suggestion'
+  };
+
+  function injectTriggerButtons() {
+    document.querySelectorAll('.field label').forEach(label => {
+      if(label.querySelector('.fga-trigger')) return;
+      const txt = label.textContent.toLowerCase();
+      let champId = null;
+      for(const [key, val] of Object.entries(LABEL_MAP)){ if(txt.includes(key)){ champId=val; break; } }
+      if(!champId) return;
+      const btn = document.createElement('span');
+      btn.className = 'fga-trigger';
+      btn.title = 'Comment remplir ce champ ?';
+      btn.textContent = '?';
+      btn.addEventListener('click', function(e){ e.stopPropagation(); e.preventDefault(); openPanel(champId); });
+      label.appendChild(btn);
+    });
+  }
+
+  function injectFAB() {
+    if(document.getElementById('fg-aide-fab')) return;
+    const fab = document.createElement('button');
+    fab.id = 'fg-aide-fab';
+    fab.title = 'Comment remplir ce formulaire ?';
+    fab.innerHTML = '?<span style="margin-left:7px;font-size:13px;font-weight:700">Aide formulaire</span>';
+    Object.assign(fab.style, {
+      position:'fixed', bottom:'24px', right:'24px', zIndex:'9999',
+      padding:'11px 18px', background:'#c0392b', color:'#fff',
+      border:'none', borderRadius:'28px', cursor:'pointer',
+      display:'flex', alignItems:'center',
+      fontSize:'16px', fontWeight:'800', fontFamily:'inherit',
+      boxShadow:'0 3px 14px rgba(192,57,43,.4)', transition:'background .15s'
+    });
+    fab.addEventListener('mouseenter', ()=>{ fab.style.background='#a93226'; });
+    fab.addEventListener('mouseleave', ()=>{ fab.style.background='#c0392b'; });
+    fab.addEventListener('click', ()=> openPanel(null));
+    document.body.appendChild(fab);
+  }
+
+  function init() {
+    const style = document.createElement('style');
+    style.id = 'fg-aide-styles';
+    style.textContent = CSS;
+    document.head.appendChild(style);
+    injectFAB();
+    injectTriggerButtons();
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+})();
+</script>
+
+<!-- ══ Changelog version ════════════════════════════════════════════════ -->
+<div id="changelog-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#1a1a1a;border-radius:10px;width:min(680px,95vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid #333;box-shadow:0 20px 60px rgba(0,0,0,.7)">
+    <div style="background:#2c2c2c;padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #333">
+      <div style="flex:1">
+        <div style="color:#fff;font-size:0.95rem;font-weight:700">Module Non-Conformités — Historique des versions</div>
+        <div style="color:#888;font-size:0.72rem;margin-top:2px">Muller Automotive · <span id="cl-curver" style="color:#e67e22;font-weight:700"></span></div>
+      </div>
+      <button onclick="closeChangelog()" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;line-height:1;padding:4px 8px;border-radius:4px">✕</button>
+    </div>
+    <div id="changelog-body" style="overflow-y:auto;padding:20px 24px;flex:1"></div>
+  </div>
+</div>
+
+<style>
+.cl-ver-block{margin-bottom:24px;border-left:3px solid #333;padding-left:16px}
+.cl-ver-block.current{border-left-color:#e67e22}
+.cl-ver-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.cl-ver-num{font-family:monospace;font-size:1rem;font-weight:800;color:#fff}
+.cl-ver-block.current .cl-ver-num{color:#e67e22}
+.cl-ver-date{font-size:0.72rem;color:#666;letter-spacing:.5px}
+.cl-ver-label{font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(255,255,255,.07);color:#aaa;padding:2px 8px;border-radius:10px}
+.cl-ver-block.current .cl-ver-label{background:rgba(230,126,34,.15);color:#e67e22}
+.cl-ver-changes{list-style:none;margin:0;padding:0}
+.cl-ver-changes li{font-size:0.83rem;color:#aaa;padding:3px 0 3px 14px;position:relative;line-height:1.5}
+.cl-ver-changes li::before{content:'·';position:absolute;left:2px;color:#555;font-weight:900}
+.cl-ver-block.current .cl-ver-changes li{color:#ccc}
+.cl-ver-block.current .cl-ver-changes li::before{color:#e67e22}
+.cl-current-badge{display:inline-block;background:#e67e22;color:#fff;font-size:0.63rem;font-weight:800;padding:1px 7px;border-radius:8px;letter-spacing:.5px;vertical-align:middle;margin-left:6px}
+</style>
+
+<script>
+let _clHistory = null;
+
+async function openChangelog() {
+  const overlay = document.getElementById('changelog-overlay');
+  overlay.style.display = 'flex';
+  if (_clHistory) return;
+  try {
+    const r = await fetch('/api/nc/appversion');
+    const data = await r.json();
+    _clHistory = data;
+    document.getElementById('cl-curver').textContent = 'Version ' + data.version;
+    const body = document.getElementById('changelog-body');
+    const sorted = [...data.history].reverse();
+    body.innerHTML = sorted.map(v => `
+      <div class="cl-ver-block${v.current?' current':''}">
+        <div class="cl-ver-head">
+          <span class="cl-ver-num">v${v.version}${v.current?'<span class="cl-current-badge">ACTUELLE</span>':''}</span>
+          <span class="cl-ver-date">${formatClDate(v.date)}</span>
+          <span class="cl-ver-label">${v.label}</span>
+        </div>
+        <ul class="cl-ver-changes">${v.changes.map(c=>`<li>${c}</li>`).join('')}</ul>
+      </div>`).join('');
+  } catch {
+    document.getElementById('changelog-body').innerHTML = '<p style="color:#888;padding:20px">Impossible de charger l\'historique.</p>';
+  }
+}
+
+function closeChangelog() {
+  document.getElementById('changelog-overlay').style.display = 'none';
+}
+
+document.getElementById('changelog-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeChangelog();
+});
+
+function formatClDate(d) {
+  const [y,m,day] = d.split('-');
+  const mois = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+  return (parseInt(day,10) > 1 ? day + ' ' : '') + mois[parseInt(m,10)-1] + ' ' + y;
+}
+
+(async function loadVerBadge() {
+  try {
+    const r = await fetch('/api/nc/appversion');
+    const d = await r.json();
+    document.getElementById('ver-badge-form').textContent = '⚙ v' + d.version;
+  } catch {}
+})();
+</script>
+</body>
+</html>

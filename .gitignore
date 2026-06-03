@@ -1,0 +1,48 @@
+# ── Dépendances ──────────────────────────────────────────
+node_modules/
+package-lock.json
+
+# ── Fichiers sensibles (credentials, secrets) ────────────
+.env
+*.env
+ecosystem.config.js
+
+# ── Données de production (archives JSON) ────────────────
+nc-data.json
+nc-users.json
+users.json
+data.json
+
+# ── Logs et fichiers temporaires ─────────────────────────
+*.log
+*.tmp
+*.temp
+logs/
+.pm2/
+
+# ── Médias uploadés (pièces jointes NC) ──────────────────
+NC/media/
+Base de cas/media/
+certificat-conformite/CertificatConformite/media/
+
+# ── Fichiers volumineux (> 100 Mo — limite GitHub) ───────
+*.mp4
+*.MP4
+*.mov
+*.MOV
+pptx_temp/
+
+# ── Sauvegardes locales ───────────────────────────────────
+*.bak
+*_backup*/
+*_avant_*/
+
+# ── OS Windows ───────────────────────────────────────────
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ── Éditeurs ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp

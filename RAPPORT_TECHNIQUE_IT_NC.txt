@@ -1,0 +1,1514 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║         RAPPORT TECHNIQUE IT — MODULE NON-CONFORMITÉS (NC)                  ║
+║         Muller Automotive                                                    ║
+║         Version 6 — 07/05/2026                                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Document destiné au responsable IT pour :
+  · Comprendre l'architecture à deux environnements (dev / production)
+  · Exporter le module NC seul et le déployer sur un VPS OVH
+  · Migrer les emails du compte Gmail vers la messagerie entreprise
+  · Référencer les formats CSV et PDF produits par l'application
+  · Diagnostiquer les problèmes courants au démarrage OVH (FAQ)
+
+SOMMAIRE
+  1.  Contexte et objectifs (v5)
+  2.  Architecture — deux environnements
+  3.  Fonctionnalités applicatives v4
+  4.  Volumétrie prévisionnelle
+  5.  Format CSV
+  6.  Format PDF
+  7.  Export NC seul + déploiement production OVH
+      7.1 Fichiers à exporter (périmètre NC uniquement)
+      7.2 Adaptations avant déploiement
+      7.3 Préparation clé USB (PC Windows)
+      7.4 Déploiement sur VPS OVH (13 étapes)
+  8.  Recommandations infrastructure OVH
+  9.  Configuration emails entreprise (@mullerautomotive.fr)
+  10. Sécurité
+  11. Plan de reprise d'activité
+  12. Coûts estimés
+  13. FAQ démarrage OVH — problèmes courants
+  14. FAQ technique — questions fréquentes
+  15. Résumé exécutif — présentation direction
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. CONTEXTE ET OBJECTIFS — VERSION 6
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le module Non-Conformités (NC) est actuellement hébergé sur un PC Windows local
+exposé via un tunnel Cloudflare sous le domaine formation-sav.fr. Ce domaine
+et cet hébergement sont utilisés comme ENVIRONNEMENT DE DÉVELOPPEMENT (tests,
+évolutions futures, formation).
+
+OBJECTIF v5 : Déployer le module NC en PRODUCTION sur un VPS OVH dédié, sous
+un nouveau domaine professionnel Muller Automotive, accessible partout dans le
+monde depuis n'importe quel navigateur, sans installation, sans VPN.
+
+Les deux environnements coexisteront en permanence :
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  DÉVELOPPEMENT (inchangé)          PRODUCTION (nouveau)                 │
+  │  ─────────────────────────         ───────────────────────────────────  │
+  │  PC Windows local                  VPS OVH Linux (IP fixe)              │
+  │  formation-sav.fr/NC/              espace-client.muller-automotive.fr   │
+  │  → Tests, mises à jour             → Usage quotidien entreprise         │
+  │  → Nouvelles versions              → Clients, fournisseurs, auditeurs   │
+  │  → Aucun impact utilisateurs       → SLA 99,9% OVH garanti              │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  DOMAINE PRODUCTION (exemple à confirmer avec registrar) :
+    https://espace-client.muller-automotive.fr/NC/
+    ⚠ Remplacer par le vrai domaine choisi par la direction IT.
+      Ce document utilise ce nom en tant que PLACEHOLDER.
+
+  CHANGEMENTS MAJEURS v6 par rapport à v5 :
+    · Double profil Pilote/Lecteur pour nc_chef_produit (bouton ⇄ dans header)
+    · Badge 📖 Notice dans l'en-tête console → /NC/presentation.html
+    · presentation.html ajouté à la liste de fichiers à exporter (§7.1)
+    · nc-data.json et nc-parent-groups.json réinitialisés pour la mise en prod
+      (données test archivées dans D:\formation\SAVE\ avant remise à zéro)
+    · Données production = vierges au 07/05/2026 — premier usage réel
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. ARCHITECTURE — DEUX ENVIRONNEMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.1 Environnement de développement — PC Windows (inchangé)
+────────────────────────────────────────────────────────────
+  URL       : https://formation-sav.fr/NC/
+  Usage     : Développement, tests, évolutions de version, formation interne
+  Risque    : Panne PC = indisponibilité (acceptable en DEV, inacceptable en PROD)
+
+  Architecture :
+    Internet (formation-sav.fr)
+      └── Cloudflare Tunnel (cloudflared)
+           └── Nginx port 80  (C:\tools\nginx-1.29.7\)
+                └── Node.js port 3001 (PM2 — process "formation-sav")
+                     └── C:\formation\  (code + données NC dev)
+
+  Versions logicielles PC Windows :
+    Node.js : v25.9.0       npm : 11.x
+    PM2     : installé      Nginx : 1.29.7 (Windows)
+    OS      : Windows 11 IoT Enterprise LTSC 2024 (build 26100)
+
+2.2 Environnement de production cible — VPS OVH Linux
+───────────────────────────────────────────────────────
+  URL       : https://espace-client.muller-automotive.fr/NC/  [PLACEHOLDER]
+  Usage     : Production entreprise — utilisateurs finaux, clients, auditeurs
+  SLA       : 99,9% garanti OVH — indépendant du PC local
+
+  Architecture cible :
+    Internet (HTTPS — nouveau domaine entreprise)
+      └── Nginx (port 443, Let's Encrypt)  ←── cert auto-renouvelé
+           ├── /NC/*       → /opt/nc/NC/        (HTML/JS statiques)
+           ├── /NC/media/* → /opt/nc/NC/media/  (pièces jointes)
+           └── /api/*      → http://127.0.0.1:3001  (Node.js via PM2)
+
+    PM2 → Node.js port 3001 → nc-data.json + nc-users.json + nc-config.json
+
+  Versions logicielles VPS cible :
+    OS      : Ubuntu 22.04 LTS (support LTS jusqu'en 2027)
+    Node.js : v20.x LTS (version stable recommandée en production)
+    PM2     : dernière version stable (npm install -g pm2)
+    Nginx   : version courante Ubuntu repository
+
+2.3 Arborescence NC de production (sur VPS OVH)
+─────────────────────────────────────────────────
+  /opt/nc/
+  ├── server.js              Point d'entrée Express — toutes les routes NC
+  ├── package.json           Dépendances Node.js
+  ├── package-lock.json      Verrou versions exactes npm
+  ├── ecosystem.config.js    Configuration PM2 (variables d'environnement)
+  ├── nc-data.json           Toutes les NC, actions, historiques, journaux
+  ├── nc-users.json          Comptes utilisateurs (hash bcrypt)
+  ├── nc-config.json         Configuration (emails, familles, types cause)
+  └── NC/
+      ├── index.html                  Formulaire public (sans authentification)
+      ├── console.html                Console admin/pilote (JWT requis)
+      ├── login.html                  Page de connexion JWT
+      ├── presentation.html           Notice d'utilisation (lien badge Notice)
+      ├── synoptique_nc_groupe.html   Documentation visuelle 6 onglets
+      ├── nc_parent_satellites.js     Module NC parent-satellites
+      ├── nc_parent_avance.js         Module rattachement avancé
+      ├── nc_droits_pilote.js         Module droits pilote
+      ├── nc_liste_accordeon.js       Module liste accordéon dépliable
+      ├── favicon.svg                 Icône onglet navigateur
+      └── media/                      Pièces jointes (photos, PDF, vidéos)
+
+  IMPORTANT : Les fichiers suivants du dossier C:\formation ne font PAS partie
+  du module NC et ne doivent PAS être exportés vers la production :
+    · Fichiers de présentation (*.pptx, presentation-codir-nc.html…)
+    · Dossier "Base de cas/" (matériel de formation interne)
+    · Dossier node_modules/ (reconstruit sur OVH via npm install)
+    · Fichiers .log, .tmp
+    · Tout autre contenu pédagogique non lié à l'application NC
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. FONCTIONNALITÉS APPLICATIVES — v5 (07/05/2026)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3.1 Accès et rôles
+───────────────────
+  URLs PRODUCTION (après déploiement OVH) :
+    Déclaration publique NC  : https://espace-client.muller-automotive.fr/NC/
+    Console admin/pilote     : https://espace-client.muller-automotive.fr/NC/console.html
+    Connexion                : https://espace-client.muller-automotive.fr/NC/login.html
+    Synoptique               : https://espace-client.muller-automotive.fr/NC/synoptique.html
+
+  URLs DÉVELOPPEMENT (maintenues en parallèle) :
+    https://formation-sav.fr/NC/           (formulaire public)
+    https://formation-sav.fr/NC/console.html
+    https://formation-sav.fr/NC/login.html
+
+  3 rôles JWT :
+    nc_admin        — accès total, configuration, gestion utilisateurs,
+                      analyse qualité, clôture NC, export CSV
+    nc_chef_produit — DOUBLE PROFIL : mode Pilote (ses NC + actions CAPA)
+                      ou mode Lecteur (toutes NC, lecture seule)
+                      Bascule via bouton ⇄ dans l'en-tête (sans reconnexion)
+    nc_lecteur      — consultation seule (toutes NC, stats, archives)
+
+3.2 Workflow NC
+────────────────
+  Statuts : ouvert → en_cours → resolu → clos / non_pertinent
+  Format numéro NC : AAMMJJ-NNNN (ex. 260503-0001)
+    Compteur 4 chiffres, remis à zéro chaque 1er janvier
+    → 9 999 NC par an maximum, multi-millésimes sans conflit
+
+  Clôture NC — 4 champs obligatoires :
+    · Type de cause (liste configurable par l'admin)
+    · Coût NC en euros (0 accepté)
+    · Commentaire de clôture (interne qualité uniquement)
+    · Commentaire général (inclus dans l'email de clôture)
+
+  Actions correctives : 3 types (curative / corrective / préventive)
+    · Pilote désigné avec échéance
+    · Badge J-/J+ (délai restant ou dépassement)
+    · Badge figé à la date de réponse pilote (jDiffFige)
+    · Modification d'échéance inline avec journal horodaté
+
+3.3 Analyse qualité intégrée (v4 — nc_admin)
+──────────────────────────────────────────────
+  Outils accessibles depuis la fiche NC :
+    · Gravité NC        : mineure / majeure / critique (PATCH /api/nc/:n/meta)
+    · Score de risque   : cotation 4 axes (impact client, conformité,
+                          sécurité opérationnelle, récurrence) → score 1–9
+                          Alerte direction automatique si score ≥ 7
+    · Analyse 5 Pourquoi : 5 champs de cause racine enchaînés
+    · Diagramme Ishikawa : 6 branches (Méthodes, Matière, Milieu, Machine,
+                           Main-d'œuvre, Management) avec cause principale
+                           + diagramme SVG arête de poisson généré
+    · Retour client      : confirmation satisfaction client à la clôture
+    · Blocage signalé    : indicateur d'urgence visible en liste NC
+
+  API utilisée :
+    PATCH /api/nc/:numero/meta  — mise à jour méta-champs (nc_admin uniquement)
+    PUT   /api/nc/:numero/status — mise à jour statut + méta combinés
+
+3.4 Aide contextuelle intégrée (v4)
+─────────────────────────────────────
+  Console admin/pilote (console.html) :
+    · Panneau latéral glissant avec 3 onglets :
+        "Aide saisie" (pilote) — explications champ par champ
+        "Métriques"   (chef)  — taux récurrence, coût qualité, efficacité CAPA
+        "Référentiel" (admin) — ISO 9001 §8.7/§10.2/§9.3/§6.1/§8.2/§9.1,
+                                LNE-1/LNE-2 avec liens internes
+    · Bouton ? contextuel sur chaque label de formulaire
+    · FAB "? Aide" (bouton flottant rouge) accessible en permanence
+    · FAB "Synoptique" (bouton bleu) → synoptique.html
+
+  Formulaire public (index.html) :
+    · Guide novice simplifié (sans référentiel normatif)
+    · Explication de chaque champ en français courant avec exemples
+    · Bouton "? Aide formulaire" orange flottant
+
+3.5 Console liste et statistiques
+───────────────────────────────────
+  · Bandeau sélecteur d'année (toutes les années avec NC)
+  · Alerte orange NC des années précédentes encore ouvertes (cliquables)
+  · Recherche plein texte (client, N° commande, référence, description…)
+  · Filtres : statut / famille / machine / source détection / gravité
+  · Tri par gravité (critique → majeure → mineure)
+  · Pagination 20 NC / page — "Page X/Y — NC n à m sur total"
+  · Surbrillance ligne verte selon rôle (nouveauté non vue)
+  · Export CSV année (nc-AAAA.csv)
+
+  KPIs statistiques (onglet dédié) :
+    · Répartition par statut, famille, source détection
+    · Durée moyenne de résolution (jours)
+    · Coût total et moyen NC closes (€)
+    · Courbe mensuelle créations vs clôtures
+    · Respect des échéances (dans / hors délais / ouvertes en retard)
+
+3.6 Notifications email
+────────────────────────
+  Événement              Destinataire         CC Qualité
+  ─────────────────────────────────────────────────────
+  Création NC          → Qualité             —
+  Création action      → Pilote              Optionnel
+  Changement statut    → Rédacteur           Optionnel
+  Relance pilote       → Pilote en retard    Optionnel
+  Clôture NC           → Qualité             —
+
+  Expéditeur (production) : qualite@mullerautomotive.fr  [À CONFIRMER]
+                            SMTP entreprise @mullerautomotive.fr
+                            (voir section 9 pour la configuration complète)
+
+  Expéditeur (développement) : formations.muller@gmail.com (inchangé)
+
+  Configuration des destinataires depuis la console NC → ⚙ Configuration
+  (sans accès au serveur ni redémarrage).
+
+3.7 Double profil Pilote / Lecteur (v5 — nc_chef_produit)
+───────────────────────────────────────────────────────────
+  Le rôle nc_chef_produit dispose d'un double profil activable depuis l'en-tête
+  de la console sans reconnexion :
+
+  Mode Pilote (défaut) :
+    · Affichage : bannière verte "🎯 Mode Pilote — N action(s) en cours"
+    · Liste NC  : filtrée sur ses NC assignées (filtre serveur actif)
+    · Dashboard : section personnelle "Mes actions CAPA" visible
+    · Droits    : réponse CAPA sur ses actions assignées
+
+  Mode Lecteur (bascule via bouton ⇄) :
+    · Affichage : bannière grise "👁 Mode Lecteur — Vue complète en lecture seule"
+    · Liste NC  : toutes NC — paramètre ?viewAll=1 envoyé au serveur
+    · Dashboard : section personnelle masquée (mode lecture seule)
+    · Droits    : aucune modification possible (même qu'un nc_lecteur)
+
+  Sécurité :
+    · Le JWT reste inchangé — le rôle réel (nc_chef_produit) est toujours
+      vérifié côté serveur avant toute opération d'écriture
+    · ?viewAll=1 désactive uniquement le filtre de liste — pas les autres
+      contrôles d'accès
+
+3.8 Badge Notice dans l'en-tête console
+─────────────────────────────────────────
+  Un badge 📖 Notice est affiché dans l'en-tête de console.html entre le titre
+  et le badge de version. Il pointe vers /NC/presentation.html (notice
+  d'utilisation destinée aux pilotes et lecteurs).
+
+  Visible pour tous les rôles authentifiés.
+  Ce fichier (presentation.html) doit être inclus dans l'export vers OVH.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. VOLUMÉTRIE PRÉVISIONNELLE — 10 ANS / 400 NC PAR AN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4.1 Volume de données NC (JSON)
+─────────────────────────────────
+  Hypothèse          : 400 NC / an
+  Sur 10 ans         : 4 000 NC au total
+  Taille JSON / NC   : ~25 Ko (champs + actions + historique + journal)
+  Total JSON 10 ans  : 4 000 × 25 Ko = ~100 Mo (négligeable)
+
+4.2 Pièces jointes — estimation par NC
+────────────────────────────────────────
+  Type de fichier                   Nb moy.  Taille moy.   Sous-total
+  ──────────────────────────────────────────────────────────────────
+  Photos déclarant (JPG/HEIC)          3        4 Mo           12 Mo
+  Photos réponses pilotes (JPG)        2        4 Mo            8 Mo
+  Documents PDF (rapport, bon…)        2        3 Mo            6 Mo
+  Vidéo courte (présente dans 1/5 NC)  0,2      80 Mo          16 Mo
+  Captures d'écran, autres             1        1 Mo            1 Mo
+  ──────────────────────────────────────────────────────────────────
+  Total moyen par NC                                          43 Mo
+
+4.3 Stockage total estimé — 10 ans
+────────────────────────────────────
+  Médias NC (4 000 × 43 Mo)                    : 172 Go
+  Données JSON (nc-data + config + users)       :   0,1 Go
+  Sauvegardes cron (30 jours glissants)         :  50 Go
+  OS Ubuntu + Node.js + Nginx + logs            :  20 Go
+  Marge croissance et imprévus (20 %)           :  48 Go
+  ────────────────────────────────────────────────────────
+  TOTAL RECOMMANDÉ                              : ~290 Go
+
+  → Choisir un VPS avec au minimum 320 Go de stockage NVMe.
+  → Au-delà de 180 Go de médias, envisager un stockage objet OVH
+    (Object Storage S3) pour délester le disque VPS.
+
+4.4 Bande passante mensuelle estimée
+──────────────────────────────────────
+  Consultation console (texte/JSON)    : < 1 Go/mois
+  Téléchargement pièces jointes        : 5–30 Go/mois
+  Upload déclarations NC (photos)      : 3–15 Go/mois
+  TOTAL ESTIMÉ                         : < 50 Go/mois
+  → Inclus dans les offres VPS standard OVH (trafic illimité entrant,
+    sortant généralement capé à 100 Go–1 To selon offre).
+
+4.5 Capacité maximale du format JSON
+──────────────────────────────────────
+  La technologie JSON plat est adaptée jusqu'à ~10 000–15 000 NC.
+  Pour la charge 400 NC/an sur 10 ans (4 000 NC), aucune migration
+  vers une base de données n'est nécessaire.
+  Au-delà de 10 000 NC : migration SQLite sans réécriture applicative
+  majeure envisageable (même API REST, même format de réponse).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. FORMAT CSV — STRUCTURE ET COLONNES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5.1 Génération
+───────────────
+  Déclencheur : Console NC → Onglet Liste → bouton "Exporter CSV"
+  Portée      : Toutes les NC de l'ANNÉE sélectionnée dans le bandeau
+  Nom du fichier : nc-AAAA.csv (ex. nc-2026.csv)
+  Encodage    : UTF-8 avec BOM (compatible Excel Windows direct)
+  Séparateur  : Point-virgule (;) — compatible paramètres régionaux FR
+  Guillemets  : Champs contenant ; ou retour à la ligne encadrés de "
+
+5.2 Colonnes exportées (dans l'ordre)
+───────────────────────────────────────
+  Colonne                   Type       Description
+  ─────────────────────────────────────────────────────────────────────
+  Numéro NC                 Texte      Format AAMMJJ-NNNN (ex. 260503-0001)
+  Date création             Date       ISO 8601 (AAAA-MM-JJ)
+  Heure création            Heure      HH:MM
+  Statut                    Texte      ouvert / en_cours / resolu / clos /
+                                       non_pertinent
+  Gravité                   Texte      mineure / majeure / critique / (vide)
+  Score risque              Entier     1–9 ou vide
+  Périmètre / Famille       Texte      Famille produit (liste configurable)
+  Source détection          Texte      client / audit / interne / fournisseur…
+  Référence produit         Texte      Référence article
+  Numéro de série           Texte      Identifiant pièce
+  Nom client                Texte      Nom de l'entreprise ou personne
+  Email client              Texte      Email du déclarant
+  Rédacteur                 Texte      Prénom Nom
+  Description               Texte      Texte libre (peut contenir des ;)
+  Description réparation    Texte      Réparation effectuée si applicable
+  Suggestion amélioration   Texte      Suggestion libre du déclarant
+  Cause racine (5 Pourquoi) Texte      Synthèse de l'analyse 5P
+  Nombre actions            Entier     Total actions créées sur cette NC
+  Pilotes assignés          Texte      Noms séparés par | si plusieurs
+  Date clôture              Date       ISO 8601 ou vide si NC ouverte
+  Durée traitement (jours)  Entier     Nb de jours entre création et clôture
+  Coût NC (€)               Décimal    Valeur numérique (0 si sans coût)
+  Type de cause             Texte      Cause de clôture (liste configurable)
+  Commentaire clôture       Texte      Commentaire interne qualité
+  Respect échéance          Texte      dans_delais / hors_delais / ouvert /
+                                       non_applicable
+  Nombre pièces jointes     Entier     Total PJ sur la NC (toutes étapes)
+  ─────────────────────────────────────────────────────────────────────
+
+5.3 Utilisation recommandée du CSV
+────────────────────────────────────
+  · Import direct dans Excel (UTF-8 BOM reconnu automatiquement)
+  · Import dans Power BI, Tableau ou autre outil BI via connecteur CSV
+  · Consolidation multi-années : concaténer nc-2024.csv + nc-2025.csv + …
+    dans un seul classeur ou pipeline ETL
+  · Archivage annuel : copier nc-AAAA.csv sur la clé USB ou NAS après
+    chaque fin d'année civile
+
+5.4 Fréquence d'export recommandée
+────────────────────────────────────
+  · Mensuel   : export en cours d'année pour suivi KPI direction
+  · Annuel    : export de fin d'année pour archivage définitif
+  · Ad hoc    : avant toute intervention sur les données serveur
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. FORMAT PDF — RAPPORT DE DIRECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6.1 Génération
+───────────────
+  Déclencheur : Console NC → Onglet Archives → bouton "Rapport PDF"
+  Portée      : Toutes les NC de l'ANNÉE sélectionnée
+  Méthode     : Impression navigateur (Ctrl+P → Enregistrer en PDF)
+                ou export PDF via le bouton dédié (window.print())
+  Format      : A4 paysage recommandé pour les tableaux
+
+6.2 Contenu du rapport de direction
+─────────────────────────────────────
+  Page 1 — En-tête et synthèse annuelle
+    · Logo Muller Automotive + titre "Rapport de revue de direction NC"
+    · Période (année concernée) + date d'édition
+    · Indicateurs synthétiques :
+        — Total NC créées dans l'année
+        — NC closes / NC en cours / NC non pertinentes
+        — Taux de clôture (%)
+        — Durée moyenne de résolution (jours)
+        — Coût total NC closes (€)
+        — Coût moyen par NC close (€)
+
+  Page 2 — Analyse et répartition
+    · Répartition par statut (barres colorées)
+    · Répartition par famille de produit (barres)
+    · Répartition par source de détection
+    · Indicateur respect des échéances :
+        ✓ Closes dans les délais  (vert)
+        ✗ Closes hors délais      (rouge)
+        ⚠ Ouvertes en retard      (orange)
+    · Courbe mensuelle créations vs clôtures
+
+  Page 3+ — Liste des NC closes
+    · Tableau : N° NC · Date · Famille · Client · Durée · Coût · Cause
+    · 20 lignes par page (pagination automatique)
+
+  Fiche NC individuelle (depuis la liste) :
+    · Toutes les informations déclaratives
+    · Actions correctives avec statut
+    · Analyse qualité (gravité, score risque, 5 Pourquoi, Ishikawa)
+    · Retour client à la clôture
+
+  Conformité documentée (mention en pied de rapport) :
+    ISO 9001:2015 §9.3 Revue de direction
+    ISO 9001:2015 §8.7 Maîtrise des NC
+    ISO 9001:2015 §10.2.1/10.2.2 Actions correctives
+
+6.3 Archivage PDF recommandé
+──────────────────────────────
+  Nommage suggéré : Rapport_NC_AAAA_vYYYYMMJJ.pdf
+  Exemple         : Rapport_NC_2026_v20261231.pdf
+  Stockage        : Serveur documentaire interne + copie NAS/clé USB
+  Fréquence       : 1 fois par an minimum (CODIR annuel), trimestriel
+                    recommandé pour le suivi direction
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. EXPORT NC SEUL + DÉPLOIEMENT PRODUCTION OVH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+7.1 Fichiers à exporter — périmètre NC uniquement
+───────────────────────────────────────────────────
+  INCLURE dans l'export (depuis C:\formation) :
+
+    ✅ server.js              Moteur applicatif NC complet
+    ✅ package.json           Dépendances Node.js
+    ✅ package-lock.json      Verrou versions exactes
+    ✅ nc-data.json           Données NC de production (snapshot)
+    ✅ nc-users.json          Comptes utilisateurs (hash bcrypt)
+    ✅ nc-config.json         Configuration (emails, familles, types)
+    ✅ NC\index.html                  Formulaire public
+    ✅ NC\console.html               Console admin/pilote
+    ✅ NC\login.html                 Page connexion
+    ✅ NC\presentation.html          Notice d'utilisation (lien badge Notice)
+    ✅ NC\synoptique_nc_groupe.html  Documentation visuelle 6 onglets
+    ✅ NC\nc_parent_satellites.js    Module NC parent-satellites
+    ✅ NC\nc_parent_avance.js        Module rattachement avancé
+    ✅ NC\nc_droits_pilote.js        Module droits pilote
+    ✅ NC\nc_liste_accordeon.js      Module liste accordéon
+    ✅ NC\favicon.svg                Icône navigateur
+    ✅ NC\media\                     Toutes les pièces jointes NC
+
+  NE PAS INCLURE dans l'export :
+
+    ❌ node_modules\          Reconstruit sur OVH via npm install
+    ❌ Base de cas\           Matériel de formation — hors périmètre NC
+    ❌ presentation-codir-nc.html  Présentation direction — pas une appli NC
+    ❌ *.log, *.tmp           Fichiers temporaires inutiles
+    ❌ .bat, scripts locaux   Scripts Windows sans équivalent Linux
+    ❌ Tout autre fichier non listé ci-dessus
+
+7.2 Adaptations obligatoires AVANT déploiement production
+───────────────────────────────────────────────────────────
+  Avant de copier les fichiers sur le VPS OVH, effectuer les modifications
+  suivantes dans les fichiers du dossier C:\formation :
+
+  A. Mettre à jour l'URL du FAB "Synoptique" dans NC\console.html
+  ────────────────────────────────────────────────────────────────
+  Dans console.html, chercher "nc-synoptique-fab" et remplacer l'URL :
+    AVANT  : href = 'https://formation-sav.fr/NC/synoptique.html'
+    APRÈS  : href = 'https://espace-client.muller-automotive.fr/NC/synoptique.html'
+
+  B. Mettre à jour toute référence à formation-sav.fr dans les fichiers NC
+  ─────────────────────────────────────────────────────────────────────────
+  Rechercher dans tous les fichiers NC\ la chaîne "formation-sav.fr" et
+  remplacer par le vrai domaine de production. Utiliser VS Code (Ctrl+Shift+H)
+  ou la commande PowerShell :
+    Get-ChildItem -Path C:\formation\NC\ -Recurse -Include *.html,*.js |
+      Select-String "formation-sav.fr"
+  → Remplacer chaque occurrence identifiée par le nouveau domaine.
+
+  C. Créer le fichier ecosystem.config.js de production
+  ──────────────────────────────────────────────────────
+  Créer C:\formation\ecosystem.config.js avec ce contenu
+  (adapter les valeurs marquées <<CHANGER>>) :
+
+    module.exports = {
+      apps: [{
+        name        : 'muller-nc',
+        script      : 'server.js',
+        cwd         : '/opt/nc',
+        instances   : 1,
+        autorestart : true,
+        watch       : false,
+        env: {
+          NODE_ENV   : 'production',
+          PORT       : 3001,
+          JWT_SECRET : '<<CHANGER_CLE_ALEATOIRE_64_CHARS>>',
+          SMTP_HOST  : '<<HOTE_SMTP_ENTREPRISE>>',
+          SMTP_PORT  : '<<PORT_SMTP>>',
+          SMTP_USER  : '<<EMAIL_EXPEDITEUR_NC>>',
+          SMTP_PASS  : '<<MOT_DE_PASSE_SMTP>>'
+        }
+      }]
+    };
+
+  Générer une clé JWT_SECRET sécurisée :
+    node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+  → Copier la valeur hexadécimale générée dans JWT_SECRET.
+
+  Pour SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS :
+  → Voir section 9 (Configuration emails @mullerautomotive.fr).
+
+7.3 Préparation clé USB (depuis PC Windows)
+─────────────────────────────────────────────
+  ÉTAPE A — Synchroniser D:\formation avant le transfert
+  ────────────────────────────────────────────────────────
+  Ouvrir PowerShell en administrateur :
+
+    robocopy C:\formation D:\formation /MIR /XD node_modules /XF "*.log" "*.tmp"
+
+  Vérifier que D:\formation contient bien tous les fichiers listés en §7.1.
+
+  ÉTAPE B — Créer le dossier NC_PRODUCTION sur la clé USB
+  ──────────────────────────────────────────────────────────
+  Insérer la clé USB (minimum 8 Go, 32 Go si NC\media\ volumineuse).
+  Supposons la clé USB montée sous E:\
+
+  Dans PowerShell :
+
+    robocopy D:\formation E:\NC_PRODUCTION /MIR /XD node_modules "Base de cas" ^
+      /XF "*.log" "*.bat" "*.tmp" "presentation-codir-nc.html"
+
+  Cela crée sur la clé USB la structure exacte du §2.3, sans les fichiers exclus.
+
+  ÉTAPE C — Vérifier le contenu de la clé USB
+  ──────────────────────────────────────────────
+  La clé USB doit contenir uniquement :
+
+    E:\NC_PRODUCTION\
+    ├── server.js
+    ├── package.json
+    ├── package-lock.json
+    ├── ecosystem.config.js       (version production créée en §7.2.C)
+    ├── nc-data.json
+    ├── nc-users.json
+    ├── nc-config.json
+    └── NC\
+        ├── index.html
+        ├── console.html
+        ├── login.html
+        ├── synoptique.html
+        ├── favicon.svg
+        └── media\               (pièces jointes — peut être volumineuse)
+
+  ÉTAPE D — Créer le fichier README_IT.txt sur la clé USB
+  ──────────────────────────────────────────────────────────
+    E:\README_IT.txt
+    ────────────────
+    Clé USB — Module NC Muller Automotive — PRODUCTION
+    Date de préparation  : JJ/MM/AAAA
+    Domaine production   : https://espace-client.muller-automotive.fr/NC/
+    Volume media NC\media\ : XX Go
+    NC les plus récentes : voir nc-data.json (date dernière modification)
+    Procédure déploiement : section 7.4 du RAPPORT_TECHNIQUE_IT_NC.txt
+    Contact              : qualite@mullerautomotive.fr
+
+  Copier également ce rapport sur la clé :
+    E:\RAPPORT_TECHNIQUE_IT_NC.txt
+
+7.4 Déploiement sur VPS OVH — 13 étapes
+─────────────────────────────────────────
+
+  PRÉ-REQUIS
+  ────────────
+  · VPS OVH commandé (voir section 8 pour le choix)
+  · OS : Ubuntu 22.04 LTS
+  · Accès SSH root : ssh root@<IP_VPS>
+  · Domaine espace-client.muller-automotive.fr pointant vers <IP_VPS>
+    (enregistrement DNS A configuré dans le panneau OVH ou registrar)
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 1 — Connexion SSH et mise à jour OS
+  ────────────────────────────────────────────────────────────────
+    ssh root@<IP_VPS>
+    apt update && apt upgrade -y
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 2 — Installation des composants serveur
+  ────────────────────────────────────────────────────────────────
+    # Node.js 20 LTS
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt install -y nodejs
+
+    # Vérification
+    node -v    # doit afficher v20.x.x
+    npm -v     # doit afficher 10.x.x
+
+    # PM2 (gestionnaire de processus)
+    npm install -g pm2
+
+    # Nginx (reverse proxy + HTTPS)
+    apt install -y nginx
+
+    # Certbot (SSL Let's Encrypt gratuit — renouvellement automatique)
+    apt install -y certbot python3-certbot-nginx
+
+    # rsync (transfert clé USB / synchronisation future)
+    apt install -y rsync
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 3 — Créer la structure de répertoires NC
+  ────────────────────────────────────────────────────────────────
+    mkdir -p /opt/nc/NC/media
+    chmod 755 /opt/nc
+    chmod 755 /opt/nc/NC
+    chmod 755 /opt/nc/NC/media
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 4 — Transférer les fichiers depuis la clé USB
+  ────────────────────────────────────────────────────────────────
+  Option A — Depuis un PC Linux/Mac avec la clé USB montée :
+
+    rsync -avz --exclude='node_modules' \
+      /media/usb/NC_PRODUCTION/ root@<IP_VPS>:/opt/nc/
+
+  Option B — Depuis le PC Windows avec WinSCP (interface graphique) :
+    1. Télécharger WinSCP (gratuit) si non installé
+    2. Nouveau site → Protocol : SFTP → Host : <IP_VPS> → Login : root
+    3. À gauche : naviguer vers E:\NC_PRODUCTION\
+    4. À droite : naviguer vers /opt/nc/
+    5. Sélectionner tous les fichiers NC_PRODUCTION\ → Copier
+    6. Dans les options de copie, exclure le dossier node_modules
+
+  Option C — Depuis Windows avec SCP en ligne de commande :
+    scp -r "E:\NC_PRODUCTION\*" root@<IP_VPS>:/opt/nc/
+
+  Vérifier le transfert sur le serveur :
+    ls -la /opt/nc/
+    ls -la /opt/nc/NC/media/ | head -20
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 5 — Installer les dépendances Node.js
+  ────────────────────────────────────────────────────────────────
+    cd /opt/nc
+    npm install --production
+    # → Crée node_modules/ (non transféré depuis la clé USB)
+    # → Durée : 30 secondes à 3 minutes selon connexion VPS
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 6 — Configurer et démarrer PM2
+  ────────────────────────────────────────────────────────────────
+    cd /opt/nc
+    pm2 start ecosystem.config.js
+    pm2 save
+
+    # Démarrage automatique au boot du VPS
+    pm2 startup
+    # → PM2 affiche une commande à copier-coller et exécuter (systemctl)
+    # → Exécuter EXACTEMENT la commande affichée par PM2
+
+    # Vérifier le démarrage
+    pm2 status
+    # → "muller-nc" doit afficher status "online"
+
+    pm2 logs muller-nc --lines 30
+    # → Vérifier l'absence d'erreurs (SMTP, fichiers manquants…)
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 7 — Configurer Nginx
+  ────────────────────────────────────────────────────────────────
+  Créer le fichier de configuration Nginx :
+
+    nano /etc/nginx/sites-available/muller-nc
+
+  Coller le contenu suivant (adapter le nom de domaine) :
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │ server {                                                        │
+  │     listen 80;                                                  │
+  │     server_name espace-client.muller-automotive.fr              │
+  │                 www.espace-client.muller-automotive.fr;         │
+  │     return 301 https://$host$request_uri;                      │
+  │ }                                                               │
+  │ server {                                                        │
+  │     listen 443 ssl;                                             │
+  │     server_name espace-client.muller-automotive.fr              │
+  │                 www.espace-client.muller-automotive.fr;         │
+  │     root /opt/nc;                                               │
+  │     client_max_body_size 200m;                                  │
+  │                                                                 │
+  │     # API Node.js NC                                            │
+  │     location /api/ {                                            │
+  │         proxy_pass http://127.0.0.1:3001;                      │
+  │         proxy_set_header Host $host;                            │
+  │         proxy_set_header X-Real-IP $remote_addr;               │
+  │         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; │
+  │         proxy_read_timeout 120s;                                │
+  │     }                                                           │
+  │     # Pièces jointes NC                                         │
+  │     location /NC/media/ {                                       │
+  │         alias /opt/nc/NC/media/;                                │
+  │         expires 30d;                                            │
+  │         add_header Cache-Control "public";                      │
+  │     }                                                           │
+  │     # Interface NC (HTML/JS statiques)                          │
+  │     location /NC/ {                                             │
+  │         root /opt/nc;                                           │
+  │         try_files $uri $uri/ =404;                              │
+  │     }                                                           │
+  │     # Racine — rediriger vers /NC/                              │
+  │     location = / {                                              │
+  │         return 302 /NC/;                                        │
+  │     }                                                           │
+  │     location / {                                                 │
+  │         try_files $uri $uri/ =404;                              │
+  │     }                                                           │
+  │ }                                                               │
+  └────────────────────────────────────────────────────────────────┘
+
+    # Activer le site
+    ln -s /etc/nginx/sites-available/muller-nc /etc/nginx/sites-enabled/
+
+    # Désactiver le site "default" de Nginx (évite conflits)
+    rm -f /etc/nginx/sites-enabled/default
+
+    # Vérifier la syntaxe
+    nginx -t
+    # → doit afficher "syntax is ok" et "test is successful"
+
+    systemctl reload nginx
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 8 — Obtenir le certificat HTTPS (Let's Encrypt)
+  ────────────────────────────────────────────────────────────────
+  IMPORTANT : L'enregistrement DNS du domaine DOIT pointer vers l'IP du VPS
+  AVANT de lancer Certbot (propagation DNS : attendre 15–60 min après modif).
+
+    certbot --nginx \
+      -d espace-client.muller-automotive.fr \
+      -d www.espace-client.muller-automotive.fr
+
+  Certbot modifie nginx automatiquement et configure le renouvellement
+  automatique (cron intégré — aucune action annuelle requise).
+
+    # Tester le renouvellement automatique
+    certbot renew --dry-run
+    # → doit afficher "Congratulations, all simulated renewals succeeded"
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 9 — Pare-feu et sécurité de base
+  ────────────────────────────────────────────────────────────────
+    apt install -y ufw fail2ban
+    ufw allow 22/tcp      # SSH
+    ufw allow 80/tcp      # HTTP (redirection vers HTTPS)
+    ufw allow 443/tcp     # HTTPS
+    ufw --force enable
+
+    systemctl enable fail2ban
+    systemctl start fail2ban
+
+    # Désactiver login SSH par mot de passe (utiliser clé SSH uniquement)
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' \
+      /etc/ssh/sshd_config
+    sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' \
+      /etc/ssh/sshd_config
+    systemctl reload sshd
+
+    # Vérifier le pare-feu
+    ufw status verbose
+    # → Doit montrer : 22, 80, 443 ALLOW
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 10 — Droits fichiers et sécurité données
+  ────────────────────────────────────────────────────────────────
+    # Restreindre l'accès aux fichiers de données NC
+    chmod 600 /opt/nc/nc-data.json
+    chmod 600 /opt/nc/nc-users.json
+    chmod 600 /opt/nc/nc-config.json
+    chmod 600 /opt/nc/ecosystem.config.js
+
+    # Le processus Node.js s'exécute en root sur un VPS OVH standard.
+    # Pour une sécurité renforcée (optionnel) :
+    adduser --system --no-create-home --group ncapp
+    chown -R ncapp:ncapp /opt/nc
+    # → Adapter PM2 pour s'exécuter en tant que "ncapp"
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 11 — Sauvegardes automatiques
+  ────────────────────────────────────────────────────────────────
+    mkdir -p /opt/backups
+    crontab -e
+
+  Ajouter les lignes suivantes dans crontab :
+
+    # Sauvegarde quotidienne NC — 02h00 chaque nuit
+    0 2 * * * tar -czf /opt/backups/nc-$(date +\%Y\%m\%d).tar.gz \
+      /opt/nc/nc-data.json \
+      /opt/nc/nc-users.json \
+      /opt/nc/nc-config.json \
+      /opt/nc/NC/media/ 2>/dev/null
+
+    # Suppression sauvegardes de plus de 30 jours
+    0 3 * * * find /opt/backups/ -name "nc-*.tar.gz" -mtime +30 -delete
+
+    # Renouvellement certificat SSL (vérification hebdomadaire)
+    0 4 * * 1 certbot renew --quiet
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 12 — Tests avant bascule DNS
+  ────────────────────────────────────────────────────────────────
+  Tester via l'IP directe du VPS (avant de modifier le DNS) :
+
+    curl http://<IP_VPS>/NC/            → doit retourner du HTML
+    curl http://<IP_VPS>/api/health     → doit retourner {"status":"ok"}
+    pm2 status                          → "muller-nc" doit être "online"
+
+  Ouvrir dans un navigateur depuis un poste externe au réseau local :
+    http://<IP_VPS>/NC/login.html       → page de connexion NC
+    http://<IP_VPS>/NC/                 → formulaire public NC
+
+  Tests fonctionnels à valider :
+    □ Connexion avec compte nc_admin
+    □ Création d'une NC de test
+    □ Upload d'une pièce jointe (photo)
+    □ Envoi d'email de notification (vérifier boîte @mullerautomotive.fr)
+    □ Export CSV
+    □ Accès synoptique.html
+
+  ────────────────────────────────────────────────────────────────
+  ÉTAPE 13 — Bascule DNS
+  ────────────────────────────────────────────────────────────────
+  Dans le panneau DNS OVH (ou registrar du domaine) :
+
+    Ajouter / modifier : Enregistrement A  →  <IP_PUBLIQUE_VPS_OVH>  TTL 300
+
+  Attendre la propagation DNS (5 min à 48h selon TTL précédent).
+  Vérifier la propagation : https://dnschecker.org
+    → Saisir le domaine, vérifier que l'IP retournée correspond au VPS
+
+  Tester depuis un réseau externe :
+    https://espace-client.muller-automotive.fr/NC/login.html
+
+  ────────────────────────────────────────────────────────────────
+  APRÈS BASCULE — Maintien de l'environnement de développement
+  ────────────────────────────────────────────────────────────────
+  L'environnement de développement sur PC Windows et formation-sav.fr
+  reste INTACT et inchangé. Aucune action requise.
+  Le PC Windows continue à servir formation-sav.fr/NC/ pour :
+    · Développement des versions futures
+    · Tests des nouvelles fonctionnalités
+    · Formation interne
+    · Synchronisation vers la production (scp/WinSCP)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. RECOMMANDATIONS INFRASTRUCTURE OVH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+8.1 VPS recommandé
+────────────────────
+  Caractéristiques minimales requises :
+    CPU   : 2 vCores (Node.js mono-thread, peu gourmand)
+    RAM   : 4 Go (Node.js + PM2 + Nginx + OS + marge)
+    SSD   : 320 Go NVMe (médias 10 ans + sauvegardes 30 jours)
+    OS    : Ubuntu 22.04 LTS
+    IP    : IP fixe publique
+    Bande passante : 100 Mbit/s (trafic estimé < 50 Go/mois)
+
+  Grille tarifaire OVH indicative (mai 2026) :
+    VPS Starter   (1 vCore,  2 Go RAM,  20 Go SSD)  : ~3 €/mois — insuffisant
+    VPS Value     (2 vCores, 2 Go RAM,  40 Go SSD)  : ~5 €/mois — insuffisant stockage
+    VPS Comfort   (4 vCores, 8 Go RAM, 160 Go SSD)  : ~17 €/mois — adapté 5 ans
+    VPS Elite     (8 vCores, 8 Go RAM, 320 Go SSD)  : ~35 €/mois — recommandé 10 ans
+
+  → Recommandation : VPS Elite pour 10 ans avec 400 NC/an + pièces jointes.
+    Si budget contraint : VPS Comfort + Object Storage OVH pour les médias.
+
+8.2 Comparatif OVH Cloud vs NAS Interne
+─────────────────────────────────────────
+  Critère                    OVH Cloud         NAS Interne
+  ──────────────────────────────────────────────────────────
+  Coût 1re année             ~135–468 €        ~700–1 100 €
+  Coût récurrent/an          ~135–468 €        ~150–280 €
+  Accès clients externes     URL directe HTTPS VPN ou IP fixe FAI
+  Déploiement                Immédiat          4–8 h configuration
+  Disponibilité              SLA 99,9% OVH     Réseau local (variable)
+  Panne matérielle           OVH intervient    Intervention sur site
+  Données                    Datacenter FR     Sur site (contrôle absolu)
+  Sauvegarde                 Automatisée cron  Manuelle ou RAID
+  ──────────────────────────────────────────────────────────
+  → OVH VPS recommandé pour usage production avec accès externe.
+
+8.3 Architecture cible sur VPS Linux
+──────────────────────────────────────
+  Internet (HTTPS — espace-client.muller-automotive.fr)
+     │
+  Nginx (port 443, Let's Encrypt)  ←── certificat auto-renouvelé
+     │
+     ├── /NC/*        → /opt/nc/NC/        (HTML/JS statiques)
+     ├── /NC/media/*  → /opt/nc/NC/media/  (pièces jointes)
+     └── /api/*       → http://127.0.0.1:3001  (Node.js via PM2)
+
+  PM2 → Node.js port 3001 → nc-data.json + nc-users.json + nc-config.json
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. CONFIGURATION EMAILS ENTREPRISE (@mullerautomotive.fr)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+9.1 Principe
+─────────────
+  En production, les emails NC (notifications, clôtures, relances) doivent
+  être envoyés depuis une adresse @mullerautomotive.fr au lieu de Gmail.
+  Cela garantit la crédibilité des emails auprès des destinataires et évite
+  la classification en spam.
+
+  La configuration SMTP est stockée dans ecosystem.config.js (variables
+  d'environnement chargées au démarrage de Node.js) et ne nécessite pas de
+  modifier le code source server.js.
+
+9.2 Paramètres SMTP selon votre hébergeur emails
+──────────────────────────────────────────────────
+  Option A — OVH Email Pro / MX Plan (hébergement email OVH)
+  ────────────────────────────────────────────────────────────
+    SMTP_HOST  : ssl0.ovh.net
+    SMTP_PORT  : 465
+    SMTP_SECURE: true  (SSL/TLS direct — plus fiable que STARTTLS pour OVH)
+    SMTP_USER  : qualite@mullerautomotive.fr   (adresse email complète)
+    SMTP_PASS  : (mot de passe de la boîte email)
+
+    Vérification : se connecter via https://ssl0.ovh.net/roundcube avec
+    ce même compte pour valider les identifiants avant de les intégrer.
+
+  Option B — Microsoft 365 / Exchange Online
+  ──────────────────────────────────────────────
+    SMTP_HOST  : smtp.office365.com
+    SMTP_PORT  : 587
+    SMTP_SECURE: false  (STARTTLS — upgrade automatique)
+    SMTP_USER  : qualite@mullerautomotive.fr
+    SMTP_PASS  : (mot de passe compte Microsoft 365)
+
+    Note : Si l'authentification basique est désactivée sur le tenant M365,
+    il faut créer un compte de service dédié avec authentification SMTP active
+    (activable dans le Centre d'administration Exchange → Boîtes aux lettres
+    → Gérer les paramètres de messagerie → Envoyer en tant que).
+
+  Option C — Serveur Exchange interne (on-premise)
+  ──────────────────────────────────────────────────
+    SMTP_HOST  : (IP ou nom du serveur Exchange interne ou relais SMTP)
+    SMTP_PORT  : 587 (STARTTLS) ou 25 (relais interne non authentifié)
+    SMTP_SECURE: false (STARTTLS)
+    SMTP_USER  : qualite@mullerautomotive.fr
+    SMTP_PASS  : (mot de passe AD)
+
+    Note : Si le VPS OVH doit relayer via le serveur Exchange interne,
+    l'IP publique du VPS OVH doit être autorisée dans le connecteur de
+    réception Exchange (paramètre "Plage d'adresses IP autorisées").
+
+9.3 Mise à jour du fichier ecosystem.config.js sur le VPS
+───────────────────────────────────────────────────────────
+  1. Éditer le fichier sur le VPS :
+       nano /opt/nc/ecosystem.config.js
+
+  2. Remplacer les valeurs SMTP par les paramètres de votre hébergeur :
+       SMTP_HOST  : 'ssl0.ovh.net',
+       SMTP_PORT  : '465',
+       SMTP_SECURE: 'true',
+       SMTP_USER  : 'qualite@mullerautomotive.fr',
+       SMTP_PASS  : 'VotreMotDePasse'
+
+  3. Redémarrer Node.js pour prendre en compte les nouvelles variables :
+       pm2 restart muller-nc
+
+  4. Vérifier dans les logs PM2 que SMTP ne génère pas d'erreur :
+       pm2 logs muller-nc --lines 30
+
+9.4 Vérification de l'envoi email
+────────────────────────────────────
+  Depuis la console NC (admin connecté) :
+    · Créer une NC de test
+    → Vérifier qu'un email de notification arrive sur la boîte qualité
+
+  Si aucun email reçu :
+    → Voir section 13 (FAQ démarrage OVH) rubrique "Emails"
+
+9.5 Adresses email dans la console NC
+───────────────────────────────────────
+  Les adresses destinataires (qualité, direction, pilotes) se configurent
+  depuis la console NC → ⚙ Configuration, sans accès SSH ni redémarrage.
+
+  Adresses recommandées à configurer en production :
+    Email qualité       : qualite@mullerautomotive.fr
+    CC direction        : direction@mullerautomotive.fr  (optionnel)
+    Email expéditeur NC : identique à SMTP_USER
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. SÉCURITÉ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+10.1 Checklist sécurité VPS (à valider avant mise en production)
+──────────────────────────────────────────────────────────────────
+  □ JWT_SECRET changé — clé aléatoire 64+ caractères hexadécimaux
+    (JAMAIS la valeur par défaut du code source)
+  □ SMTP_PASS défini — mot de passe email @mullerautomotive.fr
+    (jamais le mot de passe Gmail de développement)
+  □ SSH par clé uniquement — PasswordAuthentication no dans sshd_config
+  □ UFW actif — ports 22, 80, 443 uniquement
+  □ Fail2ban installé et actif (protection brute-force SSH)
+  □ HTTPS Let's Encrypt actif — renouvellement automatique testé
+  □ nc-data.json, nc-users.json, nc-config.json en chmod 600
+  □ ecosystem.config.js en chmod 600 (contient les mots de passe SMTP/JWT)
+  □ node_modules NON exposé via Nginx
+  □ PM2 configuré pour redémarrer automatiquement après crash
+  □ Sauvegarde cron quotidienne testée (ls -lh /opt/backups/)
+
+10.2 Gestion des rôles NC
+──────────────────────────
+  L'API vérifie le rôle JWT à chaque requête sensible côté serveur.
+  Seuls nc_admin peuvent : modifier la configuration, gérer les utilisateurs,
+  clôturer les NC, exporter le CSV, utiliser PATCH /api/nc/:n/meta.
+  Les nc_chef_produit ne peuvent répondre qu'à leurs propres actions.
+  Les nc_lecteur accèdent en lecture seule (aucune modification possible).
+
+10.3 Authentification JWT
+──────────────────────────
+  Tokens JWT HMAC SHA-256, durée 8h, stockés dans localStorage.
+  Architecture stateless : aucune session serveur.
+  En cas de compromission : changer JWT_SECRET dans ecosystem.config.js
+  puis pm2 restart muller-nc — tous les tokens existants sont révoqués
+  (reconnexion forcée de tous les utilisateurs).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. PLAN DE REPRISE D'ACTIVITÉ (PRA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Incident                  Cause probable             Action
+  ─────────────────────────────────────────────────────────────────
+  Site inaccessible         Panne VPS OVH              OVH remédie (SLA 99,9%)
+  Site inaccessible         PM2 planté                 pm2 restart muller-nc
+  Site inaccessible         Nginx arrêté               systemctl restart nginx
+  Node.js crash répété      Erreur applicative         pm2 logs → diagnostiquer
+  Disque saturé             Médias NC volumineux        Nettoyer media/ + archiver
+  nc-data.json corrompu     Édition manuelle            Restaurer depuis sauvegarde
+  Perte totale VPS          Sinistre datacenter         Snapshot OVH → nouveau VPS
+  Email SMTP bloqué         Config erronée / quota      pm2 logs → reconfig SMTP
+  Certificat SSL expiré     Renouvellement échoué       certbot renew --force-renew
+  ─────────────────────────────────────────────────────────────────
+
+  Restauration depuis sauvegarde cron :
+    # Lister les sauvegardes disponibles
+    ls -lh /opt/backups/
+
+    # Restaurer la sauvegarde du jour J
+    pm2 stop muller-nc
+    tar -xzf /opt/backups/nc-AAAAMMJJ.tar.gz -C /
+    pm2 start muller-nc
+    # Perte de données maximale : < 24h (cron quotidien à 02h00)
+
+  Basculer sur l'environnement de développement (solution de secours) :
+    Si le VPS OVH est totalement indisponible plusieurs heures, pointer
+    temporairement le DNS vers le PC Windows (IP publique FAI avec tunnel
+    Cloudflare ou redirection).
+    → Cette solution nécessite que le PC Windows soit allumé et connecté.
+    → À n'utiliser qu'en dernier recours — les données du VPS et du PC
+      peuvent diverger si des NC ont été saisies en production.
+
+  Mise à jour applicative (nouvelle version NC depuis PC dev → prod) :
+    # Depuis le PC Windows, transférer les fichiers modifiés
+    scp C:\formation\server.js root@<IP_VPS>:/opt/nc/
+    scp C:\formation\NC\console.html root@<IP_VPS>:/opt/nc/NC/
+    scp C:\formation\NC\index.html root@<IP_VPS>:/opt/nc/NC/
+    # … (autres fichiers modifiés)
+
+    # Redémarrer Node.js si server.js modifié
+    pm2 restart muller-nc
+    # Les fichiers HTML/JS statiques sont pris en compte sans redémarrage.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. COÛTS ESTIMÉS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+12.1 Coûts infrastructure OVH — production NC (annuels)
+─────────────────────────────────────────────────────────
+  Poste                              Mois          Année
+  ──────────────────────────────────────────────────────
+  VPS Elite 320 Go (recommandé)    ~35 €/mois    ~420 €/an
+  OU VPS Comfort 160 Go            ~17 €/mois    ~200 €/an
+  Sauvegarde OVH snapshot           ~3 €/mois     ~36 €/an
+  Domaine mullerautomotive.fr       déjà existant
+  SSL Let's Encrypt                  Gratuit       Gratuit
+  Emails @mullerautomotive.fr        déjà existant (dans offre actuelle)
+  ──────────────────────────────────────────────────────
+  TOTAL VPS Elite                  ~38 €/mois    ~456 €/an
+  TOTAL VPS Comfort                ~20 €/mois    ~236 €/an
+
+  → L'hébergement NC production = moins de 11 €/mois pour VPS Comfort.
+    Aucun coût d'infrastructure interne, aucune maintenance serveur.
+
+12.2 Coût de déploiement (one-shot)
+─────────────────────────────────────
+  Adaptations fichiers (URLs, SMTP)                : 1–2 h
+  Préparation clé USB                              : 1 h
+  Déploiement VPS OVH (étapes 1 à 13)             : 3–5 h
+  Tests fonctionnels complets                      : 2–3 h
+  Bascule DNS + surveillance 48h                   : 1–2 h
+  TOTAL                                            : 8–13 h de travail IT
+
+12.3 Coût sur 10 ans
+──────────────────────
+  VPS Comfort + snapshot (10 ans)              : ~2 360 €
+  VPS Elite + snapshot (10 ans)               : ~4 560 €
+  Maintenance annuelle estimée (~4 h/an)       : ~3 200 €  (@ 80€/h)
+  ──────────────────────────────────────────────────────
+  TOTAL POSSESSION 10 ANS (VPS Comfort)        : ~5 560 €
+  TOTAL POSSESSION 10 ANS (VPS Elite)          : ~7 760 €
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+13. FAQ DÉMARRAGE OVH — PROBLÈMES COURANTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cette section couvre les problèmes les plus fréquents lors du premier
+démarrage du module NC sur un VPS OVH. Lire avant de contacter le support.
+
+─── PROBLÈME : Node.js ne démarre pas ───────────────────────────────────────
+
+  Symptôme : pm2 status affiche "errored" ou "stopped" pour muller-nc.
+
+  Diagnostic :
+    pm2 logs muller-nc --lines 50
+
+  Causes fréquentes et solutions :
+
+  1. Module manquant ("Cannot find module 'express'")
+     → node_modules absent ou incomplet
+     Solution : cd /opt/nc && npm install --production
+
+  2. Port déjà utilisé ("EADDRINUSE port 3001")
+     → Un autre processus utilise le port 3001
+     Solution : lsof -i :3001    → identifier le processus
+                kill -9 <PID>    → arrêter le processus conflictuel
+                pm2 start muller-nc
+
+  3. Fichier nc-data.json absent ("ENOENT nc-data.json")
+     → Le fichier n'a pas été transféré depuis la clé USB
+     Solution : transférer nc-data.json depuis la clé USB vers /opt/nc/
+
+  4. Permission refusée ("EACCES /opt/nc/nc-data.json")
+     → Mauvais droits sur les fichiers de données
+     Solution : chmod 600 /opt/nc/nc-data.json
+                chown root:root /opt/nc/nc-data.json
+
+  5. Syntaxe JSON invalide ("SyntaxError: Unexpected token")
+     → nc-data.json ou nc-config.json corrompu
+     Solution : node -e "JSON.parse(require('fs').readFileSync('/opt/nc/nc-data.json','utf8'))"
+                → si erreur, restaurer la sauvegarde
+
+─── PROBLÈME : Le site répond "502 Bad Gateway" ─────────────────────────────
+
+  Symptôme : https://espace-client.muller-automotive.fr/api/health → 502
+
+  Cause : Nginx ne peut pas joindre Node.js (Node.js planté ou mauvais port)
+
+  Diagnostic :
+    pm2 status            → vérifier que muller-nc est "online"
+    curl localhost:3001/api/health  → tester Node.js directement
+
+  Solutions :
+    pm2 restart muller-nc          → redémarrer Node.js
+    pm2 logs muller-nc --lines 30  → chercher l'erreur de démarrage
+    nginx -t && systemctl reload nginx  → vérifier la config Nginx
+
+─── PROBLÈME : Le site ne répond pas (timeout, ERR_CONNECTION_REFUSED) ──────
+
+  Symptôme : La page ne charge pas du tout (pas de 502, juste timeout).
+
+  Causes fréquentes :
+  1. DNS pas encore propagé vers le VPS
+     → Vérifier sur https://dnschecker.org (saisir le domaine)
+     → Attendre 15 min à 48h selon l'hébergeur DNS
+
+  2. Nginx arrêté
+     → systemctl status nginx
+     → systemctl start nginx
+     → Vérifier : nginx -t (syntaxe config Nginx)
+
+  3. Pare-feu bloque les connexions
+     → ufw status   (vérifier que 80 et 443 sont autorisés)
+     → ufw allow 443/tcp && ufw allow 80/tcp
+
+  4. Certbot n'a pas encore configuré le HTTPS
+     → Accéder en HTTP : http://<IP_VPS>/NC/  (doit fonctionner)
+     → Relancer : certbot --nginx -d <domaine>
+
+─── PROBLÈME : Certificat SSL — erreur Certbot ──────────────────────────────
+
+  Symptôme : certbot --nginx retourne une erreur de validation DNS/HTTP.
+
+  Erreur "Challenge failed for domain" :
+    Cause   : Le DNS du domaine ne pointe pas encore vers l'IP du VPS
+    Solution : Vérifier l'enregistrement A dans le panneau DNS OVH
+               Attendre la propagation (jusqu'à 48h)
+               Retester : certbot --nginx -d <domaine>
+
+  Erreur "Could not bind to IPv4 or IPv6" :
+    Cause   : Nginx n'écoute pas sur le port 80
+    Solution : systemctl start nginx
+
+  Certificat expiré (après la mise en production) :
+    La commande cron "certbot renew" s'exécute chaque lundi à 4h.
+    En cas d'échec : certbot renew --force-renew
+
+─── PROBLÈME : Emails non reçus ─────────────────────────────────────────────
+
+  Symptôme : Aucun email de notification après création d'une NC.
+
+  Diagnostic :
+    pm2 logs muller-nc --lines 50 | grep -i mail
+    pm2 logs muller-nc --lines 50 | grep -i smtp
+    pm2 logs muller-nc --lines 50 | grep -i error
+
+  Causes fréquentes et solutions :
+
+  1. Identifiants SMTP incorrects ("Invalid login" / "Authentication failed")
+     → Vérifier SMTP_USER et SMTP_PASS dans ecosystem.config.js
+     → Tester les identifiants directement dans un client mail (Thunderbird)
+     → Modifier : nano /opt/nc/ecosystem.config.js
+     → Appliquer : pm2 restart muller-nc
+
+  2. Port SMTP bloqué par OVH
+     → OVH bloque le port 25 sortant sur les VPS (anti-spam).
+     → Utiliser le port 587 (STARTTLS) ou 465 (SSL) — jamais le port 25.
+     → Si OVH Email Pro : utiliser ssl0.ovh.net:465 (SSL)
+
+  3. SMTP_SECURE mal configuré
+     → Port 465 requiert SMTP_SECURE=true (SSL direct)
+     → Port 587 requiert SMTP_SECURE=false (STARTTLS upgrade)
+     → Ne pas mélanger les deux
+
+  4. IP du VPS blacklistée
+     → Certains FAI rejettent les emails venant de nouveaux VPS
+     → Vérifier : https://mxtoolbox.com/blacklists.aspx → saisir l'IP VPS
+     → Solution : utiliser le relais SMTP OVH (ssl0.ovh.net) avec l'IP
+       VPS déclarée comme expéditeur autorisé dans les enregistrements SPF/DKIM
+
+  5. Enregistrement SPF manquant (emails classés spam)
+     → Ajouter un enregistrement DNS TXT pour le domaine :
+       v=spf1 include:mx.ovh.com ~all
+     → Ou selon l'hébergeur email, demander l'enregistrement SPF exact
+
+  6. Destinataire non configuré dans la console NC
+     → Console NC → ⚙ Configuration → vérifier les adresses destinataires
+     → Les notifications ne partent que si un destinataire est renseigné
+
+─── PROBLÈME : Pièces jointes non accessibles ───────────────────────────────
+
+  Symptôme : Les photos/PDF uploadés donnent une erreur 404.
+
+  Causes et solutions :
+
+  1. Dossier media/ non créé ou mauvais droits
+     mkdir -p /opt/nc/NC/media
+     chmod 755 /opt/nc/NC/media
+
+  2. Alias Nginx incorrect pour /NC/media/
+     → Vérifier dans /etc/nginx/sites-available/muller-nc :
+       location /NC/media/ { alias /opt/nc/NC/media/; }
+     → Attention : "alias" (pas "root") est requis ici
+
+  3. media/ absent du transfert clé USB
+     → Le dossier media/ peut être vide si aucune pièce jointe uploadée
+     → Si des PJ existaient sur le PC dev, les transférer depuis :
+       C:\formation\NC\media\ vers /opt/nc/NC/media/
+
+─── PROBLÈME : Console NC — "Serveur inaccessible" au login ─────────────────
+
+  Symptôme : Page login.html s'affiche mais connexion échoue toujours
+             avec "Serveur inaccessible".
+
+  Cause : Le JavaScript fait une requête vers /api/nc-auth/login
+          qui n'atteint pas Node.js.
+
+  Diagnostic en console navigateur (F12 → Console / Network) :
+    → Regarder la requête POST /api/nc-auth/login
+    → Vérifier le code de réponse (502 = Nginx ne joint pas Node,
+      404 = mauvaise route Nginx, CORS = en-tête manquant)
+
+  Solutions :
+    502 : pm2 restart muller-nc (Node.js planté)
+    404 : vérifier le bloc "location /api/" dans nginx.conf
+    CORS: vérifier les en-têtes dans server.js (Access-Control-Allow-Origin)
+
+─── PROBLÈME : PM2 ne redémarre pas au boot du VPS ──────────────────────────
+
+  Symptôme : Après redémarrage du VPS, muller-nc n'est pas démarré.
+
+  Cause : La commande "pm2 startup" a été oubliée ou non exécutée.
+
+  Solution :
+    pm2 startup
+    # → Copier et exécuter la commande affichée (exemple :)
+    sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 \
+      startup systemd -u root --hp /root
+    pm2 save
+    # → pm2 save sauvegarde la liste des processus actifs
+
+  Vérification :
+    systemctl status pm2-root
+    # → doit afficher "active (running)"
+
+─── PROBLÈME : Disque plein ─────────────────────────────────────────────────
+
+  Symptôme : Uploads refusés / Node.js plante avec ENOSPC.
+
+  Diagnostic :
+    df -h /opt/nc/
+    du -sh /opt/nc/NC/media/
+    du -sh /opt/backups/
+
+  Solutions immédiates :
+    # Nettoyer les sauvegardes > 30 jours (si cron non configuré)
+    find /opt/backups/ -name "nc-*.tar.gz" -mtime +30 -delete
+
+    # Nettoyer les logs PM2
+    pm2 flush
+
+    # Archiver les médias NC anciennes (> 2 ans) vers Object Storage OVH
+    # ou les télécharger via SCP avant suppression
+
+  Prévention :
+    # Configurer une alerte disque (crontab)
+    # Envoyer un email si disque > 80% :
+    5 8 * * * USAGE=$(df /opt/nc | tail -1 | awk '{print $5}' | tr -d '%') && \
+      [ $USAGE -gt 80 ] && echo "ALERTE DISQUE $USAGE% /opt/nc" | \
+      mail -s "Alerte disque NC VPS" qualite@mullerautomotive.fr
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+14. FAQ TECHNIQUE — QUESTIONS FRÉQUENTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Q : Faut-il une base de données (MySQL, PostgreSQL) ?
+R : Non. Le module NC utilise des fichiers JSON plats (nc-data.json).
+    Adapté jusqu'à ~10 000–15 000 NC (soit +25 ans à 400 NC/an).
+    Au-delà, migration vers SQLite sans réécriture majeure envisageable.
+
+Q : Le code doit-il être réécrit pour Linux ?
+R : Non. Node.js, Express, PM2, Nginx sont identiques Windows/Linux.
+    Seuls les chemins changent (C:\formation → /opt/nc).
+    Adaptations : ecosystem.config.js (chemins Linux + SMTP entreprise),
+    nginx.conf (nouveau domaine + HTTPS), URLs internes dans les HTML.
+
+Q : Comment déployer une mise à jour future du module NC ?
+R : Développer et tester sur l'environnement dev (PC Windows + formation-sav.fr).
+    Puis transférer les fichiers modifiés sur le VPS OVH :
+      scp C:\formation\server.js root@<IP_VPS>:/opt/nc/
+      scp C:\formation\NC\console.html root@<IP_VPS>:/opt/nc/NC/
+    Redémarrer Node.js si server.js modifié :
+      pm2 restart muller-nc
+    Les fichiers HTML/JS statiques sont actifs immédiatement sans redémarrage.
+
+Q : Les données NC sont-elles perdues pendant la migration ?
+R : Non. L'ancien PC reste actif pendant toute la migration.
+    La bascule DNS n'affecte que le routage réseau — les données nc-data.json
+    transférées sur le VPS sont un snapshot à la date du transfert clé USB.
+    Les NC saisies entre le transfert clé et la bascule DNS doivent être
+    récupérées manuellement depuis le PC local (export JSON ou CSV).
+    → Planifier la bascule un vendredi soir ou week-end pour minimiser le delta.
+
+Q : Comment synchroniser les données du PC dev vers le VPS prod ?
+R : Uniquement pour la migration initiale. Après la bascule, ne pas écraser
+    nc-data.json du VPS (il contient les NC de production).
+    Procédure de migration initiale uniquement :
+      scp root@<IP_VPS>:/opt/nc/nc-data.json D:\formation\backup-prod.json
+      scp C:\formation\nc-data.json root@<IP_VPS>:/opt/nc/
+      pm2 restart muller-nc
+
+Q : Cloudflare est-il encore nécessaire après la migration OVH ?
+R : Non pour le tunnel. L'IP fixe OVH permet un accès direct.
+    Cloudflare reste utile pour l'environnement de DÉVELOPPEMENT
+    (formation-sav.fr via PC Windows) — ne pas le supprimer.
+    Pour le domaine production OVH, Cloudflare est optionnel
+    (CDN, protection DDoS) — Let's Encrypt suffit pour le HTTPS.
+
+Q : Pourquoi conserver l'environnement de développement sur le PC Windows ?
+R : Pour pouvoir tester toute nouvelle fonctionnalité avant de la déployer
+    en production. Cela évite de perturber les utilisateurs métier avec des
+    modifications non testées. Les deux environnements coexistent en permanence :
+    développement → test → validation → déploiement sur VPS prod.
+
+Q : Comment gérer les utilisateurs NC en production ?
+R : Depuis la console NC (nc_admin connecté) → ⚙ Configuration → Utilisateurs.
+    Aucun accès SSH requis. Les mots de passe sont hashés (bcrypt) dans
+    nc-users.json. En cas d'oubli du mot de passe admin :
+      node -e "const bcrypt=require('bcryptjs'); \
+        bcrypt.hash('NouveauPass',10,(e,h)=>console.log(h));"
+    → Remplacer le hash dans nc-users.json via nano.
+
+Q : Que faire si nc-data.json est corrompu ?
+R : 1. Arrêter PM2 : pm2 stop muller-nc
+    2. Lister les sauvegardes : ls -lh /opt/backups/
+    3. Extraire : tar -xzf /opt/backups/nc-AAAAMMJJ.tar.gz -C /
+    4. Redémarrer : pm2 start muller-nc
+    Perte de données maximale : < 24h (sauvegarde cron quotidienne à 02h00).
+
+Q : Comment appliquer les mises à jour de sécurité du serveur Linux ?
+R : Mensuellement, se connecter en SSH et exécuter :
+      apt update && apt upgrade -y
+      # Si kernel mis à jour : reboot (PM2 redémarre automatiquement)
+    Certbot et PM2 assurent leurs propres renouvellements automatiques.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+15. RÉSUMÉ EXÉCUTIF — POUR PRÉSENTATION À LA DIRECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  SITUATION ACTUELLE (environnement de développement — v5 au 07/05/2026)
+    · Module NC opérationnel sur PC Windows local (tunnel Cloudflare)
+    · Accessible via formation-sav.fr/NC/ — usage développement / test
+    · Risque en production : panne PC = site indisponible immédiatement
+    · Conservé en parallèle pour les évolutions futures
+    · Données réinitialisées au 07/05/2026 — prêt pour première utilisation réelle
+    · v5 : double profil Pilote/Lecteur, badge Notice, presentation.html
+
+  CIBLE — VPS OVH Linux + domaine entreprise
+    · VPS OVH, IP fixe, HTTPS natif Let's Encrypt
+    · Domaine professionnel Muller Automotive
+    · Accessible partout dans le monde — PC, tablette, smartphone
+    · Aucune installation, aucun VPN, aucun client spécifique requis
+    · Disponibilité garantie 99,9% (SLA OVH — indépendant du PC local)
+    · Sauvegarde quotidienne automatique (cron — perte max < 24h)
+    · Zéro réécriture du code applicatif (portabilité Windows → Linux)
+    · Emails envoyés depuis @mullerautomotive.fr (messagerie entreprise)
+
+  ARCHITECTURE CIBLE (simplifiée)
+    Utilisateur (navigateur) → HTTPS → VPS OVH → Nginx → Node.js
+    Aucun tunnel, aucun VPN, aucun matériel interne exposé à internet
+
+  VOLUMÉTRIE 10 ANS (400 NC/an)
+    · 4 000 NC × 43 Mo = ~172 Go médias
+    · + JSON + sauvegardes + OS = ~290 Go total
+    · VPS 320 Go NVMe recommandé pour 10 ans avec marge
+
+  PROCÉDURE DE DÉPLOIEMENT
+    · Export NC seul (périmètre limité — sans contenu formation)
+    · Adaptations URL + SMTP entreprise avant déploiement
+    · Déploiement VPS OVH : 13 étapes documentées (section 7.4)
+    · Durée estimée : 8–13 h de travail IT (one-shot)
+    · Bascule DNS : < 5 min, propagation 24–48 h
+
+  COÛTS ANNUELS PRODUCTION NC
+    · VPS Comfort : ~236 €/an (~20 €/mois) — horizon 5 ans
+    · VPS Elite   : ~456 €/an (~38 €/mois) — horizon 10 ans
+    · Zéro coût de maintenance interne — zéro serveur physique interne
+
+  DÉCISION REQUISE
+    · Confirmer le nom de domaine production (espace-client.muller-automotive.fr
+      ou autre sous-domaine à créer dans le DNS OVH de l'entreprise)
+    · Choisir VPS Comfort ou Elite selon horizon 5 ou 10 ans
+    · Valider le compte email expéditeur NC (@mullerautomotive.fr)
+    · Désigner le responsable IT pour le déploiement
+    · Choisir la date de bascule (week-end recommandé)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Auteur   : Support technique Muller Automotive — avet.mat@gmail.com
+  Version  : 6 — 07/05/2026
+  Basé sur : État du module NC au 07/05/2026 (v5 — double profil Pilote/Lecteur,
+             badge Notice, presentation.html, données NC réinitialisées prod)
+  Nouveautés v5 : architecture deux environnements (dev/prod), export NC
+             seul, nouveau domaine OVH entreprise, migration Gmail →
+             @mullerautomotive.fr, FAQ démarrage OVH (section 13)
+  Nouveautés v6 : double profil Pilote/Lecteur (toggleViewRole, renderModeBanner,
+             renderDashboardPilote), badge 📖 Notice header, presentation.html
+             dans l'export, nc-data.json + nc-parent-groups.json remis à zéro
+             pour première utilisation réelle (archives dans D:\formation\SAVE\)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

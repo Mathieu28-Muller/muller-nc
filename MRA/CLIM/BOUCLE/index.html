@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boucle de froid — Formation Climatisation Muller</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;600&display=swap');
+:root{--red:#cd121d;--black:#0a0a0a;--dark:#111;--card:#1a1a1a;--border:#2a2a2a;--white:#f0f0f0;--muted:#999;--green:#22c55e;--yellow:#eab308;--blue:#3b82f6;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--black);color:var(--white);min-height:100vh;}
+.app{display:flex;flex-direction:column;min-height:100vh;}
+.top-bar{background:var(--dark);border-bottom:3px solid var(--red);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;}
+.top-bar img{height:38px;object-fit:contain;}
+.top-bar h1{font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:5px;text-transform:uppercase;color:var(--muted);flex:1;}
+.back-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;white-space:nowrap;}
+.back-btn:hover{color:var(--red);}
+.progress-bar-wrap{background:#1a1a1a;height:4px;}
+.progress-bar{background:var(--red);height:4px;transition:width .4s ease;}
+.body-layout{display:flex;flex:1;}
+.sidebar{width:250px;flex-shrink:0;background:var(--dark);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto;}
+.sidebar-title{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:#444;padding:0 20px 12px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;font-size:.8rem;color:var(--muted);transition:all .15s;border-left:3px solid transparent;}
+.nav-item:hover{background:#1e1e1e;color:var(--white);}
+.nav-item.active{background:#1e1e1e;color:var(--white);border-left-color:var(--red);}
+.nav-item.done .nav-check{color:var(--green);}
+.nav-item.quiz-ch{color:#fde047;}
+.nav-item.quiz-ch.active{border-left-color:#fde047;}
+.nav-num{font-family:'Barlow Condensed',sans-serif;font-size:.73rem;font-weight:700;color:#444;min-width:18px;}
+.nav-item.active .nav-num{color:var(--red);}
+.nav-item.quiz-ch.active .nav-num{color:#fde047;}
+.nav-check{font-size:.9rem;margin-left:auto;}
+.main-content{flex:1;padding:40px 48px;max-width:920px;}
+.chapter{display:none;animation:fadeIn .35s ease;}
+.chapter.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.chapter-label{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:10px;}
+.chapter-label.is-quiz{color:#fde047;}
+.chapter-title{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;line-height:1.1;margin-bottom:24px;}
+.chapter-title span{color:var(--red);}
+.chapter-title span.yl{color:#fde047;}
+.lead{font-size:.98rem;color:#ccc;line-height:1.85;margin-bottom:24px;}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin:28px 0 12px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:#222;}
+p{color:#bbb;line-height:1.85;margin-bottom:12px;font-size:.88rem;}
+
+/* COMPOSANT AVEC PHOTO + VIDEO */
+.comp-block{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;}
+.comp-header{background:#1e1e1e;border-bottom:2px solid var(--red);padding:12px 18px;display:flex;align-items:center;gap:10px;}
+.comp-icon{font-size:1.4rem;}
+.comp-title{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--white);}
+.comp-body{display:grid;grid-template-columns:160px 1fr 1fr;gap:0;}
+.comp-photo{background:#f5f5f5;display:flex;align-items:center;justify-content:center;padding:8px;}
+.comp-photo img{width:100%;height:130px;object-fit:contain;}
+.comp-video video{width:100%;height:145px;display:block;background:#000;}
+.comp-info{padding:14px 18px;display:flex;flex-direction:column;justify-content:center;gap:6px;border-left:1px solid var(--border);}
+.comp-role{font-size:.81rem;color:#bbb;line-height:1.6;}
+.comp-role strong{color:var(--white);display:block;margin-bottom:3px;font-size:.85rem;}
+.comp-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.tag{display:inline-block;font-size:.64rem;font-weight:700;padding:2px 8px;border-radius:10px;}
+.tag-hp{background:rgba(205,18,29,.15);color:var(--red);border:1px solid rgba(205,18,29,.3);}
+.tag-bp{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);}
+.tag-liq{background:rgba(34,197,94,.1);color:#86efac;border:1px solid rgba(34,197,94,.25);}
+.tag-gaz{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25);}
+.tag-di{background:rgba(234,179,8,.1);color:#fde047;border:1px solid rgba(234,179,8,.25);}
+.tag-chaud{background:rgba(205,18,29,.08);color:#fca5a5;border:1px solid rgba(205,18,29,.2);}
+.tag-froid{background:rgba(59,130,246,.08);color:#93c5fd;border:1px solid rgba(59,130,246,.2);}
+@media(max-width:700px){.comp-body{grid-template-columns:1fr;}.comp-photo{height:100px;}.comp-info{border-left:none;border-top:1px solid var(--border);}}
+
+/* TABLES */
+.refrig-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.82rem;}
+.refrig-table th{background:#1e1e1e;color:var(--red);padding:9px 11px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;border-bottom:2px solid var(--border);}
+.refrig-table td{padding:9px 11px;border-bottom:1px solid #1a1a1a;color:#bbb;}
+.refrig-table tr:hover td{background:#111;}
+.pt-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.8rem;}
+.pt-table th{background:#1e1e1e;color:var(--muted);padding:8px 10px;font-size:.67rem;letter-spacing:1.5px;text-transform:uppercase;border-bottom:2px solid var(--border);text-align:center;}
+.pt-table td{padding:7px 10px;border-bottom:1px solid #1a1a1a;color:#bbb;text-align:center;}
+.pt-table .t-col{color:var(--white);font-weight:600;}
+.pt-table tr:hover td{background:#111;}
+
+/* ALERTS */
+.alert{border-radius:6px;padding:14px 18px;margin:16px 0;display:flex;gap:12px;align-items:flex-start;}
+.alert-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+.alert-body{font-size:.85rem;line-height:1.7;color:#ccc;}
+.alert-body strong{display:block;margin-bottom:3px;}
+.alert.red{background:rgba(205,18,29,.1);border:1px solid rgba(205,18,29,.3);}
+.alert.yellow{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);}
+.alert.green{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);}
+.alert.blue{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);}
+
+/* IMAGES */
+.img-block{margin:16px 0;}
+.img-block img{width:100%;border-radius:6px;border:1px solid var(--border);}
+.img-caption{font-size:.76rem;color:var(--muted);margin-top:5px;text-align:center;font-style:italic;}
+.schema-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+.schema-item{text-align:center;}
+.schema-item img{width:100%;border-radius:6px;border:1px solid var(--border);}
+.schema-caption{font-size:.76rem;color:var(--muted);margin-top:6px;font-style:italic;line-height:1.4;}
+
+/* VE SCHEMAS */
+.ve-tabs{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--border);}
+.ve-tab{padding:10px 20px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;}
+.ve-tab:hover{color:var(--white);}
+.ve-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.ve-tab.active.chaud{color:var(--red);border-bottom-color:var(--red);}
+.ve-tab.active.batt{color:var(--green);border-bottom-color:var(--green);}
+.ve-panel{display:none;padding-top:18px;}
+.ve-panel.active{display:block;}
+
+/* ══ TEST INTERMÉDIAIRE ══ */
+.quiz-banner{background:linear-gradient(135deg,#1a1200 0%,#2a1800 100%);border:2px solid #fde047;border-radius:10px;padding:24px;margin-bottom:24px;text-align:center;}
+.quiz-banner .qb-icon{font-size:2.5rem;margin-bottom:8px;}
+.quiz-banner h3{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#fde047;margin-bottom:6px;}
+.quiz-banner p{font-size:.85rem;color:#bbb;margin:0;}
+
+.multi-q{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:22px;margin-bottom:18px;}
+.mq-label{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:#fde047;margin-bottom:10px;}
+.mq-text{font-size:.95rem;font-weight:600;color:var(--white);line-height:1.5;margin-bottom:16px;}
+.mq-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mq-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#161616;border:1.5px solid #2a2a2a;border-radius:6px;cursor:pointer;font-size:.86rem;color:#bbb;transition:all .15s;user-select:none;}
+.mq-opt:hover:not(.locked){border-color:#fde047;color:var(--white);}
+.mq-opt.selected{border-color:#fde047;color:#fde047;background:#1a1500;}
+.mq-opt.correct{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.07);}
+.mq-opt.wrong{border-color:#c00;color:#ff6b6b;background:rgba(200,0,0,.07);}
+.mq-opt.locked{cursor:default;pointer-events:none;}
+.mq-opt input[type=checkbox]{accent-color:#fde047;width:16px;height:16px;flex-shrink:0;}
+.mq-feedback{margin-top:12px;padding:10px 14px;border-radius:6px;font-size:.83rem;line-height:1.6;display:none;}
+.mq-feedback.show{display:block;}
+.mq-feedback.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac;}
+.mq-feedback.ko{background:rgba(205,18,29,.1);border:1px solid rgba(205,18,29,.3);color:#fca5a5;}
+
+.btn-validate{background:#fde047;color:#000;border:none;padding:10px 24px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:14px;transition:background .2s;}
+.btn-validate:hover{background:#f5c800;}
+.btn-validate:disabled{opacity:.4;cursor:default;}
+.ti-score{background:var(--card);border:2px solid #fde047;border-radius:8px;padding:20px;text-align:center;margin-top:20px;display:none;}
+.ti-score.show{display:block;}
+.ti-score-num{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:#fde047;}
+.ti-score-txt{font-size:.85rem;color:var(--muted);margin-top:6px;}
+
+/* ══ EXERCICE CIRCUIT T°/P/ÉTAT ══ */
+.circuit-ex{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:22px;margin:20px 0;}
+.cx-title{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:#fde047;margin-bottom:16px;}
+.cx-zones{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:16px 0;}
+.cx-zone{background:#111;border:1.5px solid var(--border);border-radius:8px;padding:14px;}
+.cx-zone-label{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.cx-zone.hp-zone .cx-zone-label{color:#ff6b6b;}
+.cx-zone.bp-zone .cx-zone-label{color:#93c5fd;}
+.cx-select{width:100%;background:#1a1a1a;border:1px solid var(--border);color:var(--white);padding:7px 10px;border-radius:5px;font-size:.83rem;margin-bottom:6px;cursor:pointer;}
+.cx-select:focus{outline:none;border-color:#fde047;}
+.cx-result{margin-top:8px;padding:8px 10px;border-radius:5px;font-size:.78rem;line-height:1.5;display:none;}
+.cx-result.show{display:block;}
+.cx-result.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac;}
+.cx-result.ko{background:rgba(205,18,29,.1);border:1px solid rgba(205,18,29,.3);color:#fca5a5;}
+.btn-cx{background:#fde047;color:#000;border:none;padding:10px 24px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:4px;}
+.btn-cx:hover{background:#f5c800;}
+.cx-score{text-align:center;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;color:#fde047;display:none;}
+.cx-score.show{display:block;}
+.btn-cx-retry{background:transparent;border:1.5px solid #fde047;color:#fde047;padding:8px 18px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:8px;}
+.btn-cx-retry:hover{background:#fde047;color:#000;}
+
+/* ══ QCM ══ */
+.quiz-wrap{max-width:700px;}
+.quiz-ptxt{font-size:.76rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;}
+.question-block{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:24px;margin-bottom:16px;}
+.q-num{font-size:.67rem;text-transform:uppercase;letter-spacing:3px;color:var(--red);margin-bottom:10px;}
+.q-text{font-size:.96rem;font-weight:600;color:var(--white);line-height:1.6;margin-bottom:16px;}
+.choices{display:flex;flex-direction:column;gap:8px;}
+.choice{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#161616;border:1.5px solid #2a2a2a;border-radius:6px;cursor:pointer;font-size:.85rem;color:#bbb;transition:all .15s;}
+.choice:hover:not(.disabled){border-color:var(--red);color:var(--white);background:#1a1010;}
+.choice.correct{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.07);}
+.choice.wrong{border-color:#c00;color:#ff6b6b;background:rgba(200,0,0,.07);}
+.choice.disabled{cursor:default;pointer-events:none;}
+.choice-letter{width:22px;height:22px;border-radius:50%;border:1.5px solid #333;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;flex-shrink:0;}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:6px;font-size:.83rem;line-height:1.6;display:none;}
+.feedback.show{display:block;}
+.feedback.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac;}
+.feedback.ko{background:rgba(205,18,29,.1);border:1px solid rgba(205,18,29,.3);color:#fca5a5;}
+.quiz-btn{background:var(--red);color:#fff;border:none;padding:11px 24px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.86rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:14px;display:none;transition:background .2s;}
+.quiz-btn:hover{background:#a00;}
+.quiz-btn.show{display:inline-flex;align-items:center;gap:8px;}
+.score-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:36px;text-align:center;display:none;}
+.score-card.show{display:block;animation:fadeIn .4s ease;}
+.score-circle{width:110px;height:110px;border-radius:50%;margin:0 auto 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid;}
+.score-num{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:800;}
+.score-title{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
+.score-msg{font-size:.86rem;color:var(--muted);line-height:1.7;margin-bottom:20px;}
+.btn-retry{background:transparent;border:1.5px solid var(--red);color:var(--red);padding:9px 22px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.83rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-retry:hover{background:var(--red);color:#fff;}
+
+/* FLASHCARDS */
+.flashcard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:20px 0;}
+.flashcard{height:155px;perspective:1000px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;border-radius:8px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;backface-visibility:hidden;}
+.flashcard-front{background:var(--card);border:1px solid #333;}
+.flashcard-back{background:var(--red);transform:rotateY(180deg);}
+.fc-q{font-family:'Barlow Condensed',sans-serif;font-size:.92rem;font-weight:700;color:var(--white);line-height:1.4;}
+.fc-hint{font-size:.66rem;color:#555;margin-top:8px;letter-spacing:1px;text-transform:uppercase;}
+.fc-a{font-family:'Barlow Condensed',sans-serif;font-size:.98rem;font-weight:800;color:#fff;line-height:1.4;}
+.fc-detail{font-size:.74rem;color:rgba(255,255,255,.75);margin-top:6px;line-height:1.5;}
+
+/* SÉCURITÉ */
+.secu-list{margin:12px 0;list-style:none;}
+.secu-list li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #1a1a1a;font-size:.86rem;color:#bbb;line-height:1.5;}
+.secu-list li::before{content:'⚠';color:var(--yellow);font-size:.9rem;flex-shrink:0;}
+.secu-list li.danger::before{content:'🔴';}
+
+/* NAV */
+.chapter-nav{display:flex;justify-content:space-between;margin-top:44px;padding-top:22px;border-top:1px solid #1e1e1e;}
+.nav-btn{background:transparent;border:1.5px solid #333;color:var(--muted);padding:9px 20px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;}
+.nav-btn:hover{border-color:var(--red);color:var(--white);}
+.nav-btn.primary{background:var(--red);border-color:var(--red);color:#fff;}
+.nav-btn.primary:hover{background:#a00;}
+.nav-btn:disabled{opacity:.2;pointer-events:none;}
+@media(max-width:768px){.sidebar{display:none;}.main-content{padding:22px 16px;}.chapter-title{font-size:1.7rem;}.schema-2col{grid-template-columns:1fr;}.cx-zones{grid-template-columns:1fr;}.mq-options{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top-bar">
+  <img src="https://www.mullerautomotive.fr/wp-content/uploads/2025/01/logo-Muller-automotive-full-1.png" alt="Muller">
+  <h1>Boucle de froid — Climatisation</h1>
+  <a class="back-btn" href="/MRA/CLIM/">← Modules Climatisation</a>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:9%"></div></div>
+
+<div class="body-layout">
+<nav class="sidebar">
+  <div class="sidebar-title">Sommaire</div>
+  <div class="nav-item active" onclick="goTo(0)"><span class="nav-num">01</span>Introduction<span class="nav-check" id="ck0"></span></div>
+  <div class="nav-item" onclick="goTo(1)"><span class="nav-num">02</span>Éléments du circuit<span class="nav-check" id="ck1"></span></div>
+  <div class="nav-item" onclick="goTo(2)"><span class="nav-num">03</span>Les réfrigérants<span class="nav-check" id="ck2"></span></div>
+  <div class="nav-item quiz-ch" onclick="goTo(3)"><span class="nav-num">⚡</span>Test intermédiaire<span class="nav-check" id="ck3"></span></div>
+  <div class="nav-item" onclick="goTo(4)"><span class="nav-num">04</span>Boucle de froid<span class="nav-check" id="ck4"></span></div>
+  <div class="nav-item quiz-ch" onclick="goTo(5)"><span class="nav-num">🎯</span>Exercice T°/P/État<span class="nav-check" id="ck5"></span></div>
+  <div class="nav-item" onclick="goTo(6)"><span class="nav-num">05</span>Propriétés physiques<span class="nav-check" id="ck6"></span></div>
+  <div class="nav-item" onclick="goTo(7)"><span class="nav-num">06</span>Véhicule électrique<span class="nav-check" id="ck7"></span></div>
+  <div class="nav-item" onclick="goTo(8)"><span class="nav-num">07</span>Sécurité<span class="nav-check" id="ck8"></span></div>
+  <div class="nav-item" onclick="goTo(9)"><span class="nav-num">08</span>Flashcards<span class="nav-check" id="ck9"></span></div>
+  <div class="nav-item" onclick="goTo(10)"><span class="nav-num">09</span>QCM Final<span class="nav-check" id="ck10"></span></div>
+</nav>
+
+<div class="main-content">
+
+<!-- ═══ CH 0 : INTRO ═══ -->
+<div class="chapter active" id="ch0">
+  <div class="chapter-label">Chapitre 01 — Introduction</div>
+  <h2 class="chapter-title">Climatisation <span>Boucle de froid</span></h2>
+  <p class="lead">La climatisation automobile régule la température et l'hygrométrie de l'habitacle. Ce module interactif couvre le circuit frigorifique, les réfrigérants, les propriétés physiques et les spécificités des véhicules électriques.</p>
+
+  <div class="section-title">Rôle du système</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;"><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">Fonction principale</div><div style="font-size:.9rem;color:var(--white);line-height:1.5;">Réguler la <strong>température et l'hygrométrie</strong> de l'habitacle selon la demande du conducteur et la T° extérieure</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;"><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">Avantages</div><div style="font-size:.9rem;color:var(--white);line-height:1.5;">Dégivrage rapide · Désembuage · Réduction fatigue conducteur · Confort passagers</div></div>
+  </div>
+
+  <div class="section-title">Programme du module</div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin:14px 0;">
+    <div style="display:flex;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:6px;"><span style="color:var(--red);font-size:1rem;">▶</span><span style="font-size:.86rem;color:#bbb;">7 composants du circuit avec <strong style="color:var(--white);">photo 3D + vidéo</strong></span></div>
+    <div style="display:flex;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:6px;"><span style="color:var(--red);font-size:1rem;">▶</span><span style="font-size:.86rem;color:#bbb;">Réfrigérants R12/R134a/R1234yf/R744</span></div>
+    <div style="display:flex;gap:12px;padding:10px 14px;background:#1a1500;border:1.5px solid #fde047;border-radius:6px;"><span style="color:#fde047;font-size:1rem;">⚡</span><span style="font-size:.86rem;color:#bbb;"><strong style="color:#fde047;">Test intermédiaire</strong> — états, pressions, températures du circuit</span></div>
+    <div style="display:flex;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:6px;"><span style="color:var(--red);font-size:1rem;">▶</span><span style="font-size:.86rem;color:#bbb;">Schémas boucle standard + montage Harrison</span></div>
+    <div style="display:flex;gap:12px;padding:10px 14px;background:#1a1500;border:1.5px solid #fde047;border-radius:6px;"><span style="color:#fde047;font-size:1rem;">🎯</span><span style="font-size:.86rem;color:#bbb;"><strong style="color:#fde047;">Exercice T°/Pression/État</strong> — placer les valeurs dans le circuit</span></div>
+    <div style="display:flex;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:6px;"><span style="color:var(--blue);font-size:1rem;">⚡</span><span style="font-size:.86rem;color:#bbb;">Spécificités <strong style="color:var(--white);">véhicule électrique</strong> — pompe à chaleur, 3 modes</span></div>
+  </div>
+
+  <div class="chapter-nav"><button class="nav-btn" disabled>← Précédent</button><button class="nav-btn primary" onclick="goTo(1)">Éléments du circuit →</button></div>
+</div>
+
+<!-- ═══ CH 1 : ÉLÉMENTS ═══ -->
+<div class="chapter" id="ch1">
+  <div class="chapter-label">Chapitre 02 — Composants</div>
+  <h2 class="chapter-title">Éléments <span>du circuit</span></h2>
+
+  <div class="section-title">Vue d'ensemble</div>
+  <div class="img-block">
+    <img src="images/image23.png" alt="Schéma circuit coloré numéroté">
+    <div class="img-caption">Circuit de climatisation — schéma coloré avec les 7 composants numérotés dans leur disposition sur le véhicule (rouge = HP chaud, bleu = BP froid, jaune = détente)</div>
+  </div>
+
+  <div class="section-title">Les 7 composants</div>
+
+  <!-- COMPRESSEUR -->
+  <div class="comp-block">
+    <div class="comp-header"><div class="comp-icon">⚙️</div><div class="comp-title">① Compresseur</div></div>
+    <div class="comp-body">
+      <div class="comp-photo"><img src="images/image13.png" alt="Compresseur 3D"></div>
+      <div class="comp-video"><video controls preload="none" poster=""><source src="video/compresseur.mp4" type="video/mp4"></video></div>
+      <div class="comp-info"><div class="comp-role"><strong>Rôle</strong>Aspire le gaz BP (froid/évaporateur) et le comprime en HP vers le condenseur. C'est le cœur de la boucle — entraîné par la courroie moteur.</div><div class="comp-tags"><span class="tag tag-hp">HP</span><span class="tag tag-gaz">Gazeux</span><span class="tag tag-chaud">Chaud +60°C</span></div></div>
+    </div>
+  </div>
+
+  <!-- CONDENSEUR -->
+  <div class="comp-block">
+    <div class="comp-header"><div class="comp-icon">🌡️</div><div class="comp-title">② Condenseur</div></div>
+    <div class="comp-body">
+      <div class="comp-photo"><img src="images/image14.png" alt="Condenseur 3D"></div>
+      <div class="comp-video"><video controls preload="none"><source src="video/condenseur.mp4" type="video/mp4"></video></div>
+      <div class="comp-info"><div class="comp-role"><strong>Rôle</strong>Refroidit le gaz HP en le condensant (gaz → liquide). La chaleur est évacuée vers l'extérieur. Situé devant le radiateur du moteur.</div><div class="comp-tags"><span class="tag tag-hp">HP</span><span class="tag tag-liq">Liquide</span><span class="tag tag-chaud">Tiède +45°C</span></div></div>
+    </div>
+  </div>
+
+  <!-- VENTILATEUR -->
+  <div class="comp-block">
+    <div class="comp-header"><div class="comp-icon">💨</div><div class="comp-title">③ Ventilateur de condenseur</div></div>
+    <div class="comp-body">
+      <div class="comp-photo"><img src="images/image15.png" alt="Ventilateur condenseur 3D"></div>
+      <div class="comp-video"><video controls preload="none"><source src="video/ventilateur_condenseur.mp4" type="video/mp4"></video></div>
+      <div class="comp-info"><div class="comp-role"><strong>Rôle</strong>Force le passage d'air sur le condenseur pour améliorer les échanges thermiques, surtout à l'arrêt ou à faible vitesse du véhicule.</div></div>
+    </div>
+  </div>
+
+  <!-- FILTRE DÉSHYDRATEUR -->
+  <div class="comp-block">
+    <div class="comp-header"><div class="comp-icon">🧹</div><div class="comp-title">④ Filtre déshydrateur</div></div>
+    <div class="comp-body">
+      <div class="comp-photo"><img src="images/image25.png" alt="Filtre déshydrateur 3D"></div>
+      <div class="comp-video"><video controls preload="none"><source src="video/filtre_deshydrateur.mp4" type="video/mp4"></video></div>
+      <div class="comp-info"><div class="comp-role"><strong>Rôle</strong>Filtre les impuretés et absorbe l'humidité (eau) qui gèlerait dans le détendeur. <em>À remplacer à chaque ouverture du circuit.</em></div><div class="comp-tags"><span class="tag tag-hp">HP</span><span class="tag tag-liq">Liquide</span></div></div>
+    </div>
+  </div>
+
+  <!-- DÉTENDEUR -->
+  <div class="comp-block">
+    <div class="comp-header"><div class="comp-icon">🔧</div><div class="comp-title">⑤ Détendeur (orifice calibré)</div></div>
+    <div class="comp-body">
+      <div class="comp-photo"><img src="images/image26.png" alt="Détendeur 3D" style="object-fit:contain;background:#fff;padding:4px;"></div>
+      <div class="comp-video"><video controls preload="none"><source src="video/detendeur.mp4" type="video/mp4"></video></div>
+      <div class="comp-info"><div class="comp-role"><strong>Rôle</strong>Chute de pression brutale → le liquide HP devient diphasique (liquide + gaz) BP à très basse température. Régule le débit selon la charge.</div><div class="comp-tags"><span class="tag tag-bp">BP</span><span class="tag tag-di">Diphasique</span><span class="tag tag-froid">Froid −15°C</span></div></div>
+    </div>
+  </div>
+
+  <!-- ÉVAPORATEUR -->
+  <div class="comp-block">
+    <div class="comp-header"><div class="comp-icon">❄️</div><div class="comp-title">⑥ Évaporateur</div></div>
+    <div class="comp-body">
+      <div class="comp-photo"><img src="images/image17.png" alt="Évaporateur 3D"></div>
+      <div class="comp-video"><video controls preload="none"><source src="video/evaporateur.mp4" type="video/mp4"></video></div>
+      <div class="comp-info"><div class="comp-role"><strong>Rôle</strong>Le fluide s'évapore en absorbant la chaleur de l'air habitacle → l'air est refroidi et déshumidifié. Situé dans le boîtier de chauffage/clim.</div><div class="comp-tags"><span class="tag tag-bp">BP</span><span class="tag tag-gaz">Gazeux</span><span class="tag tag-froid">Froid +2°C sortie air</span></div></div>
+    </div>
+  </div>
+
+  <!-- PULSEUR -->
+  <div class="comp-block">
+    <div class="comp-header"><div class="comp-icon">🌀</div><div class="comp-title">⑦ Pulseur d'air habitacle</div></div>
+    <div class="comp-body">
+      <div class="comp-photo" style="background:#1a1a1a;"><img src="images/image22.png" alt="Circuit vue d'ensemble" style="height:130px;object-fit:cover;border-radius:4px;"></div>
+      <div class="comp-video"><video controls preload="none"><source src="video/pulseur_d_air.mp4" type="video/mp4"></video></div>
+      <div class="comp-info"><div class="comp-role"><strong>Rôle</strong>Fait circuler l'air de l'habitacle à travers l'évaporateur pour le refroidir, puis le distribue dans l'habitacle via les bouches d'aération.</div></div>
+    </div>
+  </div>
+
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(0)">← Introduction</button><button class="nav-btn primary" onclick="goTo(2)">Les réfrigérants →</button></div>
+</div>
+
+<!-- ═══ CH 2 : RÉFRIGÉRANTS ═══ -->
+<div class="chapter" id="ch2">
+  <div class="chapter-label">Chapitre 03 — Réfrigérants</div>
+  <h2 class="chapter-title">Les <span>réfrigérants</span></h2>
+
+  <table class="refrig-table">
+    <thead><tr><th>Désig.</th><th>Famille</th><th>Ébullition</th><th>PRG</th><th>ODP</th><th>Application</th></tr></thead>
+    <tbody>
+      <tr><td><strong style="color:var(--white)">R12</strong></td><td><span class="tag tag-hp">CFC</span> ChloroFluoroCarbone</td><td>−29,8°C</td><td style="color:#ff6b6b">10 900</td><td style="color:#ff6b6b">1</td><td><span class="tag tag-hp">Interdit 1995</span></td></tr>
+      <tr><td><strong style="color:var(--white)">R134a</strong></td><td><span class="tag tag-bp">HFC</span> HydroFluoroCarbone</td><td>−26,3°C</td><td style="color:var(--yellow)">1 430</td><td style="color:var(--green)">0</td><td>Circuit origine · R12 reconverti</td></tr>
+      <tr><td><strong style="color:var(--white)">R1234yf</strong></td><td><span class="tag tag-liq">HFO</span> HydroFluoroOléfine</td><td>−29,4°C</td><td style="color:var(--green)">4</td><td style="color:var(--green)">0</td><td><span class="tag tag-liq">Nouveau standard</span></td></tr>
+      <tr><td><strong style="color:var(--white)">R744</strong></td><td>CO₂ — Dioxyde de carbone</td><td>−79°C</td><td style="color:var(--green)">1</td><td style="color:var(--green)">0</td><td>VE / circuits haute pression</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert yellow"><div class="alert-icon">⚠️</div><div class="alert-body"><strong>Interdiction absolue de mélange</strong>Ne jamais mélanger deux réfrigérants différents. Chaque véhicule utilise le réfrigérant spécifié sur sa plaque constructeur. Risque de dommages circuit irréversibles.</div></div>
+  <div class="alert blue"><div class="alert-icon">💡</div><div class="alert-body"><strong>PRG — Potentiel de Réchauffement Global</strong>Mesure l'impact climatique sur 100 ans vs CO₂ (PRG=1). Le R1234yf (PRG=4) remplace progressivement le R134a (PRG=1430) sur tous les véhicules neufs depuis 2017.</div></div>
+
+  <div class="section-title">États du réfrigérant dans le circuit</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center;"><div style="font-size:1.3rem;margin-bottom:5px;">💧</div><strong style="font-family:'Barlow Condensed',sans-serif;color:var(--white);">Liquide</strong><div style="font-size:.74rem;color:var(--muted);margin-top:3px;">Côté HP sortie condenseur</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center;"><div style="font-size:1.3rem;margin-bottom:5px;">💨</div><strong style="font-family:'Barlow Condensed',sans-serif;color:var(--white);">Gazeux</strong><div style="font-size:.74rem;color:var(--muted);margin-top:3px;">Sortie compresseur et évaporateur</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center;"><div style="font-size:1.3rem;margin-bottom:5px;">🌫️</div><strong style="font-family:'Barlow Condensed',sans-serif;color:var(--white);">Diphasique</strong><div style="font-size:.74rem;color:var(--muted);margin-top:3px;">Après détendeur — 2 phases</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center;"><div style="font-size:1.3rem;margin-bottom:5px;">🧊</div><strong style="font-family:'Barlow Condensed',sans-serif;color:var(--white);">Solide</strong><div style="font-size:.74rem;color:var(--muted);margin-top:3px;">Jamais en fonctionnement normal</div></div>
+  </div>
+
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(1)">← Éléments</button><button class="nav-btn primary" onclick="goTo(3)" style="background:#fde047;border-color:#fde047;color:#000;">⚡ Test intermédiaire →</button></div>
+</div>
+
+<!-- ═══ CH 3 : TEST INTERMÉDIAIRE ═══ -->
+<div class="chapter" id="ch3">
+  <div class="chapter-label is-quiz">Test intermédiaire ⚡</div>
+  <h2 class="chapter-title">Test <span class="yl">intermédiaire</span></h2>
+
+  <div class="quiz-banner">
+    <div class="qb-icon">⚡</div>
+    <h3>Testez vos connaissances</h3>
+    <p>Cochez <strong>toutes les réponses correctes</strong> pour chaque question puis validez.</p>
+  </div>
+
+  <!-- Q1 -->
+  <div class="multi-q" id="mq0">
+    <div class="mq-label">Question 1 / 3</div>
+    <div class="mq-text">Quels sont les différents états dans lesquels on peut trouver le réfrigérant dans un circuit de climatisation en fonctionnement ?</div>
+    <div class="mq-options">
+      <label class="mq-opt" id="mq0-0"><input type="checkbox"> Liquide</label>
+      <label class="mq-opt" id="mq0-1"><input type="checkbox"> Gazeux</label>
+      <label class="mq-opt" id="mq0-2"><input type="checkbox"> Solide</label>
+      <label class="mq-opt" id="mq0-3"><input type="checkbox"> Diphasique</label>
+    </div>
+    <div class="mq-feedback" id="mq0-fb"></div>
+    <button class="btn-validate" onclick="validateMQ(0)">Valider</button>
+  </div>
+
+  <!-- Q2 -->
+  <div class="multi-q" id="mq1">
+    <div class="mq-label">Question 2 / 3</div>
+    <div class="mq-text">Quelles pressions peut-on trouver dans un circuit de climatisation R134a en fonctionnement normal ?</div>
+    <div class="mq-options">
+      <label class="mq-opt" id="mq1-0"><input type="checkbox"> 15 bar (HP)</label>
+      <label class="mq-opt" id="mq1-1"><input type="checkbox"> 2 bar (BP)</label>
+      <label class="mq-opt" id="mq1-2"><input type="checkbox"> 130 bar</label>
+      <label class="mq-opt" id="mq1-3"><input type="checkbox"> 35 bar</label>
+    </div>
+    <div class="mq-feedback" id="mq1-fb"></div>
+    <button class="btn-validate" onclick="validateMQ(1)">Valider</button>
+  </div>
+
+  <!-- Q3 -->
+  <div class="multi-q" id="mq2">
+    <div class="mq-label">Question 3 / 3</div>
+    <div class="mq-text">Quelles températures peut-on trouver dans la boucle de froid d'un circuit de climatisation ?</div>
+    <div class="mq-options">
+      <label class="mq-opt" id="mq2-0"><input type="checkbox"> −15°C (évaporateur)</label>
+      <label class="mq-opt" id="mq2-1"><input type="checkbox"> +2°C (air sortie évap.)</label>
+      <label class="mq-opt" id="mq2-2"><input type="checkbox"> +60°C (sortie compresseur)</label>
+      <label class="mq-opt" id="mq2-3"><input type="checkbox"> +165°C</label>
+    </div>
+    <div class="mq-feedback" id="mq2-fb"></div>
+    <button class="btn-validate" onclick="validateMQ(2)">Valider</button>
+  </div>
+
+  <div class="ti-score" id="tiScore">
+    <div class="ti-score-num" id="tiScoreNum">0/3</div>
+    <div class="ti-score-txt" id="tiScoreTxt"></div>
+    <button class="btn-cx-retry" style="margin-top:12px;" onclick="resetTI()">↺ Recommencer</button>
+  </div>
+
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(2)">← Réfrigérants</button><button class="nav-btn primary" onclick="goTo(4)">Boucle de froid →</button></div>
+</div>
+
+<!-- ═══ CH 4 : BOUCLE ═══ -->
+<div class="chapter" id="ch4">
+  <div class="chapter-label">Chapitre 04 — Schémas</div>
+  <h2 class="chapter-title">La <span>boucle de froid</span></h2>
+
+  <div class="section-title">Montage standard — circuit complet</div>
+  <div class="img-block">
+    <img src="images/image28.jpeg" alt="Schéma circuit standard HP/BP">
+    <div class="img-caption">Circuit standard — <span style="color:#ff6b6b">rouge = HP chaud</span>, <span style="color:#93c5fd">bleu = BP froid</span>. Compresseur → Condenseur → Filtre déshydrateur → Détendeur → Évaporateur → Compresseur.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:14px 0 20px;">
+    <div style="background:rgba(205,18,29,.08);border:1px solid rgba(205,18,29,.25);border-radius:5px;padding:8px 4px;text-align:center;font-size:.72rem;"><strong style="color:var(--red);display:block;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;">HP</strong>Haute P.</div>
+    <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:8px 4px;text-align:center;font-size:.72rem;"><strong style="color:#93c5fd;display:block;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;">BP</strong>Basse P.</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:5px;padding:8px 4px;text-align:center;font-size:.72rem;"><strong style="display:block;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;">L</strong>Liquide</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:5px;padding:8px 4px;text-align:center;font-size:.72rem;"><strong style="display:block;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;">G</strong>Gazeux</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:5px;padding:8px 4px;text-align:center;font-size:.72rem;"><strong style="color:#fca5a5;display:block;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;">C</strong>Chaud</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:5px;padding:8px 4px;text-align:center;font-size:.72rem;"><strong style="color:#fde047;display:block;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;">T</strong>Tiède</div>
+    <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:8px 4px;text-align:center;font-size:.72rem;"><strong style="color:#93c5fd;display:block;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;">F</strong>Froid</div>
+  </div>
+
+  <div class="section-title">Montage Harrison — variante</div>
+  <div class="schema-2col">
+    <div class="schema-item"><img src="images/image28.jpeg" alt="Standard"><div class="schema-caption">Standard : Bouteille filtre déshydratante + Détendeur (côté HP)</div></div>
+    <div class="schema-item"><img src="images/image29.jpeg" alt="Harrison"><div class="schema-caption">Harrison : Accumulateur + Orifice calibré (côté BP — avant l'évaporateur)</div></div>
+  </div>
+  <div class="alert blue"><div class="alert-icon">🔄</div><div class="alert-body"><strong>Différence clé Harrison vs Standard</strong>Standard : le filtre déshydrateur et le détendeur sont côté HP (après condenseur). Harrison : l'accumulateur et l'orifice calibré sont côté BP (avant l'évaporateur). Résultat : le réfrigérant entre dans l'évaporateur à l'état liquide dans les deux cas.</div></div>
+
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(3)">← Test intermédiaire</button><button class="nav-btn primary" onclick="goTo(5)" style="background:#fde047;border-color:#fde047;color:#000;">🎯 Exercice T°/P/État →</button></div>
+</div>
+
+<!-- ═══ CH 5 : EXERCICE T°/P/ÉTAT ═══ -->
+<div class="chapter" id="ch5">
+  <div class="chapter-label is-quiz">Exercice interactif 🎯</div>
+  <h2 class="chapter-title">Exercice <span class="yl">T° / P / État</span></h2>
+
+  <p class="lead" style="font-size:.9rem;">Pour chaque zone du circuit, sélectionnez la pression, la température et l'état du réfrigérant. Validez ensuite pour voir vos résultats.</p>
+
+  <div class="img-block" style="margin-bottom:8px;">
+    <img src="images/image22.png" alt="Circuit numéroté">
+    <div class="img-caption">Référez-vous au circuit numéroté — les 4 zones correspondent aux sorties des composants principaux</div>
+  </div>
+
+  <div class="circuit-ex">
+    <div class="cx-title">Remplissez les valeurs pour chaque zone du circuit</div>
+    <div class="cx-zones">
+      <!-- Zone A -->
+      <div class="cx-zone hp-zone">
+        <div class="cx-zone-label">Zone A — Sortie compresseur</div>
+        <select class="cx-select" id="za-pression">
+          <option value="">-- Pression --</option>
+          <option value="bp">Basse pression (~2 bar)</option>
+          <option value="hp">Haute pression (~15 bar)</option>
+        </select>
+        <select class="cx-select" id="za-temp">
+          <option value="">-- Température --</option>
+          <option value="-15">−15°C</option>
+          <option value="2">+2°C</option>
+          <option value="45">+45°C</option>
+          <option value="60">+60°C</option>
+        </select>
+        <select class="cx-select" id="za-etat">
+          <option value="">-- État --</option>
+          <option value="liquide">Liquide</option>
+          <option value="gazeux">Gazeux</option>
+          <option value="diphasique">Diphasique</option>
+        </select>
+        <div class="cx-result" id="za-result"></div>
+      </div>
+      <!-- Zone B -->
+      <div class="cx-zone hp-zone">
+        <div class="cx-zone-label">Zone B — Sortie condenseur</div>
+        <select class="cx-select" id="zb-pression">
+          <option value="">-- Pression --</option>
+          <option value="bp">Basse pression (~2 bar)</option>
+          <option value="hp">Haute pression (~15 bar)</option>
+        </select>
+        <select class="cx-select" id="zb-temp">
+          <option value="">-- Température --</option>
+          <option value="-15">−15°C</option>
+          <option value="2">+2°C</option>
+          <option value="45">+45°C</option>
+          <option value="60">+60°C</option>
+        </select>
+        <select class="cx-select" id="zb-etat">
+          <option value="">-- État --</option>
+          <option value="liquide">Liquide</option>
+          <option value="gazeux">Gazeux</option>
+          <option value="diphasique">Diphasique</option>
+        </select>
+        <div class="cx-result" id="zb-result"></div>
+      </div>
+      <!-- Zone C -->
+      <div class="cx-zone bp-zone">
+        <div class="cx-zone-label">Zone C — Sortie détendeur</div>
+        <select class="cx-select" id="zc-pression">
+          <option value="">-- Pression --</option>
+          <option value="bp">Basse pression (~2 bar)</option>
+          <option value="hp">Haute pression (~15 bar)</option>
+        </select>
+        <select class="cx-select" id="zc-temp">
+          <option value="">-- Température --</option>
+          <option value="-15">−15°C</option>
+          <option value="2">+2°C</option>
+          <option value="45">+45°C</option>
+          <option value="60">+60°C</option>
+        </select>
+        <select class="cx-select" id="zc-etat">
+          <option value="">-- État --</option>
+          <option value="liquide">Liquide</option>
+          <option value="gazeux">Gazeux</option>
+          <option value="diphasique">Diphasique</option>
+        </select>
+        <div class="cx-result" id="zc-result"></div>
+      </div>
+      <!-- Zone D -->
+      <div class="cx-zone bp-zone">
+        <div class="cx-zone-label">Zone D — Sortie évaporateur</div>
+        <select class="cx-select" id="zd-pression">
+          <option value="">-- Pression --</option>
+          <option value="bp">Basse pression (~2 bar)</option>
+          <option value="hp">Haute pression (~15 bar)</option>
+        </select>
+        <select class="cx-select" id="zd-temp">
+          <option value="">-- Température --</option>
+          <option value="-15">−15°C</option>
+          <option value="2">+2°C</option>
+          <option value="45">+45°C</option>
+          <option value="60">+60°C</option>
+        </select>
+        <select class="cx-select" id="zd-etat">
+          <option value="">-- État --</option>
+          <option value="liquide">Liquide</option>
+          <option value="gazeux">Gazeux</option>
+          <option value="diphasique">Diphasique</option>
+        </select>
+        <div class="cx-result" id="zd-result"></div>
+      </div>
+    </div>
+    <button class="btn-cx" onclick="validateCircuit()">🎯 Valider l'exercice</button>
+    <div class="cx-score" id="cxScore"></div>
+    <button class="btn-cx-retry" id="cxRetry" style="display:none" onclick="resetCircuit()">↺ Recommencer</button>
+  </div>
+
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(4)">← Boucle de froid</button><button class="nav-btn primary" onclick="goTo(6)">Propriétés physiques →</button></div>
+</div>
+
+<!-- ═══ CH 6 : PROPRIÉTÉS PHYSIQUES ═══ -->
+<div class="chapter" id="ch6">
+  <div class="chapter-label">Chapitre 05 — Physique</div>
+  <h2 class="chapter-title">Propriétés <span>physiques</span></h2>
+  <div class="alert green"><div class="alert-icon">⚗️</div><div class="alert-body"><strong>Principe fondamental</strong>À quantité suffisante, la pression d'un fluide frigorigène est directement liée à sa température de saturation. Mesurer la pression = connaître la température du fluide à cet endroit.</div></div>
+
+  <div class="section-title">Tableau Pression / Température de saturation</div>
+  <table class="pt-table">
+    <thead><tr><th>T° (°C)</th><th>R134a (bar)</th><th>R1234yf (bar)</th><th>R744/CO₂ (bar)</th></tr></thead>
+    <tbody>
+      <tr><td class="t-col">−30</td><td>−0,16</td><td>0</td><td>14,27</td></tr>
+      <tr><td class="t-col">−20</td><td>0,32</td><td>0,52</td><td>19,70</td></tr>
+      <tr><td class="t-col">−10</td><td>1,00</td><td>1,20</td><td>—</td></tr>
+      <tr><td class="t-col">0</td><td>1,92</td><td>2,14</td><td>34,85</td></tr>
+      <tr><td class="t-col">+10</td><td>3,13</td><td>3,36</td><td>45,02</td></tr>
+      <tr><td class="t-col">+20</td><td>4,70</td><td>4,90</td><td>—</td></tr>
+      <tr><td class="t-col">+30</td><td>6,57</td><td>6,82</td><td>72,14</td></tr>
+      <tr><td class="t-col">+40</td><td>9,12</td><td>9,17</td><td>—</td></tr>
+      <tr><td class="t-col">+50</td><td>12,11</td><td>12,01</td><td>—</td></tr>
+      <tr><td class="t-col">+60</td><td>15,72</td><td>15,41</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert yellow"><div class="alert-icon">🔬</div><div class="alert-body"><strong>Application diagnostic</strong>Si la pression lue ne correspond pas à la température théorique → anomalie : fuite de réfrigérant, fluide souillé, présence de non-condensables (air) dans le circuit.</div></div>
+
+  <div class="section-title">Températures clés de la boucle</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;">
+    <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:6px;padding:12px;text-align:center;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:#93c5fd;">−15°C</div><div style="font-size:.72rem;color:#ccc;margin-top:3px;">Évaporateur (R134a)</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:var(--white);">+2°C</div><div style="font-size:.72rem;color:#ccc;margin-top:3px;">Air sortie évaporateur</div></div>
+    <div style="background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);border-radius:6px;padding:12px;text-align:center;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:#fde047;">+60°C</div><div style="font-size:.72rem;color:#ccc;margin-top:3px;">Sortie compresseur</div></div>
+    <div style="background:rgba(205,18,29,.08);border:1px solid rgba(205,18,29,.25);border-radius:6px;padding:12px;text-align:center;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:var(--red);">+165°C</div><div style="font-size:.72rem;color:#ccc;margin-top:3px;">Max compresseur (défaut)</div></div>
+  </div>
+
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(5)">← Exercice T°/P/État</button><button class="nav-btn primary" onclick="goTo(7)">Véhicule électrique →</button></div>
+</div>
+
+<!-- ═══ CH 7 : VÉHICULE ÉLECTRIQUE ═══ -->
+<div class="chapter" id="ch7">
+  <div class="chapter-label">Chapitre 06 — VE / Hybride</div>
+  <h2 class="chapter-title">Climatisation <span>véhicule électrique</span></h2>
+  <p class="lead">Les véhicules électriques et hybrides utilisent un circuit de climatisation réversible (pompe à chaleur) avec des électrovannes pour piloter le flux réfrigérant selon 3 modes distincts.</p>
+
+  <div class="alert blue"><div class="alert-icon">🔋</div><div class="alert-body"><strong>Spécificités VE</strong>Le compresseur est <strong>électrique à spirale</strong> (entraîné par la batterie, non par la courroie moteur). Présence d'un accumulateur, d'électrovannes (A, B, C, D) et d'un échangeur batterie supplémentaire.</div></div>
+
+  <div class="section-title">Schéma du circuit VE — 3 modes</div>
+  <div class="ve-tabs">
+    <div class="ve-tab active" onclick="showVE(0,this)">❄️ Mode froid maxi</div>
+    <div class="ve-tab" onclick="showVE(1,this)">🔥 Mode PAC (chaud maxi)</div>
+    <div class="ve-tab" onclick="showVE(2,this)">🔋 Refroidissement batterie</div>
+  </div>
+
+  <div class="ve-panel active" id="vep0">
+    <div class="img-block"><img src="images/ve/image1.jpeg" alt="Mode froid maxi"><div class="img-caption">Mode froid maxi — fonctionnement classique comme un circuit thermique standard</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:12px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;margin-bottom:10px;">État des électrovannes</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:.8rem;">
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV A</strong><span style="color:var(--green);">A1→A2 (repos)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV B</strong><span style="color:var(--green);">Ouverte (repos)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV C</strong><span style="color:var(--red);">Fermée (alimentée)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV D</strong><span style="color:var(--green);">Ouverte (repos)</span></div>
+      </div>
+      <p style="margin-top:10px;font-size:.83rem;">L'échangeur externe est <strong style="color:var(--white);">condenseur</strong> — le fluide sort liquide. L'orifice calibré 1 détend le fluide → l'évaporateur habitacle refroidit l'air.</p>
+    </div>
+  </div>
+
+  <div class="ve-panel" id="vep1">
+    <div class="img-block"><img src="images/ve/image2.jpeg" alt="Mode pompe à chaleur"><div class="img-caption">Mode PAC (pompe à chaleur) — l'échangeur habitacle devient condenseur → air chaud dans l'habitacle</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:12px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:10px;">État des électrovannes</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:.8rem;">
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV A</strong><span style="color:var(--red);">A1→A3 (alimentée)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV B</strong><span style="color:var(--red);">Fermée (alimentée)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV C</strong><span style="color:var(--red);">Fermée (alimentée)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV D</strong><span style="color:var(--red);">Fermée (alimentée)</span></div>
+      </div>
+      <p style="margin-top:10px;font-size:.83rem;">L'échangeur habitacle est <strong style="color:var(--white);">condenseur</strong> → air chaud. L'échangeur externe est <strong style="color:var(--white);">évaporateur</strong>. Le fluide passe par l'accumulateur avant le compresseur.</p>
+    </div>
+  </div>
+
+  <div class="ve-panel" id="vep2">
+    <div class="img-block"><img src="images/ve/image3.jpeg" alt="Mode refroidissement batterie"><div class="img-caption">Mode refroidissement batterie — l'évaporateur habitacle est condamné, le froid est dirigé vers l'échangeur batterie</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:12px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:10px;">État des électrovannes</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:.8rem;">
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV A</strong><span style="color:var(--green);">A1→A2 (repos)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV B</strong><span style="color:var(--red);">Fermée (alimentée)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV C</strong><span style="color:var(--green);">Ouverte (repos)</span></div>
+        <div style="text-align:center;padding:8px;background:#111;border-radius:5px;"><strong style="color:var(--white);display:block;">EV D</strong><span style="color:var(--green);">Ouverte (repos)</span></div>
+      </div>
+      <p style="margin-top:10px;font-size:.83rem;">EV B fermée = évaporateur habitacle condamné. EV C ouverte = orifice calibré C actif → échangeur batterie. L'air vers la batterie est froid. Protège la batterie lors de charges rapides ou forte chaleur.</p>
+    </div>
+  </div>
+
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(6)">← Propriétés physiques</button><button class="nav-btn primary" onclick="goTo(8)">Sécurité →</button></div>
+</div>
+
+<!-- ═══ CH 8 : SÉCURITÉ ═══ -->
+<div class="chapter" id="ch8">
+  <div class="chapter-label">Chapitre 07 — Sécurité</div>
+  <h2 class="chapter-title">Règles <span>d'hygiène & sécurité</span></h2>
+  <div class="alert red"><div class="alert-icon">🧤</div><div class="alert-body"><strong>EPI obligatoires — RISQUE DE GELURE</strong>Gants cryogéniques + lunettes de protection lors de toute manipulation de fluide frigorigène. Le réfrigérant liquide à −26°C provoque des brûlures par le froid au contact de la peau.</div></div>
+  <div class="section-title">Règles obligatoires</div>
+  <ul class="secu-list">
+    <li>Travailler dans un local ventilé</li>
+    <li>Ne pas fumer à proximité d'un fluide frigorigène</li>
+    <li class="danger">Ne pas surchauffer anormalement le fluide (bouteille, flexible)</li>
+    <li>Stocker les bouteilles à moins de 50°C</li>
+    <li class="danger">Ne jamais vidanger volontairement dans l'atmosphère</li>
+    <li class="danger">Ne pas démonter un circuit contenant encore du fluide</li>
+    <li class="danger">Ne jamais mélanger des fluides différents</li>
+    <li>Porter gants et lunettes au branchement/débranchement station</li>
+  </ul>
+  <div class="section-title">Utilités de la station de recharge</div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin:12px 0;">
+    <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:6px;"><span style="color:var(--green);">✓</span><span style="font-size:.86rem;color:#bbb;">Démonter en sécurité et <strong style="color:var(--white);">éviter de polluer l'atmosphère</strong></span></div>
+    <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:6px;"><span style="color:var(--green);">✓</span><span style="font-size:.86rem;color:#bbb;"><strong style="color:var(--white);">Recharger</strong> aux préconisations constructeur</span></div>
+    <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:6px;"><span style="color:var(--green);">✓</span><span style="font-size:.86rem;color:#bbb;"><strong style="color:var(--white);">Éliminer l'humidité</strong> par tirage au vide</span></div>
+    <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:6px;"><span style="color:var(--green);">✓</span><span style="font-size:.86rem;color:#bbb;">Injecter <strong style="color:var(--white);">huile + traceur UV</strong> selon préco constructeur</span></div>
+  </div>
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(7)">← Véhicule électrique</button><button class="nav-btn primary" onclick="goTo(9)">Flashcards →</button></div>
+</div>
+
+<!-- ═══ CH 9 : FLASHCARDS ═══ -->
+<div class="chapter" id="ch9">
+  <div class="chapter-label">Chapitre 08 — Révision</div>
+  <h2 class="chapter-title">Flashcards <span>— mémorisation</span></h2>
+  <p style="color:var(--muted);font-size:.84rem;margin-bottom:20px;">Cliquez sur chaque carte pour révéler la réponse. Maîtrisez toutes les cartes avant le QCM.</p>
+  <div class="flashcard-grid">
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Rôle du compresseur ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Aspirer le gaz BP et le comprimer en HP</div><div class="fc-detail">Cœur de la boucle — entraîné par la courroie moteur (ou moteur électrique sur VE).</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">PRG le plus faible parmi les réfrigérants courants ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">R744 (CO₂) — PRG = 1</div><div class="fc-detail">Puis R1234yf (PRG=4) · R134a (PRG=1430) · R12 (PRG=10900, interdit 1995).</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">État du réfrigérant après le détendeur ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Diphasique (liquide + gaz) — BP froid</div><div class="fc-detail">La chute de pression brutale cause l'évaporation partielle du liquide → température très basse (≈ −15°C).</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Différence Harrison vs Standard ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Accumulateur + Orifice calibré (côté BP)</div><div class="fc-detail">Standard : bouteille filtre + détendeur côté HP. Harrison : accumulateur + orifice calibré côté BP.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">T° évaporateur R134a ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">≈ −15°C</div><div class="fc-detail">Pression BP ≈ 2 bar. L'air sortant de l'évaporateur est à ≈ +2°C, refroidi et déshumidifié.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Mode PAC — quel échangeur devient condenseur ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">L'échangeur habitacle (intérieur)</div><div class="fc-detail">En mode pompe à chaleur, le fluide HP chaud condense dans l'habitacle → air chaud soufflé. L'échangeur externe devient évaporateur.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Pourquoi remplacer le filtre déshydrateur à chaque ouverture ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Il est saturé en humidité dès l'ouverture du circuit</div><div class="fc-detail">L'eau dans le circuit gèlerait dans le détendeur et bloquerait le système. Le filtre ne peut être régénéré.</div></div></div></div>
+    <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front"><div class="fc-q">Principe fondamental propriétés physiques réfrigérant ?</div><div class="fc-hint">Cliquez pour révéler</div></div><div class="flashcard-back"><div class="fc-a">Pression liée à la température de saturation</div><div class="fc-detail">Mesurer la pression = connaître la T° du fluide. Toute anomalie (pression ≠ T° théorique) = fuite, pollution ou non-condensables.</div></div></div></div>
+  </div>
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(8)">← Sécurité</button><button class="nav-btn primary" onclick="goTo(10)">QCM Final →</button></div>
+</div>
+
+<!-- ═══ CH 10 : QCM ═══ -->
+<div class="chapter" id="ch10">
+  <div class="chapter-label">Chapitre 09 — Évaluation</div>
+  <h2 class="chapter-title">QCM <span>Final</span></h2>
+  <div class="quiz-wrap" id="quizWrap">
+    <div class="quiz-ptxt" id="quizProgressTxt">Question 1 / 10</div>
+    <div id="questionContainer"></div>
+    <button class="quiz-btn" id="btnNext" onclick="nextQuestion()">Question suivante →</button>
+    <button class="quiz-btn" id="btnFinish" onclick="showScore()">Voir mon score →</button>
+  </div>
+  <div class="score-card" id="scoreCard">
+    <div class="score-circle" id="scoreCircle"><div class="score-num" id="scoreNum">0/10</div></div>
+    <div class="score-title" id="scoreTitle">Résultat</div>
+    <p class="score-msg" id="scoreMsg"></p>
+    <button class="btn-retry" onclick="resetQuiz()">↺ Recommencer le QCM</button>
+  </div>
+  <div class="chapter-nav"><button class="nav-btn" onclick="goTo(9)">← Flashcards</button><button class="nav-btn" disabled>Fin du module ✓</button></div>
+</div>
+
+</div></div></div>
+
+<script>
+// ══ NAVIGATION ══
+const TOTAL=11; let curCh=0; const visited=new Set([0]);
+function goTo(n){
+  document.getElementById('ch'+curCh).classList.remove('active');
+  document.querySelectorAll('.nav-item')[curCh].classList.remove('active');
+  if(curCh!==n){document.querySelectorAll('.nav-item')[curCh].classList.add('done');document.getElementById('ck'+curCh).textContent='✓';}
+  curCh=n; visited.add(n);
+  document.getElementById('ch'+n).classList.add('active');
+  document.querySelectorAll('.nav-item')[n].classList.remove('done');
+  document.querySelectorAll('.nav-item')[n].classList.add('active');
+  document.getElementById('progressBar').style.width=Math.round((visited.size/TOTAL)*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===10&&!quizStarted)initQuiz();
+}
+
+// ══ VE TABS ══
+function showVE(idx,el){
+  document.querySelectorAll('.ve-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ve-tab').forEach(t=>{t.classList.remove('active','chaud','batt');});
+  document.getElementById('vep'+idx).classList.add('active');
+  el.classList.add('active');
+  if(idx===1)el.classList.add('chaud');
+  if(idx===2)el.classList.add('batt');
+}
+
+// ══ TEST INTERMÉDIAIRE ══
+const MQdef=[
+  {correct:[0,1,3], explain:"Le réfrigérant circule à l'état <strong>liquide</strong> (côté HP après condenseur), <strong>gazeux</strong> (sortie compresseur et évaporateur) et <strong>diphasique</strong> (après détendeur). L'état solide n'existe pas en fonctionnement normal."},
+  {correct:[0,1], explain:"Pressions normales : <strong>~15 bar</strong> côté HP et <strong>~2 bar</strong> côté BP. 130 bar et 35 bar ne correspondent pas à un circuit R134a standard."},
+  {correct:[0,1,2], explain:"On trouve <strong>−15°C</strong> à l'évaporateur, <strong>+2°C</strong> en sortie d'air de l'évaporateur et <strong>+60°C</strong> en sortie compresseur. +165°C indiquerait un problème grave (compresseur en défaut)."}
+];
+let tiAnswered=[false,false,false], tiScores=0;
+function validateMQ(qIdx){
+  const def=MQdef[qIdx];
+  const opts=document.querySelectorAll(`#mq${qIdx} .mq-opt`);
+  const selected=[];
+  opts.forEach((o,i)=>{if(o.querySelector('input').checked)selected.push(i);});
+  opts.forEach(o=>o.classList.add('locked'));
+  opts.forEach(o=>o.querySelector('input').disabled=true);
+  let allOk=true;
+  for(let i=0;i<opts.length;i++){
+    const isCorrect=def.correct.includes(i);
+    const isSelected=selected.includes(i);
+    if(isCorrect&&isSelected)opts[i].classList.add('correct');
+    else if(!isCorrect&&isSelected){opts[i].classList.add('wrong');allOk=false;}
+    else if(isCorrect&&!isSelected){opts[i].classList.add('correct');allOk=false;}
+  }
+  const fb=document.getElementById(`mq${qIdx}-fb`);
+  fb.className=`mq-feedback show ${allOk?'ok':'ko'}`;
+  fb.innerHTML=(allOk?'✅ <strong>Correct !</strong> ':'❌ <strong>Incomplet ou incorrect.</strong> ')+def.explain;
+  document.querySelector(`#mq${qIdx} .btn-validate`).disabled=true;
+  if(!tiAnswered[qIdx]){
+    if(allOk)tiScores++;
+    tiAnswered[qIdx]=true;
+  }
+  if(tiAnswered.every(Boolean)){
+    const sc=document.getElementById('tiScore');sc.classList.add('show');
+    document.getElementById('tiScoreNum').textContent=tiScores+'/3';
+    const msgs=['❌ Relisez les chapitres 2 et 3 avant de continuer.','⚠️ Quelques points à revoir — continuez !','✅ Parfait ! Vous maîtrisez les bases de la boucle de froid.'];
+    document.getElementById('tiScoreTxt').textContent=msgs[tiScores];
+  }
+}
+function resetTI(){
+  tiAnswered=[false,false,false];tiScores=0;
+  for(let q=0;q<3;q++){
+    const opts=document.querySelectorAll(`#mq${q} .mq-opt`);
+    opts.forEach(o=>{o.className='mq-opt';o.querySelector('input').checked=false;o.querySelector('input').disabled=false;});
+    document.getElementById(`mq${q}-fb`).className='mq-feedback';
+    document.querySelector(`#mq${q} .btn-validate`).disabled=false;
+  }
+  document.getElementById('tiScore').classList.remove('show');
+}
+
+// ══ EXERCICE CIRCUIT T°/P/ÉTAT ══
+const circuitAnswers={
+  za:{pression:'hp',temp:'60',etat:'gazeux',label:'Sortie compresseur',explain:'HP ~15 bar · +60°C · Gazeux chaud — le compresseur vient de comprimer le gaz.'},
+  zb:{pression:'hp',temp:'45',etat:'liquide',label:'Sortie condenseur',explain:'HP ~15 bar · +45°C · Liquide tiède — le condenseur a refroidi et condensé le gaz.'},
+  zc:{pression:'bp',temp:'-15',etat:'diphasique',label:'Sortie détendeur',explain:'BP ~2 bar · −15°C · Diphasique — la détente a provoqué l\'évaporation partielle.'},
+  zd:{pression:'bp',temp:'2',etat:'gazeux',label:'Sortie évaporateur',explain:'BP ~2 bar · +2°C · Gazeux froid — l\'évaporateur a achevé la vaporisation du fluide.'}
+};
+function validateCircuit(){
+  let score=0;
+  ['za','zb','zc','zd'].forEach(z=>{
+    const ans=circuitAnswers[z];
+    const p=document.getElementById(z+'-pression').value;
+    const t=document.getElementById(z+'-temp').value;
+    const e=document.getElementById(z+'-etat').value;
+    const ok=(p===ans.pression&&t===ans.temp&&e===ans.etat);
+    if(ok)score++;
+    const r=document.getElementById(z+'-result');
+    r.className=`cx-result show ${ok?'ok':'ko'}`;
+    r.innerHTML=ok?`✅ Correct — ${ans.explain}`:`❌ Réponse attendue : <strong>${ans.pression==='hp'?'HP ~15 bar':'BP ~2 bar'} · ${ans.temp}°C · ${ans.etat}</strong>. ${ans.explain}`;
+    ['pression','temp','etat'].forEach(f=>document.getElementById(z+'-'+f).disabled=true);
+  });
+  const sc=document.getElementById('cxScore');sc.classList.add('show');
+  const medals=['❌ 0/4','⚠️ 1/4','⚠️ 2/4','✅ 3/4','🏆 4/4 — Parfait !'];
+  sc.textContent=medals[score]+' bonne'+(score>1?'s':'')+' réponse'+(score>1?'s':'');
+  document.getElementById('cxRetry').style.display='inline-block';
+}
+function resetCircuit(){
+  ['za','zb','zc','zd'].forEach(z=>{
+    ['pression','temp','etat'].forEach(f=>{const s=document.getElementById(z+'-'+f);s.value='';s.disabled=false;});
+    document.getElementById(z+'-result').className='cx-result';
+    document.getElementById(z+'-result').textContent='';
+  });
+  document.getElementById('cxScore').classList.remove('show');
+  document.getElementById('cxRetry').style.display='none';
+}
+
+// ══ QCM ══
+const questions=[
+  {q:"Quel composant du circuit de climatisation transforme le réfrigérant gazeux haute pression en liquide ?",choices:["Compresseur","Condenseur","Détendeur","Évaporateur"],correct:1,explain:"Le condenseur refroidit le gaz HP (sortant du compresseur) jusqu'à le condenser en liquide. La chaleur extraite est évacuée vers l'extérieur."},
+  {q:"Quel est le rôle du détendeur dans la boucle de froid ?",choices:["Comprime le gaz","Filtre les impuretés","Crée une chute de pression — passage liquide HP en diphasique BP","Refroidit le condenseur"],correct:2,explain:"Le détendeur (ou orifice calibré) crée une chute de pression brutale. Le liquide HP se transforme en fluide diphasique (liquide + gaz) BP à très basse température."},
+  {q:"Quel réfrigérant possède le potentiel de réchauffement global (PRG) le plus faible ?",choices:["R12 (PRG=10900)","R134a (PRG=1430)","R1234yf (PRG=4)","R744/CO₂ (PRG=1)"],correct:3,explain:"Le R744 (CO₂) a un PRG de 1 — le plus faible. C'est le CO₂ lui-même qui sert de référence. Le R1234yf (PRG=4) est le standard actuel sur véhicules neufs."},
+  {q:"Dans le montage Harrison, qu'est-ce qui remplace le filtre déshydrateur du montage standard ?",choices:["Un deuxième condenseur","Un accumulateur","Un compresseur supplémentaire","Une valve thermostatique"],correct:1,explain:"Dans le montage Harrison, l'accumulateur remplace la bouteille filtre déshydratante, et l'orifice calibré remplace le détendeur thermique. Ces éléments sont placés côté BP."},
+  {q:"À quelle température approximative fonctionne l'évaporateur avec du R134a ?",choices:["+45°C","0°C","−15°C","+2°C"],correct:2,explain:"L'évaporateur fonctionne à ≈ −15°C avec du R134a (BP ≈ 2 bar). C'est cette température très basse qui permet d'absorber la chaleur de l'air habitacle."},
+  {q:"En mode pompe à chaleur (PAC) sur un VE, quel échangeur devient le condenseur ?",choices:["L'échangeur extérieur","L'évaporateur habitacle","L'échangeur habitacle","L'échangeur batterie"],correct:2,explain:"En mode PAC, le fluide HP chaud condense dans l'échangeur habitacle → l'air soufflé dans l'habitacle est chaud. L'échangeur extérieur devient évaporateur."},
+  {q:"Pourquoi ne faut-il jamais mélanger deux réfrigérants différents ?",choices:["Risque de mauvaise couleur uniquement","Incompatibilité chimique et impossibilité de recycler le mélange","Aucun risque réel","Problème uniquement avec le R12"],correct:1,explain:"Mélanger des réfrigérants est interdit : incompatibilité chimique, dommages irréversibles aux composants, et le mélange ne peut pas être récupéré et recyclé correctement."},
+  {q:"Quelle est la pression approximative côté haute pression d'un circuit R134a ?",choices:["2 bar","15 bar","50 bar","130 bar"],correct:1,explain:"Côté HP ≈ 15 bar (sortie compresseur, condenseur). Côté BP ≈ 2 bar (évaporateur, sortie évaporateur). Ces valeurs varient avec la température ambiante."},
+  {q:"En mode refroidissement batterie sur un VE, quelle électrovanne est fermée pour condamner l'habitacle ?",choices:["EV A","EV B","EV C","EV D"],correct:1,explain:"L'électrovanne B fermée (position alimentée) condamne l'évaporateur habitacle. L'EV C ouvre pour diriger le froid vers l'orifice calibré C et l'échangeur batterie."},
+  {q:"Quelle est la principale propriété physique utilisée pour le diagnostic d'un circuit de climatisation ?",choices:["La couleur du réfrigérant","La liaison pression/température de saturation","Le débit volumique","L'odeur du réfrigérant"],correct:1,explain:"La liaison pression/température de saturation est fondamentale : mesurer la pression permet de connaître la T° théorique du fluide. Tout écart indique une anomalie (fuite, pollution, non-condensables)."}
+];
+
+let quizStarted=false,currentQ=0,score=0;
+function initQuiz(){quizStarted=true;currentQ=0;score=0;renderQuestion();}
+function renderQuestion(){
+  const q=questions[currentQ];
+  document.getElementById('quizProgressTxt').textContent=`Question ${currentQ+1} / ${questions.length}`;
+  const L=['A','B','C','D'];
+  document.getElementById('questionContainer').innerHTML=`<div class="question-block"><div class="q-num">Question ${currentQ+1}</div><div class="q-text">${q.q}</div><div class="choices">${q.choices.map((c,i)=>`<div class="choice" id="ch${i}" onclick="selectChoice(${i})"><div class="choice-letter">${L[i]}</div>${c}</div>`).join('')}</div><div class="feedback" id="feedback"></div></div>`;
+  document.getElementById('btnNext').classList.remove('show');
+  document.getElementById('btnFinish').classList.remove('show');
+}
+function selectChoice(idx){
+  const q=questions[currentQ];
+  document.querySelectorAll('.choice').forEach(c=>c.classList.add('disabled'));
+  const fb=document.getElementById('feedback');
+  if(idx===q.correct){score++;document.getElementById('ch'+idx).classList.add('correct');fb.className='feedback show ok';fb.innerHTML='✅ <strong>Correct !</strong> '+q.explain;}
+  else{document.getElementById('ch'+idx).classList.add('wrong');document.getElementById('ch'+q.correct).classList.add('correct');fb.className='feedback show ko';fb.innerHTML='❌ <strong>Incorrect.</strong> '+q.explain;}
+  if(currentQ<questions.length-1)document.getElementById('btnNext').classList.add('show');
+  else document.getElementById('btnFinish').classList.add('show');
+}
+function nextQuestion(){currentQ++;renderQuestion();}
+function showScore(){
+  document.getElementById('quizWrap').style.display='none';
+  const sc=document.getElementById('scoreCard');sc.classList.add('show');
+  const pct=score/questions.length;
+  const color=pct>=0.75?'#22c55e':pct>=0.5?'#eab308':'#cd121d';
+  document.getElementById('scoreCircle').style.borderColor=color;
+  document.getElementById('scoreNum').style.color=color;
+  document.getElementById('scoreNum').textContent=score+'/'+questions.length;
+  let title,msg;
+  if(pct===1){title='🏆 Parfait !';msg='Maîtrise complète du module boucle de froid. Bravo !';}
+  else if(pct>=0.75){title='✅ Très bien';msg=`${score}/${questions.length} — Bonne maîtrise. Relisez les points manqués avant votre formation.`;}
+  else if(pct>=0.5){title='⚠️ À revoir';msg=`${score}/${questions.length} — Des points importants sont à consolider. Recommencez les chapitres concernés.`;}
+  else{title='❌ À reprendre';msg=`${score}/${questions.length} — Reprenez l'ensemble du module depuis le début.`;}
+  document.getElementById('scoreTitle').textContent=title;
+  document.getElementById('scoreMsg').textContent=msg;
+}
+function resetQuiz(){document.getElementById('quizWrap').style.display='block';document.getElementById('scoreCard').classList.remove('show');initQuiz();}
+</script>
+</body>
+</html>

@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="/NC/favicon.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Synoptique NC — Muller Automotive</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#c0392b;--dark:#1a1a1a;--border:#e0e0e0;--bg:#f0f0f2;
+  --recu:#e67e22;--traitement:#2980b9;--resolu:#27ae60;--clos:#7f8c8d;--non_pertinent:#8e44ad;
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222;min-height:100vh}
+
+/* HEADER */
+header{background:var(--dark);padding:10px 20px;display:flex;align-items:center;gap:14px;border-bottom:3px solid var(--red);position:sticky;top:0;z-index:200}
+header img{height:32px;filter:brightness(2)}
+header h1{color:#fff;font-size:1rem;font-weight:700;flex:1}
+header .sub{color:#aaa;font-size:0.72rem;margin-top:2px}
+.btn-hdr{background:transparent;border:1px solid #555;color:#aaa;padding:5px 11px;border-radius:5px;font-size:0.72rem;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap}
+.btn-hdr:hover{border-color:#fff;color:#fff}
+
+/* SIDENAV */
+.sidenav{position:fixed;top:67px;left:0;bottom:0;width:216px;background:#fff;border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;z-index:100}
+.sidenav a{display:block;padding:7px 18px;font-size:0.78rem;color:#555;text-decoration:none;border-left:3px solid transparent;transition:all .15s;line-height:1.3}
+.sidenav a:hover{color:var(--red);background:#fafafa;border-left-color:#eee}
+.sidenav a.active{color:var(--red);font-weight:700;border-left-color:var(--red);background:#fff5f5}
+.sidenav .nav-group{font-size:0.63rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.8px;padding:14px 18px 4px}
+
+/* MAIN */
+.main{margin-left:216px;padding:30px 32px 80px}
+@media(max-width:860px){.sidenav{display:none}.main{margin-left:0;padding:20px 14px 60px}}
+
+/* SECTIONS */
+section{margin-bottom:48px;scroll-margin-top:84px}
+section h2{font-size:1.2rem;font-weight:800;color:var(--dark);margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:10px}
+section h2 .ico{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+section h3{font-size:0.82rem;font-weight:700;color:#333;margin:18px 0 10px;text-transform:uppercase;letter-spacing:.4px}
+
+/* CARDS */
+.card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px}
+.card-head{color:#fff;padding:10px 16px;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.card-head.dk{background:#2b2b2b}
+.card-head.red{background:var(--red)}
+.card-head.blue{background:#1a6fa0}
+.card-head.green{background:#1e8449}
+.card-head.orange{background:#d35400}
+.card-head.purple{background:#7d3c98}
+.card-head.gray{background:var(--clos)}
+.card-body{padding:18px}
+
+/* GRILLES */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:860px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* WORKFLOW */
+.flow{display:flex;flex-direction:column}
+.flow-step{display:flex;gap:16px;align-items:stretch}
+.flow-left{display:flex;flex-direction:column;align-items:center;width:44px;flex-shrink:0}
+.flow-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:#fff;flex-shrink:0}
+.flow-line{flex:1;width:3px;background:#e0e0e0;margin:0 auto}
+.flow-body{flex:1;padding-bottom:24px}
+.flow-tag{display:inline-block;font-size:0.65rem;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;margin-bottom:6px;letter-spacing:.3px}
+.flow-title{font-weight:700;font-size:0.88rem;margin-bottom:4px}
+.flow-desc{font-size:0.8rem;color:#555;line-height:1.5}
+
+/* RÔLES */
+.role-card{border-radius:10px;padding:18px;background:#fff;border:1px solid var(--border);border-left:5px solid;margin-bottom:0}
+
+/* PILLS */
+.pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.pill-ouvert{background:#fdebd0;color:#d35400}
+.pill-en_cours{background:#d6eaf8;color:#1a6fa0}
+.pill-resolu{background:#d5f5e3;color:#1e8449}
+.pill-clos{background:#e8e8e8;color:#555}
+.pill-np{background:#f5eef8;color:#8e44ad}
+
+/* NOTIF TABLE */
+.notif-table{width:100%;border-collapse:collapse;font-size:0.81rem}
+.notif-table th{padding:9px 12px;background:#f5f5f5;font-size:0.68rem;text-transform:uppercase;letter-spacing:.4px;color:#888;font-weight:700;text-align:left}
+.notif-table td{padding:10px 12px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+.notif-table tr:last-child td{border-bottom:none}
+
+/* FAQ */
+.faq-item{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:#fff;overflow:hidden}
+.faq-q{padding:13px 16px;font-weight:700;font-size:0.84rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.faq-q:hover{background:#fafafa}
+.faq-q .arr{color:#aaa;transition:transform .2s;font-size:0.8rem}
+.faq-item.open .arr{transform:rotate(180deg)}
+.faq-a{display:none;padding:4px 16px 14px;font-size:0.82rem;color:#555;line-height:1.6;border-top:1px solid #f5f5f5}
+.faq-item.open .faq-a{display:block}
+
+/* INFO BOXES */
+.info-box{border-radius:8px;padding:13px 16px;font-size:0.82rem;line-height:1.6;margin-bottom:12px}
+.info-box.blue{background:#d6eaf8;border-left:4px solid #2980b9;color:#1a3a5c}
+.info-box.orange{background:#fef3cd;border-left:4px solid #f0ad4e;color:#7d5a00}
+.info-box.green{background:#d5f5e3;border-left:4px solid #27ae60;color:#1a5c35}
+.info-box.red{background:#fdecea;border-left:4px solid var(--red);color:#7c1a1a}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;font-size:0.75rem;font-weight:700}
+.badge-red{background:#fdecea;color:#c0392b}
+.badge-blue{background:#d6eaf8;color:#1a6fa0}
+.badge-green{background:#d5f5e3;color:#1e8449}
+.badge-gray{background:#e8e8e8;color:#555}
+.badge-purple{background:#f5eef8;color:#7d3c98}
+.badge-orange{background:#fef3cd;color:#7d5a00}
+
+/* GUIDE STEPS */
+.guide-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.guide-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.78rem;color:#fff;flex-shrink:0;margin-top:2px}
+.guide-text{font-size:0.81rem;color:#444;line-height:1.5}
+
+/* CHAMPS CLOTURE */
+.field-req{display:flex;align-items:flex-start;gap:12px;padding:9px 14px;border:1px solid var(--border);border-radius:8px;background:#fff;margin-bottom:8px}
+.field-ico{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.95rem}
+.field-text{font-size:0.81rem}
+.field-text strong{display:block;margin-bottom:2px}
+.field-text span{color:#888;font-size:0.76rem}
+
+/* NC NUM DEMO */
+.nc-num-demo{font-family:monospace;font-size:1.8rem;font-weight:800;background:#1a1a1a;color:#fff;padding:10px 24px;border-radius:8px;letter-spacing:2px;display:inline-block}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1a1a1a 0%,#2c2c2c 100%);color:#fff;border-radius:12px;padding:28px 32px;margin-bottom:32px;display:flex;align-items:center;gap:28px}
+.hero-text h2{font-size:1.4rem;font-weight:800;margin-bottom:8px}
+.hero-text p{font-size:0.86rem;color:#ccc;line-height:1.6;max-width:560px}
+@media(max-width:700px){.hero{flex-direction:column}}
+
+/* role list */
+.role-list{list-style:none;font-size:0.8rem;line-height:1.8;color:#444}
+.role-list li::before{content:"✓  ";color:#27ae60;font-weight:700}
+.role-list li.no::before{content:"✗  ";color:#e74c3c}
+
+/* ── DIAGRAMMES VISUELS ── */
+.diag-wrap{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px 22px;margin:16px 0;overflow-x:auto}
+.diag-title{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#aaa;margin-bottom:16px}
+/* Statuts horizontal */
+.ds-flow{display:flex;align-items:flex-start;gap:0;min-width:520px}
+.ds-node{text-align:center;flex:1}
+.ds-box{display:inline-flex;align-items:center;justify-content:center;padding:9px 6px;border-radius:8px;font-size:0.72rem;font-weight:800;border:2px solid;width:96px;line-height:1.2;text-transform:uppercase;letter-spacing:.3px}
+.ds-arrow{color:#ccc;font-size:1.6rem;padding:0 2px;margin-top:8px;flex-shrink:0}
+.ds-label{font-size:0.63rem;color:#999;margin-top:5px;display:block;line-height:1.3}
+/* Flux acteurs CAPA */
+.actor-flow{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;align-items:start;gap:0;margin:10px 0;min-width:520px}
+.actor-col{border-radius:9px;padding:12px 14px;border:1px solid}
+.actor-head{font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;gap:6px}
+.actor-item{font-size:0.77rem;color:#444;padding:5px 8px;background:rgba(255,255,255,.7);border-radius:5px;margin-bottom:5px;line-height:1.4;border-left:3px solid}
+.actor-mid{display:flex;align-items:center;justify-content:center;padding-top:36px;color:#ccc;font-size:2rem}
+/* Arbre NC Parent */
+.tree-root{display:flex;flex-direction:column;align-items:center;min-width:480px}
+.tree-parent-box{background:#f5eef8;border:2.5px solid #8e44ad;border-radius:10px;padding:11px 22px;text-align:center;font-weight:800;font-size:0.82rem;color:#6c3483;z-index:1}
+.tree-stem{width:3px;height:20px;background:#c9a8e8;margin:0 auto}
+.tree-branch-row{display:flex;align-items:flex-start;justify-content:center;gap:16px;position:relative}
+.tree-branch-row::before{content:'';position:absolute;top:0;left:44px;right:44px;height:3px;background:#c9a8e8}
+.tree-sat-col{display:flex;flex-direction:column;align-items:center}
+.tree-sat-stem{width:3px;height:18px;background:#c9a8e8;margin:0 auto}
+.tree-sat-box{background:#faf5ff;border:1.5px solid #c9a8e8;border-radius:7px;padding:7px 13px;font-size:0.75rem;color:#7d3c98;font-weight:600;white-space:nowrap}
+.tree-cascade{margin-top:14px;display:flex;align-items:center;justify-content:center;gap:0;width:100%}
+.tree-cascade-line{flex:1;height:2px;background:#27ae60;max-width:140px}
+.tree-cascade-box{background:#d5f5e3;border:2px solid #27ae60;border-radius:8px;padding:8px 16px;font-size:0.76rem;font-weight:700;color:#1e8449;text-align:center}
+/* Types CAPA palette */
+.capa-pal{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:12px 0}
+.capa-pal-item{border-radius:8px;padding:10px 12px;font-size:0.78rem;border-left:4px solid}
+.capa-pal-item strong{display:block;font-size:0.82rem;margin-bottom:2px}
+/* ── FLOWCHART VERTICAL DÉTAILLÉ ── */
+.vflow{display:flex;flex-direction:column;align-items:center;gap:0}
+.vf-etape{font-size:0.7rem;color:#888;text-align:center;margin:8px 0 5px;font-style:italic;max-width:520px;line-height:1.4;padding:0 10px}
+.vf-arr{display:flex;flex-direction:column;align-items:center;margin:1px 0}
+.vf-arr-line{width:2px;height:20px;background:#bbb}
+.vf-arr-head{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #bbb}
+.vf-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;width:100%}
+.vf-nc{border:1.5px solid #aaa;background:#f9f9f9;border-radius:8px;padding:8px 13px;text-align:center;min-width:100px;flex:1;max-width:180px}
+.vf-nc b{display:block;font-size:0.81rem;font-weight:800;color:#333;margin-bottom:2px}
+.vf-nc small{font-size:0.68rem;color:#777}
+.vf-nc-close{border:1.5px solid #27ae60;background:#d5f5e3;border-radius:8px;padding:8px 13px;text-align:center;min-width:100px;flex:1;max-width:180px}
+.vf-nc-close b{display:block;font-size:0.81rem;font-weight:800;color:#1e8449;margin-bottom:2px}
+.vf-nc-close small{font-size:0.68rem;color:#1e8449}
+.vf-box-admin{border:2px dashed #e67e22;background:#fff8f0;border-radius:10px;padding:11px 22px;text-align:center;max-width:340px;width:100%}
+.vf-box{border-radius:10px;padding:12px 22px;text-align:center;max-width:400px;width:100%;border:2px solid}
+.vf-box b{display:block;font-size:0.88rem;font-weight:800;margin-bottom:3px}
+.vf-box small{font-size:0.74rem;line-height:1.5}
+.vf-rattachee{display:flex;align-items:center;gap:0;width:100%;max-width:480px;margin:4px 0}
+.vf-ratt-label{font-size:0.67rem;color:#aaa;white-space:nowrap;text-align:center;line-height:1.3;padding:0 5px}
+.vf-ratt-dashed{flex:1;border-top:2px dashed #e67e22;margin:0 3px}
+.vf-ratt-center{font-size:0.68rem;color:#888;text-align:center;padding:0 5px;line-height:1.3;white-space:nowrap}
+.vf-audit{font-size:0.72rem;color:#888;text-align:center;font-style:italic;line-height:1.5;margin:10px 0 4px;max-width:500px}
+.vf-result{border:1px solid #ddd;background:#f5f5f5;border-radius:8px;padding:12px 18px;font-size:0.75rem;color:#444;text-align:center;line-height:1.7;max-width:540px;width:100%}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="../Base de cas/logo/Logo.png" alt="" onerror="this.style.display='none'">
+  <div>
+    <h1>Module Non-Conformités — Synoptique de fonctionnement</h1>
+    <div class="sub">Muller Automotive · formation-sav.fr/NC/</div>
+  </div>
+  <a href="console.html" class="btn-hdr">Console NC →</a>
+</header>
+
+<nav class="sidenav">
+  <div class="nav-group">Introduction</div>
+  <a href="#vue">Vue d'ensemble</a>
+  <a href="#cycle">Cycle de vie</a>
+  <a href="#roles">Rôles et droits</a>
+  <div class="nav-group">Formulaire public</div>
+  <a href="#declarer">Déclarer une NC</a>
+  <div class="nav-group">Console admin</div>
+  <a href="#liste">Onglet Liste</a>
+  <a href="#fiche">Fiche NC</a>
+  <a href="#stats">Statistiques</a>
+  <a href="#archives">Archives</a>
+  <a href="#config">Configuration</a>
+  <a href="#users">Utilisateurs</a>
+  <a href="#parent-satellites" style="color:#7d3c98;font-weight:700">♦ NC Parent-Satellites</a>
+  <div class="nav-group">Référence</div>
+  <a href="#notifs">Notifications email</a>
+  <a href="#guide">Guide rapide</a>
+  <a href="#faq">Questions fréquentes</a>
+</nav>
+
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-text">
+    <h2>Module Non-Conformités</h2>
+    <p>Ce document présente le fonctionnement complet du module NC&nbsp;: du dépôt d'une non-conformité par un client jusqu'à sa clôture par le service qualité, en passant par le traitement des pilotes.</p>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <span class="badge badge-orange">v1 — 01/05/2026</span>
+      <span class="badge badge-gray">formation-sav.fr/NC/</span>
+    </div>
+  </div>
+  <div style="font-size:4rem;flex-shrink:0">📋</div>
+</div>
+
+<!-- 1. VUE D'ENSEMBLE -->
+<section id="vue">
+  <h2><span class="ico" style="background:#1a1a1a;color:#fff">ℹ</span>Vue d'ensemble</h2>
+
+  <div class="info-box blue">
+    Une <strong>Non-Conformité (NC)</strong> est signalée lorsqu'un produit ou service ne répond pas aux exigences attendues. Le module permet d'enregistrer, de traiter et d'archiver chaque NC avec un historique complet, sur plusieurs années.
+  </div>
+
+  <div class="grid-3" style="margin-top:16px">
+    <div class="card">
+      <div class="card-head orange">① Enregistrement</div>
+      <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+        Le client ou l'équipe interne soumet le problème via le formulaire public. Un numéro unique est attribué automatiquement et le service qualité est notifié par email.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head blue">② Traitement</div>
+      <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+        Le service qualité affecte des actions correctives à des pilotes. Les pilotes analysent et répondent avec leurs pièces jointes. Des échanges peuvent avoir lieu jusqu'à validation.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head green">③ Clôture</div>
+      <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+        Après validation des réponses, l'admin renseigne la cause, le coût et les commentaires pour clôturer définitivement la NC. Un email est envoyé à la qualité.
+      </div>
+    </div>
+  </div>
+
+  <h3>Format de numérotation</h3>
+  <div style="text-align:center;padding:20px 0">
+    <div class="nc-num-demo"><span style="color:var(--red)">26</span>0501<span style="color:#555">-</span><span style="color:var(--red)">0022</span></div>
+    <div style="margin-top:14px;display:flex;justify-content:center;gap:40px;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--red)">AAMMJJ</div>
+        <div style="font-size:0.78rem;color:#666">Date de création</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--red)">NNNN</div>
+        <div style="font-size:0.78rem;color:#666">N° séquentiel / an (0001 → 9999)</div>
+      </div>
+    </div>
+    <div class="info-box blue" style="max-width:460px;margin:16px auto 0">
+      Le compteur repart de <strong>0001 chaque année civile</strong> — aucun conflit entre millésimes.
+    </div>
+  </div>
+</section>
+
+<!-- 2. CYCLE DE VIE -->
+<section id="cycle">
+  <h2><span class="ico" style="background:#2980b9;color:#fff">↻</span>Cycle de vie d'une NC</h2>
+
+  <div class="diag-wrap">
+    <div class="diag-title">Cycle de vie complet d'une NC — acteurs, statuts et étapes</div>
+    <div class="vflow" style="min-width:460px">
+
+      <div class="vf-box" style="background:#fdebd0;border-color:#e67e22">
+        <b style="color:#d35400">Déclarant — soumet le formulaire public</b>
+        <small style="color:#888">Client, partenaire ou équipe interne · Pièces jointes acceptées</small>
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#fff8f0;border-color:#f39c12;border-style:dashed">
+        <b style="color:#7d5a00">NC créée — numérotée AAMMJJ-NNNN</b>
+        <small style="color:#888">Email automatique → service Qualité · Statut : <strong style="color:#e67e22">Réceptionné</strong></small>
+      </div>
+
+      <div class="vf-etape">Étape 1 — L'admin prend en charge et affecte les CAPA</div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#fef9f0;border-color:#e67e22">
+        <b style="color:#d35400">Admin Qualité — crée les actions CAPA</b>
+        <small style="color:#888">4 types : Immédiate · Curative · Corrective · Préventive<br>Pilote désigné + échéance par action · Statut NC : <strong style="color:#2980b9">En traitement</strong></small>
+      </div>
+
+      <div class="vf-etape">Étape 2 — Les pilotes agissent (échanges via fil de discussion)</div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#f0f7fd;border-color:#2980b9">
+        <b style="color:#1a5276">Pilote(s) — analyse et réponse</b>
+        <small style="color:#888">Reçoit email · Analyse le problème · Poste réponse + PJ<br>Badge J-/J+ indique le délai · Admin peut relancer · Statut action : <strong style="color:#27ae60">Terminée</strong></small>
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#fef9f0;border-color:#e67e22">
+        <b style="color:#d35400">Admin Qualité — valide ou retourne les réponses</b>
+        <small style="color:#888">Peut poser des questions supplémentaires par action<br>Quand tout est OK → Statut NC : <strong style="color:#27ae60">En att. validation</strong></small>
+      </div>
+
+      <div class="vf-etape">Étape 3 — Clôture définitive (4 champs obligatoires)</div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#eafaf1;border-color:#27ae60">
+        <b style="color:#1e8449">Admin Qualité — clôture la NC</b>
+        <small style="color:#888">Type de cause · Coût NC (€) · Commentaire interne · Commentaire général<br>Statut : <strong style="color:#7f8c8d">Clos</strong> · Email qualité + déclarant · NC exportable CSV/an</small>
+      </div>
+
+      <div style="margin-top:14px;padding:9px 16px;background:#f9f5ff;border:1.5px dashed #8e44ad;border-radius:8px;font-size:0.74rem;color:#666;text-align:center;max-width:380px;width:100%">
+        <span style="font-weight:700;color:#8e44ad">Statut Non pertinent</span> — disponible depuis tout statut<br>
+        <span style="font-size:0.69rem;color:#999">NC annulée : hors périmètre, doublon, erreur de saisie…</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="flow">
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-circle" style="background:var(--recu)">1</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-body">
+          <div class="flow-tag" style="background:#fdebd0;color:#d35400">Réceptionné</div>
+          <div class="flow-title">Déclaration</div>
+          <div class="flow-desc">Le formulaire public est soumis. La NC est créée, numérotée automatiquement. Un email est envoyé au service qualité.</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-circle" style="background:var(--traitement)">2</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-body">
+          <div class="flow-tag" style="background:#d6eaf8;color:#1a6fa0">En traitement</div>
+          <div class="flow-title">Affectation des actions</div>
+          <div class="flow-desc">L'admin crée des actions CAPA et désigne des pilotes. 4 types disponibles : <strong>immédiate</strong> (stopper le problème), <strong>curative</strong> (corriger le client/produit affecté), <strong>corrective</strong> (éliminer la cause racine), <strong>préventive</strong> (éviter la récurrence). Chaque pilote est notifié par email avec l'échéance.</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-circle" style="background:#5d6d7e;font-size:0.8rem">↔</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-body">
+          <div class="flow-tag" style="background:#eee;color:#555">Échanges</div>
+          <div class="flow-title">Réponses et retours</div>
+          <div class="flow-desc">Le pilote poste ses réponses et pièces jointes. L'admin peut retourner des questions. La ligne apparaît en <strong style="color:#27ae60">vert</strong> pour chaque nouveauté non consultée.</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-circle" style="background:var(--resolu)">3</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-body">
+          <div class="flow-tag" style="background:#d5f5e3;color:#1e8449">En att. validation</div>
+          <div class="flow-title">Validation admin</div>
+          <div class="flow-desc">Toutes les actions sont terminées. L'admin examine et valide les réponses avant de clôturer.</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-circle" style="background:var(--clos)">4</div>
+        </div>
+        <div class="flow-body">
+          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px">
+            <div class="flow-tag" style="background:#e8e8e8;color:#555">Clos</div>
+            <div class="flow-tag" style="background:#f5eef8;color:#8e44ad">Non pertinent</div>
+          </div>
+          <div class="flow-title">Clôture définitive</div>
+          <div class="flow-desc">L'admin complète les 4 champs obligatoires. La NC est archivée définitivement et un email est envoyé à la qualité.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-head dk">Statuts possibles</div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:11px">
+          <div style="display:flex;align-items:center;gap:10px"><span class="pill pill-ouvert">Réceptionné</span><span style="font-size:0.78rem;color:#555">NC reçue, non encore traitée</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="pill pill-en_cours">En traitement</span><span style="font-size:0.78rem;color:#555">Actions affectées, pilotes notifiés</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="pill pill-resolu">En att. validation</span><span style="font-size:0.78rem;color:#555">Actions terminées, validation attendue</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="pill pill-clos">Clos</span><span style="font-size:0.78rem;color:#555">NC traitée et archivée</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="pill pill-np">Non pertinent</span><span style="font-size:0.78rem;color:#555">NC annulée (hors périmètre…)</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head green">Clôture — 4 champs obligatoires</div>
+        <div class="card-body" style="padding:12px">
+          <div class="field-req">
+            <div class="field-ico" style="background:#fdebd0">🔍</div>
+            <div class="field-text"><strong>Type de cause</strong><span>Liste configurable par l'admin</span></div>
+          </div>
+          <div class="field-req">
+            <div class="field-ico" style="background:#d5f5e3">€</div>
+            <div class="field-text"><strong>Coût NC (euros)</strong><span>La valeur 0 est acceptée</span></div>
+          </div>
+          <div class="field-req">
+            <div class="field-ico" style="background:#d6eaf8">🔒</div>
+            <div class="field-text"><strong>Commentaire interne</strong><span>Usage qualité uniquement</span></div>
+          </div>
+          <div class="field-req">
+            <div class="field-ico" style="background:#f5eef8">✉</div>
+            <div class="field-text"><strong>Commentaire général</strong><span>Envoyé par email à la qualité</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. RÔLES -->
+<section id="roles">
+  <h2><span class="ico" style="background:#8e44ad;color:#fff">👤</span>Rôles et droits</h2>
+
+  <div class="diag-wrap">
+    <div class="diag-title">Séquence de traitement — qui intervient à chaque étape</div>
+    <div class="vflow" style="min-width:460px">
+
+      <div class="vf-box" style="background:#eafaf1;border-color:#27ae60">
+        <b style="color:#1e8449">① Déclarant / Client — soumet le formulaire public</b>
+        <small style="color:#888">Formulaire accessible sans connexion · Pièces jointes · Email de confirmation automatique</small>
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#fef9f0;border-color:#e67e22">
+        <b style="color:#d35400">② Admin Qualité <span style="background:#fdebd0;border-radius:4px;padding:2px 6px;font-size:0.65rem;font-weight:700">nc_admin</span> — reçoit et ouvre la NC</b>
+        <small style="color:#888">Email automatique · Liste NC avec surbrillance verte des nouvelles · Consultation fiche complète</small>
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#fef9f0;border-color:#e67e22">
+        <b style="color:#d35400">③ Admin Qualité — affecte les actions CAPA</b>
+        <small style="color:#888">Choisit le type (Immédiate / Curative / Corrective / Préventive) · Désigne le pilote · Fixe l'échéance · Email pilote automatique</small>
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#f0f7fd;border-color:#2980b9">
+        <b style="color:#1a5276">④ Pilote <span style="background:#d6eaf8;border-radius:4px;padding:2px 6px;font-size:0.65rem;font-weight:700">nc_chef_produit</span> — traite l'action</b>
+        <small style="color:#888">Reçoit email avec N° NC et échéance · Badge J-/J+ visible · Poste réponse + pièces jointes · Marque "Terminée"</small>
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#fef9f0;border-color:#e67e22">
+        <b style="color:#d35400">⑤ Admin Qualité — valide ou retourne les réponses</b>
+        <small style="color:#888">Échanges via fil de discussion · Peut relancer les pilotes en retard · Accès aux pièces jointes</small>
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#fef9f0;border-color:#e67e22">
+        <b style="color:#d35400">⑥ Admin Qualité — clôture la NC (4 champs obligatoires)</b>
+        <small style="color:#888">Type de cause · Coût NC (€) · Commentaire interne · Commentaire général → Email clôture qualité + déclarant</small>
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#eafaf1;border-color:#27ae60">
+        <b style="color:#1e8449">⑦ Déclarant / Client — informé de la clôture</b>
+        <small style="color:#888">Email automatique · NC archivée · Accessible en lecture seule · Exportable CSV par année</small>
+      </div>
+
+      <div style="margin-top:14px;padding:9px 16px;background:#fafafa;border:1px solid #e0e0e0;border-radius:8px;font-size:0.74rem;color:#666;text-align:center;max-width:400px;width:100%">
+        <span style="font-weight:700;color:#555">nc_lecteur</span> — vue en lecture seule à toutes les étapes<br>
+        <span style="font-size:0.69rem;color:#999">Voit la liste et les fiches, ne peut ni modifier ni répondre</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card role-card" style="border-left:5px solid var(--red)">
+      <div style="color:var(--red);font-weight:800;font-size:0.68rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">nc_admin</div>
+      <div style="font-weight:800;font-size:0.95rem;margin-bottom:3px">Qualité / Responsable</div>
+      <div style="font-size:0.75rem;color:#888;margin-bottom:12px">Accès total au module</div>
+      <ul class="role-list">
+        <li>Voir et modifier toutes les NC</li>
+        <li>Créer des actions correctives</li>
+        <li>Affecter des pilotes avec échéance</li>
+        <li>Valider ou retourner les réponses</li>
+        <li>Clôturer les NC (4 champs)</li>
+        <li>Relancer les pilotes en retard</li>
+        <li>Exporter CSV par année</li>
+        <li>Gérer les utilisateurs</li>
+        <li>Configurer le module</li>
+        <li>Consulter statistiques et archives</li>
+      </ul>
+    </div>
+
+    <div class="card role-card" style="border-left:5px solid var(--traitement)">
+      <div style="color:var(--traitement);font-weight:800;font-size:0.68rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">nc_chef_produit</div>
+      <div style="font-weight:800;font-size:0.95rem;margin-bottom:3px">Pilote</div>
+      <div style="font-size:0.75rem;color:#888;margin-bottom:12px">Traitement de ses propres actions</div>
+      <ul class="role-list">
+        <li>Voir toutes les NC en liste</li>
+        <li>Ouvrir les fiches NC</li>
+        <li>Poster réponses + pièces jointes</li>
+        <li>Changer statut de ses actions</li>
+        <li class="no">Créer des actions</li>
+        <li class="no">Clôturer des NC</li>
+        <li class="no">Gérer utilisateurs / config</li>
+        <li class="no">Exporter CSV</li>
+      </ul>
+    </div>
+
+    <div class="card role-card" style="border-left:5px solid var(--clos)">
+      <div style="color:var(--clos);font-weight:800;font-size:0.68rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">nc_lecteur</div>
+      <div style="font-weight:800;font-size:0.95rem;margin-bottom:3px">Lecteur</div>
+      <div style="font-size:0.75rem;color:#888;margin-bottom:12px">Consultation uniquement</div>
+      <ul class="role-list">
+        <li>Voir toutes les NC en liste</li>
+        <li>Consulter les fiches NC</li>
+        <li>Voir statistiques et archives</li>
+        <li class="no">Toute modification</li>
+        <li class="no">Répondre à des actions</li>
+        <li class="no">Exporter CSV</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-box blue" style="margin-top:8px">
+    <strong>Connexion :</strong> formation-sav.fr/NC/login.html &nbsp;·&nbsp; Durée de session : <strong>8 heures</strong> — une reconnexion est nécessaire après expiration.
+  </div>
+</section>
+
+<!-- 4. DÉCLARER -->
+<section id="declarer">
+  <h2><span class="ico" style="background:var(--recu);color:#fff">✏</span>Déclarer une NC</h2>
+
+  <div class="info-box green">
+    <strong>URL :</strong> formation-sav.fr/NC/ &nbsp;·&nbsp; <strong>Aucune connexion requise.</strong> Accessible à tous (clients, techniciens, partenaires).
+  </div>
+
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-head dk">Champs du formulaire</div>
+      <div class="card-body" style="padding:0">
+        <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700;width:46%">Famille de produit</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Liste déroulante configurable</td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">N° de commande</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Référence commande client</td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Référence produit</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Référence article</td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">N° de série</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Identifiant pièce</td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Version programme</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Logiciel / firmware <em style="color:#bbb">(facultatif)</em></td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Quantité d'unités <span style="font-size:0.72rem;background:#e8f8f5;color:#1e8449;padding:1px 6px;border-radius:4px">Nouveau</span></td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Nb d'unités concernées pour NC de lot <em style="color:#bbb">(facultatif)</em></td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Code SAP</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Référence ERP</td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Client</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Nom, CP, ville, pays</td></tr>
+          <tr><td style="padding:9px 14px;font-weight:700">Description</td><td style="padding:9px 14px;color:#555">Texte libre</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-head green">Après validation</div>
+        <div class="card-body" style="font-size:0.82rem;line-height:1.8;color:#444">
+          <div>✓ &nbsp;Numéro NC attribué automatiquement (<strong>AAMMJJ-NNNN</strong>)</div>
+          <div>✓ &nbsp;Email de notification au service qualité</div>
+          <div>✓ &nbsp;NC visible immédiatement dans la console admin</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head dk">Pièces jointes acceptées</div>
+        <div class="card-body" style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="badge badge-blue">📷 JPG / PNG</span>
+          <span class="badge badge-red">📄 PDF</span>
+          <span class="badge badge-gray">🎬 Vidéo</span>
+          <span class="badge badge-green">📎 Tout format</span>
+        </div>
+        <div style="padding:0 18px 14px;font-size:0.75rem;color:#aaa">Taille maximale : 200 Mo par fichier</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. LISTE -->
+<section id="liste">
+  <h2><span class="ico" style="background:#1a6fa0;color:#fff">☰</span>Console — Onglet Liste</h2>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-head blue">Bandeau sélecteur d'année</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+          Seules les années contenant des NC sont affichées. <strong>L'année en cours est sélectionnée par défaut</strong> à l'ouverture.
+          <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
+            <span style="padding:4px 14px;border-radius:20px;border:2px solid #ddd;font-size:0.78rem;color:#888;font-weight:700">2024</span>
+            <span style="padding:4px 14px;border-radius:20px;border:2px solid #ddd;font-size:0.78rem;color:#888;font-weight:700">2025</span>
+            <span style="padding:4px 14px;border-radius:20px;border:2px solid #1a6fa0;background:#1a6fa0;color:#fff;font-size:0.78rem;font-weight:700">2026</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head orange">Alerte NC années précédentes ouvertes</div>
+        <div class="card-body">
+          <div style="background:#fef3cd;border:1.5px solid #f0ad4e;border-radius:8px;padding:12px">
+            <div style="font-weight:700;color:#7d5a00;margin-bottom:8px;font-size:0.82rem">⚠ 2 NC de 2025 encore ouvertes — à clôturer</div>
+            <div style="display:flex;gap:6px">
+              <span style="background:#fff3cd;border:1px solid #f0ad4e;border-radius:5px;padding:2px 10px;font-size:0.76rem;font-weight:600;color:#7d5a00">251212-0030</span>
+              <span style="background:#fff3cd;border:1px solid #f0ad4e;border-radius:5px;padding:2px 10px;font-size:0.76rem;font-weight:600;color:#7d5a00">251222-0031</span>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:0.78rem;color:#888">S'affiche automatiquement si des NC d'années précédentes ne sont pas closes. Chaque numéro est cliquable pour ouvrir directement la fiche NC.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head dk">Pagination et export</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.8">
+          <div><strong>20 NC par page</strong> — navigation ‹ Préc. [1][2][3]… Suiv. ›</div>
+          <div style="color:#888;font-size:0.78rem;margin-bottom:10px">"Page 1 / 3 — NC 1 à 20 sur 51"</div>
+          <div><strong>Export CSV</strong> → fichier <code style="background:#f5f5f5;padding:1px 5px;border-radius:3px">nc-2026.csv</code> (NC de l'année affichée)</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-head green">Surbrillance — ligne verte</div>
+        <div class="card-body">
+          <div style="background:#d5f5e3;border-radius:8px;padding:10px 14px;margin-bottom:14px">
+            <span style="font-size:0.82rem;color:#1e5c35;font-weight:700">● Ligne verte = nouveauté non vue dans cette NC</span>
+          </div>
+          <div style="margin-bottom:12px">
+            <span class="badge badge-red" style="margin-bottom:6px;font-size:0.68rem">nc_admin</span>
+            <div style="font-size:0.8rem;color:#444;line-height:1.5;margin-top:4px">Vert si le <strong>pilote a posté une nouvelle réponse</strong> depuis la dernière consultation.</div>
+          </div>
+          <div style="margin-bottom:14px">
+            <span class="badge badge-blue" style="margin-bottom:6px;font-size:0.68rem">nc_chef_produit</span>
+            <div style="font-size:0.8rem;color:#444;line-height:1.5;margin-top:4px">Vert si une <strong>nouvelle action est assignée</strong>, ou si l'admin a <strong>retourné une réponse</strong>.</div>
+          </div>
+          <div class="info-box green" style="margin-bottom:0">La ligne redevient normale dès que vous ouvrez la fiche NC.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head dk">Filtres et recherche</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.8">
+          <div>🔍 &nbsp;<strong>Recherche plein texte</strong> sur tous les champs (client, N° commande, référence, description, pilote…)</div>
+          <div>📌 &nbsp;<strong>Filtre Statut</strong> : Tous / Réceptionné / En traitement / En att. validation / Clos / Non pertinent</div>
+          <div>🏷 &nbsp;<strong>Filtre Famille</strong> : toutes les familles configurées</div>
+          <div>🔧 &nbsp;<strong>Filtre Machine</strong> : par type de machine</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. FICHE NC -->
+<section id="fiche">
+  <h2><span class="ico" style="background:var(--resolu);color:#fff">📄</span>Fiche NC — Détail</h2>
+
+  <div class="info-box blue">Cliquer sur une ligne ouvre la fiche NC. La NC est automatiquement marquée comme vue : la surbrillance verte disparaît à la fermeture.</div>
+
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-head dk">Contenu de la fiche</div>
+      <div class="card-body" style="font-size:0.82rem;line-height:2;color:#444">
+        <div>📌 &nbsp;<strong>En-tête</strong> : N° NC, statut, date, famille, client</div>
+        <div>📋 &nbsp;<strong>Déclaration</strong> : tous les champs + pièces jointes</div>
+        <div>🔧 &nbsp;<strong>Actions correctives</strong> : statut, pilote, badge J-/J+</div>
+        <div>💬 &nbsp;<strong>Échanges</strong> : historique admin ↔ pilote par action</div>
+        <div>📅 &nbsp;<strong>Historique de statut</strong> de la NC</div>
+        <div>📝 &nbsp;<strong>Journal</strong> des modifications (échéances…)</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-head dk">Badge J- / J+</div>
+        <div class="card-body">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+            <span style="background:#d5f5e3;color:#1e8449;padding:5px 16px;border-radius:6px;font-weight:800;font-size:0.9rem">J-5</span>
+            <span style="font-size:0.78rem;color:#555">Délai dans 5 jours — fond vert</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+            <span style="background:#fdecea;color:#c0392b;padding:5px 16px;border-radius:6px;font-weight:800;font-size:0.9rem">J+3</span>
+            <span style="font-size:0.78rem;color:#555">Retard de 3 jours — rouge clignotant</span>
+          </div>
+          <div style="font-size:0.78rem;color:#888;line-height:1.5">Le badge est <strong>cliquable (admin)</strong> pour modifier l'échéance.<br>Pour une NC close, le badge affiche la situation à la <strong>date de clôture</strong> — il ne change plus.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head dk">Actions disponibles selon rôle</div>
+        <div class="card-body">
+          <div style="margin-bottom:14px">
+            <span class="badge badge-red" style="font-size:0.68rem;margin-bottom:6px">nc_admin</span>
+            <div style="font-size:0.78rem;color:#444;line-height:1.6;margin-top:4px">Ajouter / modifier actions · Changer statut NC · Valider ou retourner réponses · Clôturer · Relancer · Exporter PDF</div>
+          </div>
+          <div>
+            <span class="badge badge-blue" style="font-size:0.68rem;margin-bottom:6px">nc_chef_produit</span>
+            <div style="font-size:0.78rem;color:#444;line-height:1.6;margin-top:4px">Saisir réponse + pièces jointes · Changer statut de ses propres actions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. STATS -->
+<section id="stats">
+  <h2><span class="ico" style="background:#9b59b6;color:#fff">📊</span>Onglet Statistiques</h2>
+
+  <div class="info-box blue">Toutes les statistiques sont calculées sur <strong>l'année choisie</strong> via le bandeau — indépendant du bandeau de l'onglet Liste.</div>
+
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-head dk">Indicateurs (KPIs) — Tableau de bord &amp; Statistiques</div>
+      <div class="card-body" style="padding:0">
+        <table style="width:100%;font-size:0.81rem;border-collapse:collapse">
+          <tr style="background:#f5f5f5"><td colspan="2" style="padding:6px 14px;font-size:0.72rem;font-weight:700;color:#888;text-transform:uppercase">Tableau de bord (barre KPI permanente)</td></tr>
+          <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Total NC — Réceptionné — En traitement — Clos</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#888;text-align:right">toutes années</td></tr>
+          <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Actions actives / Actions en retard</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#888;text-align:right">alerte rouge si retard</td></tr>
+          <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5"><strong style="color:#7d3c98">💶 Coût total NC closes</strong> <span style="font-size:0.72rem;background:#f5eef8;color:#7d3c98;padding:1px 6px;border-radius:4px">Nouveau</span></td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#888;text-align:right">toutes NC closes avec coût</td></tr>
+          <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5"><strong style="color:#e67e22">Taux de récurrence</strong> <span style="font-size:0.72rem;background:#fef5e7;color:#e67e22;padding:1px 6px;border-radius:4px">Nouveau</span></td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#888;text-align:right">familles récidivantes / 6 mois</td></tr>
+          <tr style="background:#f5f5f5"><td colspan="2" style="padding:6px 14px;font-size:0.72rem;font-weight:700;color:#888;text-transform:uppercase;border-top:1px solid #eee">Onglet Statistiques (par année)</td></tr>
+          <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Taux de récurrence &amp; Efficacité CAPA</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#888;text-align:right">§9.1 — revue direction</td></tr>
+          <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Coût NC par famille / par type de cause</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#888;text-align:right">barres colorées</td></tr>
+          <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Durée moyenne de résolution par famille</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#888;text-align:right">en jours</td></tr>
+          <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Respect des échéances</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#888;text-align:right">dans les délais / hors délais</td></tr>
+          <tr><td style="padding:8px 14px">NC par périmètre &amp; source de détection</td><td style="padding:8px 14px;color:#888;text-align:right">tableaux interactifs</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head green">Respect des échéances</div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:20px;height:20px;border-radius:50%;background:#27ae60;flex-shrink:0"></div>
+          <div style="font-size:0.82rem;color:#444"><strong>Closes dans les délais</strong><br><span style="color:#888;font-size:0.76rem">Date de clôture ≤ échéance prévue</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:20px;height:20px;border-radius:50%;background:#c0392b;flex-shrink:0"></div>
+          <div style="font-size:0.82rem;color:#444"><strong>Closes hors délais</strong><br><span style="color:#888;font-size:0.76rem">Date de clôture > échéance prévue</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:20px;height:20px;border-radius:50%;background:#e67e22;flex-shrink:0"></div>
+          <div style="font-size:0.82rem;color:#444"><strong>Ouvertes, échéance dépassée</strong><br><span style="color:#888;font-size:0.76rem">NC en cours avec délai dépassé aujourd'hui</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. ARCHIVES -->
+<section id="archives">
+  <h2><span class="ico" style="background:var(--clos);color:#fff">🗄</span>Onglet Archives</h2>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-head dk">Bilan annuel</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:2">
+          <div>📦 &nbsp;NC créées / closes / en cours / non pertinentes</div>
+          <div>⏱ &nbsp;Durée moyenne de résolution</div>
+          <div>💰 &nbsp;Coût total NC closes</div>
+          <div>📅 &nbsp;Indicateur de respect des échéances (barres)</div>
+          <div>📈 &nbsp;Courbe mensuelle créations vs clôtures</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head orange">Alerte NC année N-1 ouvertes</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+          Si des NC de l'année précédente ne sont pas clôturées, une bannière orange les signale avec des numéros cliquables.
+          <div class="info-box orange" style="margin-top:10px;margin-bottom:0;font-size:0.78rem">Ces NC sont prioritaires — elles influent sur les stats de l'année N-1.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-head purple">Suivi interannuel</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+          <p>Les NC créées dans une année mais clôturées une autre sont signalées par un badge <span style="background:#f5eef8;color:#7d3c98;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.72rem">↗2026</span> dans la liste.</p>
+          <p style="margin-top:10px;color:#888">Exemple&nbsp;: NC créée en 2025, traitée et close en 2026. Le badge ↗2026 apparaît dans l'archive 2025.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head dk">Liste NC de l'année</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.7">
+          20 NC par page, triées par date décroissante.
+          <div style="margin-top:8px;color:#888">Colonnes : N° NC · Date · Client · Famille · Statut · Durée · Délai</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. CONFIG -->
+<section id="config">
+  <h2><span class="ico" style="background:var(--dark);color:#fff">⚙</span>Onglet Configuration <span style="font-size:0.63rem;background:#fdecea;color:var(--red);padding:3px 8px;border-radius:4px;font-weight:700;vertical-align:middle;margin-left:8px">nc_admin uniquement</span></h2>
+
+  <div class="info-box green">Tous les paramètres sont modifiables en temps réel, sans toucher au code et sans redémarrage serveur.</div>
+
+  <div class="grid-2" style="margin-top:16px">
+    <div>
+      <div class="card">
+        <div class="card-head dk">Email(s) qualité</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+          Un ou plusieurs destinataires séparés par <code style="background:#f5f5f5;padding:1px 5px;border-radius:3px">;</code><br>
+          Ces adresses reçoivent les emails de création NC et de clôture.<br>
+          <strong>📧 Bouton "Tester l'envoi"</strong> <span style="font-size:0.72rem;background:#e8f8f5;color:#1e8449;padding:1px 6px;border-radius:4px">Nouveau</span> — envoie un email de diagnostic réel et affiche le résultat (✅ / ❌ avec message d'erreur SMTP).
+          <div style="margin-top:8px;color:#888;font-size:0.78rem">Ex. : qualite@muller.fr;resp@muller.fr</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head dk">Familles de produit</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+          Liste affichée dans le formulaire public. Ajouter ou supprimer des familles sans redémarrage.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head dk">Types de cause</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+          Utilisés lors de la clôture (champ obligatoire).<br>
+          <span style="color:#888">Ex. : Erreur de conception · Défaut fournisseur · Erreur opérateur…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0">
+      <div class="card-head dk">Notifications email — 5 scénarios</div>
+      <div class="card-body" style="padding:0">
+        <table class="notif-table">
+          <thead>
+            <tr><th>Événement</th><th>Destinataire</th><th style="text-align:center">CC Qualité</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Création NC</td><td>Qualité</td><td style="text-align:center;color:#7f8c8d">—</td></tr>
+            <tr><td>Création action</td><td>Pilote désigné</td><td style="text-align:center;color:#27ae60;font-weight:700">✓ opt.</td></tr>
+            <tr><td>Changement statut</td><td>Déclarant</td><td style="text-align:center;color:#27ae60;font-weight:700">✓ opt.</td></tr>
+            <tr><td>Relance pilote</td><td>Pilote en retard</td><td style="text-align:center;color:#27ae60;font-weight:700">✓ opt.</td></tr>
+            <tr><td>Clôture NC</td><td>Qualité</td><td style="text-align:center;color:#7f8c8d">—</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:10px 14px;font-size:0.74rem;color:#888">Chaque scénario est activable/désactivable indépendamment. "CC opt." = option CC qualité configurable séparément.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. USERS -->
+<section id="users">
+  <h2><span class="ico" style="background:#1a6fa0;color:#fff">👥</span>Onglet Utilisateurs <span style="font-size:0.63rem;background:#fdecea;color:var(--red);padding:3px 8px;border-radius:4px;font-weight:700;vertical-align:middle;margin-left:8px">nc_admin uniquement</span></h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head dk">Informations par compte</div>
+      <div class="card-body" style="padding:0">
+        <table style="width:100%;font-size:0.81rem;border-collapse:collapse">
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700;width:42%">Identifiant</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Login de connexion</td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Mot de passe</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Hashé côté serveur — jamais visible en clair</td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Rôle</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">admin / chef_produit / lecteur</td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Nom affiché</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Visible dans les emails et sur les actions</td></tr>
+          <tr><td style="padding:9px 14px;font-weight:700">Email</td><td style="padding:9px 14px;color:#555">Reçoit les notifications d'actions et relances</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head dk">Comptes actuels</div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#f9f9f9;border-radius:8px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">M</div>
+          <div><div style="font-weight:700;font-size:0.85rem">Matsupport</div><div style="font-size:0.72rem;color:#888">nc_admin · Compte support technique</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#f9f9f9;border-radius:8px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">E</div>
+          <div><div style="font-weight:700;font-size:0.85rem">Estelle Gouache</div><div style="font-size:0.72rem;color:#888">nc_admin</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11bis. NC PARENT-SATELLITES -->
+<section id="parent-satellites">
+  <h2><span class="ico" style="background:#7d3c98;color:#fff">♦</span>Module NC Parent-Satellites <span style="font-size:0.63rem;background:#f5eef8;color:#7d3c98;padding:3px 8px;border-radius:4px;font-weight:700;vertical-align:middle;margin-left:8px">nc_admin</span></h2>
+
+  <div class="info-box" style="background:#f5eef8;border-color:#c9a8e8;color:#6c3483">
+    <strong>Objectif :</strong> Regrouper plusieurs NC similaires sous une NC Parent commune pour conduire une analyse de cause et des CAPA mutualisées — conformément à l'ISO 9001 §10.2 (traitement des NC récurrentes) et aux exigences LNE (cause racine démontrée + preuve d'efficacité tangible).
+  </div>
+
+  <div class="diag-wrap">
+    <div class="diag-title">Flux complet NC Parent-Satellites — de la détection à la clôture en cascade</div>
+    <div class="vflow" style="min-width:480px">
+
+      <div class="vf-etape">Étape 1 — Signalements indépendants (pilotes / opérateurs)</div>
+      <div class="vf-row">
+        <div class="vf-nc"><b>NC-001</b><small>SAV — boîtier</small></div>
+        <div class="vf-nc"><b>NC-002</b><small>Production — idem</small></div>
+        <div class="vf-nc"><b>NC-003 … NC-N</b><small>Appro — fournisseur</small></div>
+      </div>
+
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+      <div class="vf-etape">Étape 2 — Détection similarité par l'admin qualité (même famille, même lot, même cause probable)</div>
+
+      <div class="vf-box-admin">
+        <b style="font-size:0.86rem;color:#c0392b">Admin qualité — console</b>
+        <div style="font-size:0.74rem;color:#888;margin-top:3px">Sélection NC + motif + libellé groupe</div>
+      </div>
+
+      <div class="vf-rattachee">
+        <div class="vf-ratt-label">statut →<br>rattachée</div>
+        <div class="vf-ratt-dashed"></div>
+        <div class="vf-ratt-center">NC-001, NC-002, NC-003…NC-N rattachées (sans limite)</div>
+        <div class="vf-ratt-dashed"></div>
+        <div class="vf-ratt-label">statut →<br>rattachée</div>
+      </div>
+
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#ebf5fb;border-color:#2980b9">
+        <b style="color:#1a5276;font-size:0.92rem">NC-PARENT-P001</b>
+        <small style="color:#2471a3">Défaut boîtier BT-2200 — SAV + Prod + Appro</small>
+      </div>
+
+      <div class="vf-etape">Étape 3 — Analyse unique sur la NC Parent</div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#f5eef8;border-color:#8e44ad">
+        <b style="color:#6c3483">5 Pourquoi + Ishikawa</b>
+        <small style="color:#8e44ad">Cause racine couvrant tous les périmètres</small>
+      </div>
+
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#e8f6f8;border-color:#17a2b8">
+        <b style="color:#0c6675">CAPA — 4 types</b>
+        <small style="color:#17a2b8">Immédiate · Curative · Corrective · Préventive</small>
+      </div>
+
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-box" style="background:#eafaf1;border-color:#27ae60">
+        <b style="color:#1e8449">Clôture parent + preuve d'efficacité</b>
+        <small style="color:#27ae60">ISO §10.2.1e — pièce jointe obligatoire</small>
+      </div>
+
+      <div class="vf-etape">Étape 4 — Clôture en cascade (automatique)</div>
+      <div class="vf-arr"><div class="vf-arr-line"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-row">
+        <div class="vf-nc-close"><b>NC-001 close</b><small>notif. J. Dupont (SAV)</small></div>
+        <div class="vf-nc-close"><b>NC-002 close</b><small>notif. M. Martin (Prod)</small></div>
+        <div class="vf-nc-close"><b>NC-N close</b><small>notif. déclarant N</small></div>
+      </div>
+
+      <div class="vf-audit">
+        Journal d'audit immuable sur chaque opération — ISO §10.2.2 / LNE-4<br>
+        Tous les enregistrements conservés — aucune donnée supprimée
+      </div>
+      <div class="vf-arr"><div class="vf-arr-line" style="height:10px"></div><div class="vf-arr-head"></div></div>
+
+      <div class="vf-result">
+        <strong>Résultat :</strong> 1 analyse rigoureuse · 1 CAPA couvrant tous les périmètres · N déclarants informés<br>
+        Trace complète auditeur · §10.2 + §10.3 + §9.3 couverts · LNE points 1-2-3-4-5 résolus
+      </div>
+
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:16px">
+    <div>
+      <div class="card">
+        <div class="card-head purple">Concepts clés</div>
+        <div class="card-body" style="padding:0">
+          <table style="width:100%;font-size:0.81rem;border-collapse:collapse">
+            <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700;width:42%">NC Parent</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">NC coordinatrice portant l'analyse et les CAPA. Badge <strong>♦ PARENT (N)</strong> dans la liste.</td></tr>
+            <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">NC Satellite</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">NC rattachée. Statut automatiquement "rattachée". Badge <strong>→ ID-PARENT</strong>. Fiche verrouillée (RG-05).</td></tr>
+            <tr><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Pilote groupe</td><td style="padding:9px 14px;border-bottom:1px solid #f5f5f5;color:#555">Chef produit (nc_chef_produit) assigné au groupe. Reçoit les notifications et les messages.</td></tr>
+            <tr><td style="padding:9px 14px;font-weight:700">Clôture en cascade</td><td style="padding:9px 14px;color:#555">Clôturer le groupe parent clôture automatiquement toutes les NC satellites.</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head dk">Onglets de la fiche NC Parent</div>
+        <div class="card-body" style="padding:0">
+          <table style="width:100%;font-size:0.81rem;border-collapse:collapse">
+            <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Identification</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#555">Label, gravité, périmètre, satellites rattachés, pilote</td></tr>
+            <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Analyse</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#555">5 Pourquoi + Ishikawa + Cause racine commune</td></tr>
+            <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">CAPA</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#555">Actions correctives/préventives/amélioratives avec pilote, type, échéance, statut</td></tr>
+            <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;font-weight:700">Messages</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#555">Fil de discussion admin ↔ pilote avec relances</td></tr>
+            <tr><td style="padding:8px 14px;font-weight:700">Clôture</td><td style="padding:8px 14px;color:#555">Preuve d'efficacité requise — clôture en cascade de toutes les satellites</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-head purple">Actions CAPA du groupe</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+          Les actions CAPA du groupe NC Parent fonctionnent comme dans une fiche NC simple :
+          <ul style="margin:8px 0 0 16px;line-height:1.9">
+            <li><strong>Type d'action</strong> : Immédiate / Curative / Corrective / Préventive</li>
+            <li><strong>Pilote de l'action</strong> : sélectionné depuis la liste des <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">nc_chef_produit</code> — email stocké automatiquement</li>
+            <li><strong>Échéance</strong> avec badge retard si dépassée</li>
+            <li><strong>Email automatique</strong> au pilote de l'action à la création</li>
+            <li>Statut : <span style="color:#e67e22;font-weight:700">Ouvert</span> → <span style="color:#2980b9;font-weight:700">En cours</span> → <span style="color:#27ae60;font-weight:700">Validée</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head dk">Notifications email</div>
+        <div class="card-body" style="padding:0">
+          <table style="width:100%;font-size:0.81rem;border-collapse:collapse">
+            <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Création groupe + pilote assigné</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#27ae60;font-weight:700;text-align:right">✓ Email pilote groupe</td></tr>
+            <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Nouvelle action CAPA créée</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#27ae60;font-weight:700;text-align:right">✓ Email pilote action</td></tr>
+            <tr><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5">Message / relance</td><td style="padding:8px 14px;border-bottom:1px solid #f5f5f5;color:#27ae60;font-weight:700;text-align:right">✓ Email pilote groupe</td></tr>
+            <tr><td style="padding:8px 14px">Clôture du groupe</td><td style="padding:8px 14px;color:#27ae60;font-weight:700;text-align:right">✓ Email pilote groupe</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head dk">Persistance &amp; journal</div>
+        <div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">
+          Les groupes NC Parent sont stockés dans <code style="background:#f5f5f5;padding:1px 5px;border-radius:3px">nc-parent-groups.json</code> (côté serveur). Le module charge l'état au démarrage via <code style="background:#f5f5f5;padding:1px 5px;border-radius:3px">GET /api/nc/parent-groups</code> et sauvegarde après chaque modification via <code style="background:#f5f5f5;padding:1px 5px;border-radius:3px">PUT /api/nc/parent-groups</code>.<br><br>
+          Un journal d'audit interne enregistre chaque action (création, ajout satellite, clôture, CAPA…) avec date, utilisateur et motif.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- 11. NOTIFS -->
+<section id="notifs">
+  <h2><span class="ico" style="background:var(--recu);color:#fff">✉</span>Notifications email</h2>
+
+  <div class="grid-2">
+    <div class="card"><div class="card-head orange">Création NC → Qualité</div><div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">Dès la soumission du formulaire public.<br><span style="color:#888">Contenu : N° NC · famille · client · description · PJ</span></div></div>
+    <div class="card"><div class="card-head blue">Création action → Pilote</div><div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">Quand l'admin affecte une action corrective.<br><span style="color:#888">Contenu : N° NC · description de l'action · échéance</span></div></div>
+    <div class="card"><div class="card-head dk">Changement statut → Déclarant</div><div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">Quand le statut de la NC évolue.<br><span style="color:#888">Informe le rédacteur de l'avancement</span></div></div>
+    <div class="card"><div class="card-head purple">Relance → Pilote en retard</div><div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">Quand l'admin clique "Relancer" sur une action.<br><span style="color:#888">Rappel avec détails et retard constaté</span></div></div>
+    <div class="card"><div class="card-head green">Clôture NC → Qualité</div><div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6">À chaque passage en statut "Clos" ou "Non pertinent".<br><span style="color:#888">Résumé complet : cause · coût · commentaires</span></div></div>
+    <div class="card"><div class="card-head dk">Expéditeur</div><div class="card-body" style="font-size:0.82rem;color:#444;line-height:1.6"><code style="background:#f5f5f5;padding:2px 6px;border-radius:3px">formations.muller@gmail.com</code><br><span style="color:#888">SMTP Gmail · port 587 · STARTTLS</span></div></div>
+  </div>
+</section>
+
+<!-- 12. GUIDE RAPIDE -->
+<section id="guide">
+  <h2><span class="ico" style="background:var(--resolu);color:#fff">⚡</span>Guide rapide par rôle</h2>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-head red">Service qualité (admin)</div>
+      <div class="card-body" style="padding:16px">
+        <div class="guide-step"><div class="guide-num" style="background:var(--red)">1</div><div class="guide-text">Connexion : <strong>/NC/login.html</strong></div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--red)">2</div><div class="guide-text">Vérifier les <strong style="color:#27ae60">lignes vertes</strong> = nouveautés</div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--red)">3</div><div class="guide-text">Bannière orange = NC d'années précédentes à clôturer</div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--red)">4</div><div class="guide-text">Ouvrir la NC → lire la réponse → <strong>valider ou retourner</strong></div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--red)">5</div><div class="guide-text"><strong>Clôturer</strong> : remplir les 4 champs obligatoires</div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--red)">6</div><div class="guide-text">Statistiques → année → consulter les KPIs</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head blue">Pilote (chef produit)</div>
+      <div class="card-body" style="padding:16px">
+        <div class="guide-step"><div class="guide-num" style="background:var(--traitement)">1</div><div class="guide-text">Recevoir un <strong>email</strong> de notification d'action</div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--traitement)">2</div><div class="guide-text">Connexion : <strong>/NC/login.html</strong></div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--traitement)">3</div><div class="guide-text"><strong style="color:#27ae60">Lignes vertes</strong> = actions à traiter</div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--traitement)">4</div><div class="guide-text">Ouvrir la NC → lire l'action → <strong>rédiger une réponse + PJ</strong></div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--traitement)">5</div><div class="guide-text">Changer le statut de l'action si nécessaire</div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--traitement)">6</div><div class="guide-text">Si retour admin → <strong style="color:#27ae60">ligne redevient verte</strong></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head gray">Lecteur</div>
+      <div class="card-body" style="padding:16px">
+        <div class="guide-step"><div class="guide-num" style="background:var(--clos)">1</div><div class="guide-text">Connexion : <strong>/NC/login.html</strong></div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--clos)">2</div><div class="guide-text">Consultation libre de toutes les NC</div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--clos)">3</div><div class="guide-text">Accès aux statistiques et archives</div></div>
+        <div class="guide-step"><div class="guide-num" style="background:var(--clos)">4</div><div class="guide-text" style="color:#aaa">Aucune modification possible</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. FAQ -->
+<section id="faq">
+  <h2><span class="ico" style="background:#f39c12;color:#fff">?</span>Questions fréquentes</h2>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Je suis déconnecté(e) automatiquement — pourquoi ?<span class="arr">▼</span></div>
+    <div class="faq-a">La session dure <strong>8 heures</strong>. Reconnectez-vous sur <code>/NC/login.html</code>. Sur de longues journées, pensez à vous reconnecter en milieu de journée.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Je ne vois pas les NC de 2024 — où sont-elles ?<span class="arr">▼</span></div>
+    <div class="faq-a">Dans l'onglet Liste, cliquez sur le bouton <strong>2024</strong> dans le bandeau d'années. L'onglet Archives permet aussi de les consulter avec un bilan complet de l'année.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">La ligne reste verte après avoir ouvert la NC — est-ce normal ?<span class="arr">▼</span></div>
+    <div class="faq-a">Non. Ouvrir la fiche NC la marque automatiquement comme vue et la ligne repasse à la couleur normale à la fermeture. Si le problème persiste, rechargez la page avec <strong>Ctrl+F5</strong>.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Je ne vois pas le bouton "Clôturer" — pourquoi ?<span class="arr">▼</span></div>
+    <div class="faq-a">La clôture est réservée aux comptes <strong>nc_admin</strong>. Si vous êtes pilote, contactez le service qualité pour qu'il procède à la clôture après validation de vos réponses.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Comment exporter toutes les NC 2025 en CSV ?<span class="arr">▼</span></div>
+    <div class="faq-a">Dans l'onglet Liste, sélectionnez <strong>2025</strong> dans le bandeau d'années, puis cliquez sur <strong>Exporter CSV</strong>. Le fichier s'appelle automatiquement <code>nc-2025.csv</code>.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Que signifie le badge ↗2026 en violet sur une NC 2025 ?<span class="arr">▼</span></div>
+    <div class="faq-a">Cette NC a été créée en 2025 mais <strong>clôturée en 2026</strong>. Le badge indique l'année réelle de clôture et permet de suivre les NC dont le traitement a débordé sur l'année suivante.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Comment ajouter une nouvelle famille de produit ?<span class="arr">▼</span></div>
+    <div class="faq-a">Console NC → onglet <strong>⚙ Configuration</strong> → section "Familles de produit" → bouton <strong>Ajouter</strong>. La famille est immédiatement disponible dans le formulaire public. Action réservée aux <strong>nc_admin</strong>.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Les emails n'arrivent pas — que faire ?<span class="arr">▼</span></div>
+    <div class="faq-a">
+      1. Vérifier dans <strong>⚙ Configuration</strong> que le scénario est bien activé.<br>
+      2. Vérifier l'adresse email du destinataire (qualité ou pilote).<br>
+      3. Contacter le support technique : <strong>avet.mat@gmail.com</strong>.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Peut-on clôturer une NC avec un coût de 0 € ?<span class="arr">▼</span></div>
+    <div class="faq-a">Oui. La valeur <strong>0</strong> est acceptée dans le champ Coût NC. Le champ doit simplement être renseigné (pas vide) — une NC sans coût financier direct vaut 0.</div>
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<div style="border-top:1px solid var(--border);padding:24px 0 0;text-align:center;font-size:0.74rem;color:#aaa;margin-top:20px">
+  Module Non-Conformités · Muller Automotive · formation-sav.fr/NC/ · Support : avet.mat@gmail.com · v1 — 01/05/2026
+</div>
+
+</main>
+
+<script>
+const sections=document.querySelectorAll('section[id]');
+const links=document.querySelectorAll('.sidenav a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{ if(window.scrollY>=s.offsetTop-100) cur=s.id; });
+  links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+},{passive:true});
+// init
+(()=>{ let cur=''; sections.forEach(s=>{ if(window.scrollY>=s.offsetTop-100) cur=s.id; }); links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur)); })();
+</script>
+</body>
+</html>
