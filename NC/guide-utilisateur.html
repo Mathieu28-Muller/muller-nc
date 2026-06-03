@@ -206,7 +206,7 @@ tr:nth-child(even) td{background:#f9f9f9}
 <div id="top-banner">
   <h1>Guide Utilisateur — Module NC</h1>
   <div class="sub">Gestion des Non-Conformités — Muller Automotive</div>
-  <div class="ver-badge">Version 4.3 — 03/06/2026</div>
+  <div class="ver-badge" id="guide-ver-badge">Version 4.3 — 03/06/2026</div>
   <div class="meta-row">
     <div class="meta-item"><strong>Rôles couverts :</strong> nc_admin · nc_chef_produit · nc_lecteur</div>
     <div class="meta-item"><strong>URL :</strong> formation-sav.fr/NC/</div>
@@ -749,6 +749,14 @@ function onScroll(){
 }
 window.addEventListener('scroll', onScroll, {passive:true});
 onScroll();
+(async function(){
+  try {
+    const d = await (await fetch('/api/nc/appversion')).json();
+    const cur = d.history?.find(v=>v.current);
+    const el = document.getElementById('guide-ver-badge');
+    if(el && cur) el.textContent = 'Version ' + d.version + ' — ' + cur.date.split('-').reverse().join('/');
+  } catch{}
+})();
 </script>
 </body>
 </html>

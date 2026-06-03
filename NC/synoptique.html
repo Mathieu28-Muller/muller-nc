@@ -230,7 +230,7 @@ section h3{font-size:0.82rem;font-weight:700;color:#333;margin:18px 0 10px;text-
     <h2>Module Non-Conformités</h2>
     <p>Ce document présente le fonctionnement complet du module NC&nbsp;: du dépôt d'une non-conformité par un client jusqu'à sa clôture par le service qualité, en passant par le traitement des pilotes.</p>
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-      <span class="badge badge-orange">v1 — 01/05/2026</span>
+      <span class="badge badge-orange" id="syn-ver-badge">v… — chargement</span>
       <span class="badge badge-gray">formation-sav.fr/NC/</span>
     </div>
   </div>
@@ -1173,7 +1173,7 @@ section h3{font-size:0.82rem;font-weight:700;color:#333;margin:18px 0 10px;text-
 
 <!-- FOOTER -->
 <div style="border-top:1px solid var(--border);padding:24px 0 0;text-align:center;font-size:0.74rem;color:#aaa;margin-top:20px">
-  Module Non-Conformités · Muller Automotive · formation-sav.fr/NC/ · Support : avet.mat@gmail.com · v1 — 01/05/2026
+  Module Non-Conformités · Muller Automotive · formation-sav.fr/NC/ · Support : avet.mat@gmail.com · <span id="syn-ver-footer">v…</span>
 </div>
 
 </main>
@@ -1188,6 +1188,19 @@ window.addEventListener('scroll',()=>{
 },{passive:true});
 // init
 (()=>{ let cur=''; sections.forEach(s=>{ if(window.scrollY>=s.offsetTop-100) cur=s.id; }); links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur)); })();
+</script>
+<script>
+(async function(){
+  try {
+    const d = await (await fetch('/api/nc/appversion')).json();
+    const cur = d.history?.find(v=>v.current);
+    const label = 'v' + d.version + (cur ? ' — ' + cur.date.split('-').reverse().join('/') : '');
+    const b = document.getElementById('syn-ver-badge');
+    const f = document.getElementById('syn-ver-footer');
+    if(b) b.textContent = label;
+    if(f) f.textContent = label;
+  } catch{}
+})();
 </script>
 </body>
 </html>

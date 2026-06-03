@@ -163,7 +163,7 @@ h4{font-size:0.88rem;font-weight:700;color:#444;margin:16px 0 8px}
 <nav class="sidebar">
   <div class="sidebar-logo">
     <h2>🔧 Muller Automotive</h2>
-    <small>Système NC — Notice complète v1 · 2026</small>
+    <small>Système NC — Notice complète <span id="pres-ver-sidebar">v…</span></small>
   </div>
 
   <div class="nav-group">
@@ -207,7 +207,7 @@ h4{font-size:0.88rem;font-weight:700;color:#444;margin:16px 0 8px}
   <h1>Système de gestion des<br><span>Non-Conformités</span></h1>
   <div class="cover-sub">Muller Automotive — Notice utilisateur, audit ISO 9001:2015 &amp; LNE</div>
   <div class="cover-meta">
-    <div><strong>Version</strong>v1 — 01/05/2026</div>
+    <div><strong>Version</strong><span id="pres-ver-header">v…</span></div>
     <div><strong>Référentiel</strong>ISO 9001:2015 · LNE</div>
     <div><strong>Portée</strong>SAV / Qualité / Terrain</div>
     <div><strong>URL production</strong>formation-sav.fr</div>
@@ -876,7 +876,7 @@ h4{font-size:0.88rem;font-weight:700;color:#444;margin:16px 0 8px}
   </div>
 
   <div style="margin-top:30px;padding-top:20px;border-top:1px solid var(--border);font-size:0.78rem;color:#aaa;text-align:center">
-    Système NC Muller Automotive · Version v1 · 06/05/2026<br>
+    Système NC Muller Automotive · <span id="pres-ver-footer">Version v…</span><br>
     Contact support technique : <a href="mailto:avet.mat@gmail.com" style="color:#888">avet.mat@gmail.com</a><br>
     Notice générée pour validation client, utilisateur, ISO 9001:2015 et LNE
   </div>
@@ -900,6 +900,20 @@ window.addEventListener('scroll', () => {
     a.classList.toggle('active', a.getAttribute('href') === current);
   });
 }, { passive: true });
+</script>
+<script>
+(async function(){
+  try {
+    const d = await (await fetch('/api/nc/appversion')).json();
+    const cur = d.history?.find(v=>v.current);
+    const label = 'v' + d.version + (cur ? ' — ' + cur.date.split('-').reverse().join('/') : '');
+    ['pres-ver-sidebar','pres-ver-header'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.textContent=label;
+    });
+    const f=document.getElementById('pres-ver-footer');
+    if(f) f.textContent='Version ' + label;
+  } catch{}
+})();
 </script>
 </body>
 </html>
