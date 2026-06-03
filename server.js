@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.3';
+const NC_APP_VERSION = '4.4';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -129,12 +129,27 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.3', date: '2026-05-25', label: 'PostgreSQL en production',
-    current: true,
     changes: [
       'DATA_SOURCE=postgres — PostgreSQL source de vérité unique',
       'Fichiers JSON conservés en archive uniquement',
       'Backup complet archivé avant bascule (769 fichiers, 702 Mo)',
       'Rollback dual disponible en moins de 2 minutes'
+    ]
+  },
+  {
+    version: '4.4', date: '2026-06-03', label: 'Gestion mots de passe & rôles',
+    current: true,
+    changes: [
+      'Nouveau rôle Codir — accès lecture complète (dashboard + stats + liste + archives)',
+      'Rôle Lecteur allégé — liste des NC et archives uniquement',
+      'Chef produit : mode Lecteur via toggle masque dashboard et statistiques',
+      'Modal "Changer mon mot de passe" accessible depuis le header (tous rôles)',
+      'Page "Mot de passe oublié" avec lien de réinitialisation par email (token 1h)',
+      'Bouton admin "Envoyer identifiants" — MDP temporaire généré et envoyé par email',
+      'Validation MDP renforcée : 8 caractères min, 1 majuscule, 1 chiffre (partout)',
+      'Indicateur de force MDP en temps réel dans les formulaires',
+      'Correction rate-limit : vérification ancien MDP via bcrypt serveur (plus via login)',
+      'Tableau utilisateurs admin : colonnes à largeur fixe, toutes visibles'
     ]
   }
 ];
@@ -495,6 +510,26 @@ function hashBcrypt(pass) { return bcrypt.hashSync(pass, BCRYPT_ROUNDS); }
 function verifyPass(plain, stored) {
     if (stored.startsWith('$2b$') || stored.startsWith('$2a$')) return bcrypt.compareSync(plain, stored);
     return hash(plain) === stored; // fallback legacy → sera migré au prochain login
+}
+// Étape D — validation mot de passe (min 8 chars, 1 maj, 1 chiffre)
+function validatePassword(pass) {
+    if (!pass || pass.length < 8) return 'Le mot de passe doit contenir au moins 8 caractères.';
+    if (!/[A-Z]/.test(pass))      return 'Le mot de passe doit contenir au moins une majuscule.';
+    if (!/[0-9]/.test(pass))      return 'Le mot de passe doit contenir au moins un chiffre.';
+    return null; // ok
+}
+// Étape C — tokens de réinitialisation MDP (en mémoire, TTL 1h)
+const _resetTokens = new Map(); // token → { user, expires }
+function genResetToken(userLogin) {
+    const token = require('crypto').randomBytes(32).toString('hex');
+    _resetTokens.set(token, { user: userLogin, expires: Date.now() + 3600_000 });
+    return token;
+}
+function consumeResetToken(token) {
+    const entry = _resetTokens.get(token);
+    if (!entry || Date.now() > entry.expires) return null;
+    _resetTokens.delete(token);
+    return entry.user;
 }
 
 // ── Écriture atomique + queue par fichier ─────────────────────
@@ -978,11 +1013,12 @@ app.get('/api/nc-auth/pilotes', requireNCAuth, (req,res) => {
 app.post('/api/nc-auth/users', requireNCAdmin, (req,res) => {
     const { name, user, pass, role, email } = req.body||{};
     if (!name||!user||!pass) return res.status(400).json({ result:'invalid' });
-    if (pass.length < 4) return res.status(400).json({ result:'invalid', error:'Mot de passe trop court' });
+    const passErr = validatePassword(pass);
+    if (passErr) return res.status(400).json({ result:'invalid', error: passErr });
     const users = loadNCUsers();
     if (users.find(u=>u.user.toLowerCase()===user.toLowerCase()))
         return res.json({ result:'existe' });
-    const validRoles = ['nc_admin','nc_chef_produit','nc_lecteur','nc_viewer'];
+    const validRoles = ['nc_admin','nc_chef_produit','nc_lecteur','nc_viewer','nc_codir'];
     users.push({ user, passHash:hashBcrypt(pass),
         role: validRoles.includes(role) ? role : 'nc_lecteur',
         name, email: email||'', createdAt:new Date().toISOString() });
@@ -998,21 +1034,29 @@ app.put('/api/nc-auth/users/:user', requireNCAdmin, (req,res) => {
     if (!u) return res.status(404).json({ error:'Utilisateur non trouvé' });
     if (name?.trim())  u.name  = name.trim();
     if (email !== undefined) u.email = (email||'').trim();
-    if (role && ['nc_admin','nc_chef_produit','nc_lecteur'].includes(role)) u.role = role;
+    if (role && ['nc_admin','nc_chef_produit','nc_lecteur','nc_codir'].includes(role)) u.role = role;
     saveNCUsers(users);
     res.json({ ok:true, user:{ user:u.user, name:u.name, email:u.email, role:u.role } });
 });
 
 // PUT /api/nc-auth/users/:user/password — changer MDP (nc_admin ou soi-même)
 app.put('/api/nc-auth/users/:user/password', requireNCAuth, (req,res) => {
-    if (req.ncUser.role!=='nc_admin' && req.ncUser.user!==req.params.user)
-        return res.status(403).json({ error:'Accès refusé' });
-    const { pass } = req.body||{};
-    if (!pass||pass.length<4) return res.status(400).json({ error:'Mot de passe trop court' });
+    const isSelf  = req.ncUser.user === req.params.user;
+    const isAdmin = req.ncUser.role === 'nc_admin';
+    if (!isSelf && !isAdmin) return res.status(403).json({ error:'Accès refusé' });
+    const { pass, currentPass } = req.body||{};
+    const passErr = validatePassword(pass);
+    if (passErr) return res.status(400).json({ error: passErr });
     const users = loadNCUsers();
     const u = users.find(u=>u.user===req.params.user);
     if (!u) return res.status(404).json({ error:'Utilisateur non trouvé' });
+    // Vérification ancien MDP côté serveur (bcrypt) — sans passer par la route login rate-limitée
+    if (isSelf && !isAdmin) {
+        if (!currentPass) return res.status(400).json({ error:'Mot de passe actuel requis.' });
+        if (!verifyPass(currentPass, u.passHash)) return res.status(403).json({ error:'Mot de passe actuel incorrect.' });
+    }
     u.passHash = hashBcrypt(pass);
+    u.mustChangePass = false;
     saveNCUsers(users);
     res.json({ ok:true });
 });
@@ -1025,6 +1069,94 @@ app.delete('/api/nc-auth/users/:user', requireNCAdmin, (req,res) => {
     if (!users.find(u=>u.user===req.params.user))
         return res.status(404).json({ error:'Utilisateur non trouvé' });
     saveNCUsers(users.filter(u=>u.user!==req.params.user));
+    res.json({ ok:true });
+});
+
+// POST /api/nc-auth/users/:user/send-credentials — envoi identifiants par email (nc_admin)
+// Étape A : génère un MDP temporaire, met à jour le hash, envoie email à l'utilisateur
+app.post('/api/nc-auth/users/:user/send-credentials', requireNCAdmin, async (req,res) => {
+    const users = loadNCUsers();
+    const u = users.find(u=>u.user===req.params.user);
+    if (!u) return res.status(404).json({ error:'Utilisateur non trouvé' });
+    if (!u.email) return res.status(400).json({ error:'Cet utilisateur n\'a pas d\'adresse email renseignée.' });
+    // MDP temporaire : 12 chars, maj + chiffre garantis
+    const chars = 'abcdefghjkmnpqrstuvwxyz';
+    const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+    const digits = '23456789';
+    let tmp = upper[Math.floor(Math.random()*upper.length)]
+            + digits[Math.floor(Math.random()*digits.length)]
+            + digits[Math.floor(Math.random()*digits.length)];
+    for (let i=0; i<9; i++) tmp += chars[Math.floor(Math.random()*chars.length)];
+    tmp = tmp.split('').sort(()=>Math.random()-.5).join('');
+    u.passHash = hashBcrypt(tmp);
+    u.mustChangePass = true;
+    saveNCUsers(users);
+    try {
+        const tr = nodemailer.createTransport({ host:EMAIL_CFG.host, port:EMAIL_CFG.port, secure:EMAIL_CFG.secure, auth:{ user:EMAIL_CFG.user, pass:EMAIL_CFG.pass } });
+        await tr.sendMail({
+            from: EMAIL_CFG.from,
+            to:   u.email,
+            subject: '[NC Muller] Vos identifiants de connexion',
+            html: `<div style="font-family:Arial,sans-serif;max-width:480px">
+<h2 style="color:#c0392b">Console Non-Conformités — Muller Automotive</h2>
+<p>Bonjour <strong>${u.name}</strong>,</p>
+<p>Voici vos identifiants de connexion :</p>
+<table style="border-collapse:collapse;margin:16px 0">
+  <tr><td style="padding:6px 12px;background:#f5f5f5;font-weight:700">Identifiant</td><td style="padding:6px 12px;font-family:monospace">${u.user}</td></tr>
+  <tr><td style="padding:6px 12px;background:#f5f5f5;font-weight:700">Mot de passe temporaire</td><td style="padding:6px 12px;font-family:monospace;font-size:1.1em;color:#c0392b">${tmp}</td></tr>
+</table>
+<p>Connectez-vous ici : <a href="https://formation-sav.fr/NC/login.html">https://formation-sav.fr/NC/login.html</a></p>
+<p style="color:#888;font-size:0.85em">Ce mot de passe est temporaire. Vous serez invité à le modifier lors de votre prochaine connexion.</p>
+</div>`
+        });
+        res.json({ ok:true });
+    } catch(e) {
+        res.status(500).json({ error:'Email non envoyé : ' + e.message });
+    }
+});
+
+// POST /api/nc-auth/forgot-password — demande reset MDP (public, sans auth)
+// Étape C : envoie un lien de réinitialisation par email
+app.post('/api/nc-auth/forgot-password', async (req,res) => {
+    const { user } = req.body||{};
+    const users = loadNCUsers();
+    const u = users.find(u=>u.user.toLowerCase()===(user||'').toLowerCase());
+    // Réponse identique qu'on trouve ou non (sécurité : ne pas révéler l'existence du compte)
+    if (!u || !u.email) return res.json({ ok:true });
+    const token = genResetToken(u.user);
+    const link = `https://formation-sav.fr/NC/reset-password.html?token=${token}`;
+    try {
+        const tr = nodemailer.createTransport({ host:EMAIL_CFG.host, port:EMAIL_CFG.port, secure:EMAIL_CFG.secure, auth:{ user:EMAIL_CFG.user, pass:EMAIL_CFG.pass } });
+        await tr.sendMail({
+            from: EMAIL_CFG.from,
+            to:   u.email,
+            subject: '[NC Muller] Réinitialisation de votre mot de passe',
+            html: `<div style="font-family:Arial,sans-serif;max-width:480px">
+<h2 style="color:#c0392b">Réinitialisation de mot de passe</h2>
+<p>Bonjour <strong>${u.name}</strong>,</p>
+<p>Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
+<p style="margin:20px 0"><a href="${link}" style="background:#c0392b;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700">Réinitialiser mon mot de passe</a></p>
+<p style="color:#888;font-size:0.85em">Ce lien est valable <strong>1 heure</strong>. Si vous n'avez pas fait cette demande, ignorez cet email.</p>
+</div>`
+        });
+    } catch(e) { console.error('forgot-password email error:', e.message); }
+    res.json({ ok:true });
+});
+
+// POST /api/nc-auth/reset-password — appliquer le nouveau MDP via token (public)
+// Étape C
+app.post('/api/nc-auth/reset-password', (req,res) => {
+    const { token, pass } = req.body||{};
+    const passErr = validatePassword(pass);
+    if (passErr) return res.status(400).json({ error: passErr });
+    const userLogin = consumeResetToken(token);
+    if (!userLogin) return res.status(400).json({ error:'Lien invalide ou expiré. Faites une nouvelle demande.' });
+    const users = loadNCUsers();
+    const u = users.find(u=>u.user===userLogin);
+    if (!u) return res.status(404).json({ error:'Utilisateur introuvable.' });
+    u.passHash = hashBcrypt(pass);
+    u.mustChangePass = false;
+    saveNCUsers(users);
     res.json({ ok:true });
 });
 

@@ -52,11 +52,16 @@ footer{margin-top:32px;font-size:0.7rem;color:#333;text-align:center;letter-spac
   </form>
 
   <div class="msg" id="msg"></div>
+  <p style="margin-top:16px;text-align:center">
+    <a href="/NC/reset-password.html" style="font-size:0.75rem;color:#666;text-decoration:none;border-bottom:1px solid #444">Mot de passe oublié ?</a>
+  </p>
 </div>
 
-<footer>© Muller Automotive — formation-sav.fr &nbsp;·&nbsp; <span style="color:#e67e22;font-weight:700">v1 — 01/05/2026</span></footer>
+<footer>© Muller Automotive — formation-sav.fr &nbsp;·&nbsp; <span style="color:#e67e22;font-weight:700" id="ver-footer">…</span></footer>
 
 <script>
+(async function(){ try { const d=await(await fetch('/api/nc/appversion')).json(); document.getElementById('ver-footer').textContent='v'+d.version; } catch{} })();
+
 // Si ?logout dans l'URL, effacer le token et rester sur la page de login
 (function(){
   if (window.location.search.includes('logout')) {

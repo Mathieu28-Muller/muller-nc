@@ -110,7 +110,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-header">
     <div class="ma-badge">MA</div>
     <h1>Rapport Technique IT<br>Module NC</h1>
-    <div class="ver">Version 7 — 25/05/2026</div>
+    <div class="ver">Version 8 — 03/06/2026</div>
   </div>
   <nav>
     <div class="nav-section">Avancement</div>
@@ -146,7 +146,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-footer">
     Muller Automotive<br>
     avet.mat@gmail.com<br>
-    MàJ : 25/05/2026 — Bascule PostgreSQL production
+    MàJ : 03/06/2026 — v4.4 Gestion mots de passe &amp; rôles
   </div>
 </div>
 
@@ -155,10 +155,10 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
 <div id="top-banner">
   <h1>Rapport Technique IT — Module Non-Conformités</h1>
   <div class="sub">Muller Automotive — Document destiné au responsable IT</div>
-  <div class="ver-badge">Version 7 — 25/05/2026</div>
+  <div class="ver-badge">Version 8 — 03/06/2026</div>
   <div class="meta-row">
     <div class="meta-item"><strong>Auteur :</strong> Support technique Muller Automotive</div>
-    <div class="meta-item"><strong>Mis à jour :</strong> 25/05/2026 (Bascule PostgreSQL production)</div>
+    <div class="meta-item"><strong>Mis à jour :</strong> 03/06/2026 (v4.4 — Gestion mots de passe &amp; rôles)</div>
     <div class="meta-item"><strong>Contact :</strong> avet.mat@gmail.com</div>
   </div>
 </div>
@@ -170,7 +170,24 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div class="section-title"><span class="section-num">0</span>Journal des mises à jour — Avancement et planification</div>
 
   <div class="subsection">
-    <div class="subsection-title">Réalisé — 25/05/2026 (état actuel)</div>
+    <div class="subsection-title">Réalisé — 03/06/2026 — v4.4 (état actuel)</div>
+    <div class="box box-green">
+      <strong>Gestion des mots de passe &amp; nouveau rôle Codir — déployé le 03/06/2026</strong>
+    </div>
+    <table>
+      <tr><th>Tâche</th><th>Statut</th><th>Détail technique</th></tr>
+      <tr><td>Nouveau rôle <code class="inline">nc_codir</code></td><td><span class="badge badge-green">✅ Actif</span></td><td>Accès lecture complète (dashboard, liste, stats, archives). Badge violet distinct. Ordre de tri entre Pilote et Lecteur.</td></tr>
+      <tr><td>Rôle Lecteur allégé</td><td><span class="badge badge-green">✅ Actif</span></td><td>Liste NC + Archives uniquement. Dashboard et Statistiques masqués. Bouton Rapport revue de direction masqué.</td></tr>
+      <tr><td>Chef produit — mode Lecteur</td><td><span class="badge badge-green">✅ Actif</span></td><td>Toggle ⇄ : masque dashboard + stats, affiche toutes les NC. Retour Pilote : onglets réaffichés.</td></tr>
+      <tr><td>Modal "Changer mon mot de passe"</td><td><span class="badge badge-green">✅ Actif</span></td><td>Bouton 🔑 dans le header — tous rôles. Vérification ancien MDP via bcrypt serveur (sans rate-limit).</td></tr>
+      <tr><td>Page "Mot de passe oublié"</td><td><span class="badge badge-green">✅ Actif</span></td><td><code class="inline">NC/reset-password.html</code> — token 1h en mémoire. Routes : POST /api/nc-auth/forgot-password + /reset-password.</td></tr>
+      <tr><td>Bouton admin "Envoyer identifiants"</td><td><span class="badge badge-green">✅ Actif</span></td><td>Génère MDP temporaire, hash bcrypt, envoie email. Visible si email renseigné sur le compte.</td></tr>
+      <tr><td>Validation MDP renforcée</td><td><span class="badge badge-green">✅ Actif</span></td><td>8 caractères min + 1 majuscule + 1 chiffre. Fonction <code class="inline">validatePassword()</code> centralisée. Indicateur temps réel.</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">Réalisé — 25/05/2026 — v4.3</div>
     <div class="box box-green">
       <strong>Bascule PostgreSQL — 100 % production depuis le 25/05/2026</strong>
       DATA_SOURCE=postgres actif. PostgreSQL est la source de vérité unique pour toutes les lectures et écritures. Les fichiers JSON sont conservés comme archive historique uniquement.
@@ -198,8 +215,8 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
     <div class="subsection-title">Planification — Prochaines étapes (objectif final : production OVH)</div>
     <table>
       <tr><th>Date</th><th>Tâche</th><th>Priorité</th></tr>
-      <tr><td><strong>25–31/05</strong></td><td>Phase 3 : vérification fonctionnelle continue en mode postgres. Surveiller pm2 logs après chaque opération. Relancer <code class="inline">node plan_controle.js</code> si suspicion d'écart. En cas d'anomalie : rollback dual.</td><td><span class="badge badge-orange">Important</span></td></tr>
-      <tr><td><strong>Fin mai / début juin</strong></td><td>Phase 4 sécurité : pg_dump automatique quotidien, CORS restrict origins, Helmet CSP activé, <code class="inline">app.set('trust proxy', 1)</code> dans server.js.</td><td><span class="badge badge-blue">Standard</span></td></tr>
+      <tr><td><strong>✅ 03/06</strong></td><td>v4.4 — Gestion mots de passe, rôle Codir, Lecteur allégé, validation MDP renforcée.</td><td><span class="badge badge-green">✅ Fait</span></td></tr>
+      <tr><td><strong>Juin 2026</strong></td><td>Phase 4 sécurité : pg_dump automatique quotidien, CORS restrict origins, Helmet CSP activé.</td><td><span class="badge badge-blue">Standard</span></td></tr>
       <tr><td><strong>Juin 2026</strong></td><td><strong>Déploiement OVH</strong> : VPS Elite commandé, PostgreSQL Managed OVH ou PG sur VPS, déploiement 13 étapes (section 7.4), bascule DNS, surveillance 48h.</td><td><span class="badge badge-green">Objectif final</span></td></tr>
     </table>
   </div>

@@ -6,24 +6,41 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
-## [Non publié] — v4.4 (prévu juin 2026)
-
-### Ajouté
-- Dépôt Git initialisé — branches `main` / `develop`, tags de version
-- Documentation OpenAPI / Swagger de l'API REST
-- Guide utilisateur illustré (nc_admin / nc_chef_produit)
-
-### Modifié
-- CORS restreint aux origines autorisées (suppression du wildcard `*`)
-- Helmet CSP (Content Security Policy) activé
-- `app.set('trust proxy', 1)` — correction ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+## [Non publié] — v4.5 (prévu juin 2026)
 
 ### Infrastructure
 - Déploiement VPS OVH — serveur dédié KS-1-S (Xeon D-2123IT, 32 Go RAM, 2×4 To RAID 1)
-- OS Ubuntu 24.04 LTS
-- PostgreSQL 16 en local sur le VPS
+- OS Ubuntu 24.04 LTS — PostgreSQL 16 en local sur le VPS
+
+### Sécurité
+- CORS restreint aux origines autorisées (suppression du wildcard `*`)
+- Helmet CSP (Content Security Policy) activé
+- `pg_dump` automatique quotidien (tâche planifiée)
 
 ---
+
+## [4.4] — 03/06/2026
+
+### Ajouté
+- **Nouveau rôle `nc_codir`** — accès lecture complète (tableau de bord, liste, statistiques, archives)
+- **Page "Mot de passe oublié"** (`NC/reset-password.html`) — lien de réinitialisation par email, token valide 1 heure
+- **Modal "Changer mon mot de passe"** — bouton 🔑 dans le header, accessible à tous les rôles connectés
+- **Bouton admin "📧 Identifiants"** — génère un MDP temporaire et l'envoie par email à l'utilisateur (visible si email renseigné)
+- Lien "Mot de passe oublié ?" sur la page de connexion `login.html`
+- Routes API : `POST /api/nc-auth/forgot-password`, `POST /api/nc-auth/reset-password`, `POST /api/nc-auth/users/:user/send-credentials`
+
+### Modifié
+- **Rôle Lecteur (`nc_lecteur`) allégé** — liste des NC et archives uniquement (tableau de bord et statistiques masqués)
+- **Chef produit — mode Lecteur (toggle ⇄)** — masque tableau de bord et statistiques, affiche toutes les NC
+- Validation MDP renforcée partout : 8 caractères minimum, 1 majuscule, 1 chiffre
+- Indicateur de force MDP en temps réel dans tous les formulaires de saisie
+- Tableau utilisateurs admin : colonnes à largeur fixe (`table-layout:fixed`), toutes visibles sans scroll
+- Bouton "Rapport revue de direction" masqué pour le rôle Lecteur
+- Version affichée en pied de page `login.html` mise à jour (v4.4)
+
+### Corrigé
+- Vérification ancien MDP désormais via `bcrypt` côté serveur — évite de consommer le rate-limit de la route login
+- Tri des utilisateurs : `nc_codir` positionné entre Pilote et Lecteur
 
 ## [4.3] — 25/05/2026
 

@@ -285,14 +285,15 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
   <span class="header-user" id="hdr-user"></span>
   <a href="/NC/" class="btn-hdr">+ Nouvelle NC</a>
   <a href="/index.html" class="btn-hdr">← Accueil</a>
+  <button class="btn-hdr" onclick="openChangePass()" title="Changer mon mot de passe" style="background:rgba(39,174,96,.15);color:#27ae60;border:1px solid rgba(39,174,96,.4)">🔑 Mon MDP</button>
   <button class="btn-hdr red" onclick="doLogout()">Déconnexion</button>
 </header>
 
 <nav class="nav-tabs">
-  <button class="nav-tab active" id="tab-btn-dashboard"  onclick="showTab('dashboard',this)">📊 Tableau de bord</button>
-  <button class="nav-tab"                                onclick="showTab('liste',this)">📋 Liste des NC</button>
-  <button class="nav-tab"                                onclick="showTab('stats',this)">📈 Statistiques</button>
-  <button class="nav-tab"                                onclick="showTab('archive',this)">📁 Archives</button>
+  <button class="nav-tab active" id="tab-btn-dashboard" onclick="showTab('dashboard',this)">📊 Tableau de bord</button>
+  <button class="nav-tab"        id="tab-btn-liste"     onclick="showTab('liste',this)">📋 Liste des NC</button>
+  <button class="nav-tab"        id="tab-btn-stats"     onclick="showTab('stats',this)">📈 Statistiques</button>
+  <button class="nav-tab"        id="tab-btn-archive"   onclick="showTab('archive',this)">📁 Archives</button>
   <button class="nav-tab" id="tab-btn-parents" style="display:none" onclick="showTab('parents',this)">🔗 NC Parents</button>
   <button class="nav-tab" id="tab-btn-users"  style="display:none" onclick="showTab('users',this)">👥 Utilisateurs</button>
   <button class="nav-tab" id="tab-btn-config" style="display:none" onclick="showTab('config',this);loadConfig()">⚙ Configuration</button>
@@ -504,7 +505,7 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
     <div id="archive-year-tabs" style="display:flex;gap:6px;flex-wrap:wrap"></div>
   </div>
   <div style="margin-bottom:14px">
-    <button class="btn-sm btn-dark" onclick="genererRapportRevue()" title="Générer le rapport de revue de direction">📋 Rapport revue de direction</button>
+    <button class="btn-sm btn-dark" id="btn-rapport-revue" onclick="genererRapportRevue()" title="Générer le rapport de revue de direction">📋 Rapport revue de direction</button>
   </div>
   <div id="archive-body"><div class="loader"></div></div>
 </div>
@@ -573,7 +574,8 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
           <div class="form-field">
             <label>Rôle</label>
             <select id="u-role">
-              <option value="nc_lecteur">Lecteur — consultation seule</option>
+              <option value="nc_lecteur">Lecteur — liste et archives uniquement</option>
+              <option value="nc_codir">Codir — consultation complète (tableau de bord + stats)</option>
               <option value="nc_chef_produit">Chef produit — réponse sur NC assignées</option>
               <option value="nc_admin">Administrateur NC — tous les droits</option>
             </select>
@@ -581,9 +583,10 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
           <div class="form-field">
             <label id="u-pass-label">Mot de passe *</label>
             <div style="display:flex;gap:6px">
-              <input type="password" id="u-pass" placeholder="Min. 4 caractères" style="flex:1">
+              <input type="password" id="u-pass" placeholder="Min. 8 car., 1 maj., 1 chiffre" style="flex:1" oninput="checkAdminPassStrength(this.value)">
               <button type="button" onclick="togglePassVis()" style="border:1.5px solid var(--border);background:#fafafa;border-radius:6px;padding:0 10px;cursor:pointer;font-size:0.9rem" title="Afficher/masquer">👁</button>
             </div>
+            <div id="admin-pass-strength" style="font-size:0.7rem;margin-top:3px;min-height:14px"></div>
           </div>
           <div class="form-field" style="align-self:flex-end">
             <div style="display:flex;gap:8px">
@@ -786,14 +789,15 @@ const session = (() => {
 let isAdmin       = session?.role === 'nc_admin';
 let isChefProduit = session?.role === 'nc_chef_produit';
 let isLecteur     = session?.role === 'nc_lecteur' || session?.role === 'nc_viewer';
+let isCodir       = session?.role === 'nc_codir';
 let _viewRole     = session?.role;
 
-const ROLE_LABELS = { nc_admin:'Admin NC', nc_chef_produit:'Pilote', nc_lecteur:'Lecteur', nc_viewer:'Lecteur' };
+const ROLE_LABELS = { nc_admin:'Admin NC', nc_chef_produit:'Pilote', nc_lecteur:'Lecteur', nc_viewer:'Lecteur', nc_codir:'Codir' };
 
 function renderHeader() {
   if (!session) return;
   const roleLabel  = ROLE_LABELS[_viewRole] || _viewRole;
-  const badgeCol   = isAdmin ? '#1a6fa0' : isChefProduit ? '#27ae60' : '#888';
+  const badgeCol   = isAdmin ? '#1a6fa0' : isChefProduit ? '#27ae60' : isCodir ? '#8e44ad' : '#888';
   const isPiloteReal = session.role === 'nc_chef_produit';
   const toggleBtn  = isPiloteReal
     ? ` <span onclick="toggleViewRole()" title="${_viewRole==='nc_chef_produit'?'Passer en mode Lecteur':'Revenir en mode Pilote'}" style="cursor:pointer;font-size:0.6rem;margin-left:5px;padding:2px 7px;border-radius:8px;background:${_viewRole==='nc_chef_produit'?'#e8f5e9':'#f0f0f0'};color:#555;border:1px solid #ccc;vertical-align:middle;user-select:none">⇄ ${_viewRole==='nc_chef_produit'?'Vue Lecteur':'Vue Pilote'}</span>`
@@ -807,6 +811,24 @@ function renderHeader() {
   } else {
     const btnCsv = document.getElementById('btn-export-csv');
     if (btnCsv) btnCsv.style.display = 'none';
+  }
+  // Lecteur strict : masquer aussi le bouton Rapport revue de direction
+  if (session?.role === 'nc_lecteur' || session?.role === 'nc_viewer') {
+    const btnRapport = document.getElementById('btn-rapport-revue');
+    if (btnRapport) btnRapport.style.display = 'none';
+  }
+  // Lecteur (nc_lecteur / nc_viewer) : uniquement Liste + Archives
+  // On vérifie le rôle réel du compte (session.role), pas la vue dynamique (_viewRole)
+  if (session?.role === 'nc_lecteur' || session?.role === 'nc_viewer') {
+    document.getElementById('tab-btn-dashboard').style.display = 'none';
+    document.getElementById('tab-btn-stats').style.display     = 'none';
+    // Activer l'onglet Liste par défaut (une seule fois au chargement)
+    if (!document.getElementById('tab-btn-liste').classList.contains('active')) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-liste').classList.add('active');
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-btn-liste').classList.add('active');
+    }
   }
 }
 renderHeader();
@@ -863,19 +885,32 @@ function renderDashboardPilote() {
 async function toggleViewRole() {
   if (session?.role !== 'nc_chef_produit') return;
   if (_viewRole === 'nc_chef_produit') {
+    // Passage en mode Lecteur : masquer Dashboard + Stats, basculer sur Liste
     _viewRole     = 'nc_lecteur';
     isChefProduit = false;
     isLecteur     = true;
+    document.getElementById('tab-btn-dashboard').style.display = 'none';
+    document.getElementById('tab-btn-stats').style.display     = 'none';
+    const activeTab = document.querySelector('.tab-content.active');
+    if (activeTab?.id === 'tab-dashboard' || activeTab?.id === 'tab-stats') {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-liste').classList.add('active');
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-btn-liste').classList.add('active');
+    }
   } else {
+    // Retour en mode Pilote : réafficher Dashboard + Stats
     _viewRole     = 'nc_chef_produit';
     isChefProduit = true;
     isLecteur     = false;
+    document.getElementById('tab-btn-dashboard').style.display = '';
+    document.getElementById('tab-btn-stats').style.display     = '';
   }
   renderHeader();
   renderModeBanner();
   // Recharger les NC avec le bon périmètre (filtré Pilote ou toutes en Lecteur)
   await loadNC();
-  // Rester sur l'onglet actif — re-rendre si nécessaire
+  // Re-rendre l'onglet actif si nécessaire
   const activeTab = document.querySelector('.tab-content.active');
   if (activeTab?.id === 'tab-stats')   { buildStatsYearBand(); renderStats(); }
   if (activeTab?.id === 'tab-archive') renderArchive();
@@ -2349,15 +2384,26 @@ async function loadUsers() {
 }
 
 const ROLE_BADGE = {
-  nc_admin:        { label:'Admin NC',      col:'#1a6fa0' },
-  nc_chef_produit: { label:'Pilote',  col:'#27ae60' },
-  nc_lecteur:      { label:'Lecteur',       col:'#888' },
-  nc_viewer:       { label:'Lecteur',       col:'#888' }
+  nc_admin:        { label:'Admin NC', col:'#1a6fa0' },
+  nc_chef_produit: { label:'Pilote',   col:'#27ae60' },
+  nc_lecteur:      { label:'Lecteur',  col:'#888' },
+  nc_viewer:       { label:'Lecteur',  col:'#888' },
+  nc_codir:        { label:'Codir',    col:'#8e44ad' }
 };
 
 function togglePassVis() {
   const f = document.getElementById('u-pass');
   f.type = f.type === 'password' ? 'text' : 'password';
+}
+function checkAdminPassStrength(p) {
+  const el = document.getElementById('admin-pass-strength');
+  if (!p) { el.textContent=''; return; }
+  const errs = [];
+  if (p.length < 8) errs.push('8 car. min');
+  if (!/[A-Z]/.test(p)) errs.push('1 majuscule');
+  if (!/[0-9]/.test(p)) errs.push('1 chiffre');
+  if (errs.length === 0) { el.textContent='✅ Valide'; el.style.color='#27ae60'; }
+  else { el.textContent='Manque : '+errs.join(', '); el.style.color='#c0392b'; }
 }
 
 function showUserForm(editUser) {
@@ -2402,10 +2448,18 @@ function renderUsers(users) {
   const el = document.getElementById('users-list');
   if (!users.length) { el.innerHTML='<div class="empty" style="padding:20px">Aucun utilisateur</div>'; return; }
   const sorted = [...users].sort((a,b)=>{
-    const order = { nc_admin:0, nc_chef_produit:1, nc_lecteur:2, nc_viewer:2 };
+    const order = { nc_admin:0, nc_chef_produit:1, nc_codir:2, nc_lecteur:3, nc_viewer:3 };
     return (order[a.role]??3)-(order[b.role]??3) || a.name.localeCompare(b.name,'fr');
   });
-  el.innerHTML = `<table class="stat-table" style="font-size:0.8rem">
+  el.innerHTML = `<table class="stat-table" style="font-size:0.78rem;table-layout:fixed;width:100%">
+    <colgroup>
+      <col style="width:16%">
+      <col style="width:12%">
+      <col style="width:22%">
+      <col style="width:9%">
+      <col style="width:13%">
+      <col style="width:28%">
+    </colgroup>
     <thead><tr>
       <th>Nom</th><th>Identifiant</th><th>Email</th><th>Rôle</th>
       <th>Dernière connexion</th><th style="text-align:center">Actions</th>
@@ -2413,15 +2467,16 @@ function renderUsers(users) {
     <tbody>${sorted.map(u=>{
       const rb = ROLE_BADGE[u.role] || { label:u.role, col:'#888' };
       return `<tr>
-        <td><strong>${esc(u.name)}</strong></td>
-        <td style="font-family:monospace;font-size:0.75rem;color:#666">${esc(u.user)}</td>
-        <td style="font-size:0.75rem;color:#555">${u.email?`<a href="mailto:${esc(u.email)}" style="color:#2980b9">${esc(u.email)}</a>`:'<span style="color:#ccc">—</span>'}</td>
-        <td><span style="font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:10px;background:${rb.col}22;color:${rb.col};border:1px solid ${rb.col}44">${rb.label}</span></td>
-        <td style="font-size:0.73rem;color:#888">${u.lastLogin?fmtDT(u.lastLogin):'Jamais'}</td>
+        <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(u.name)}"><strong>${esc(u.name)}</strong></td>
+        <td style="font-family:monospace;font-size:0.72rem;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.user)}</td>
+        <td style="font-size:0.72rem;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email?`<a href="mailto:${esc(u.email)}" style="color:#2980b9">${esc(u.email)}</a>`:'<span style="color:#ccc">—</span>'}</td>
+        <td><span style="font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:10px;background:${rb.col}22;color:${rb.col};border:1px solid ${rb.col}44;white-space:nowrap">${rb.label}</span></td>
+        <td style="font-size:0.7rem;color:#888;white-space:nowrap">${u.lastLogin?fmtDT(u.lastLogin):'Jamais'}</td>
         <td style="text-align:center;white-space:nowrap">
-          <button class="btn-sm" style="padding:4px 10px;font-size:0.73rem;background:#2980b9;color:#fff;margin-right:4px"
+          <button class="btn-sm" style="padding:3px 8px;font-size:0.7rem;background:#2980b9;color:#fff;margin-right:3px"
             onclick='showUserForm(${JSON.stringify({user:u.user,name:u.name,email:u.email||"",role:u.role})})'>Modifier</button>
-          ${u.user!==session.user?`<button class="btn-del" style="font-size:0.73rem" onclick="deleteUser('${esc(u.user)}','${esc(u.name)}')">Supprimer</button>`:'<span style="color:#ccc;font-size:0.73rem">(vous)</span>'}
+          ${u.email?`<button class="btn-sm" style="padding:3px 8px;font-size:0.7rem;background:#27ae60;color:#fff;margin-right:3px" title="Envoyer identifiants + MDP temporaire par email" onclick="sendCredentials('${esc(u.user)}','${esc(u.name)}')">📧 Identif.</button>`:''}
+          ${u.user!==session.user?`<button class="btn-del" style="font-size:0.7rem;padding:3px 8px" onclick="deleteUser('${esc(u.user)}','${esc(u.name)}')">Supprimer</button>`:'<span style="color:#ccc;font-size:0.7rem">(vous)</span>'}
         </td>
       </tr>`;
     }).join('')}</tbody>
@@ -4885,6 +4940,92 @@ function formatClDate(d) {
     document.getElementById('ver-badge').textContent = '⚙ v' + d.version;
   } catch {}
 })();
+
+// ── Étape B — Modal "Changer mon mot de passe" ───────────────
+function openChangePass() {
+  document.getElementById('chgpass-old').value = '';
+  document.getElementById('chgpass-new').value = '';
+  document.getElementById('chgpass-conf').value = '';
+  document.getElementById('chgpass-msg').style.display = 'none';
+  document.getElementById('chgpass-strength').textContent = '';
+  document.getElementById('modal-chgpass').style.display = 'flex';
+  document.getElementById('chgpass-old').focus();
+}
+function closeChangePass() {
+  document.getElementById('modal-chgpass').style.display = 'none';
+}
+function checkPassStrength(p) {
+  const el = document.getElementById('chgpass-strength');
+  if (!p) { el.textContent=''; return; }
+  const errs = [];
+  if (p.length < 8) errs.push('8 caractères min');
+  if (!/[A-Z]/.test(p)) errs.push('1 majuscule');
+  if (!/[0-9]/.test(p)) errs.push('1 chiffre');
+  if (errs.length === 0) { el.textContent='✅ Mot de passe valide'; el.style.color='#27ae60'; }
+  else { el.textContent='Manque : '+errs.join(', '); el.style.color='#c0392b'; }
+}
+async function submitChangePass() {
+  const oldPass  = document.getElementById('chgpass-old').value;
+  const newPass  = document.getElementById('chgpass-new').value;
+  const confPass = document.getElementById('chgpass-conf').value;
+  const msg = document.getElementById('chgpass-msg');
+  function showErr(t) { msg.textContent=t; msg.className='msg-box err'; msg.style.display='block'; }
+  if (newPass !== confPass) { showErr('Les deux nouveaux mots de passe ne correspondent pas.'); return; }
+  if (newPass.length < 8 || !/[A-Z]/.test(newPass) || !/[0-9]/.test(newPass)) {
+    showErr('Le nouveau mot de passe ne respecte pas les critères (8 chars, 1 maj, 1 chiffre).'); return;
+  }
+  // Vérification ancien MDP via bcrypt côté serveur — sans toucher à la route login rate-limitée
+  try {
+    const r = await fetch('/api/nc-auth/users/'+encodeURIComponent(session.user)+'/password',
+      { method:'PUT', headers: authHdr(), body: JSON.stringify({ pass: newPass, currentPass: oldPass }) });
+    const d = await r.json();
+    if (r.status === 403) { showErr('Mot de passe actuel incorrect.'); return; }
+    if (!r.ok) { showErr(d.error||'Erreur serveur.'); return; }
+    msg.textContent = '✅ Mot de passe modifié avec succès.';
+    msg.className = 'msg-box ok'; msg.style.display = 'block';
+    setTimeout(closeChangePass, 1800);
+  } catch { showErr('Erreur serveur.'); }
+}
+
+// ── Étape A — Envoyer identifiants par email (admin) ─────────
+async function sendCredentials(userLogin, userName) {
+  if (!confirm(`Générer un mot de passe temporaire et l'envoyer par email à "${userName}" ?`)) return;
+  try {
+    const r = await fetch('/api/nc-auth/users/'+encodeURIComponent(userLogin)+'/send-credentials',
+      { method:'POST', headers: authHdr() });
+    const d = await r.json();
+    if (r.ok) alert(`✅ Identifiants envoyés à "${userName}".`);
+    else alert('Erreur : ' + (d.error||'inconnue'));
+  } catch { alert('Erreur serveur.'); }
+}
 </script>
+
+<!-- Étape B — Modal changement MDP (tous rôles) -->
+<div id="modal-chgpass" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative">
+    <button onclick="closeChangePass()" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#888">✕</button>
+    <h2 style="font-size:1rem;font-weight:700;margin-bottom:18px;color:#222">🔑 Changer mon mot de passe</h2>
+    <div class="form-field" style="margin-bottom:12px">
+      <label style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#777;display:block;margin-bottom:4px">Mot de passe actuel</label>
+      <input type="password" id="chgpass-old" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:inherit">
+    </div>
+    <div class="form-field" style="margin-bottom:6px">
+      <label style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#777;display:block;margin-bottom:4px">Nouveau mot de passe</label>
+      <input type="password" id="chgpass-new" oninput="checkPassStrength(this.value)" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:inherit">
+      <div id="chgpass-strength" style="font-size:0.72rem;margin-top:4px;min-height:16px"></div>
+    </div>
+    <div class="form-field" style="margin-bottom:14px">
+      <label style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#777;display:block;margin-bottom:4px">Confirmer le nouveau mot de passe</label>
+      <input type="password" id="chgpass-conf" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:inherit">
+    </div>
+    <p style="font-size:0.72rem;color:#888;margin-bottom:14px">Critères : 8 caractères minimum, 1 majuscule, 1 chiffre.</p>
+    <div class="msg-box" id="chgpass-msg" style="display:none;margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="submitChangePass()" style="flex:1;padding:10px;background:#c0392b;color:#fff;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-size:0.9rem">Enregistrer</button>
+      <button onclick="closeChangePass()" style="padding:10px 16px;border:1.5px solid var(--border);background:#fff;border-radius:7px;cursor:pointer;font-size:0.9rem">Annuler</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

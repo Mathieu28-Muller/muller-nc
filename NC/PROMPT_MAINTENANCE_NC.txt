@@ -1,7 +1,7 @@
 ================================================================================
 PROMPT DE MAINTENANCE — Module NC — Muller Automotive
 Copier dans une nouvelle conversation Claude pour toute mise à jour du module
-Mis à jour le : 29/05/2026
+Mis à jour le : 03/06/2026
 ================================================================================
 
 Tu travailles sur le système NC de Muller Automotive (ISO 9001:2015 / LNE).
@@ -28,7 +28,7 @@ FICHIERS DU MODULE (ne jamais supprimer, toujours ajouter) :
   C:\formation\nc-parent-groups.json      → Persistance groupes (ne pas modifier manuellement)
   C:\formation\nc-data.json               → ARCHIVE JSON — ne plus modifier (source = PostgreSQL)
 
-ÉTAT AU 29/05/2026 — MODE PRODUCTION POSTGRESQL :
+ÉTAT AU 03/06/2026 — MODE PRODUCTION POSTGRESQL :
   DATA_SOURCE=postgres dans .env (bascule effectuée le 25/05/2026)
     → Lecture et écriture exclusivement depuis PostgreSQL
     → nc-data.json = archive historique uniquement (ne plus modifier manuellement)
@@ -230,39 +230,53 @@ POINTS LNE CRITIQUES (vérifier après chaque modification)
   LNE-5 : NC sans analyse > 5j (mineure) / 48h (majeure) = alerte obligatoire
 
 ================================================================================
-PLANIFICATION — ÉTAT AU 29/05/2026
+RÔLES UTILISATEURS NC — ÉTAT AU 03/06/2026
+================================================================================
+
+  nc_admin        → Tous les droits + onglets Utilisateurs / Configuration / NC Parents
+  nc_chef_produit → Dashboard (ses NC) + Liste (ses NC) + Stats (ses NC) + Archives (ses NC)
+                    Toggle ⇄ "vue Lecteur" : masque dashboard+stats, voit toutes les NC
+  nc_codir        → Dashboard + Liste + Stats + Archives — toutes NC, lecture seule
+                    Badge violet — aucune restriction de périmètre
+  nc_lecteur      → Liste des NC + Archives uniquement — toutes NC, lecture seule
+  nc_viewer       → Identique nc_lecteur (alias legacy)
+
+  Règles validation MDP (partout : création, changement, reset) :
+    - 8 caractères minimum
+    - 1 majuscule obligatoire
+    - 1 chiffre obligatoire
+
+================================================================================
+ROUTES API GESTION MOTS DE PASSE — AJOUTÉES 03/06/2026
+================================================================================
+
+  POST /api/nc-auth/forgot-password        — public — envoie lien reset par email (token 1h mémoire)
+  POST /api/nc-auth/reset-password         — public — applique nouveau MDP via token
+  POST /api/nc-auth/users/:user/send-credentials — nc_admin — MDP temporaire + email à l'utilisateur
+  PUT  /api/nc-auth/users/:user/password   — self ou nc_admin
+       → Paramètres : { pass, currentPass } — currentPass requis pour changement par soi-même
+       → Vérification bcrypt côté serveur (ne passe PAS par la route login rate-limitée)
+
+  Page reset : C:\formation\NC\reset-password.html
+  Lien login : "Mot de passe oublié ?" → /NC/reset-password.html
+
+================================================================================
+PLANIFICATION — ÉTAT AU 03/06/2026
 ================================================================================
 
   ✅ 09/05 — Phase 1 sécurité + PostgreSQL dual-write
-  ✅ 10/05 — compare.js + validation dual-write 100% vert
-  ✅ 12-15/05 — Corrections critiques (pgSyncFiche bug, migrate.js, satellites,
-               dashboard famille, index.html dynamique) — plan_controle.js TOUT VERT
-  ✅ 16-25/05 — Contrôle renforcé dual-write + corrections désynchronisations
-               (260521-0007 absent PG, réponses 260511-0005/0006)
-               Backup : D:\formation_backup_20260525_avant_postgres (769 fichiers, 702 Mo)
-  ✅ 25/05   — Bascule DATA_SOURCE=postgres — lecture PG validée, TOUT VERT ✅
-  ✅ 29/05   — Correction filtre "en retard réel" ISO §10.2.1 (6 points console.html)
-               datePiloteReponse pris en compte — seul Fabrice Simon en retard réel
-  ✅ 29/05   — CAHIER_DES_CHARGES_NC.md → v4.0 (architecture PG, schéma, planification OVH)
-  ✅ 29/05   — trust proxy : app.set('trust proxy',1) dans server.js
-               Corrige ERR_ERL_UNEXPECTED_X_FORWARDED_FOR + rate-limit par vraie IP client
-  ✅ 29/05   — JWT_SECRET sécurisé : clé 64 chars dans .env (plus de valeur par défaut)
-               Sauvegarde : C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt
+  ✅ 25/05 — Bascule DATA_SOURCE=postgres — TOUT VERT ✅
+  ✅ 29/05 — trust proxy, JWT_SECRET, correctif "en retard réel" ISO §10.2.1
+  ✅ 03/06 — v4.4 : gestion mots de passe + rôle Codir + Lecteur allégé
 
-  ☐ 25-31/05 — Phase 3 : vérification fonctionnelle continue en mode postgres
-               → Surveiller pm2 logs après chaque opération utilisateur
-               → Relancer node plan_controle.js si suspicion d'écart
-               → En cas d'anomalie : rollback dual (voir section RETOUR ARRIÈRE)
-
-  ☐ Fin mai / début juin — Phase 4 sécurité renforcée (reste à faire) :
+  ☐ Phase 4 sécurité (juin 2026) :
                → pg_dump automatique quotidien (tâche planifiée Windows)
                  Script : pg_dump -U postgres -d nc_muller -F c -f D:\backups\pg\nc_muller_DATE.dump
                → CORS : restreindre origins autorisées (enlever *)
                → Helmet CSP : activer contentSecurityPolicy avec directives adaptées
 
-  ☐ Juin 2026 — Déploiement OVH final :
+  ☐ Déploiement OVH (juin 2026) :
                Voir D:\formation\RAPPORT_TECHNIQUE_IT_NC.html pour checklist complète
-               Voir D:\formation\NC\CAHIER_DES_CHARGES_NC.md §18.3 pour détail complet
                Points restants :
                  - PostgreSQL OVH (Managed DB ou VPS)
                  - DATA_SOURCE=postgres en production OVH
@@ -287,5 +301,5 @@ PLANIFICATION — ÉTAT AU 29/05/2026
      → Tester avec node plan_controle.js après chaque modification de données
 
 ================================================================================
-FIN PROMPT MAINTENANCE — version 29/05/2026
+FIN PROMPT MAINTENANCE — version 03/06/2026 — v4.4
 ================================================================================
