@@ -105,7 +105,6 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ### Ajouté
 - **Score de risque** — cotation 4 axes (impact client, conformité, sécurité, récurrence), valeur 1–9
-- Alerte direction automatique par email si score de risque ≥ 7
 - **Analyse 5 Pourquoi** — 5 champs de cause racine enchaînés
 - **Diagramme Ishikawa** — SVG généré automatiquement, 6 branches (Méthodes, Matière, Milieu, Machine, Main-d'œuvre, Management)
 - Gravité NC — 3 niveaux : mineure / majeure / critique
