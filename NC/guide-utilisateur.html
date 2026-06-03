@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide Utilisateur — Module NC — Muller Automotive</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#c0392b;--dark:#1a1a1a;--mid:#2c2c2c;--border:#e0e0e0;
+  --blue:#2980b9;--green:#27ae60;--orange:#e67e22;--purple:#8e44ad;
+  --sidebar:260px
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;color:#222}
+/* ── SIDEBAR ── */
+#sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--dark);overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+#sidebar-header{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1);background:var(--mid)}
+#sidebar-header .badge{background:var(--red);color:#fff;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:8px}
+#sidebar-header h1{color:#fff;font-size:0.85rem;font-weight:700;line-height:1.3}
+#sidebar-header p{color:rgba(255,255,255,.35);font-size:0.68rem;margin-top:4px}
+nav{padding:10px 0;flex:1}
+nav a{display:block;padding:7px 18px;color:rgba(255,255,255,.5);font-size:0.78rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;line-height:1.4}
+nav a:hover{color:#fff;background:rgba(255,255,255,.06);border-left-color:rgba(255,255,255,.2)}
+nav a.active{color:#fff;background:rgba(192,57,43,.2);border-left-color:var(--red)}
+nav .nav-sep{padding:10px 18px 4px;color:rgba(255,255,255,.2);font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px}
+nav a.sub{padding-left:28px;font-size:0.74rem}
+#sidebar-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.25);font-size:0.65rem;flex-shrink:0;line-height:1.6}
+/* ── MAIN ── */
+#main{margin-left:var(--sidebar);padding:0}
+#top-banner{background:linear-gradient(135deg,#1a1a1a 0%,#2c1010 100%);padding:36px 48px 32px;border-bottom:3px solid var(--red)}
+#top-banner h1{color:#fff;font-size:1.6rem;font-weight:900}
+#top-banner .sub{color:rgba(255,255,255,.4);font-size:0.85rem;margin-top:6px}
+.ver-badge{display:inline-block;background:rgba(192,57,43,.25);border:1px solid var(--red);color:#e07070;font-size:0.7rem;font-weight:700;padding:2px 10px;border-radius:10px;letter-spacing:.5px;margin-top:10px}
+.meta-row{display:flex;gap:24px;margin-top:14px;flex-wrap:wrap}
+.meta-item{font-size:0.78rem;color:rgba(255,255,255,.45)}
+.meta-item strong{color:rgba(255,255,255,.75)}
+#content{padding:0 48px 60px;max-width:920px}
+/* ── SECTIONS ── */
+.section{padding-top:52px}
+.section-title{font-size:1.2rem;font-weight:800;color:var(--dark);border-bottom:2px solid var(--red);padding-bottom:8px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.section-num{background:var(--red);color:#fff;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:4px}
+.subsection{margin-top:28px}
+.subsection-title{font-size:0.98rem;font-weight:700;color:var(--dark);margin-bottom:12px;padding-left:10px;border-left:3px solid var(--red)}
+p{color:#444;line-height:1.7;margin-bottom:10px;font-size:0.9rem}
+/* ── ROLES ── */
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0}
+.role-card{border-radius:8px;padding:16px 18px;border:2px solid}
+.role-admin{background:#fff5f5;border-color:#c0392b}
+.role-pilote{background:#f0f7ff;border-color:#2980b9}
+.role-lecteur{background:#f5f5f5;border-color:#aaa}
+.role-card .rc-title{font-weight:800;font-size:0.88rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.rc-badge{display:inline-block;border-radius:4px;padding:1px 8px;font-size:0.68rem;font-weight:700;letter-spacing:.5px}
+.rc-admin{background:#fdddd8;color:#7d1a1a}
+.rc-pilote{background:#d8eaff;color:#0a2d5a}
+.rc-lecteur{background:#e8e8e8;color:#555}
+.role-card ul{list-style:none;margin-top:4px}
+.role-card ul li{font-size:0.82rem;color:#444;padding:2px 0 2px 14px;position:relative}
+.role-card ul li::before{content:'·';position:absolute;left:2px;color:var(--red);font-weight:900}
+/* ── STEPS ── */
+.steps{margin:16px 0}
+.step{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;font-weight:800;font-size:0.88rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-body{flex:1}
+.step-title{font-weight:700;color:var(--dark);font-size:0.9rem;margin-bottom:3px}
+.step-desc{font-size:0.84rem;color:#555;line-height:1.55}
+/* ── BOXES ── */
+.box{border-radius:8px;padding:14px 18px;margin:14px 0;font-size:0.86rem;line-height:1.6}
+.box-green{background:#f0fbf6;border-left:4px solid var(--green);color:#1e5c35}
+.box-orange{background:#fff8f0;border-left:4px solid var(--orange);color:#7d3100}
+.box-blue{background:#eff5ff;border-left:4px solid var(--blue);color:#0a2d5a}
+.box-red{background:#fff0f0;border-left:4px solid var(--red);color:#7d1a1a}
+.box strong{display:block;margin-bottom:4px}
+/* ── MOCKUP BASE ── */
+.mockup{border-radius:8px;overflow:hidden;border:1px solid #ccc;box-shadow:0 4px 16px rgba(0,0,0,.12);margin:16px 0;font-family:'Segoe UI',Arial,sans-serif;position:relative}
+.mock-label{position:absolute;top:-10px;right:12px;background:var(--red);color:#fff;font-size:0.65rem;font-weight:800;padding:2px 10px;border-radius:8px;letter-spacing:.5px;text-transform:uppercase;z-index:10}
+/* ── MOCKUP — FORMULAIRE ── */
+.mock-form-header{background:#1a1a1a;padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:3px solid var(--red)}
+.mock-form-header .logo-block{width:28px;height:28px;background:var(--red);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.55rem;font-weight:800;flex-shrink:0}
+.mock-form-header h3{color:#fff;font-size:0.8rem;font-weight:700;flex:1}
+.mock-form-header .mock-verbadge{background:rgba(230,126,34,.2);color:#e67e22;border:1px solid rgba(230,126,34,.4);border-radius:10px;font-size:0.6rem;font-weight:700;padding:2px 8px;cursor:pointer}
+.mock-form-body{background:#f2f2f2;padding:14px 16px}
+.mock-section{background:#fff;border-radius:8px;margin-bottom:10px;overflow:hidden;border:1px solid #e0e0e0}
+.mock-section-title{background:#2b2b2b;color:#fff;padding:7px 12px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.mock-section-body{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mock-field{display:flex;flex-direction:column;gap:3px}
+.mock-field label{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#777}
+.mock-field .mock-input{border:1px solid #ddd;border-radius:5px;padding:5px 8px;font-size:0.72rem;color:#333;background:#fafafa}
+.mock-field .mock-input.focus{border-color:var(--red);background:#fff}
+.mock-field .mock-textarea{border:1px solid #ddd;border-radius:5px;padding:5px 8px;font-size:0.72rem;color:#333;height:40px;background:#fafafa}
+.mock-btn-submit{background:var(--red);color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:0.78rem;font-weight:700;width:100%;margin-top:8px;cursor:pointer}
+.mock-dropzone{border:2px dashed #ccc;border-radius:6px;padding:10px;text-align:center;font-size:0.65rem;color:#999;background:#fafafa;margin-top:4px}
+/* ── MOCKUP — CONSOLE ── */
+.mock-console-header{background:#1a1a1a;padding:8px 14px;display:flex;align-items:center;gap:10px;border-bottom:3px solid var(--red)}
+.mock-console-header h3{color:#fff;font-size:0.78rem;font-weight:700;flex:1}
+.mock-console-header .mch-btn{background:rgba(255,255,255,.1);color:#ccc;border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:3px 8px;font-size:0.62rem;cursor:pointer}
+.mock-console-header .mch-btn.red{background:rgba(192,57,43,.3);color:#ff9999;border-color:rgba(192,57,43,.5)}
+.mock-tabs{background:#111;display:flex;gap:2px;padding:0 14px;border-bottom:1px solid #333}
+.mock-tab{padding:6px 12px;font-size:0.68rem;font-weight:600;color:#666;cursor:pointer;border-bottom:2px solid transparent}
+.mock-tab.active{color:#fff;border-bottom-color:var(--red)}
+.mock-console-body{background:#0f0f0f;padding:14px}
+/* ── STAT CARDS ── */
+.mock-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.mock-stat{background:#1a1a1a;border-radius:6px;padding:10px 12px;border:1px solid #2a2a2a}
+.mock-stat .ms-num{font-size:1.4rem;font-weight:800;color:#fff;font-family:monospace}
+.mock-stat .ms-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-top:2px}
+.mock-stat .ms-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px}
+/* ── NC ROWS ── */
+.mock-nc-list{background:#1a1a1a;border-radius:6px;overflow:hidden;border:1px solid #2a2a2a}
+.mock-nc-header{display:grid;grid-template-columns:1fr 0.7fr 0.7fr 0.8fr 1.2fr 0.5fr;gap:8px;padding:6px 12px;background:#111;border-bottom:1px solid #2a2a2a}
+.mock-nc-header span{font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#555}
+.mock-nc-row{display:grid;grid-template-columns:1fr 0.7fr 0.7fr 0.8fr 1.2fr 0.5fr;gap:8px;padding:7px 12px;border-bottom:1px solid #1e1e1e;align-items:center;cursor:pointer}
+.mock-nc-row:hover{background:#1f1f1f}
+.mock-nc-row span{font-size:0.68rem;color:#aaa}
+.mock-nc-row .nc-num{color:#fff;font-weight:700;font-family:monospace;font-size:0.72rem}
+.status-badge{display:inline-block;border-radius:10px;padding:2px 8px;font-size:0.6rem;font-weight:700;letter-spacing:.5px}
+.s-ouvert{background:rgba(230,126,34,.15);color:#e67e22;border:1px solid rgba(230,126,34,.3)}
+.s-en_cours{background:rgba(41,128,185,.15);color:#5dade2;border:1px solid rgba(41,128,185,.3)}
+.s-resolu{background:rgba(39,174,96,.15);color:#58d68d;border:1px solid rgba(39,174,96,.3)}
+.s-clos{background:rgba(127,140,141,.15);color:#95a5a6;border:1px solid rgba(127,140,141,.3)}
+.grav-badge{display:inline-block;border-radius:3px;padding:1px 6px;font-size:0.58rem;font-weight:700}
+.g-min{background:#1a3a1a;color:#58d68d}
+.g-maj{background:#3a2a00;color:#f39c12}
+.g-crit{background:#3a0a0a;color:#e74c3c}
+/* ── MODAL NC ── */
+.mock-modal{background:#111;border-radius:8px;border:1px solid #333;overflow:hidden}
+.mock-modal-header{background:#1a1a1a;padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #333}
+.mock-modal-header h4{color:#fff;font-size:0.82rem;font-weight:700;flex:1}
+.mock-modal-body{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mock-modal-section{background:#1a1a1a;border-radius:6px;padding:10px 12px;border:1px solid #2a2a2a}
+.mock-modal-section .mms-title{font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:var(--red);font-weight:700;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px}
+.mock-field-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1e1e1e}
+.mock-field-row .mfr-label{font-size:0.65rem;color:#666}
+.mock-field-row .mfr-val{font-size:0.65rem;color:#ccc;font-weight:600;text-align:right;max-width:60%}
+.mock-action-bar{padding:10px 14px;border-top:1px solid #2a2a2a;display:flex;gap:8px;flex-wrap:wrap;background:#0f0f0f}
+.mock-action-btn{border:1px solid;border-radius:4px;padding:4px 10px;font-size:0.65rem;font-weight:700;cursor:pointer}
+.mab-blue{background:rgba(41,128,185,.15);color:#5dade2;border-color:rgba(41,128,185,.4)}
+.mab-green{background:rgba(39,174,96,.15);color:#58d68d;border-color:rgba(39,174,96,.4)}
+.mab-red{background:rgba(192,57,43,.15);color:#e07070;border-color:rgba(192,57,43,.4)}
+.mab-orange{background:rgba(230,126,34,.15);color:#f39c12;border-color:rgba(230,126,34,.4)}
+/* ── ANNOTATIONS ── */
+.annot{position:relative;display:inline-block}
+.annot-tag{background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:800;flex-shrink:0;margin-right:6px}
+.annot-list{list-style:none;margin:12px 0;display:flex;flex-direction:column;gap:7px}
+.annot-list li{display:flex;align-items:flex-start;gap:0;font-size:0.84rem;color:#444;line-height:1.5}
+/* ── TIPS ── */
+.tip{background:#fffbe0;border-left:3px solid #e6b800;border-radius:4px;padding:10px 14px;font-size:0.84rem;color:#664d00;margin:12px 0}
+.tip strong{display:block;margin-bottom:3px}
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:0.84rem}
+th{background:var(--dark);color:#fff;padding:8px 12px;text-align:left;font-weight:600}
+td{padding:7px 12px;border-bottom:1px solid var(--border);color:#333;vertical-align:top}
+tr:nth-child(even) td{background:#f9f9f9}
+/* ── PRINT ── */
+@media print{#sidebar{display:none}#main{margin-left:0}#top-banner{background:#1a1a1a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media(max-width:768px){#sidebar{display:none}#main{margin-left:0}#content{padding:0 16px 40px}.mock-stats{grid-template-columns:1fr 1fr}.mock-nc-header,.mock-nc-row{grid-template-columns:1fr 0.8fr 0.8fr}.mock-nc-header span:nth-child(n+4),.mock-nc-row span:nth-child(n+4){display:none}}
+/* ── WORKFLOW ── */
+.workflow{display:flex;align-items:center;gap:0;margin:16px 0;flex-wrap:wrap}
+.wf-step{background:#1a1a1a;color:#ccc;border-radius:6px;padding:8px 16px;font-size:0.78rem;font-weight:700;white-space:nowrap}
+.wf-step.current{background:var(--red);color:#fff}
+.wf-arrow{color:#555;font-size:1.2rem;padding:0 6px}
+.wf-final{background:#1a3a1a;color:#58d68d;border-radius:6px;padding:8px 16px;font-size:0.78rem;font-weight:700}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <div class="badge">GUIDE</div>
+    <h1>Module NC<br>Guide Utilisateur</h1>
+    <p>v4.3 — 03/06/2026</p>
+  </div>
+  <nav>
+    <div class="nav-sep">Démarrage</div>
+    <a href="#s1">1. Accès & connexion</a>
+    <a href="#s2">2. Les rôles utilisateurs</a>
+    <div class="nav-sep">Déclarer une NC</div>
+    <a href="#s3">3. Formulaire de déclaration</a>
+    <a href="#s3-1" class="sub">3.1 Remplir le formulaire</a>
+    <a href="#s3-2" class="sub">3.2 Confirmation</a>
+    <div class="nav-sep">Console nc_admin</div>
+    <a href="#s4">4. Tableau de bord</a>
+    <a href="#s5">5. Liste des NC</a>
+    <a href="#s6">6. Traiter une NC</a>
+    <a href="#s6-1" class="sub">6.1 Qualification</a>
+    <a href="#s6-2" class="sub">6.2 Analyse qualité</a>
+    <a href="#s6-3" class="sub">6.3 Actions CAPA</a>
+    <a href="#s6-4" class="sub">6.4 Clôture</a>
+    <a href="#s7">7. Export & rapports</a>
+    <a href="#s8">8. Configuration</a>
+    <div class="nav-sep">Console nc_chef_produit</div>
+    <a href="#s9">9. Vue pilote</a>
+    <a href="#s9-1" class="sub">9.1 Répondre à une action</a>
+    <div class="nav-sep">Référence</div>
+    <a href="#s10">10. Statuts & workflow</a>
+    <a href="#s11">11. Raccourcis utiles</a>
+  </nav>
+  <div id="sidebar-footer">
+    Muller Automotive<br>
+    Module Non-Conformités v4.3<br>
+    Développé avec Claude Code
+  </div>
+</div>
+
+<div id="main">
+<div id="top-banner">
+  <h1>Guide Utilisateur — Module NC</h1>
+  <div class="sub">Gestion des Non-Conformités — Muller Automotive</div>
+  <div class="ver-badge">Version 4.3 — 03/06/2026</div>
+  <div class="meta-row">
+    <div class="meta-item"><strong>Rôles couverts :</strong> nc_admin · nc_chef_produit · nc_lecteur</div>
+    <div class="meta-item"><strong>URL :</strong> formation-sav.fr/NC/</div>
+  </div>
+</div>
+
+<div id="content">
+
+<!-- ══ 1. ACCÈS ══ -->
+<div class="section" id="s1">
+  <div class="section-title"><span class="section-num">1</span>Accès & connexion</div>
+
+  <p>Le module NC est accessible depuis n'importe quel navigateur — PC, tablette ou smartphone — sans installation.</p>
+
+  <table>
+    <tr><th>Page</th><th>URL</th><th>Authentification</th></tr>
+    <tr><td>Formulaire déclaration NC</td><td><code>formation-sav.fr/NC/</code></td><td>Aucune — accès public</td></tr>
+    <tr><td>Console admin/pilote</td><td><code>formation-sav.fr/NC/console.html</code></td><td>Connexion requise</td></tr>
+    <tr><td>Page de connexion</td><td><code>formation-sav.fr/NC/login.html</code></td><td>—</td></tr>
+  </table>
+
+  <div class="subsection">
+    <div class="subsection-title">Se connecter à la console</div>
+    <div class="mockup">
+      <div class="mock-label">Page de connexion</div>
+      <div style="background:#1a1a1a;padding:30px;display:flex;justify-content:center">
+        <div style="background:#fff;border-radius:10px;width:360px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)">
+          <div style="background:#2b2b2b;padding:20px;text-align:center">
+            <div style="display:inline-block;background:var(--red);color:#fff;font-size:0.65rem;font-weight:800;padding:2px 8px;border-radius:4px;margin-bottom:8px">NC</div>
+            <div style="color:#fff;font-size:0.9rem;font-weight:700">Console Non-Conformités</div>
+            <div style="color:#666;font-size:0.72rem;margin-top:3px">Muller Automotive</div>
+          </div>
+          <div style="padding:20px">
+            <div style="margin-bottom:12px">
+              <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;color:#777;margin-bottom:4px">Identifiant</div>
+              <div style="border:1.5px solid #e0e0e0;border-radius:6px;padding:8px 12px;font-size:0.82rem;color:#333;background:#fafafa">matsupport</div>
+            </div>
+            <div style="margin-bottom:14px">
+              <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;color:#777;margin-bottom:4px">Mot de passe</div>
+              <div style="border:1.5px solid var(--red);border-radius:6px;padding:8px 12px;font-size:0.82rem;color:#333;background:#fff">••••••••</div>
+            </div>
+            <div style="background:var(--red);color:#fff;border-radius:6px;padding:10px;text-align:center;font-size:0.82rem;font-weight:700">Se connecter →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="annot-list">
+      <li><span class="annot-tag">1</span>Entrez votre identifiant (ex. : <code>matsupport</code>)</li>
+      <li><span class="annot-tag">2</span>Entrez votre mot de passe</li>
+      <li><span class="annot-tag">3</span>Cliquez <strong>Se connecter</strong> ou appuyez sur <kbd>Entrée</kbd></li>
+    </ul>
+    <div class="box box-blue"><strong>Première connexion</strong> Contactez l'administrateur pour obtenir vos identifiants. Si vous avez oublié votre mot de passe, l'administrateur peut le réinitialiser depuis la configuration.</div>
+  </div>
+</div>
+
+<!-- ══ 2. RÔLES ══ -->
+<div class="section" id="s2">
+  <div class="section-title"><span class="section-num">2</span>Les rôles utilisateurs</div>
+  <p>Chaque utilisateur dispose d'un rôle qui détermine ses droits dans le module.</p>
+  <div class="role-grid">
+    <div class="role-card role-admin">
+      <div class="rc-title"><span class="rc-badge rc-admin">nc_admin</span> Administrateur</div>
+      <ul>
+        <li>Voir toutes les NC</li>
+        <li>Qualifier (gravité, score risque)</li>
+        <li>Analyser (5P, Ishikawa)</li>
+        <li>Créer des actions CAPA</li>
+        <li>Clôturer les NC</li>
+        <li>Exporter CSV / PDF</li>
+        <li>Configurer l'application</li>
+        <li>Gérer les utilisateurs</li>
+      </ul>
+    </div>
+    <div class="role-card role-pilote">
+      <div class="rc-title"><span class="rc-badge rc-pilote">nc_chef_produit</span> Pilote</div>
+      <ul>
+        <li>Voir ses NC assignées</li>
+        <li>Répondre aux actions CAPA</li>
+        <li>Uploader des preuves</li>
+        <li>Mode Lecteur : toutes NC en lecture</li>
+      </ul>
+    </div>
+    <div class="role-card role-lecteur">
+      <div class="rc-title"><span class="rc-badge rc-lecteur">nc_lecteur</span> Lecteur</div>
+      <ul>
+        <li>Consulter toutes les NC</li>
+        <li>Voir les statistiques</li>
+        <li>Accéder aux archives</li>
+        <li>Aucune modification</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3. FORMULAIRE ══ -->
+<div class="section" id="s3">
+  <div class="section-title"><span class="section-num">3</span>Formulaire de déclaration NC</div>
+  <p>Le formulaire est accessible sans connexion. N'importe qui (client, technicien, fournisseur) peut déclarer une non-conformité.</p>
+
+  <div class="subsection" id="s3-1">
+    <div class="subsection-title">3.1 Remplir le formulaire</div>
+    <div class="mockup">
+      <div class="mock-label">Formulaire public</div>
+      <div class="mock-form-header">
+        <div class="mock-form-header logo-block" style="width:24px;height:24px;background:var(--red);border-radius:3px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.5rem;font-weight:800">MA</div>
+        <h3>Déclaration Non-Conformité</h3>
+        <span class="mock-form-header mock-verbadge">⚙ v4.3</span>
+      </div>
+      <div class="mock-form-body">
+        <div style="background:#1a1a1a;border-radius:8px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+          <span style="color:#ff9999;font-size:0.72rem;font-weight:700;font-family:monospace">N° NC : — en attente de validation —</span>
+        </div>
+        <div class="mock-section">
+          <div class="mock-section-title">① Identification</div>
+          <div class="mock-section-body">
+            <div class="mock-field"><label>Nom client *</label><div class="mock-input focus">Garage Dupont</div></div>
+            <div class="mock-field"><label>Email *</label><div class="mock-input">contact@dupont.fr</div></div>
+            <div class="mock-field"><label>Ville</label><div class="mock-input">Lyon</div></div>
+            <div class="mock-field"><label>Pays</label><div class="mock-input">France</div></div>
+          </div>
+        </div>
+        <div class="mock-section">
+          <div class="mock-section-title">② Caractérisation du problème</div>
+          <div class="mock-section-body" style="grid-template-columns:1fr">
+            <div class="mock-field"><label>Famille produit *</label><div class="mock-input">Célérométre CEL50 ▾</div></div>
+            <div class="mock-field"><label>Référence produit</label><div class="mock-input">CEL50-2024-0042</div></div>
+            <div class="mock-field"><label>Description *</label><div class="mock-textarea">L'écran du célérométre affiche une erreur E04 au démarrage depuis 2 jours...</div></div>
+          </div>
+        </div>
+        <div class="mock-section">
+          <div class="mock-section-title">③ Photos / Vidéos</div>
+          <div style="padding:8px 12px"><div class="mock-dropzone">📎 Glissez vos fichiers ici ou cliquez pour sélectionner<br><span style="color:#ccc">Photos · PDF · Vidéos</span></div></div>
+        </div>
+        <button class="mock-btn-submit">✅ Valider la déclaration</button>
+      </div>
+    </div>
+
+    <ul class="annot-list">
+      <li><span class="annot-tag">①</span><strong>Identification</strong> — Nom client et email sont obligatoires. L'email recevra les mises à jour de la NC.</li>
+      <li><span class="annot-tag">②</span><strong>Famille produit</strong> — Sélectionnez dans la liste (configurée par l'admin). Décrivez le problème précisément.</li>
+      <li><span class="annot-tag">③</span><strong>Pièces jointes</strong> — Photos, vidéos et PDF acceptés. Glisser-déposer ou clic. Plusieurs fichiers possibles.</li>
+    </ul>
+
+    <div class="tip"><strong>💡 Conseil</strong> Plus la description est précise (conditions d'apparition, fréquence, numéro de série), plus le traitement sera rapide.</div>
+  </div>
+
+  <div class="subsection" id="s3-2">
+    <div class="subsection-title">3.2 Confirmation de réception</div>
+    <div class="mockup">
+      <div class="mock-label">Écran de confirmation</div>
+      <div class="mock-form-body" style="background:#f2f2f2;padding:20px;text-align:center">
+        <div style="background:#fff;border-radius:10px;padding:24px;border:1px solid #e0e0e0;max-width:460px;margin:0 auto">
+          <div style="font-size:2.5rem;margin-bottom:10px">✅</div>
+          <div style="font-size:1rem;font-weight:800;color:#1a1a1a;margin-bottom:6px">Déclaration enregistrée</div>
+          <div style="font-size:0.8rem;color:#666;margin-bottom:16px">Votre non-conformité a bien été transmise à l'équipe qualité.</div>
+          <div style="background:#1a1a1a;color:#ff9999;border-radius:6px;padding:10px;font-family:monospace;font-size:1.1rem;font-weight:800;letter-spacing:2px">260603-0009</div>
+          <div style="font-size:0.72rem;color:#888;margin-top:8px">Conservez ce numéro pour le suivi de votre dossier.</div>
+          <div style="margin-top:16px;border-top:1px solid #eee;padding-top:14px;font-size:0.8rem;color:#666">Un email de confirmation vous a été envoyé à<br><strong>contact@dupont.fr</strong></div>
+        </div>
+      </div>
+    </div>
+    <p>Un numéro unique est généré automatiquement au format <strong>AAMMJJ-NNNN</strong>. Un email de confirmation est envoyé au déclarant.</p>
+  </div>
+</div>
+
+<!-- ══ 4. TABLEAU DE BORD ══ -->
+<div class="section" id="s4">
+  <div class="section-title"><span class="section-num">4</span>Tableau de bord <span style="font-size:0.72rem;font-weight:400;color:#888;margin-left:8px">nc_admin</span></div>
+  <p>Le tableau de bord s'affiche à la connexion. Il donne une vision immédiate de l'état des non-conformités.</p>
+
+  <div class="mockup">
+    <div class="mock-label">Console — Tableau de bord</div>
+    <div class="mock-console-header">
+      <div style="width:22px;height:22px;background:var(--red);border-radius:3px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.5rem;font-weight:800;flex-shrink:0">MA</div>
+      <h3>⚠ Console Non-Conformités</h3>
+      <span style="position:relative;background:rgba(230,126,34,.13);color:#e67e22;border:1px solid rgba(230,126,34,.38);border-radius:10px;font-size:0.6rem;font-weight:700;padding:2px 8px">⚙ v4.3</span>
+      <span class="mch-btn" style="margin-left:auto">Matsupport (admin)</span>
+      <span class="mch-btn">+ Nouvelle NC</span>
+      <span class="mch-btn red">Déconnexion</span>
+    </div>
+    <div class="mock-tabs">
+      <div class="mock-tab active">📊 Tableau de bord</div>
+      <div class="mock-tab">📋 Liste des NC</div>
+      <div class="mock-tab">📈 Statistiques</div>
+      <div class="mock-tab">🗄 Archives</div>
+    </div>
+    <div class="mock-console-body">
+      <div class="mock-stats">
+        <div class="mock-stat"><div class="ms-num">9</div><div class="ms-label"><span class="ms-dot" style="background:#aaa"></span>Total NC</div></div>
+        <div class="mock-stat"><div class="ms-num" style="color:#e67e22">3</div><div class="ms-label"><span class="ms-dot" style="background:#e67e22"></span>Ouvertes</div></div>
+        <div class="mock-stat"><div class="ms-num" style="color:#5dade2">4</div><div class="ms-label"><span class="ms-dot" style="background:#5dade2"></span>En cours</div></div>
+        <div class="mock-stat"><div class="ms-num" style="color:#58d68d">2</div><div class="ms-label"><span class="ms-dot" style="background:#58d68d"></span>Closes</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#1a1a1a;border-radius:6px;padding:10px;border:1px solid #2a2a2a">
+          <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:8px">NC récentes</div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #1e1e1e"><span style="font-size:0.68rem;color:#fff;font-family:monospace">260526-0008</span><span class="status-badge s-ouvert">Ouvert</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #1e1e1e"><span style="font-size:0.68rem;color:#fff;font-family:monospace">260521-0007</span><span class="status-badge s-ouvert">Ouvert</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="font-size:0.68rem;color:#fff;font-family:monospace">260511-0006</span><span class="status-badge s-en_cours">En cours</span></div>
+        </div>
+        <div style="background:#1a1a1a;border-radius:6px;padding:10px;border:1px solid #2a2a2a">
+          <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:8px">Actions en retard</div>
+          <div style="padding:5px 0;border-bottom:1px solid #1e1e1e;font-size:0.68rem;color:#e07070">⚠ 260511-0005 — Action J. Martin — 3 jours de retard</div>
+          <div style="padding:5px 0;font-size:0.68rem;color:#aaa">Aucune autre action en retard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="annot-list">
+    <li><span class="annot-tag">A</span><strong>Compteurs synthétiques</strong> — Vision instantanée du stock de NC par statut.</li>
+    <li><span class="annot-tag">B</span><strong>NC récentes</strong> — Les dernières déclarations reçues avec leur statut actuel.</li>
+    <li><span class="annot-tag">C</span><strong>Actions en retard</strong> — Alertes rouges pour les pilotes qui n'ont pas répondu à temps.</li>
+  </ul>
+</div>
+
+<!-- ══ 5. LISTE ══ -->
+<div class="section" id="s5">
+  <div class="section-title"><span class="section-num">5</span>Liste des NC <span style="font-size:0.72rem;font-weight:400;color:#888;margin-left:8px">nc_admin · nc_lecteur</span></div>
+
+  <div class="mockup">
+    <div class="mock-label">Onglet Liste</div>
+    <div class="mock-console-header">
+      <h3>⚠ Console Non-Conformités</h3>
+    </div>
+    <div class="mock-tabs">
+      <div class="mock-tab">📊 Tableau de bord</div>
+      <div class="mock-tab active">📋 Liste des NC</div>
+      <div class="mock-tab">📈 Statistiques</div>
+      <div class="mock-tab">🗄 Archives</div>
+    </div>
+    <div class="mock-console-body">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:5px 10px;font-size:0.65rem;color:#aaa">Statut : Tous ▾</div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:5px 10px;font-size:0.65rem;color:#aaa">Famille : Toutes ▾</div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:5px 10px;font-size:0.65rem;color:#aaa">Gravité : Toutes ▾</div>
+        <div style="background:#1a1a1a;border:1px solid var(--red);border-radius:4px;padding:5px 10px;font-size:0.65rem;color:#fff;flex:1;min-width:120px">🔍 Rechercher...</div>
+        <div style="background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.4);border-radius:4px;padding:5px 10px;font-size:0.65rem;color:#58d68d;cursor:pointer">⬇ Export CSV</div>
+      </div>
+      <div class="mock-nc-list">
+        <div class="mock-nc-header">
+          <span>N° NC</span><span>Date</span><span>Famille</span><span>Gravité</span><span>Client</span><span>Statut</span>
+        </div>
+        <div class="mock-nc-row">
+          <span class="nc-num">260603-0009</span>
+          <span>03/06/2026</span>
+          <span>CEL50</span>
+          <span>—</span>
+          <span style="color:#fff">Garage Dupont</span>
+          <span><div class="status-badge s-ouvert">Ouvert</div></span>
+        </div>
+        <div class="mock-nc-row" style="background:#1f1f1f">
+          <span class="nc-num">260526-0008</span>
+          <span>26/05/2026</span>
+          <span>SLM50</span>
+          <span><div class="grav-badge g-maj">Majeure</div></span>
+          <span style="color:#fff">Auto Center 69</span>
+          <span><div class="status-badge s-ouvert">Ouvert</div></span>
+        </div>
+        <div class="mock-nc-row">
+          <span class="nc-num">260511-0006</span>
+          <span>11/05/2026</span>
+          <span>Géométrie</span>
+          <span><div class="grav-badge g-min">Mineure</div></span>
+          <span style="color:#fff">Garage Martin</span>
+          <span><div class="status-badge s-en_cours">En cours</div></span>
+        </div>
+        <div class="mock-nc-row">
+          <span class="nc-num">260507-0003</span>
+          <span>07/05/2026</span>
+          <span>CEL50</span>
+          <span><div class="grav-badge g-crit">Critique</div></span>
+          <span style="color:#fff">CT Nord Express</span>
+          <span><div class="status-badge s-clos">Clos</div></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="annot-list">
+    <li><span class="annot-tag">1</span><strong>Filtres</strong> — Filtrez par statut, famille produit ou gravité. Les filtres se combinent.</li>
+    <li><span class="annot-tag">2</span><strong>Recherche</strong> — Tapez un numéro, un nom client ou un mot-clé pour filtrer instantanément.</li>
+    <li><span class="annot-tag">3</span><strong>Cliquez sur une ligne</strong> pour ouvrir la fiche complète de la NC.</li>
+    <li><span class="annot-tag">4</span><strong>Export CSV</strong> — Exporte toutes les NC filtrées en fichier Excel.</li>
+  </ul>
+</div>
+
+<!-- ══ 6. TRAITER ══ -->
+<div class="section" id="s6">
+  <div class="section-title"><span class="section-num">6</span>Traiter une NC <span style="font-size:0.72rem;font-weight:400;color:#888;margin-left:8px">nc_admin</span></div>
+  <p>Cliquez sur une ligne de la liste pour ouvrir la fiche NC complète. La fiche regroupe toutes les informations, actions et historique.</p>
+
+  <div class="mockup">
+    <div class="mock-label">Fiche NC — modal</div>
+    <div class="mock-modal">
+      <div class="mock-modal-header">
+        <div style="background:var(--red);color:#fff;font-size:0.65rem;font-weight:800;padding:2px 8px;border-radius:4px">NC</div>
+        <h4>260526-0008 — Sonomètre SLM50</h4>
+        <div class="status-badge s-ouvert" style="margin-left:auto">Ouvert</div>
+        <div style="color:#555;font-size:1rem;cursor:pointer;margin-left:10px">✕</div>
+      </div>
+      <div class="mock-modal-body">
+        <div class="mock-modal-section">
+          <div class="mms-title">Identification</div>
+          <div class="mock-field-row"><span class="mfr-label">Numéro</span><span class="mfr-val">260526-0008</span></div>
+          <div class="mock-field-row"><span class="mfr-label">Date</span><span class="mfr-val">26/05/2026</span></div>
+          <div class="mock-field-row"><span class="mfr-label">Client</span><span class="mfr-val">Auto Center 69</span></div>
+          <div class="mock-field-row"><span class="mfr-label">Famille</span><span class="mfr-val">SLM50</span></div>
+          <div class="mock-field-row"><span class="mfr-label">Référence</span><span class="mfr-val">SLM50-2025-0118</span></div>
+          <div class="mock-field-row"><span class="mfr-label">Rédacteur</span><span class="mfr-val">P. Dumont</span></div>
+        </div>
+        <div class="mock-modal-section">
+          <div class="mms-title">Analyse qualité</div>
+          <div class="mock-field-row"><span class="mfr-label">Gravité</span><span class="mfr-val"><div class="grav-badge g-maj">Majeure</div></span></div>
+          <div class="mock-field-row"><span class="mfr-label">Score risque</span><span class="mfr-val" style="color:#f39c12">★ 6 / 9</span></div>
+          <div class="mock-field-row"><span class="mfr-label">5 Pourquoi</span><span class="mfr-val" style="color:#58d68d">✓ Renseigné</span></div>
+          <div class="mock-field-row"><span class="mfr-label">Ishikawa</span><span class="mfr-val" style="color:#e07070">— À compléter</span></div>
+          <div class="mock-field-row"><span class="mfr-label">Actions CAPA</span><span class="mfr-val" style="color:#5dade2">1 action</span></div>
+          <div class="mock-field-row"><span class="mfr-label">Durée</span><span class="mfr-val">8 jours</span></div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;background:#1a1a1a;border-top:1px solid #2a2a2a">
+        <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:8px">Description du problème</div>
+        <div style="font-size:0.78rem;color:#ccc;line-height:1.6">Le sonomètre affiche une erreur de calibration après 3 mois d'utilisation. Le calibreur semble défectueux — le résultat de calibration quotidienne est systématiquement hors tolérance (+2,1 dB).</div>
+      </div>
+      <div class="mock-action-bar">
+        <div class="mock-action-btn mab-blue">✏ Qualifier</div>
+        <div class="mock-action-btn mab-orange">📊 Analyser</div>
+        <div class="mock-action-btn mab-green">+ Action CAPA</div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <div class="mock-action-btn mab-blue">▶ En cours</div>
+          <div class="mock-action-btn mab-red">✓ Clôturer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection" id="s6-1">
+    <div class="subsection-title">6.1 Qualifier une NC (gravité & score risque)</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Cliquer "✏ Qualifier"</div><div class="step-desc">Un panneau s'ouvre sous la fiche avec les champs de qualification.</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Choisir la gravité</div><div class="step-desc"><strong>Mineure</strong> — impact limité, traitement standard.<br><strong>Majeure</strong> — impact significatif client ou conformité.<br><strong>Critique</strong> — sécurité ou risque de réclamation majeure.</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Coter le score de risque (4 axes, 1 à 3 chacun)</div><div class="step-desc">Impact client · Conformité réglementaire · Sécurité · Risque de récurrence. Score total = somme des 4 axes (min 4, max 9).</div></div></div>
+    </div>
+    <div class="box box-red"><strong>⚠ Score ≥ 7 — Alerte direction automatique</strong> Un email est envoyé automatiquement à la direction dès qu'une NC atteint un score de risque de 7 ou plus.</div>
+  </div>
+
+  <div class="subsection" id="s6-2">
+    <div class="subsection-title">6.2 Analyse qualité (5 Pourquoi & Ishikawa)</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Cliquer "📊 Analyser"</div><div class="step-desc">Le panneau d'analyse s'ouvre avec deux outils : 5 Pourquoi et diagramme Ishikawa.</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Remplir les 5 Pourquoi</div><div class="step-desc">Partez du symptôme (P1) et enchaînez 5 niveaux de cause. Le dernier niveau est la cause racine.</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Compléter l'Ishikawa</div><div class="step-desc">6 branches : Méthodes, Matière, Milieu, Machine, Main-d'œuvre, Management. Renseignez au moins les branches concernées. Le diagramme SVG se génère automatiquement.</div></div></div>
+    </div>
+    <div class="tip"><strong>💡 Exigence LNE</strong> La cause racine doit être un facteur systémique identifiable et actionnable. Exemple refusé : "erreur humaine". Exemple accepté : "absence de procédure de contrôle réception sur ref. X".</div>
+  </div>
+
+  <div class="subsection" id="s6-3">
+    <div class="subsection-title">6.3 Créer une action CAPA</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Cliquer "+ Action CAPA"</div><div class="step-desc">Un formulaire s'affiche pour définir l'action corrective ou préventive.</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Renseigner les champs</div><div class="step-desc">Description de l'action · Pilote assigné (sélection dans la liste) · Date d'échéance.</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Valider</div><div class="step-desc">Le pilote reçoit un email automatique avec le détail de l'action et la date limite.</div></div></div>
+    </div>
+    <div class="box box-blue"><strong>Suivi des échéances</strong> Le tableau de bord signale en rouge les actions dont l'échéance est dépassée. Des relances automatiques sont envoyées aux pilotes en retard.</div>
+  </div>
+
+  <div class="subsection" id="s6-4">
+    <div class="subsection-title">6.4 Clôturer une NC</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Cliquer "✓ Clôturer"</div><div class="step-desc">Le bouton est accessible depuis la barre d'actions de la fiche NC.</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Remplir les 4 champs obligatoires</div><div class="step-desc"><strong>Type de cause</strong> (liste configurable) · <strong>Coût NC en €</strong> (0 si sans coût) · <strong>Commentaire clôture</strong> (interne qualité) · <strong>Commentaire général</strong> (inclus dans l'email envoyé au client).</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Confirmer</div><div class="step-desc">La NC passe au statut <strong>Clos</strong>. Un email de clôture est envoyé au rédacteur et au client.</div></div></div>
+    </div>
+    <div class="box box-orange"><strong>⚠ Clôture bloquée si</strong> La NC Parent n'a pas de cause racine (5P) renseignée ou pas d'Ishikawa complété. Complétez l'analyse avant de clôturer.</div>
+  </div>
+</div>
+
+<!-- ══ 7. EXPORT ══ -->
+<div class="section" id="s7">
+  <div class="section-title"><span class="section-num">7</span>Export & rapports <span style="font-size:0.72rem;font-weight:400;color:#888;margin-left:8px">nc_admin</span></div>
+
+  <table>
+    <tr><th>Export</th><th>Accès</th><th>Contenu</th><th>Usage</th></tr>
+    <tr><td><strong>CSV</strong></td><td>Liste des NC → bouton "⬇ Export CSV"</td><td>25 colonnes — toutes les NC filtrées, encodage UTF-8 BOM</td><td>Analyse Excel, KPI, archivage</td></tr>
+    <tr><td><strong>PDF direction</strong></td><td>Archives → bouton "Rapport PDF"</td><td>KPI synthétiques + répartitions + tableau NC closes</td><td>Revue de direction ISO 9001 §9.3</td></tr>
+  </table>
+
+  <div class="tip"><strong>💡 Pour le rapport PDF</strong> Utilisez Ctrl+P → "Enregistrer en PDF" depuis le navigateur. Format A4 paysage recommandé.</div>
+</div>
+
+<!-- ══ 8. CONFIG ══ -->
+<div class="section" id="s8">
+  <div class="section-title"><span class="section-num">8</span>Configuration <span style="font-size:0.72rem;font-weight:400;color:#888;margin-left:8px">nc_admin uniquement</span></div>
+
+  <div class="mockup">
+    <div class="mock-label">Onglet Configuration</div>
+    <div class="mock-console-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#1a1a1a;border-radius:6px;padding:10px;border:1px solid #2a2a2a">
+          <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:var(--red);font-weight:700;margin-bottom:8px">📧 Destinataires emails</div>
+          <div style="font-size:0.7rem;color:#888;margin-bottom:4px">Email qualité (création NC)</div>
+          <div style="background:#111;border-radius:4px;padding:5px 8px;font-size:0.68rem;color:#ccc;font-family:monospace;margin-bottom:8px">qualite@mullerautomotive.fr</div>
+          <div style="font-size:0.7rem;color:#888;margin-bottom:4px">Email direction (score ≥ 7)</div>
+          <div style="background:#111;border-radius:4px;padding:5px 8px;font-size:0.68rem;color:#ccc;font-family:monospace">direction@mullerautomotive.fr</div>
+        </div>
+        <div style="background:#1a1a1a;border-radius:6px;padding:10px;border:1px solid #2a2a2a">
+          <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:var(--red);font-weight:700;margin-bottom:8px">📋 Familles produits</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="background:#111;border-radius:4px;padding:4px 8px;font-size:0.68rem;color:#ccc;display:flex;justify-content:space-between">Célérométre CEL50<span style="color:#e07070">✕</span></div>
+            <div style="background:#111;border-radius:4px;padding:4px 8px;font-size:0.68rem;color:#ccc;display:flex;justify-content:space-between">Sonomètre SLM50<span style="color:#e07070">✕</span></div>
+            <div style="background:#111;border-radius:4px;padding:4px 8px;font-size:0.68rem;color:#ccc;display:flex;justify-content:space-between">Géométrie<span style="color:#e07070">✕</span></div>
+            <div style="background:rgba(39,174,96,.1);border:1px dashed rgba(39,174,96,.3);border-radius:4px;padding:4px 8px;font-size:0.68rem;color:#58d68d;text-align:center;cursor:pointer">+ Ajouter une famille</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top:14px">Depuis la configuration vous pouvez modifier <strong>sans redémarrer le serveur</strong> :</p>
+  <table>
+    <tr><th>Paramètre</th><th>Description</th></tr>
+    <tr><td>Destinataires email</td><td>Adresses qualité et direction pour les notifications automatiques</td></tr>
+    <tr><td>Familles produits</td><td>Liste des familles affichées dans le formulaire de déclaration</td></tr>
+    <tr><td>Types de cause</td><td>Liste des causes proposées à la clôture</td></tr>
+    <tr><td>Utilisateurs</td><td>Créer, modifier, désactiver les comptes nc_admin / nc_chef_produit / nc_lecteur</td></tr>
+  </table>
+</div>
+
+<!-- ══ 9. PILOTE ══ -->
+<div class="section" id="s9">
+  <div class="section-title"><span class="section-num">9</span>Vue pilote (nc_chef_produit)</div>
+  <p>Le pilote voit uniquement les NC où une action lui est assignée. Il peut basculer en "mode Lecteur" pour consulter toutes les NC sans modification.</p>
+
+  <div class="mockup">
+    <div class="mock-label">Console pilote</div>
+    <div class="mock-console-header">
+      <h3>⚠ Console Non-Conformités</h3>
+      <span class="mch-btn" style="margin-left:auto">J. Martin (pilote)</span>
+      <span class="mch-btn">Vue Lecteur</span>
+      <span class="mch-btn red">Déconnexion</span>
+    </div>
+    <div class="mock-tabs">
+      <div class="mock-tab active">📊 Mes actions</div>
+      <div class="mock-tab">📋 Mes NC</div>
+    </div>
+    <div class="mock-console-body">
+      <div style="background:#3a1a00;border:1px solid rgba(230,126,34,.4);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:0.75rem;color:#f39c12">
+        ⚠ 1 action en retard — NC 260511-0005 — échéance dépassée de 3 jours
+      </div>
+      <div class="mock-nc-list">
+        <div class="mock-nc-header"><span>N° NC</span><span>Action assignée</span><span>Échéance</span><span>Statut action</span></div>
+        <div class="mock-nc-row">
+          <span class="nc-num">260511-0005</span>
+          <span style="color:#ccc;font-size:0.65rem">Vérifier calibreur SLM50 ref. 105730</span>
+          <span style="color:#e07070">30/05/2026 ⚠</span>
+          <span><div class="status-badge" style="background:rgba(231,76,60,.15);color:#e74c3c;border:1px solid rgba(231,76,60,.3)">En retard</div></span>
+        </div>
+        <div class="mock-nc-row">
+          <span class="nc-num">260511-0006</span>
+          <span style="color:#ccc;font-size:0.65rem">Mettre à jour procédure INS-C-21</span>
+          <span style="color:#aaa">15/06/2026</span>
+          <span><div class="status-badge s-en_cours">En cours</div></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection" id="s9-1">
+    <div class="subsection-title">9.1 Répondre à une action CAPA</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Cliquer sur la NC concernée</div><div class="step-desc">La fiche s'ouvre. Descendez jusqu'à la section "Mes actions".</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Cliquer "Répondre"</div><div class="step-desc">Un champ texte s'ouvre pour décrire l'action réalisée.</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Joindre une preuve (recommandé)</div><div class="step-desc">Photo, document, capture d'écran — la preuve tangible est exigée par les auditeurs LNE.</div></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Valider la réponse</div><div class="step-desc">L'administrateur est notifié par email. L'action passe au statut "Résolu".</div></div></div>
+    </div>
+    <div class="box box-red"><strong>⚠ Preuve obligatoire (LNE)</strong> Une réponse textuelle sans pièce jointe est considérée comme insuffisante lors d'un audit LNE. Joignez toujours un document ou une photo prouvant l'action réalisée.</div>
+  </div>
+</div>
+
+<!-- ══ 10. WORKFLOW ══ -->
+<div class="section" id="s10">
+  <div class="section-title"><span class="section-num">10</span>Statuts & workflow</div>
+
+  <div class="workflow">
+    <div class="wf-step">📥 Ouvert</div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step">🔄 En cours</div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step">⏳ Résolu</div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-final">✅ Clos</div>
+    <div class="wf-arrow" style="margin:0 6px">ou</div>
+    <div class="wf-final" style="background:#1a1a3a;color:#95a5a6">🚫 Non pertinent</div>
+  </div>
+
+  <table>
+    <tr><th>Statut</th><th>Déclencheur</th><th>Email envoyé à</th></tr>
+    <tr><td><span class="status-badge s-ouvert">Ouvert</span></td><td>Création via le formulaire</td><td>Équipe qualité</td></tr>
+    <tr><td><span class="status-badge s-en_cours">En cours</span></td><td>Admin passe la NC en traitement</td><td>Rédacteur déclarant</td></tr>
+    <tr><td><span class="status-badge s-resolu">Résolu</span></td><td>Admin indique la résolution</td><td>Rédacteur déclarant</td></tr>
+    <tr><td><span class="status-badge s-clos">Clos</span></td><td>Admin clôture (4 champs requis)</td><td>Rédacteur + client</td></tr>
+    <tr><td><span class="status-badge" style="background:rgba(127,140,141,.15);color:#95a5a6;border:1px solid rgba(127,140,141,.3)">Non pertinent</span></td><td>Admin rejette la NC</td><td>Rédacteur déclarant</td></tr>
+  </table>
+</div>
+
+<!-- ══ 11. RACCOURCIS ══ -->
+<div class="section" id="s11">
+  <div class="section-title"><span class="section-num">11</span>Raccourcis & astuces</div>
+
+  <table>
+    <tr><th>Action</th><th>Comment faire</th></tr>
+    <tr><td>Ouvrir une NC</td><td>Cliquer sur n'importe quelle ligne de la liste</td></tr>
+    <tr><td>Fermer le modal NC</td><td>Touche <kbd>Échap</kbd> ou cliquer en dehors du modal</td></tr>
+    <tr><td>Recherche rapide</td><td>Champ recherche en haut de la liste — numéro NC, nom client, mot-clé</td></tr>
+    <tr><td>Voir toutes les NC (pilote)</td><td>Bouton "Vue Lecteur" en haut à droite</td></tr>
+    <tr><td>Voir l'historique des versions</td><td>Cliquer sur le badge <code>⚙ v4.3</code> dans l'en-tête</td></tr>
+    <tr><td>Accéder au synoptique</td><td>Bouton "📖 Notice" dans l'en-tête de la console</td></tr>
+    <tr><td>Export CSV rapide</td><td>Appliquer les filtres souhaités → "⬇ Export CSV"</td></tr>
+    <tr><td>Rapport PDF direction</td><td>Onglet Archives → "Rapport PDF" → Ctrl+P → Enregistrer en PDF</td></tr>
+  </table>
+
+  <div class="box box-green" style="margin-top:20px"><strong>Support</strong> Pour toute question ou anomalie : avet.mat@gmail.com<br>Pour signaler un bug urgent, précisez le numéro NC concerné et le message d'erreur affiché.</div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+const sections = document.querySelectorAll('.section');
+const links = document.querySelectorAll('nav a');
+function onScroll(){
+  let cur='';
+  sections.forEach(s=>{ if(window.scrollY+120>=s.offsetTop) cur=s.id; });
+  links.forEach(a=>{ a.classList.toggle('active', a.getAttribute('href').replace('#','')=== cur); });
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+</script>
+</body>
+</html>
