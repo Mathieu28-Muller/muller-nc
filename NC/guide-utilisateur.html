@@ -549,9 +549,13 @@ tr:nth-child(even) td{background:#f9f9f9}
     <div class="steps">
       <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Cliquer "✏ Qualifier"</div><div class="step-desc">Un panneau s'ouvre sous la fiche avec les champs de qualification.</div></div></div>
       <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Choisir la gravité</div><div class="step-desc"><strong>Mineure</strong> — impact limité, traitement standard.<br><strong>Majeure</strong> — impact significatif client ou conformité.<br><strong>Critique</strong> — sécurité ou risque de réclamation majeure.</div></div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Coter le score de risque (4 axes, 1 à 3 chacun)</div><div class="step-desc">Impact client · Conformité réglementaire · Sécurité · Risque de récurrence. Score total = somme des 4 axes (min 4, max 9).</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Coter le score de risque (4 axes)</div><div class="step-desc">
+        <strong>Impact client</strong> : 1 à 4 &nbsp;·&nbsp; <strong>Conformité réglementaire</strong> : 1 à 3 &nbsp;·&nbsp; <strong>Sécurité</strong> : 1 à 3 &nbsp;·&nbsp; <strong>Récurrence</strong> : 1 à 3<br>
+        Le score est calculé automatiquement et normalisé sur 9 (score = total / 13 × 9).<br>
+        <span style="color:#c0392b;font-weight:700">> 6 / 9 = Risque ÉLEVÉ</span> &nbsp;·&nbsp; <span style="color:#e67e22;font-weight:700">4 à 6 = Risque MODÉRÉ</span> &nbsp;·&nbsp; <span style="color:#27ae60;font-weight:700">≤ 3 = Risque FAIBLE</span>
+      </div></div></div>
     </div>
-    <div class="box box-red"><strong>⚠ Score ≥ 7 — Alerte direction automatique</strong> Un email est envoyé automatiquement à la direction dès qu'une NC atteint un score de risque de 7 ou plus.</div>
+    <div class="box box-orange"><strong>🔮 Itération prévue — Alerte direction (score ≥ 7)</strong> L'envoi automatique d'un email à la direction pour les NC à risque élevé est prévu dans une prochaine version. Actuellement, le score est visible dans la fiche et la liste NC mais n'envoie pas d'alerte automatique.</div>
   </div>
 
   <div class="subsection" id="s6-2">
@@ -608,10 +612,10 @@ tr:nth-child(even) td{background:#f9f9f9}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="background:#1a1a1a;border-radius:6px;padding:10px;border:1px solid #2a2a2a">
           <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:var(--red);font-weight:700;margin-bottom:8px">📧 Destinataires emails</div>
-          <div style="font-size:0.7rem;color:#888;margin-bottom:4px">Email qualité (création NC)</div>
-          <div style="background:#111;border-radius:4px;padding:5px 8px;font-size:0.68rem;color:#ccc;font-family:monospace;margin-bottom:8px">qualite@mullerautomotive.fr</div>
-          <div style="font-size:0.7rem;color:#888;margin-bottom:4px">Email direction (score ≥ 7)</div>
-          <div style="background:#111;border-radius:4px;padding:5px 8px;font-size:0.68rem;color:#ccc;font-family:monospace">direction@mullerautomotive.fr</div>
+          <div style="font-size:0.7rem;color:#888;margin-bottom:4px">Email qualité (notifications NC)</div>
+          <div style="background:#111;border-radius:4px;padding:5px 8px;font-size:0.68rem;color:#ccc;font-family:monospace;margin-bottom:8px">egouache@mullerautomotive.fr</div>
+          <div style="font-size:0.7rem;color:#555;margin-bottom:4px;font-style:italic">Email direction — prévu itération suivante</div>
+          <div style="background:#111;border-radius:4px;padding:5px 8px;font-size:0.65rem;color:#555;font-style:italic">🔮 Alerte score ≥ 7 — non implémenté</div>
         </div>
         <div style="background:#1a1a1a;border-radius:6px;padding:10px;border:1px solid #2a2a2a">
           <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:var(--red);font-weight:700;margin-bottom:8px">📋 Familles produits</div>
@@ -628,11 +632,14 @@ tr:nth-child(even) td{background:#f9f9f9}
 
   <p style="margin-top:14px">Depuis la configuration vous pouvez modifier <strong>sans redémarrer le serveur</strong> :</p>
   <table>
-    <tr><th>Paramètre</th><th>Description</th></tr>
-    <tr><td>Destinataires email</td><td>Adresses qualité et direction pour les notifications automatiques</td></tr>
-    <tr><td>Familles produits</td><td>Liste des familles affichées dans le formulaire de déclaration</td></tr>
-    <tr><td>Types de cause</td><td>Liste des causes proposées à la clôture</td></tr>
-    <tr><td>Utilisateurs</td><td>Créer, modifier, désactiver les comptes nc_admin / nc_chef_produit / nc_lecteur</td></tr>
+    <tr><th>Paramètre</th><th>Description</th><th>État</th></tr>
+    <tr><td>Email qualité</td><td>Adresse qui reçoit les notifications NC (création, clôture…)</td><td>✅ Actif</td></tr>
+    <tr><td>Familles produits</td><td>Liste des familles affichées dans le formulaire de déclaration</td><td>✅ Actif</td></tr>
+    <tr><td>Types de cause</td><td>Liste des causes proposées à la clôture</td><td>✅ Actif</td></tr>
+    <tr><td>Périmètres</td><td>Zones de l'entreprise concernées par les NC</td><td>✅ Actif</td></tr>
+    <tr><td>Sources de détection</td><td>Comment le problème a été découvert</td><td>✅ Actif</td></tr>
+    <tr><td>Utilisateurs</td><td>Créer, modifier, désactiver les comptes NC</td><td>✅ Actif</td></tr>
+    <tr><td>Email direction (score ≥ 7)</td><td>Alerte automatique pour NC à risque élevé</td><td>🔮 Itération suivante</td></tr>
   </table>
 </div>
 

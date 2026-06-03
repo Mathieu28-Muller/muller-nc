@@ -85,10 +85,10 @@ const NC_VERSION_HISTORY = [
   {
     version: '3.0', date: '2026-04-22', label: 'Analyse qualité',
     changes: [
-      'Score de risque 4 axes (impact client, conformité, sécurité, récurrence) — cotation 1 à 9',
+      'Score de risque 4 axes normalisé /9 : impact client (1-4), conformité (1-3), sécurité (1-3), récurrence (1-3)',
       'Analyse 5 Pourquoi (5 champs de cause racine enchaînés)',
       'Diagramme Ishikawa SVG généré automatiquement (6 branches)',
-      'Alerte direction automatique si score de risque ≥ 7'
+      'Gravité NC — 3 niveaux : mineure / majeure / critique'
     ]
   },
   {
