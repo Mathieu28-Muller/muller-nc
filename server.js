@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.4';
+const NC_APP_VERSION = '4.5';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -138,7 +138,6 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.4', date: '2026-06-03', label: 'Gestion mots de passe & rôles',
-    current: true,
     changes: [
       'Nouveau rôle Codir — accès lecture complète (dashboard + stats + liste + archives)',
       'Rôle Lecteur allégé — liste des NC et archives uniquement',
@@ -150,6 +149,16 @@ const NC_VERSION_HISTORY = [
       'Indicateur de force MDP en temps réel dans les formulaires',
       'Correction rate-limit : vérification ancien MDP via bcrypt serveur (plus via login)',
       'Tableau utilisateurs admin : colonnes à largeur fixe, toutes visibles'
+    ]
+  },
+  {
+    version: '4.5', date: '2026-06-04', label: 'Correctifs phase test pilotes',
+    current: true,
+    changes: [
+      'Décodage JWT UTF-8 : noms avec accents (é, ç) s\'affichaient corrompus — fix decodeURIComponent',
+      'Email ajouté dans le token JWT NC — débloque la réponse aux actions CAPA pour tous les pilotes',
+      'Email obligatoire pour le rôle Pilote (nc_chef_produit) — création et modification',
+      'Card Certificat de Conformité masquée sur la page d\'accueil (application non finalisée)'
     ]
   }
 ];
