@@ -776,7 +776,7 @@ const session = (() => {
   if (!token) { window.location.href = '/NC/login.html'; return null; }
   try {
     const b64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
-    const payload = JSON.parse(atob(b64));
+    const payload = JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     if (payload.scope !== 'nc' || (payload.exp && Date.now()/1000 > payload.exp)) {
       localStorage.removeItem(NC_TOKEN_KEY);
       window.location.href = '/NC/login.html';
@@ -2491,6 +2491,7 @@ async function submitUserForm() {
   const role  = document.getElementById('u-role').value;
   const email = document.getElementById('u-email').value.trim();
   if (!name) { showMsg('u-msg','Le nom est obligatoire.','err'); return; }
+  if (role === 'nc_chef_produit' && !email) { showMsg('u-msg','L\'email est obligatoire pour le rôle Pilote.','err'); return; }
   try {
     if (editUser) {
       // MODE ÉDITION

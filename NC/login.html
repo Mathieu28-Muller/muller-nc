@@ -73,7 +73,8 @@ footer{margin-top:32px;font-size:0.7rem;color:#333;text-align:center;letter-spac
   const token = localStorage.getItem('nc_jwt');
   if (!token) return;
   try {
-    const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    const b64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    const p = JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     if (p.scope === 'nc' && p.exp > Date.now()/1000) window.location.href = 'console.html';
   } catch {}
 })();

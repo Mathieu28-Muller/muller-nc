@@ -988,7 +988,7 @@ app.post('/api/nc-auth/login', loginLimiter, (req,res) => {
         found.passHash = hashBcrypt(pass);
     }
     const token = jwt.sign(
-        { user:found.user, role:found.role, name:found.name, scope:'nc' },
+        { user:found.user, role:found.role, name:found.name, email:found.email||'', scope:'nc' },
         JWT_SECRET, { expiresIn:'8h' }
     );
     found.lastLogin = new Date().toISOString();
@@ -1015,6 +1015,8 @@ app.post('/api/nc-auth/users', requireNCAdmin, (req,res) => {
     if (!name||!user||!pass) return res.status(400).json({ result:'invalid' });
     const passErr = validatePassword(pass);
     if (passErr) return res.status(400).json({ result:'invalid', error: passErr });
+    if (role === 'nc_chef_produit' && !email?.trim())
+        return res.status(400).json({ result:'invalid', error:'L\'email est obligatoire pour le rôle Pilote.' });
     const users = loadNCUsers();
     if (users.find(u=>u.user.toLowerCase()===user.toLowerCase()))
         return res.json({ result:'existe' });
@@ -1032,6 +1034,11 @@ app.put('/api/nc-auth/users/:user', requireNCAdmin, (req,res) => {
     const users = loadNCUsers();
     const u = users.find(u=>u.user===req.params.user);
     if (!u) return res.status(404).json({ error:'Utilisateur non trouvé' });
+    const targetRole = role || u.role;
+    if (targetRole === 'nc_chef_produit') {
+        const targetEmail = email !== undefined ? (email||'').trim() : u.email;
+        if (!targetEmail) return res.status(400).json({ error:'L\'email est obligatoire pour le rôle Pilote.' });
+    }
     if (name?.trim())  u.name  = name.trim();
     if (email !== undefined) u.email = (email||'').trim();
     if (role && ['nc_admin','nc_chef_produit','nc_lecteur','nc_codir'].includes(role)) u.role = role;
