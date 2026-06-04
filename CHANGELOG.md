@@ -26,9 +26,6 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 - **Email absent du token JWT NC** — les pilotes ne pouvaient pas répondre à leurs actions CAPA assignées (`peutRepondreAction` comparait `action.pilote` avec `session.email` vide). Fix : ajout de `email` dans le payload `jwt.sign()`
 - **Email obligatoire pour le rôle Pilote** — création et modification d'un compte `nc_chef_produit` sans email bloquées côté serveur et formulaire admin
 
-### Modifié
-- Card **Certificat de Conformité** masquée sur la page d'accueil (application non finalisée)
-
 ---
 
 ## [4.4] — 03/06/2026

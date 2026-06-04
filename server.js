@@ -157,8 +157,7 @@ const NC_VERSION_HISTORY = [
     changes: [
       'Décodage JWT UTF-8 : noms avec accents (é, ç) s\'affichaient corrompus — fix decodeURIComponent',
       'Email ajouté dans le token JWT NC — débloque la réponse aux actions CAPA pour tous les pilotes',
-      'Email obligatoire pour le rôle Pilote (nc_chef_produit) — création et modification',
-      'Card Certificat de Conformité masquée sur la page d\'accueil (application non finalisée)'
+      'Email obligatoire pour le rôle Pilote (nc_chef_produit) — création et modification'
     ]
   }
 ];
