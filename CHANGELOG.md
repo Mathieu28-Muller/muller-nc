@@ -19,7 +19,12 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
-## [4.4] — 03/06/2026
+## [4.4] — 03/06/2026 — 04/06/2026
+
+### Corrigé (04/06/2026 — correctifs phase test)
+- **Décodage JWT UTF-8** — noms avec accents (é, ç, è…) s'affichaient corrompus (`FranÃ§ois`) dans le header et empêchaient la correspondance pilote/action CAPA. Cause : `atob()` retourne du Latin-1 ; fix : `decodeURIComponent` sur le payload base64 dans `console.html` et `login.html`
+- **Email absent du token JWT NC** — les pilotes ne pouvaient pas répondre à leurs actions CAPA assignées (`peutRepondreAction` comparait `action.pilote` avec `session.email` vide). Fix : ajout de `email` dans le payload `jwt.sign()`
+- **Email obligatoire pour le rôle Pilote** — création et modification d'un compte `nc_chef_produit` sans email désormais bloquées côté serveur et formulaire admin
 
 ### Ajouté
 - **Nouveau rôle `nc_codir`** — accès lecture complète (tableau de bord, liste, statistiques, archives)

@@ -301,5 +301,27 @@ PLANIFICATION — ÉTAT AU 03/06/2026
      → Tester avec node plan_controle.js après chaque modification de données
 
 ================================================================================
-FIN PROMPT MAINTENANCE — version 03/06/2026 — v4.4
+CORRECTIFS PHASE TEST — 04/06/2026
+================================================================================
+
+  BUG 1 — Noms avec accents corrompus dans le header (FranÃ§ois au lieu de François)
+    Cause : atob() en JavaScript retourne du Latin-1, pas de l'UTF-8
+    Fix   : decodeURIComponent(atob(b64).split('').map(...)) dans console.html ET login.html
+    Impact: session.name corrompu → _piloteMatch échouait → action CAPA invisible pour le pilote
+
+  BUG 2 — Pilotes ne pouvaient pas répondre à leurs actions CAPA
+    Cause : email absent du payload jwt.sign() → session.email vide → peutRepondreAction() = false
+    Fix   : email:found.email||'' ajouté dans jwt.sign() (server.js ligne ~991)
+    Impact: tous les pilotes avec accents ET tous les pilotes (email manquant) étaient bloqués
+
+  BUG 3 — Email non obligatoire à la création d'un compte Pilote
+    Fix   : validation server.js (POST + PUT /api/nc-auth/users) + console.html formulaire
+    Règle : nc_chef_produit DOIT avoir un email — bloqué sinon
+
+  RÈGLE CRITIQUE ajoutée :
+    Tout compte nc_chef_produit doit avoir un email renseigné.
+    Le JWT NC doit toujours contenir : user, role, name, email, scope:'nc'
+
+================================================================================
+FIN PROMPT MAINTENANCE — version 04/06/2026 — v4.4
 ================================================================================

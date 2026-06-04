@@ -110,7 +110,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-header">
     <div class="ma-badge">MA</div>
     <h1>Rapport Technique IT<br>Module NC</h1>
-    <div class="ver">Version 8 — 03/06/2026</div>
+    <div class="ver">Version 9 — 04/06/2026</div>
   </div>
   <nav>
     <div class="nav-section">Avancement</div>
@@ -146,7 +146,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-footer">
     Muller Automotive<br>
     avet.mat@gmail.com<br>
-    MàJ : 03/06/2026 — v4.4 Gestion mots de passe &amp; rôles
+    MàJ : 04/06/2026 — v4.4 correctifs phase test (JWT UTF-8, email pilote)
   </div>
 </div>
 
@@ -155,10 +155,10 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
 <div id="top-banner">
   <h1>Rapport Technique IT — Module Non-Conformités</h1>
   <div class="sub">Muller Automotive — Document destiné au responsable IT</div>
-  <div class="ver-badge">Version 8 — 03/06/2026</div>
+  <div class="ver-badge">Version 9 — 04/06/2026</div>
   <div class="meta-row">
     <div class="meta-item"><strong>Auteur :</strong> Support technique Muller Automotive</div>
-    <div class="meta-item"><strong>Mis à jour :</strong> 03/06/2026 (v4.4 — Gestion mots de passe &amp; rôles)</div>
+    <div class="meta-item"><strong>Mis à jour :</strong> 04/06/2026 (v4.4 — Correctifs phase test : JWT UTF-8, email pilote)</div>
     <div class="meta-item"><strong>Contact :</strong> avet.mat@gmail.com</div>
   </div>
 </div>
@@ -170,7 +170,20 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div class="section-title"><span class="section-num">0</span>Journal des mises à jour — Avancement et planification</div>
 
   <div class="subsection">
-    <div class="subsection-title">Réalisé — 03/06/2026 — v4.4 (état actuel)</div>
+    <div class="subsection-title">Réalisé — 04/06/2026 — v4.4 correctifs phase test (état actuel)</div>
+    <div class="box box-green">
+      <strong>Correctifs critiques validés en phase test — 04/06/2026</strong>
+    </div>
+    <table>
+      <tr><th>Tâche</th><th>Statut</th><th>Détail technique</th></tr>
+      <tr><td>Décodage JWT UTF-8</td><td><span class="badge badge-green">✅ Corrigé</span></td><td>Noms avec accents (é, ç) s'affichaient corrompus. <code class="inline">atob()</code> retourne du Latin-1 — fix : <code class="inline">decodeURIComponent</code> sur le payload dans console.html et login.html.</td></tr>
+      <tr><td>Email manquant dans le token JWT</td><td><span class="badge badge-green">✅ Corrigé</span></td><td>Les pilotes ne pouvaient pas répondre à leurs actions CAPA. <code class="inline">email</code> ajouté dans le <code class="inline">jwt.sign()</code> côté serveur.</td></tr>
+      <tr><td>Email obligatoire rôle Pilote</td><td><span class="badge badge-green">✅ Actif</span></td><td>Création et modification d'un compte <code class="inline">nc_chef_produit</code> sans email bloquées côté serveur et formulaire admin.</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <div class="subsection-title">Réalisé — 03/06/2026 — v4.4</div>
     <div class="box box-green">
       <strong>Gestion des mots de passe &amp; nouveau rôle Codir — déployé le 03/06/2026</strong>
     </div>
