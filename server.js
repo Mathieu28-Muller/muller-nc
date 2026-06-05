@@ -175,9 +175,7 @@ const NC_VERSION_HISTORY = [
     changes: [
       'SMTP NC migré vers noreply-nc@mullerautomotive.fr — serveur OVH ssl0.ovh.net:465 SSL',
       'Toute la configuration SMTP pilotée par variables d\'environnement (.env) — plus de valeurs hardcodées',
-      'Variables : NC_SMTP_HOST/PORT/SECURE/USER/PASS/FROM + NC_MAIL_TO',
-      'Validé 05/06/2026 — envoi reçu sur mavet@mullerautomotive.fr et avet.mat@gmail.com',
-      'Gabarit .env OVH mis à jour dans SECRETS_DEPLOIEMENT_NC.txt'
+      'Variables : NC_SMTP_HOST/PORT/SECURE/USER/PASS/FROM + NC_MAIL_TO'
     ]
   }
 ];
