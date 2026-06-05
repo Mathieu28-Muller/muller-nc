@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.5';
+const NC_APP_VERSION = '4.6';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -153,11 +153,21 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.5', date: '2026-06-04', label: 'Correctifs phase test pilotes',
-    current: true,
     changes: [
       'Décodage JWT UTF-8 : noms avec accents (é, ç) s\'affichaient corrompus — fix decodeURIComponent',
       'Email ajouté dans le token JWT NC — débloque la réponse aux actions CAPA pour tous les pilotes',
       'Email obligatoire pour le rôle Pilote (nc_chef_produit) — création et modification'
+    ]
+  },
+  {
+    version: '4.6', date: '2026-06-05', label: 'Sécurité MDP & PDF restructuré',
+    current: true,
+    changes: [
+      'Forçage changement MDP à la première connexion (mustChangePass) — modal bloquant non fermable',
+      'mustChangePass inclus dans le token JWT — vérification côté serveur exemptée si MDP temporaire',
+      'PDF fiche NC restructuré — "Historique NC" séparé de "Actions CAPA — Détail des échanges"',
+      'Chaque action CAPA a son propre bloc chronologique dans le PDF (statuts + réponses + pièces jointes)',
+      'Vérification upload pièces jointes : noms avec caractères spéciaux et accents 100% fonctionnels'
     ]
   }
 ];
@@ -2619,16 +2629,10 @@ function ncBodyHtml(nc, showQualite){
     const s=nc.statut||'ouvert';
     const sC=SC[s]||'#888';
 
-    // Timeline unifiée
+    // Timeline NC uniquement (statuts NC + réponses legacy) — sans les actions
     const tl=[];
     (nc.historique||[]).forEach(h=>tl.push({_t:'statut',date:h.date,statut:h.statut,par:h.par,commentaire:h.commentaire}));
     (nc.reponsesPilote||[]).forEach(r=>tl.push({_t:'rep_leg',date:r.date,par:r.par,reponse:r.reponse}));
-    (nc.actions||[]).forEach(a=>{
-        tl.push({_t:'act_create',date:a.createdAt,a});
-        (a.historiqueStatut||[]).slice(1).forEach(h=>tl.push({_t:'act_stat',date:h.date,a,statut:h.statut,par:h.par,commentaire:h.commentaire}));
-        (a.reponsesActions||[]).forEach(r=>tl.push({_t:'act_rep',date:r.date,a,par:r.par,reponse:r.reponse,fichiers:r.fichiers}));
-        (a.relances||[]).forEach(r=>tl.push({_t:'act_relance',date:r.date||r.sentAt,a,par:r.par||r.sentBy,commentaire:r.commentaire||r.message}));
-    });
     tl.sort((x,y)=>new Date(x.date||0)-new Date(y.date||0));
 
     const tlHtml=tl.map(ev=>{
@@ -2638,28 +2642,46 @@ function ncBodyHtml(nc, showQualite){
                 [ev.par?`par ${eh(ev.par)}`:'',ev.commentaire?eh(ev.commentaire):''].filter(Boolean).join(' — '));
         }
         if(ev._t==='rep_leg') return tlRow('#1e8449','💬',`Réponse — ${eh(ev.par||'?')}`,ev.date,ev.reponse?eh(ev.reponse):'');
-        if(ev._t==='act_create'){
-            const a=ev.a;
-            return tlRow(AC[a.statut]||'#888','►',`Action ${eh(TLP[a.type]||a.type)} — Pilote : ${eh(a.pilote)}`,ev.date,
-                [a.commentaireAction?eh(a.commentaireAction):'',a.echeance?`Échéance : ${pd(a.echeance)}`:''].filter(Boolean).join(' — '));
-        }
-        if(ev._t==='act_stat'){
-            const a=ev.a;
-            return tlRow(AC[ev.statut]||'#888','▸',`[${eh(a.pilote)}] → ${eh(ALP[ev.statut]||ev.statut)}`,ev.date,
-                [ev.par?`par ${eh(ev.par)}`:'',ev.commentaire?eh(ev.commentaire):''].filter(Boolean).join(' — '));
-        }
-        if(ev._t==='act_rep'){
-            const a=ev.a;
-            const aDir=path.join(NC_MEDIA,nc.numero,'actions',a.id);
-            return tlRow('#1e8449','💬',`Réponse — ${eh(ev.par||'?')}`,ev.date,
-                `${ev.reponse?eh(ev.reponse):''}${mediasBlock(ev.fichiers||[],aDir)}`);
-        }
-        if(ev._t==='act_relance'){
-            const a=ev.a;
-            return tlRow('#e67e22','📢',`Relance — ${eh(a.pilote)}`,ev.date,
-                [ev.par?`par ${eh(ev.par)}`:'',ev.commentaire?eh(ev.commentaire):''].filter(Boolean).join(' — '));
-        }
         return '';
+    }).join('');
+
+    // Détail par action : chaque action dans son propre bloc chronologique
+    const actionsDetailHtml=(nc.actions||[]).map(a=>{
+        const ac=AC[a.statut]||'#888';
+        const aDir=path.join(NC_MEDIA,nc.numero,'actions',a.id);
+        const aEvents=[];
+        (a.historiqueStatut||[]).forEach(h=>aEvents.push({_t:'act_stat',date:h.date,statut:h.statut,par:h.par,commentaire:h.commentaire}));
+        (a.reponsesActions||[]).forEach(r=>aEvents.push({_t:'act_rep',date:r.date,par:r.par,reponse:r.reponse,fichiers:r.fichiers,type:r.type}));
+        (a.relances||[]).forEach(r=>aEvents.push({_t:'act_relance',date:r.date||r.sentAt,par:r.par||r.sentBy,commentaire:r.commentaire||r.message}));
+        aEvents.sort((x,y)=>new Date(x.date||0)-new Date(y.date||0));
+        const aEventsHtml=aEvents.map(ev=>{
+            if(ev._t==='act_stat'){
+                const isRetour=ev.statut==='retour_admin';
+                return tlRow(AC[ev.statut]||'#888','▸',`→ ${eh(ALP[ev.statut]||ev.statut)}`,ev.date,
+                    [ev.par?`par ${eh(ev.par)}`:'',ev.commentaire?eh(ev.commentaire):''].filter(Boolean).join(' — '));
+            }
+            if(ev._t==='act_rep'){
+                const isRetour=ev.type==='retour_admin', isForce=ev.type==='reponse_admin';
+                const rCol=isRetour?'#8e44ad':(isForce?'#e67e22':'#1e8449');
+                const rIcon=isRetour?'↩ Retour admin':(isForce?'🔒 Réponse admin':'💬 Réponse pilote');
+                return tlRow(rCol,rIcon.split(' ')[0],`${rIcon.split(' ').slice(1).join(' ')} — ${eh(ev.par||'?')}`,ev.date,
+                    `${ev.reponse?`<div style="white-space:pre-wrap">${eh(ev.reponse)}</div>`:''}${mediasBlock(ev.fichiers||[],aDir)}`);
+            }
+            if(ev._t==='act_relance')
+                return tlRow('#e67e22','📢',`Relance — ${eh(a.pilote)}`,ev.date,
+                    [ev.par?`par ${eh(ev.par)}`:'',ev.commentaire?eh(ev.commentaire):''].filter(Boolean).join(' — '));
+            return '';
+        }).join('');
+        return `<div style="break-inside:avoid;margin-bottom:10px;border:1.5px solid ${ac};border-radius:6px;overflow:hidden">
+          <div style="background:${ac}18;border-bottom:1px solid ${ac}44;padding:6px 10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span style="font-size:8.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:${ac}">${eh(TLP[a.type]||a.type)}</span>
+            <span style="font-size:9pt;font-weight:700;color:#333">${eh(a.pilote)}</span>
+            ${a.echeance?`<span style="font-size:8.5pt;color:#666">Échéance : ${pd(a.echeance)}</span>`:''}
+            <span style="font-size:8.5pt;font-weight:700;color:${ac};margin-left:auto">${ALP[a.statut]||a.statut}</span>
+          </div>
+          ${a.commentaireAction?`<div style="padding:5px 10px;font-size:9pt;color:#555;background:#fafafa;border-bottom:1px solid #eee;white-space:pre-wrap">${eh(a.commentaireAction)}${a.echeance?' — Échéance : '+pd(a.echeance):''}</div>`:''}
+          ${aEventsHtml?`<table class="tl-table" style="padding:4px 8px"><tbody>${aEventsHtml}</tbody></table>`:'<div style="padding:6px 10px;font-size:8.5pt;color:#aaa;font-style:italic">Aucun échange enregistré</div>'}
+        </div>`;
     }).join('');
 
     // Table actions
@@ -2733,7 +2755,7 @@ function ncBodyHtml(nc, showQualite){
 
   ${actTableHtml}
 
-  <div class="psec"><div class="psec-title">Fil de discussion</div>
+  <div class="psec"><div class="psec-title">Historique NC</div>
     <table class="tl-table">
       <tbody>
         ${tlRow('#2c3e50','●','Déclaration créée',nc.createdAt,nc.redacteur?`par ${eh(nc.redacteur)}`:'')}
@@ -2741,6 +2763,8 @@ function ncBodyHtml(nc, showQualite){
       </tbody>
     </table>
   </div>
+
+  ${actionsDetailHtml?`<div class="psec"><div class="psec-title">Actions CAPA — Détail des échanges</div>${actionsDetailHtml}</div>`:''}
 
   ${showQualite&&(nc.typeCause||nc.cout!=null&&nc.cout!==''||nc.commentaireCloture||nc.gravite||nc.scoreRisque!=null||nc.processus)?`
   <div class="psec qual-box">

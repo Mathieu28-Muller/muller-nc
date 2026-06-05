@@ -832,17 +832,20 @@ function renderHeader() {
   }
 }
 renderHeader();
-// Forçage changement MDP à la première connexion (mustChangePass = true)
+// Forçage changement MDP à la première connexion — différé après chargement DOM complet
 if (session?.mustChangePass) {
-  const oldField = document.getElementById('chgpass-old')?.closest('.form-field');
-  if (oldField) oldField.style.display = 'none';
-  const closeBtn = document.querySelector('#modal-chgpass button[onclick="closeChangePass()"]');
-  if (closeBtn) closeBtn.style.display = 'none';
-  const topCloseBtn = document.querySelector('#modal-chgpass button[title]');
-  if (topCloseBtn) topCloseBtn.style.display = 'none';
-  const msgEl = document.getElementById('chgpass-msg');
-  if (msgEl) { msgEl.style.cssText='display:block;padding:10px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;font-size:0.82rem;color:#856404;margin-bottom:12px'; msgEl.textContent='⚠ Vous devez définir un nouveau mot de passe avant d\'accéder à l\'application.'; }
-  document.getElementById('modal-chgpass').style.display = 'flex';
+  window.addEventListener('load', function() {
+    const oldField = document.getElementById('chgpass-old')?.closest('.form-field');
+    if (oldField) oldField.style.display = 'none';
+    const closeBtn = document.querySelector('#modal-chgpass button[onclick="closeChangePass()"]');
+    if (closeBtn) closeBtn.style.display = 'none';
+    const topCloseBtn = document.querySelector('#modal-chgpass button[title]');
+    if (topCloseBtn) topCloseBtn.style.display = 'none';
+    const msgEl = document.getElementById('chgpass-msg');
+    if (msgEl) { msgEl.style.cssText='display:block;padding:10px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;font-size:0.82rem;color:#856404;margin-bottom:12px'; msgEl.textContent='⚠ Vous devez définir un nouveau mot de passe avant d\'accéder à l\'application.'; }
+    const modal = document.getElementById('modal-chgpass');
+    if (modal) modal.style.display = 'flex';
+  });
 }
 function doLogout() { localStorage.removeItem(NC_TOKEN_KEY); window.location.href = '/NC/login.html'; }
 

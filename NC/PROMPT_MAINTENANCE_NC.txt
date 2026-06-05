@@ -269,6 +269,7 @@ PLANIFICATION — ÉTAT AU 03/06/2026
   ✅ 29/05 — trust proxy, JWT_SECRET, correctif "en retard réel" ISO §10.2.1
   ✅ 03/06 — v4.4 : gestion mots de passe + rôle Codir + Lecteur allégé
   ✅ 04/06 — v4.5 : correctifs phase test (JWT UTF-8, email token, email pilote obligatoire)
+  ✅ 05/06 — v4.6 : forçage MDP première connexion + PDF restructuré par action
 
   ☐ Phase 4 sécurité (juin 2026) :
                → pg_dump automatique quotidien (tâche planifiée Windows)
@@ -324,5 +325,33 @@ CORRECTIFS PHASE TEST — 04/06/2026
     Le JWT NC doit toujours contenir : user, role, name, email, scope:'nc'
 
 ================================================================================
-FIN PROMPT MAINTENANCE — version 04/06/2026 — v4.5
+CORRECTIFS ET AMÉLIORATIONS — 05/06/2026 — v4.6
+================================================================================
+
+  SÉCURITÉ — Forçage changement MDP première connexion :
+    mustChangePass=true → modal bloquant au chargement de console.html (window.addEventListener('load'))
+    Modal non fermable (bouton Annuler masqué, ✕ masqué)
+    Ancien MDP non requis (c'est un temporaire admin)
+    Après changement : déconnexion automatique → reconnexion avec nouveau MDP
+    mustChangePass inclus dans jwt.sign() → session.mustChangePass disponible côté browser
+    server.js : PUT /password exempte vérification currentPass si u.mustChangePass=true
+
+  PDF FICHE NC — Restructuration :
+    Avant : timeline plate mélant tous les événements NC + toutes les actions
+    Après :
+      - Section "Historique NC" : statuts NC uniquement (déclaration, réception, traitement, clôture)
+      - Section "Actions CAPA — Détail des échanges" : un bloc par action avec
+          → En-tête coloré (type, pilote, échéance, statut)
+          → Description de l'action
+          → Historique statuts de l'action (chronologique)
+          → Réponses pilote / retours admin / pièces jointes
+    Code modifié : fonction ncBodyHtml() dans server.js (~ligne 2618)
+
+  UPLOAD PIÈCES JOINTES — Vérification :
+    fileId sur disque : timestamp + sanitisation /[^\w.\-]/g → _ (filesystem safe)
+    originalName préservé en UTF-8 pour l'affichage
+    Accents, espaces, tirets : upload et ouverture garantis
+
+================================================================================
+FIN PROMPT MAINTENANCE — version 05/06/2026 — v4.6
 ================================================================================

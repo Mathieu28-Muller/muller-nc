@@ -6,7 +6,7 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
-## [Non publié] — v4.6 (prévu juin 2026)
+## [Non publié] — v4.7 (prévu juin 2026)
 
 ### Infrastructure
 - Déploiement VPS OVH — serveur dédié KS-1-S (Xeon D-2123IT, 32 Go RAM, 2×4 To RAID 1)
@@ -16,6 +16,23 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 - CORS restreint aux origines autorisées (suppression du wildcard `*`)
 - Helmet CSP (Content Security Policy) activé
 - `pg_dump` automatique quotidien (tâche planifiée)
+
+---
+
+## [4.6] — 05/06/2026
+
+### Sécurité
+- **Forçage changement MDP à la première connexion** — modal bloquant non fermable si `mustChangePass = true`
+- `mustChangePass` inclus dans le token JWT — exemption vérification ancien MDP si MDP temporaire admin
+- Correction exécution différée du modal (`window.addEventListener('load')`) — évitait le spinner infini
+
+### Modifié
+- **PDF fiche NC restructuré** — section "Historique NC" (événements NC uniquement) séparée de "Actions CAPA — Détail des échanges"
+- Chaque action CAPA affichée dans son propre bloc chronologique (statuts + réponses pilote/admin + pièces jointes)
+- Pièces jointes visibles dans le PDF par action (images en base64, documents avec badge type)
+
+### Vérifié
+- Upload pièces jointes : noms avec caractères spéciaux (espaces, tirets, accents) — aucun blocage, ouverture garantie
 
 ---
 

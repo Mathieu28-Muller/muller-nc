@@ -226,4 +226,4 @@ pg_dump -U <user> -h <host> nc_muller | gzip > /opt/backups/pg-nc-$(date +%Y%m%d
 
 *Propriétaire : Mathieu Avet — avet.mat@gmail.com*  
 *Développé avec Claude Code (Anthropic) — abonnement personnel*  
-*Version actuelle : v4.5 — voir [CHANGELOG.md](CHANGELOG.md)*
+*Version actuelle : v4.6 — voir [CHANGELOG.md](CHANGELOG.md)*
