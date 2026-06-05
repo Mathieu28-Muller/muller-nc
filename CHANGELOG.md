@@ -6,7 +6,7 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
-## [Non publié] — v4.7 (prévu juin 2026)
+## [Non publié] — v4.8 (prévu juin 2026)
 
 ### Infrastructure
 - Déploiement VPS OVH — serveur dédié KS-1-S (Xeon D-2123IT, 32 Go RAM, 2×4 To RAID 1)
@@ -16,6 +16,17 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 - CORS restreint aux origines autorisées (suppression du wildcard `*`)
 - Helmet CSP (Content Security Policy) activé
 - `pg_dump` automatique quotidien (tâche planifiée)
+
+---
+
+## [4.7] — 05/06/2026
+
+### Infrastructure
+- **Email NC migré** vers `noreply-nc@mullerautomotive.fr` — serveur OVH `ssl0.ovh.net:465` SSL
+- Configuration SMTP entièrement pilotée par variables d'environnement `.env` — plus aucune valeur hardcodée dans le code
+- Variables ajoutées : `NC_SMTP_HOST`, `NC_SMTP_PORT`, `NC_SMTP_SECURE`, `NC_SMTP_USER`, `NC_SMTP_PASS`, `NC_SMTP_FROM`, `NC_MAIL_TO`
+- Validé 05/06/2026 — réception confirmée sur `mavet@mullerautomotive.fr` et `avet.mat@gmail.com`
+- Gabarit `.env` OVH mis à jour dans `SECRETS_DEPLOIEMENT_NC.txt`
 
 ---
 

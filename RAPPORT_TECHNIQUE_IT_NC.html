@@ -110,7 +110,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-header">
     <div class="ma-badge">MA</div>
     <h1>Rapport Technique IT<br>Module NC</h1>
-    <div class="ver">Version 11 — 05/06/2026</div>
+    <div class="ver">Version 12 — 05/06/2026</div>
   </div>
   <nav>
     <div class="nav-section">Avancement</div>
@@ -146,7 +146,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-footer">
     Muller Automotive<br>
     avet.mat@gmail.com<br>
-    MàJ : 05/06/2026 — v4.6 sécurité MDP + PDF restructuré
+    MàJ : 05/06/2026 — v4.7 email NC noreply-nc@mullerautomotive.fr
   </div>
 </div>
 
@@ -155,10 +155,10 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
 <div id="top-banner">
   <h1>Rapport Technique IT — Module Non-Conformités</h1>
   <div class="sub">Muller Automotive — Document destiné au responsable IT</div>
-  <div class="ver-badge">Version 11 — 05/06/2026</div>
+  <div class="ver-badge">Version 12 — 05/06/2026</div>
   <div class="meta-row">
     <div class="meta-item"><strong>Auteur :</strong> Support technique Muller Automotive</div>
-    <div class="meta-item"><strong>Mis à jour :</strong> 05/06/2026 (v4.6 — Sécurité MDP &amp; PDF restructuré)</div>
+    <div class="meta-item"><strong>Mis à jour :</strong> 05/06/2026 (v4.7 — Email NC noreply-nc@mullerautomotive.fr)</div>
     <div class="meta-item"><strong>Contact :</strong> avet.mat@gmail.com</div>
   </div>
 </div>
@@ -170,7 +170,19 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div class="section-title"><span class="section-num">0</span>Journal des mises à jour — Avancement et planification</div>
 
   <div class="subsection">
-    <div class="subsection-title">Réalisé — 05/06/2026 — v4.6 (état actuel)</div>
+    <div class="subsection-title">Réalisé — 05/06/2026 — v4.7 (état actuel)</div>
+    <div class="box box-green">
+      <strong>Email NC noreply-nc@mullerautomotive.fr — validé le 05/06/2026</strong>
+    </div>
+    <table>
+      <tr><th>Tâche</th><th>Statut</th><th>Détail technique</th></tr>
+      <tr><td>Email NC — noreply-nc@mullerautomotive.fr</td><td><span class="badge badge-green">✅ Actif</span></td><td>Expéditeur officiel Muller Automotive. Serveur OVH <code class="inline">ssl0.ovh.net:465</code> SSL. Authentification validée. Réception confirmée sur mavet@ et avet.mat@gmail.com.</td></tr>
+      <tr><td>Config SMTP 100% variables .env</td><td><span class="badge badge-green">✅ Actif</span></td><td>Variables <code class="inline">NC_SMTP_HOST/PORT/SECURE/USER/PASS/FROM</code> + <code class="inline">NC_MAIL_TO</code>. Plus aucune valeur hardcodée dans server.js.</td></tr>
+      <tr><td>Gabarit .env OVH mis à jour</td><td><span class="badge badge-green">✅ Fait</span></td><td>SECRETS_DEPLOIEMENT_NC.txt complété avec les variables SMTP OVH — prêt pour déploiement production.</td></tr>
+    </table>
+
+    <div class="subsection">
+    <div class="subsection-title">Réalisé — 05/06/2026 — v4.6</div>
     <div class="box box-green">
       <strong>Sécurité MDP + PDF restructuré — déployé le 05/06/2026</strong>
     </div>
@@ -178,9 +190,10 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
       <tr><th>Tâche</th><th>Statut</th><th>Détail technique</th></tr>
       <tr><td>Forçage changement MDP première connexion</td><td><span class="badge badge-green">✅ Actif</span></td><td>Modal bloquant non fermable si <code class="inline">mustChangePass=true</code>. Chargement différé via <code class="inline">window.addEventListener('load')</code>. Déconnexion automatique après changement.</td></tr>
       <tr><td><code class="inline">mustChangePass</code> dans le JWT</td><td><span class="badge badge-green">✅ Actif</span></td><td>Inclus dans <code class="inline">jwt.sign()</code>. Exemption vérification <code class="inline">currentPass</code> côté serveur si MDP temporaire admin.</td></tr>
-      <tr><td>PDF fiche NC restructuré</td><td><span class="badge badge-green">✅ Actif</span></td><td>Section "Historique NC" séparée de "Actions CAPA — Détail des échanges". Chaque action dans son propre bloc chronologique avec réponses et pièces jointes. Modifié : <code class="inline">ncBodyHtml()</code> dans server.js.</td></tr>
+      <tr><td>PDF fiche NC restructuré</td><td><span class="badge badge-green">✅ Actif</span></td><td>Section "Historique NC" séparée de "Actions CAPA — Détail des échanges". Chaque action dans son propre bloc chronologique avec réponses et pièces jointes.</td></tr>
       <tr><td>Vérification upload pièces jointes</td><td><span class="badge badge-green">✅ Vérifié</span></td><td>fileId sanitisé (timestamp + <code class="inline">/[^\w.\-]/g → _</code>). originalName UTF-8 préservé. Accents, espaces, tirets : upload et ouverture garantis.</td></tr>
     </table>
+    </div>
   </div>
 
   <div class="subsection">

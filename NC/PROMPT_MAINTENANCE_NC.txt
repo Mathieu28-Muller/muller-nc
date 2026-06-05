@@ -270,6 +270,7 @@ PLANIFICATION — ÉTAT AU 03/06/2026
   ✅ 03/06 — v4.4 : gestion mots de passe + rôle Codir + Lecteur allégé
   ✅ 04/06 — v4.5 : correctifs phase test (JWT UTF-8, email token, email pilote obligatoire)
   ✅ 05/06 — v4.6 : forçage MDP première connexion + PDF restructuré par action
+  ✅ 05/06 — v4.7 : SMTP NC → noreply-nc@mullerautomotive.fr (OVH ssl0.ovh.net:465)
 
   ☐ Phase 4 sécurité (juin 2026) :
                → pg_dump automatique quotidien (tâche planifiée Windows)
@@ -353,5 +354,17 @@ CORRECTIFS ET AMÉLIORATIONS — 05/06/2026 — v4.6
     Accents, espaces, tirets : upload et ouverture garantis
 
 ================================================================================
-FIN PROMPT MAINTENANCE — version 05/06/2026 — v4.6
+SMTP NC — ÉTAT AU 05/06/2026 (v4.7)
+================================================================================
+
+  Expéditeur   : noreply-nc@mullerautomotive.fr
+  Serveur      : ssl0.ovh.net port 465 SSL (✅ validé 05/06/2026)
+  Destinataire : mavet@mullerautomotive.fr (NC_MAIL_TO dans .env)
+  Config       : 100% variables .env — NC_SMTP_HOST/PORT/SECURE/USER/PASS/FROM/NC_MAIL_TO
+  Secrets      : C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt (gabarit OVH inclus)
+
+  JAMAIS hardcoder les credentials SMTP dans server.js — toujours passer par .env
+
+================================================================================
+FIN PROMPT MAINTENANCE — version 05/06/2026 — v4.7
 ================================================================================

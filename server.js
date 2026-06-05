@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.6';
+const NC_APP_VERSION = '4.7';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -161,13 +161,23 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.6', date: '2026-06-05', label: 'Sécurité MDP & PDF restructuré',
-    current: true,
     changes: [
       'Forçage changement MDP à la première connexion (mustChangePass) — modal bloquant non fermable',
       'mustChangePass inclus dans le token JWT — vérification côté serveur exemptée si MDP temporaire',
       'PDF fiche NC restructuré — "Historique NC" séparé de "Actions CAPA — Détail des échanges"',
       'Chaque action CAPA a son propre bloc chronologique dans le PDF (statuts + réponses + pièces jointes)',
       'Vérification upload pièces jointes : noms avec caractères spéciaux et accents 100% fonctionnels'
+    ]
+  },
+  {
+    version: '4.7', date: '2026-06-05', label: 'Email NC — noreply-nc@mullerautomotive.fr',
+    current: true,
+    changes: [
+      'SMTP NC migré vers noreply-nc@mullerautomotive.fr — serveur OVH ssl0.ovh.net:465 SSL',
+      'Toute la configuration SMTP pilotée par variables d\'environnement (.env) — plus de valeurs hardcodées',
+      'Variables : NC_SMTP_HOST/PORT/SECURE/USER/PASS/FROM + NC_MAIL_TO',
+      'Validé 05/06/2026 — envoi reçu sur mavet@mullerautomotive.fr et avet.mat@gmail.com',
+      'Gabarit .env OVH mis à jour dans SECRETS_DEPLOIEMENT_NC.txt'
     ]
   }
 ];
