@@ -832,6 +832,18 @@ function renderHeader() {
   }
 }
 renderHeader();
+// Forçage changement MDP à la première connexion (mustChangePass = true)
+if (session?.mustChangePass) {
+  const oldField = document.getElementById('chgpass-old')?.closest('.form-field');
+  if (oldField) oldField.style.display = 'none';
+  const closeBtn = document.querySelector('#modal-chgpass button[onclick="closeChangePass()"]');
+  if (closeBtn) closeBtn.style.display = 'none';
+  const topCloseBtn = document.querySelector('#modal-chgpass button[title]');
+  if (topCloseBtn) topCloseBtn.style.display = 'none';
+  const msgEl = document.getElementById('chgpass-msg');
+  if (msgEl) { msgEl.style.cssText='display:block;padding:10px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;font-size:0.82rem;color:#856404;margin-bottom:12px'; msgEl.textContent='⚠ Vous devez définir un nouveau mot de passe avant d\'accéder à l\'application.'; }
+  document.getElementById('modal-chgpass').style.display = 'flex';
+}
 function doLogout() { localStorage.removeItem(NC_TOKEN_KEY); window.location.href = '/NC/login.html'; }
 
 function renderModeBanner() {
@@ -4975,16 +4987,25 @@ async function submitChangePass() {
   if (newPass.length < 8 || !/[A-Z]/.test(newPass) || !/[0-9]/.test(newPass)) {
     showErr('Le nouveau mot de passe ne respecte pas les critères (8 chars, 1 maj, 1 chiffre).'); return;
   }
-  // Vérification ancien MDP via bcrypt côté serveur — sans toucher à la route login rate-limitée
+  // En mode forcé (mustChangePass) : pas de vérification ancien MDP — admin a déjà réinitialisé
+  // En mode normal : vérification bcrypt côté serveur
+  const body = session?.mustChangePass
+    ? JSON.stringify({ pass: newPass })
+    : JSON.stringify({ pass: newPass, currentPass: oldPass });
   try {
     const r = await fetch('/api/nc-auth/users/'+encodeURIComponent(session.user)+'/password',
-      { method:'PUT', headers: authHdr(), body: JSON.stringify({ pass: newPass, currentPass: oldPass }) });
+      { method:'PUT', headers: authHdr(), body });
     const d = await r.json();
     if (r.status === 403) { showErr('Mot de passe actuel incorrect.'); return; }
     if (!r.ok) { showErr(d.error||'Erreur serveur.'); return; }
     msg.textContent = '✅ Mot de passe modifié avec succès.';
     msg.className = 'msg-box ok'; msg.style.display = 'block';
-    setTimeout(closeChangePass, 1800);
+    if (session?.mustChangePass) {
+      msg.textContent = '✅ Mot de passe défini. Reconnexion en cours…';
+      setTimeout(function(){ localStorage.removeItem(NC_TOKEN_KEY); window.location.href='/NC/login.html'; }, 1800);
+    } else {
+      setTimeout(closeChangePass, 1800);
+    }
   } catch { showErr('Erreur serveur.'); }
 }
 

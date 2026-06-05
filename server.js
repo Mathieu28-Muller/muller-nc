@@ -996,7 +996,7 @@ app.post('/api/nc-auth/login', loginLimiter, (req,res) => {
         found.passHash = hashBcrypt(pass);
     }
     const token = jwt.sign(
-        { user:found.user, role:found.role, name:found.name, email:found.email||'', scope:'nc' },
+        { user:found.user, role:found.role, name:found.name, email:found.email||'', mustChangePass:found.mustChangePass||false, scope:'nc' },
         JWT_SECRET, { expiresIn:'8h' }
     );
     found.lastLogin = new Date().toISOString();
@@ -1065,8 +1065,8 @@ app.put('/api/nc-auth/users/:user/password', requireNCAuth, (req,res) => {
     const users = loadNCUsers();
     const u = users.find(u=>u.user===req.params.user);
     if (!u) return res.status(404).json({ error:'Utilisateur non trouvé' });
-    // Vérification ancien MDP côté serveur (bcrypt) — sans passer par la route login rate-limitée
-    if (isSelf && !isAdmin) {
+    // Vérification ancien MDP — exemption si mustChangePass (première connexion, MDP temporaire)
+    if (isSelf && !isAdmin && !u.mustChangePass) {
         if (!currentPass) return res.status(400).json({ error:'Mot de passe actuel requis.' });
         if (!verifyPass(currentPass, u.passHash)) return res.status(403).json({ error:'Mot de passe actuel incorrect.' });
     }
