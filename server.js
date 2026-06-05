@@ -367,13 +367,13 @@ function ncMailEnabled(key) {
 // ── Configuration email ─────────────────────────────────────────
 // Renseignez vos paramètres SMTP ici ou via variables d'environnement
 const EMAIL_CFG = {
-    host:   'smtp.gmail.com',
-    port:   587,
-    secure: false,   // STARTTLS
-    user:   'formations.muller@gmail.com',
-    pass:   process.env.MAIL_PASS || 'uawlibpfebvpwawu',
-    from:   'Formation SAV Muller <formations.muller@gmail.com>',
-    to:     'mavet@mullerautomotive.fr'
+    host:   process.env.NC_SMTP_HOST   || 'ssl0.ovh.net',
+    port:   parseInt(process.env.NC_SMTP_PORT||'465'),
+    secure: process.env.NC_SMTP_SECURE !== 'false',  // true par défaut (SSL port 465)
+    user:   process.env.NC_SMTP_USER   || 'noreply-nc@mullerautomotive.fr',
+    pass:   process.env.NC_SMTP_PASS   || '',
+    from:   process.env.NC_SMTP_FROM   || 'Qualité NC Muller Automotive <noreply-nc@mullerautomotive.fr>',
+    to:     process.env.NC_MAIL_TO || 'mavet@mullerautomotive.fr'
 };
 
 // Emails des pilotes NC — à mettre à jour si nécessaire
