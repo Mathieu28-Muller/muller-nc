@@ -2705,7 +2705,7 @@ function openParentGroupFiche(groupId) {
   const satsHtml = sats.map(id => {
     const nc = allNCList.find(n=>n.numero===id);
     return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f0f0">
-      <span style="font-size:0.78rem;font-weight:600;color:#0c447c;cursor:pointer" onclick="closeOverlay();openModal('${esc(id)}')">${esc(id)}</span>
+      <span style="font-size:0.78rem;font-weight:600;color:#0c447c;cursor:pointer" onclick="openModal('${esc(id)}')">${esc(id)}</span>
       ${nc?`<span style="font-size:0.75rem;color:#555">${esc((nc.description||nc.probleme||'').substring(0,60))}</span>`:''}
       ${nc?`<span class="pill pill-${nc.statut||'ouvert'}" style="margin-left:auto">${SL[nc.statut]||nc.statut||'—'}</span>`:''}
     </div>`;
@@ -2944,7 +2944,7 @@ function renderModal(nc) {
     const sats = nc.satellites || [];
     const allNCList = typeof allNC !== 'undefined' ? allNC : [];
     const SLP = { ouvert:'Ouvert', en_traitement:'En traitement', en_cours:'En traitement', resolu:'Résolu', clos:'Clôturé', non_pertinent:'Non pertinent', rattachee:'Rattachée' };
-    const satsChips = sats.map(id=>`<span style="background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.5);border-radius:6px;padding:3px 10px;font-size:0.77rem;cursor:pointer;white-space:nowrap" onclick="closeOverlay();openModal('${esc(id)}')">${esc(id)}</span>`).join('');
+    const satsChips = sats.map(id=>`<span title="Ouvrir la NC satellite" style="background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.6);border-radius:6px;padding:3px 10px;font-size:0.77rem;cursor:pointer;white-space:nowrap;text-decoration:underline dotted rgba(255,255,255,0.7);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'" onclick="openModal('${esc(id)}')">${esc(id)} →</span>`).join('');
     html+=`<div style="background:#0c447c;color:#fff;border-radius:8px;padding:12px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <div style="flex:1;min-width:180px">
         <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;opacity:.75">NC Groupe Parent</div>
@@ -3086,7 +3086,7 @@ function renderModal(nc) {
     const SL2 = { ouvert:'Ouvert', en_traitement:'En traitement', en_cours:'En traitement', resolu:'Résolu', clos:'Clôturé', non_pertinent:'Non pertinent', rattachee:'Rattachée' };
     const rowsCols = sats.map(id => {
       const sat = allNCList.find(n=>n.numero===id);
-      return `<div title="Cliquer pour ouvrir la fiche complète" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;border-radius:6px;transition:background .15s" onmouseover="this.style.background='#e8f4fd'" onmouseout="this.style.background=''" onclick="closeOverlay();openModal('${esc(id)}')">
+      return `<div title="Cliquer pour ouvrir la fiche complète" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;border-radius:6px;transition:background .15s" onmouseover="this.style.background='#e8f4fd'" onmouseout="this.style.background=''" onclick="openModal('${esc(id)}')">
         <span style="font-family:monospace;font-weight:700;font-size:0.88rem;color:#0c447c;min-width:110px;text-decoration:underline dotted">${esc(id)}</span>
         ${sat?`<span style="font-size:0.8rem;color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((sat.probleme||'').substring(0,80))}</span>
         <span class="pill pill-${sat.statut||'ouvert'}" style="white-space:nowrap">${SL2[sat.statut]||sat.statut||'—'}</span>
