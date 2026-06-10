@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.7';
+const NC_APP_VERSION = '4.8';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -171,11 +171,20 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.7', date: '2026-06-05', label: 'Email NC — noreply-nc@mullerautomotive.fr',
-    current: true,
     changes: [
       'SMTP NC migré vers noreply-nc@mullerautomotive.fr — serveur OVH ssl0.ovh.net:465 SSL',
       'Toute la configuration SMTP pilotée par variables d\'environnement (.env) — plus de valeurs hardcodées',
       'Variables : NC_SMTP_HOST/PORT/SECURE/USER/PASS/FROM + NC_MAIL_TO'
+    ]
+  },
+  {
+    version: '4.8', date: '2026-06-10', label: 'Navigation NC Parent — satellites cliquables',
+    current: true,
+    changes: [
+      'NC satellites cliquables depuis la fiche NC Parent — ouverture directe dans la même fenêtre',
+      'Badges satellites (en-tête bleu) et lignes de la section "NC Satellites rattachées" cliquables',
+      'Chargement automatique des satellites non présents dans la liste filtrée du pilote',
+      'Navigation bidirectionnelle : satellite → bouton "Ouvrir NC Parent ↗" déjà présent'
     ]
   }
 ];

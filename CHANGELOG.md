@@ -6,7 +6,7 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
-## [Non publié] — v4.8 (prévu juin 2026)
+## [Non publié] — v4.9 (prévu juin 2026)
 
 ### Infrastructure
 - Déploiement VPS OVH — serveur dédié KS-1-S (Xeon D-2123IT, 32 Go RAM, 2×4 To RAID 1)
@@ -16,6 +16,15 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 - CORS restreint aux origines autorisées (suppression du wildcard `*`)
 - Helmet CSP (Content Security Policy) activé
 - `pg_dump` automatique quotidien (tâche planifiée)
+
+---
+
+## [4.8] — 10/06/2026
+
+### Ajouté
+- **NC satellites cliquables** depuis la fiche NC Parent — badges (en-tête bleu) et lignes de la section "NC Satellites rattachées" ouvrent la fiche satellite directement dans la même fenêtre
+- Chargement automatique des satellites absents de la liste filtrée du pilote (mode Pilote)
+- Navigation bidirectionnelle : satellite → bouton "Ouvrir NC Parent ↗" dans la fiche satellite
 
 ---
 

@@ -110,7 +110,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-header">
     <div class="ma-badge">MA</div>
     <h1>Rapport Technique IT<br>Module NC</h1>
-    <div class="ver">Version 12 — 05/06/2026</div>
+    <div class="ver">Version 13 — 10/06/2026</div>
   </div>
   <nav>
     <div class="nav-section">Avancement</div>
@@ -146,7 +146,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-footer">
     Muller Automotive<br>
     avet.mat@gmail.com<br>
-    MàJ : 05/06/2026 — v4.7 email NC noreply-nc@mullerautomotive.fr
+    MàJ : 10/06/2026 — v4.8 satellites NC Parent cliquables
   </div>
 </div>
 
@@ -155,10 +155,10 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
 <div id="top-banner">
   <h1>Rapport Technique IT — Module Non-Conformités</h1>
   <div class="sub">Muller Automotive — Document destiné au responsable IT</div>
-  <div class="ver-badge">Version 12 — 05/06/2026</div>
+  <div class="ver-badge">Version 13 — 10/06/2026</div>
   <div class="meta-row">
     <div class="meta-item"><strong>Auteur :</strong> Support technique Muller Automotive</div>
-    <div class="meta-item"><strong>Mis à jour :</strong> 05/06/2026 (v4.7 — Email NC noreply-nc@mullerautomotive.fr)</div>
+    <div class="meta-item"><strong>Mis à jour :</strong> 10/06/2026 (v4.8 — Satellites NC Parent cliquables)</div>
     <div class="meta-item"><strong>Contact :</strong> avet.mat@gmail.com</div>
   </div>
 </div>
@@ -170,15 +170,15 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div class="section-title"><span class="section-num">0</span>Journal des mises à jour — Avancement et planification</div>
 
   <div class="subsection">
-    <div class="subsection-title">Réalisé — 05/06/2026 — v4.7 (état actuel)</div>
+    <div class="subsection-title">Réalisé — 10/06/2026 — v4.8 (état actuel)</div>
     <div class="box box-green">
-      <strong>Email NC noreply-nc@mullerautomotive.fr — validé le 05/06/2026</strong>
+      <strong>Satellites NC Parent cliquables — déployé le 10/06/2026</strong>
     </div>
     <table>
       <tr><th>Tâche</th><th>Statut</th><th>Détail technique</th></tr>
-      <tr><td>Email NC — noreply-nc@mullerautomotive.fr</td><td><span class="badge badge-green">✅ Actif</span></td><td>Expéditeur officiel Muller Automotive. Serveur OVH <code class="inline">ssl0.ovh.net:465</code> SSL. Authentification validée. Réception confirmée sur mavet@ et avet.mat@gmail.com.</td></tr>
-      <tr><td>Config SMTP 100% variables .env</td><td><span class="badge badge-green">✅ Actif</span></td><td>Variables <code class="inline">NC_SMTP_HOST/PORT/SECURE/USER/PASS/FROM</code> + <code class="inline">NC_MAIL_TO</code>. Plus aucune valeur hardcodée dans server.js.</td></tr>
-      <tr><td>Gabarit .env OVH mis à jour</td><td><span class="badge badge-green">✅ Fait</span></td><td>SECRETS_DEPLOIEMENT_NC.txt complété avec les variables SMTP OVH — prêt pour déploiement production.</td></tr>
+      <tr><td>Satellites cliquables dans fiche NC Parent</td><td><span class="badge badge-green">✅ Actif</span></td><td>Badges (en-tête bleu) et lignes "NC Satellites rattachées" ouvrent la fiche satellite dans la même fenêtre. <code class="inline">openModal(id)</code> sans <code class="inline">closeOverlay()</code>.</td></tr>
+      <tr><td>Chargement automatique satellites mode Pilote</td><td><span class="badge badge-green">✅ Actif</span></td><td>Dans <code class="inline">openModal()</code> : fetch des satellites absents de <code class="inline">allNC</code> filtré. Ajout temporaire pour le rendu.</td></tr>
+      <tr><td>Navigation bidirectionnelle</td><td><span class="badge badge-green">✅ Actif</span></td><td>Satellite → bouton "Ouvrir NC Parent ↗" déjà présent. Parent → satellites via badges/lignes. Fiche satellite en lecture seule pour pilote non assigné.</td></tr>
     </table>
 
     <div class="subsection">
