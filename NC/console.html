@@ -2581,6 +2581,19 @@ async function openModal(numero) {
       if (parentGroup) { nc.is_satellite=true; nc.parent_id=parentGroup.id; nc.parent_label=parentGroup.groupe_label; }
     }
     ncMarkSeen(numero,nc);
+    // Pré-charger les satellites manquants dans allNC (non visibles en mode Pilote filtré)
+    if (nc.is_parent && (nc.satellites||[]).length) {
+      const missing = (nc.satellites||[]).filter(id => !allNC.find(n=>n.numero===id));
+      if (missing.length) {
+        const fetched = await Promise.all(missing.map(id =>
+          fetch('/api/nc/'+encodeURIComponent(id),{headers:authHdr()})
+            .then(r=>r.ok?r.json():null).catch(()=>null)
+        ));
+        fetched.filter(Boolean).forEach(sat=>{
+          if (!allNC.find(n=>n.numero===sat.numero)) allNC.push(sat);
+        });
+      }
+    }
     renderModal(nc);
   } catch(e){document.getElementById('modal-body').innerHTML=`<div class="empty">Erreur : ${e.message}</div>`;}
 }
@@ -3073,13 +3086,14 @@ function renderModal(nc) {
     const SL2 = { ouvert:'Ouvert', en_traitement:'En traitement', en_cours:'En traitement', resolu:'Résolu', clos:'Clôturé', non_pertinent:'Non pertinent', rattachee:'Rattachée' };
     const rowsCols = sats.map(id => {
       const sat = allNCList.find(n=>n.numero===id);
-      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;border-radius:6px" onmouseover="this.style.background='#f4f8fd'" onmouseout="this.style.background=''" onclick="closeOverlay();openModal('${esc(id)}')">
-        <span style="font-family:monospace;font-weight:700;font-size:0.88rem;color:#0c447c;min-width:110px">${esc(id)}</span>
+      return `<div title="Cliquer pour ouvrir la fiche complète" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;border-radius:6px;transition:background .15s" onmouseover="this.style.background='#e8f4fd'" onmouseout="this.style.background=''" onclick="closeOverlay();openModal('${esc(id)}')">
+        <span style="font-family:monospace;font-weight:700;font-size:0.88rem;color:#0c447c;min-width:110px;text-decoration:underline dotted">${esc(id)}</span>
         ${sat?`<span style="font-size:0.8rem;color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((sat.probleme||'').substring(0,80))}</span>
         <span class="pill pill-${sat.statut||'ouvert'}" style="white-space:nowrap">${SL2[sat.statut]||sat.statut||'—'}</span>
         ${sat.redacteur?`<span style="font-size:0.72rem;color:#888;white-space:nowrap">${esc(sat.redacteur)}</span>`:''}
         ${sat.nomClient?`<span style="font-size:0.72rem;color:#aaa;white-space:nowrap">${esc(sat.nomClient)}</span>`:''}`:
-        `<span style="font-size:0.8rem;color:#aaa;font-style:italic">NC non disponible</span>`}
+        `<span style="font-size:0.8rem;color:#aaa;font-style:italic">Cliquer pour ouvrir →</span>`}
+        <span style="font-size:0.7rem;color:#2980b9;flex-shrink:0">→</span>
       </div>`;
     }).join('');
     const addSatBtn = isAdmin&&s!=='clos'?`<button class="btn-upd" style="background:#555;font-size:0.75rem;padding:4px 12px;margin-top:8px" onclick="openAddSatelliteModal('${esc(nc.numero)}')">+ Rattacher une NC</button>`:'';
