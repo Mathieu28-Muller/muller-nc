@@ -229,11 +229,13 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
             <div class="drop-zone" id="drop-zone">
               <input type="file" id="file-input" multiple accept="image/*,video/*" onchange="handleFiles(this.files)">
               <span class="drop-zone-icon">📷</span>
-              <p>Glissez vos photos ou vidéos ici</p>
+              <p><strong>Glissez vos photos ou vidéos ici</strong></p>
+              <p style="margin-top:4px">ou importez depuis votre galerie</p>
+              <small style="display:block;margin-top:6px">📱 Sur téléphone : appuyez pour ouvrir la galerie ou prendre une photo</small>
               <small>JPG, PNG, MP4, MOV… jusqu'à 200 Mo par fichier</small>
             </div>
             <button type="button" class="camera-btn" style="margin-top:8px">
-              📸 Prendre une photo
+              📸 Prendre une photo en direct
               <input type="file" accept="image/*" capture="environment" onchange="handleFiles(this.files)">
             </button>
             <div class="preview-grid" id="preview-grid"></div>
@@ -264,11 +266,13 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
             <div class="drop-zone" id="drop-zone-traitement">
               <input type="file" id="file-input-traitement" multiple accept="image/*,video/*" onchange="handleFilesTraitement(this.files)">
               <span class="drop-zone-icon">🔧</span>
-              <p>Photos de la réparation effectuée</p>
+              <p><strong>Glissez vos photos ou vidéos ici</strong></p>
+              <p style="margin-top:4px">ou importez depuis votre galerie</p>
+              <small style="display:block;margin-top:6px">📱 Sur téléphone : appuyez pour ouvrir la galerie ou prendre une photo</small>
               <small>JPG, PNG, MP4, MOV…</small>
             </div>
             <button type="button" class="camera-btn" style="margin-top:8px">
-              📸 Prendre une photo
+              📸 Prendre une photo en direct
               <input type="file" accept="image/*" capture="environment" onchange="handleFilesTraitement(this.files)">
             </button>
             <div class="preview-grid" id="preview-grid-traitement"></div>
