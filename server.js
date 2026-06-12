@@ -1775,9 +1775,13 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
     if (typeCause          !== undefined) nc.typeCause          = typeCause          || '';
     if (cout               !== undefined) nc.cout               = cout !== '' && cout != null ? parseFloat(cout) : null;
     if (commentaireCloture !== undefined) nc.commentaireCloture = commentaireCloture || '';
+    // Commentaire automatique pour le passage en traitement si aucun commentaire fourni
+    const commentaireEffectif = (statut === 'en_cours' && !commentaire?.trim())
+        ? `Votre NC N° ${nc.numero} est prise en charge et passée En traitement. Une analyse est en cours. Vous serez tenu(e) informé(e) au prochain changement de statut.`
+        : commentaire||'';
     if (!nc.historique) nc.historique = [];
     nc.historique.push({
-        date: now.toISOString(), statut, commentaire: commentaire||'',
+        date: now.toISOString(), statut, commentaire: commentaireEffectif,
         par: req.ncUser.name||req.ncUser.user,
         ...(pilote     ? { pilote }      : {}),
         ...(delaiAction ? { delaiAction } : {})
@@ -1914,7 +1918,7 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
   <p style="margin-bottom:16px;font-size:0.9rem">Le statut de votre déclaration a été mis à jour :</p>
   <div style="background:${couleur}18;border-left:4px solid ${couleur};padding:12px 16px;border-radius:0 6px 6px 0;margin-bottom:20px">
     <span style="font-size:1rem;font-weight:700;color:${couleur}">${statutLabel}</span>
-    ${commentaire ? `<p style="margin:8px 0 0;color:#444;font-size:0.88rem">${commentaire.replace(/\n/g,'<br>')}</p>` : ''}
+    ${commentaireEffectif ? `<p style="margin:8px 0 0;color:#444;font-size:0.88rem">${commentaireEffectif.replace(/\n/g,'<br>')}</p>` : ''}
   </div>
   <table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:20px">
     <thead><tr style="background:#2b2b2b;color:#fff">

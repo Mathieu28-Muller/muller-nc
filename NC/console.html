@@ -3527,9 +3527,11 @@ function renderModal(nc) {
         ${newActionHtml}
         <div style="border-top:1.5px solid #eee;padding-top:14px">
           <div style="font-size:0.78rem;font-weight:700;color:#2980b9;margin-bottom:6px">→ Passer En traitement
-            <span style="font-weight:400;color:#888;font-size:0.7rem;margin-left:4px">✉ message transmis par mail au rédacteur</span>
+            <span style="font-weight:400;color:#888;font-size:0.7rem;margin-left:4px">✉ notification automatique envoyée au rédacteur</span>
           </div>
-          <textarea id="passer-traitement-comment" placeholder="Commentaire obligatoire — message au rédacteur de la NC…" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:0.82rem;resize:vertical;min-height:60px;font-family:inherit;margin-bottom:8px;box-sizing:border-box"></textarea>
+          <div style="background:#e8f4fd;border-left:3px solid #2980b9;border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:10px;font-size:0.78rem;color:#1a5276">
+            ℹ Le rédacteur recevra automatiquement un email l'informant que sa NC est prise en charge.
+          </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn-upd" style="background:var(--traitement);flex:2" onclick="passerEnTraitement('${esc(nc.numero)}')">→ Passer En traitement</button>
             <button class="btn-upd" style="background:#8e44ad;flex:1" onclick="marquerNonPertinent('${esc(nc.numero)}')">⚠ Non pertinent</button>
@@ -3808,17 +3810,11 @@ async function saveRetourClient(numero) {
   } catch(e){if(msg){msg.textContent='✗ Erreur';msg.style.color='#c0392b';}}
 }
 async function passerEnTraitement(numero) {
-  const commentaire=document.getElementById('passer-traitement-comment')?.value.trim();
-  if(!commentaire){
-    const ta=document.getElementById('passer-traitement-comment');
-    if(ta){ta.style.borderColor='#e74c3c';ta.focus();}
-    alert('Un commentaire est obligatoire pour passer en traitement.');return;
-  }
   const famille=document.getElementById('upd-famille')?.value||'';
   try {
     const res=await fetch('/api/nc/'+encodeURIComponent(numero)+'/status',{
       method:'PUT',headers:authHdr(),
-      body:JSON.stringify({statut:'en_cours',commentaire,familleProduit:famille||undefined})
+      body:JSON.stringify({statut:'en_cours',familleProduit:famille||undefined})
     });
     if(!res.ok){const e=await res.json();throw new Error(e.error||'HTTP '+res.status);}
     const updated=await res.json();
