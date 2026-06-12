@@ -121,8 +121,8 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
   </div>
   <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
     <div style="display:flex;gap:4px">
-      <button onclick="setLang('fr')" id="flag-fr" title="Français" style="font-size:1.2rem;background:none;border:2px solid transparent;border-radius:4px;cursor:pointer;padding:1px 3px;line-height:1;transition:border-color .15s">🇫🇷</button>
-      <button onclick="setLang('en')" id="flag-en" title="English"  style="font-size:1.2rem;background:none;border:2px solid transparent;border-radius:4px;cursor:pointer;padding:1px 3px;line-height:1;transition:border-color .15s">🇬🇧</button>
+      <button onclick="setLang('fr')" id="flag-fr" title="Français" style="font-size:0.72rem;font-weight:800;letter-spacing:.5px;background:#2b2b2b;color:#ccc;border:2px solid transparent;border-radius:5px;cursor:pointer;padding:3px 7px;line-height:1.4;transition:all .15s;font-family:inherit">FR</button>
+      <button onclick="setLang('en')" id="flag-en" title="English"  style="font-size:0.72rem;font-weight:800;letter-spacing:.5px;background:#2b2b2b;color:#ccc;border:2px solid transparent;border-radius:5px;cursor:pointer;padding:3px 7px;line-height:1.4;transition:all .15s;font-family:inherit">EN</button>
     </div>
     <a href="console.html" style="color:#888;text-decoration:none;font-size:0.75rem" data-i18n="header.console">→ Console suivi</a>
   </div>
@@ -660,8 +660,8 @@ function toast(msg, warn=false) {
 (function () {
   'use strict';
 
-  // Guide de remplissage — langage simple, sans références normatives
-  const GUIDE = [
+  // Guide de remplissage — bilingue FR / EN
+  const GUIDE_FR = [
     {
       id: 'redacteur',
       nom: 'Rédacteur',
@@ -730,6 +730,44 @@ function toast(msg, warn=false) {
     }
   ];
 
+  const GUIDE_EN = [
+    { id:'redacteur', nom:'Reported by',
+      quoi:"Enter your <strong>full first and last name</strong>. This is the person reporting the issue.",
+      exemple:"John Smith" },
+    { id:'date', nom:'Discovery date',
+      quoi:"Enter the <strong>date you first noticed the problem</strong> — even if you are reporting it later. Do not use today's date if the problem is older.",
+      exemple:"15/04/2026" },
+    { id:'emailRedacteur', nom:'Reporter email',
+      quoi:"Your professional email address. It will only be used to send you the <strong>tracking reference</strong> and any follow-up questions.",
+      exemple:"john.smith@muller-auto.com" },
+    { id:'perimetre', nom:'Scope concerned',
+      quoi:"Choose <strong>where the problem was found</strong>:<ul style='margin:6px 0 0 16px;line-height:2'><li><strong>Production</strong> — found in workshop or manufacturing</li><li><strong>After-Sales</strong> — found at a customer site during an intervention</li><li><strong>Procurement</strong> — defective part or product received from a supplier</li><li><strong>Final inspection</strong> — detected before shipping</li><li><strong>Warranty</strong> — customer return after sale</li></ul>",
+      exemple:"After-Sales — if a technician finds the defect at the customer's site" },
+    { id:'sourceDetection', nom:'Detection source',
+      quoi:"Indicate <strong>how the problem was discovered</strong>:<ul style='margin:6px 0 0 16px;line-height:2'><li><strong>Customer complaint</strong> — customer contacted you</li><li><strong>Quality control</strong> — detected during internal check</li><li><strong>Product return</strong> — product returned for repair</li><li><strong>Internal audit</strong> — found during an audit</li></ul>",
+      exemple:"Customer complaint" },
+    { id:'refProduit', nom:'Product reference',
+      quoi:"The <strong>product code or reference</strong> as it appears on the label, box, or delivery note.",
+      exemple:"XG_VL-2024 or BC-0042A" },
+    { id:'noSerie', nom:'Serial number',
+      quoi:"The <strong>unique serial number</strong> of the defective product, engraved or printed on the unit. If multiple units are affected, enter the first and last serial numbers.",
+      exemple:"SN240301-0042" },
+    { id:'nomClient', nom:'Customer name',
+      quoi:"The <strong>full company name</strong> of the customer where the problem was found, or who reported the defect.",
+      exemple:"Martin Garage Ltd" },
+    { id:'description', nom:'Problem description',
+      quoi:"Describe <strong>what you observed</strong>, factually and precisely.<br><br>✅ Describe the visible defect, fault or malfunction.<br>✅ Specify which part, under what circumstances.<br>❌ Do not explain why — describe what you saw.<br>❌ Avoid assumptions.",
+      exemple:"The casing has a crack on the front face, right side. Discovered during start-up at the customer's site. 3 units affected in the batch." },
+    { id:'reparation', nom:'Repair performed',
+      quoi:"If you have already carried out a <strong>repair or temporary fix</strong>, describe what you did to address the problem immediately.",
+      exemple:"Replaced the casing on-site. Defective unit returned for analysis." },
+    { id:'suggestion', nom:'Improvement suggestion',
+      quoi:"If you have an <strong>idea to prevent this problem from recurring</strong>, share it here. This field is optional but valuable.",
+      exemple:"Add a systematic visual inspection before packaging." }
+  ];
+
+  function getGuide() { return (typeof _currentLang!=='undefined'&&_currentLang==='en') ? GUIDE_EN : GUIDE_FR; }
+
   const CSS = `
     #fg-aide-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:10000;display:flex;align-items:flex-start;justify-content:flex-end}
     #fg-aide-panel{width:460px;max-width:96vw;height:100vh;background:#fff;border-left:3px solid #c0392b;display:flex;flex-direction:column;overflow:hidden;box-shadow:-4px 0 24px rgba(0,0,0,.15)}
@@ -764,12 +802,13 @@ function toast(msg, warn=false) {
   function openPanel(champId) {
     if(document.getElementById('fg-aide-overlay')) closePanel();
     const wrap = document.createElement('div');
+    var isEn = (typeof _currentLang!=='undefined'&&_currentLang==='en');
     wrap.innerHTML = `<div id="fg-aide-overlay"><div id="fg-aide-panel">
       <div class="fga-header">
-        <div><div class="fga-title">Comment remplir ce formulaire ?</div><div class="fga-sub">Guide de déclaration — Muller Automotive</div></div>
+        <div><div class="fga-title">${isEn?'How to fill in this form?':'Comment remplir ce formulaire ?'}</div><div class="fga-sub">${isEn?'Declaration guide — Muller Automotive':'Guide de déclaration — Muller Automotive'}</div></div>
         <button class="fga-close" id="fg-aide-close">&#x2715;</button>
       </div>
-      <div class="fga-search-wrap"><input class="fga-search" type="text" id="fg-aide-search" placeholder="Chercher un champ..."></div>
+      <div class="fga-search-wrap"><input class="fga-search" type="text" id="fg-aide-search" placeholder="${isEn?'Search a field...':'Chercher un champ...'}"></div>
       <div class="fga-body" id="fg-aide-body"></div>
     </div></div>`;
     document.body.appendChild(wrap.firstElementChild);
@@ -781,13 +820,14 @@ function toast(msg, warn=false) {
 
   function renderGuide(query, focusId) {
     const body = document.getElementById('fg-aide-body');
-    let items = GUIDE;
+    var isEn = (typeof _currentLang!=='undefined'&&_currentLang==='en');
+    let items = getGuide();
     if(query) {
       const q = query.toLowerCase();
-      items = GUIDE.filter(g => g.nom.toLowerCase().includes(q) || g.quoi.toLowerCase().includes(q));
+      items = items.filter(g => g.nom.toLowerCase().includes(q) || g.quoi.toLowerCase().includes(q));
     }
-    if(items.length === 0){ body.innerHTML='<div class="fga-empty">Aucun champ correspondant.</div>'; return; }
-    const intro = query ? '' : `<div class="fga-intro">Cliquez sur le <strong>?</strong> à côté d'un champ pour afficher directement son aide, ou parcourez tous les champs ci-dessous.</div>`;
+    if(items.length === 0){ body.innerHTML=`<div class="fga-empty">${isEn?'No matching field.':'Aucun champ correspondant.'}</div>`; return; }
+    const intro = query ? '' : `<div class="fga-intro">${isEn?'Click <strong>?</strong> next to a field to open its help directly, or browse all fields below.':'Cliquez sur le <strong>?</strong> à côté d\'un champ pour afficher directement son aide, ou parcourez tous les champs ci-dessous.'}</div>`;
     body.innerHTML = intro + items.map(g => `
       <div class="fga-card${g.id===focusId?' focus':''}" data-id="${g.id}">
         <div class="fga-card-name">${g.nom}</div>
@@ -807,42 +847,39 @@ function toast(msg, warn=false) {
 
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePanel(); });
 
-  const LABEL_MAP = {
-    'rédacteur':'redacteur',
-    'date de découv':'date',
-    'email':'emailRedacteur',
-    'périmètre':'perimetre',
-    'source de déte':'sourceDetection',
-    'référence produit':'refProduit',
-    'numéro de série':'noSerie',
-    'nom client':'nomClient',
-    'description du problème':'description',
-    'description de la répar':'reparation',
-    "suggestion d'amélio":'suggestion'
+  // Correspondance clé data-i18n → id du champ dans le guide
+  const I18N_TO_GUIDE = {
+    'lbl.reporter':'redacteur', 'lbl.date':'date', 'lbl.email':'emailRedacteur',
+    'lbl.scope':'perimetre', 'lbl.source':'sourceDetection',
+    'lbl.productRef':'refProduit', 'lbl.serialNum':'noSerie',
+    'lbl.clientName':'nomClient', 'lbl.problem':'description',
+    'lbl.repair':'reparation', 'lbl.suggestion':'suggestion'
   };
 
   function injectTriggerButtons() {
-    document.querySelectorAll('.field label').forEach(label => {
+    document.querySelectorAll('.field label[data-i18n]').forEach(label => {
       if(label.querySelector('.fga-trigger')) return;
-      const txt = label.textContent.toLowerCase();
-      let champId = null;
-      for(const [key, val] of Object.entries(LABEL_MAP)){ if(txt.includes(key)){ champId=val; break; } }
+      const key = label.getAttribute('data-i18n');
+      const champId = I18N_TO_GUIDE[key];
       if(!champId) return;
+      const isEn = (typeof _currentLang!=='undefined'&&_currentLang==='en');
       const btn = document.createElement('span');
       btn.className = 'fga-trigger';
-      btn.title = 'Comment remplir ce champ ?';
+      btn.title = isEn ? 'Field help' : 'Comment remplir ce champ ?';
       btn.textContent = '?';
       btn.addEventListener('click', function(e){ e.stopPropagation(); e.preventDefault(); openPanel(champId); });
       label.appendChild(btn);
     });
   }
+  window._fgaInjectTriggers = injectTriggerButtons;
 
   function injectFAB() {
     if(document.getElementById('fg-aide-fab')) return;
     const fab = document.createElement('button');
     fab.id = 'fg-aide-fab';
-    fab.title = 'Comment remplir ce formulaire ?';
-    fab.innerHTML = '?<span style="margin-left:7px;font-size:13px;font-weight:700">Aide formulaire</span>';
+    var isEn2 = (typeof _currentLang!=='undefined'&&_currentLang==='en');
+    fab.title = isEn2 ? 'How to fill in this form?' : 'Comment remplir ce formulaire ?';
+    fab.innerHTML = '?<span id="fg-aide-fab-txt" style="margin-left:7px;font-size:13px;font-weight:700">'+(isEn2?'Form help':'Aide formulaire')+'</span>';
     Object.assign(fab.style, {
       position:'fixed', bottom:'24px', right:'24px', zIndex:'9999',
       padding:'11px 18px', background:'#c0392b', color:'#fff',
@@ -1001,25 +1038,39 @@ function setLang(lang) {
   _currentLang = lang;
   localStorage.setItem('nc_lang', lang);
   applyLang(lang);
-  // Mettre en évidence le drapeau actif
-  document.getElementById('flag-fr').style.borderColor = lang==='fr' ? '#c0392b' : 'transparent';
-  document.getElementById('flag-en').style.borderColor = lang==='en' ? '#c0392b' : 'transparent';
+  // Mettre en évidence la langue active
+  var fFr=document.getElementById('flag-fr'), fEn=document.getElementById('flag-en');
+  fFr.style.borderColor = lang==='fr' ? '#c0392b' : 'transparent';
+  fFr.style.color        = lang==='fr' ? '#fff'    : '#888';
+  fEn.style.borderColor = lang==='en' ? '#c0392b' : 'transparent';
+  fEn.style.color        = lang==='en' ? '#fff'    : '#888';
   document.documentElement.lang = lang;
   document.title = I18N[lang]['page.title'] || document.title;
 }
 
 function applyLang(lang) {
   const d = I18N[lang] || I18N['fr'];
-  // Textes innerHTML
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
     var key = el.getAttribute('data-i18n');
-    if (d[key] !== undefined) el.innerHTML = d[key];
+    if (d[key] === undefined) return;
+    // Conserver les boutons ? (fga-trigger) avant de remplacer le HTML
+    var triggers = Array.from(el.querySelectorAll('.fga-trigger'));
+    el.innerHTML = d[key];
+    triggers.forEach(function(t) { el.appendChild(t); });
   });
-  // Placeholders
   document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
     var key = el.getAttribute('data-i18n-ph');
     if (d[key] !== undefined) el.placeholder = d[key];
   });
+  // Mettre à jour le texte des bulles ? déjà injectées
+  document.querySelectorAll('.fga-trigger').forEach(function(t) {
+    t.title = lang === 'en' ? 'Field help' : 'Comment remplir ce champ ?';
+  });
+  // Mettre à jour le FAB
+  var fabTxt = document.getElementById('fg-aide-fab-txt');
+  if (fabTxt) fabTxt.textContent = lang==='en' ? 'Form help' : 'Aide formulaire';
+  // Ré-injecter les boutons ?
+  if (window._fgaInjectTriggers) window._fgaInjectTriggers();
 }
 
 // Détection automatique de la langue navigateur
