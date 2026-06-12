@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <link rel="icon" type="image/svg+xml" href="/NC/favicon.svg">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Déclaration Non-Conformité — Muller Automotive</title>
+<title data-i18n-title="page.title">Déclaration Non-Conformité — Muller Automotive</title>
 <!-- v20260428 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -117,23 +117,27 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       Accueil
     </a>
-    <small>Muller Automotive — SAV</small>
+    <small data-i18n="header.subtitle">Muller Automotive — SAV</small>
   </div>
-  <div style="margin-left:auto;font-size:0.75rem;color:#555">
-    <a href="console.html" style="color:#888;text-decoration:none">→ Console suivi</a>
+  <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+    <div style="display:flex;gap:4px">
+      <button onclick="setLang('fr')" id="flag-fr" title="Français" style="font-size:1.2rem;background:none;border:2px solid transparent;border-radius:4px;cursor:pointer;padding:1px 3px;line-height:1;transition:border-color .15s">🇫🇷</button>
+      <button onclick="setLang('en')" id="flag-en" title="English"  style="font-size:1.2rem;background:none;border:2px solid transparent;border-radius:4px;cursor:pointer;padding:1px 3px;line-height:1;transition:border-color .15s">🇬🇧</button>
+    </div>
+    <a href="console.html" style="color:#888;text-decoration:none;font-size:0.75rem" data-i18n="header.console">→ Console suivi</a>
   </div>
 </header>
 
 <div class="container">
   <div class="nc-numero-bar" id="nc-info-bar">
     <span>🗓 <span id="nc-date-bar"></span></span>
-    <span style="margin-left:auto;color:#888">Le numéro sera attribué à la validation</span>
+    <span style="margin-left:auto;color:#888" data-i18n="info.number">Le numéro sera attribué à la validation</span>
   </div>
 
   <!-- SUIVI D'UNE NC EXISTANTE -->
   <div class="suivi-bloc">
     <div class="suivi-title" onclick="toggleSuivi(this)">
-      🔍 Suivre une non-conformité existante
+      <span data-i18n="suivi.title">🔍 Suivre une non-conformité existante</span>
       <span id="suivi-arrow">▼</span>
     </div>
     <div class="suivi-body" id="suivi-body">
@@ -141,7 +145,7 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
         <input class="suivi-input" type="text" id="suivi-numero" placeholder="Ex : 260405-00001" maxlength="14"
                oninput="this.value=this.value.toUpperCase()"
                onkeydown="if(event.key==='Enter'){event.preventDefault();rechercherNC();}">
-        <button type="button" class="btn-suivi" onclick="rechercherNC()">Rechercher</button>
+        <button type="button" class="btn-suivi" onclick="rechercherNC()" data-i18n="suivi.btn">Rechercher</button>
       </div>
       <div class="suivi-result" id="suivi-result"></div>
     </div>
@@ -151,20 +155,20 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
 
     <!-- IDENTIFICATION -->
     <div class="section">
-      <div class="section-title">🧑 Identification</div>
+      <div class="section-title" data-i18n="sec.identification">🧑 Identification</div>
       <div class="section-body">
         <div class="row">
-          <div class="field"><label>Rédacteur *</label><input type="text" id="redacteur" placeholder="Prénom Nom" required autocomplete="name"></div>
-          <div class="field"><label>Date de découverte *</label><input type="date" id="dateDecouverte" required></div>
+          <div class="field"><label data-i18n="lbl.reporter">Rédacteur *</label><input type="text" id="redacteur" data-i18n-ph="ph.reporter" placeholder="Prénom Nom" required autocomplete="name"></div>
+          <div class="field"><label data-i18n="lbl.date">Date de découverte *</label><input type="date" id="dateDecouverte" required></div>
         </div>
         <div class="row">
-          <div class="field"><label>Email rédacteur <span style="color:#c0392b">*</span></label><input type="email" id="emailRedacteur" placeholder="votre@email.fr" required autocomplete="email"></div>
-          <div class="field"><label>Périmètre concerné <span style="color:#c0392b">*</span></label>
+          <div class="field"><label data-i18n="lbl.email">Email rédacteur <span style="color:#c0392b">*</span></label><input type="email" id="emailRedacteur" data-i18n-ph="ph.email" placeholder="votre@email.fr" required autocomplete="email"></div>
+          <div class="field"><label data-i18n="lbl.scope">Périmètre concerné <span style="color:#c0392b">*</span></label>
             <select id="perimetre" name="perimetre" required style="width:100%;padding:9px 10px;border:1.5px solid #ddd;border-radius:6px;font-size:0.9rem;font-family:inherit;background:#fafafa">
               <option value="">— Sélectionner —</option>
             </select>
           </div>
-          <div class="field"><label>Source de détection <span style="color:#c0392b">*</span></label>
+          <div class="field"><label data-i18n="lbl.source">Source de détection <span style="color:#c0392b">*</span></label>
             <select id="sourceDetection" name="sourceDetection" required style="width:100%;padding:9px 10px;border:1.5px solid #ddd;border-radius:6px;font-size:0.9rem;font-family:inherit;background:#fafafa">
               <option value="">— Sélectionner —</option>
             </select>
@@ -175,67 +179,67 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
 
     <!-- PRODUIT -->
     <div class="section">
-      <div class="section-title">🔧 Produit</div>
+      <div class="section-title" data-i18n="sec.product">🔧 Produit</div>
       <div class="section-body">
         <div class="row">
-          <div class="field"><label>N° de Commande</label><input type="text" id="noCommande" placeholder="Ex: CMD-2026-001"></div>
-          <div class="field"><label>Référence produit <span style="color:#c0392b">*</span></label><input type="text" id="refProduit" placeholder="Ex: XG_VL" required></div>
-          <div class="field"><label>Famille de produit <span style="color:#c0392b">*</span></label>
+          <div class="field"><label data-i18n="lbl.orderNum">N° de Commande</label><input type="text" id="noCommande" data-i18n-ph="ph.orderNum" placeholder="Ex: CMD-2026-001"></div>
+          <div class="field"><label data-i18n="lbl.productRef">Référence produit <span style="color:#c0392b">*</span></label><input type="text" id="refProduit" placeholder="Ex: XG_VL" required></div>
+          <div class="field"><label data-i18n="lbl.productFamily">Famille de produit <span style="color:#c0392b">*</span></label>
             <select id="familleProduit" onchange="this.style.borderColor=this.value?'':'#c0392b'" style="border:1.5px solid #e0e0e0;border-radius:6px;padding:8px 10px;font-size:0.87rem;background:#fafafa;font-family:inherit;width:100%">
               <option value="">— Sélectionner —</option>
             </select>
           </div>
         </div>
         <div class="row">
-          <div class="field"><label>N° de série <span style="color:#c0392b">*</span></label><input type="text" id="noSerie" placeholder="Ex : SN-12345 — saisir NS si non sérialisé" required><div style="font-size:0.72rem;color:#888;margin-top:3px">Produit non sérialisé → saisir <strong>NS</strong></div></div>
-          <div class="field"><label>Version programme <span style="color:#999;font-weight:400">(facultatif)</span></label><input type="text" id="versionProg" placeholder="Ex: v2.4.1"></div>
+          <div class="field"><label data-i18n="lbl.serialNum">N° de série <span style="color:#c0392b">*</span></label><input type="text" id="noSerie" data-i18n-ph="ph.serialNum" placeholder="Ex : SN-12345 — saisir NS si non sérialisé" required><div style="font-size:0.72rem;color:#888;margin-top:3px" data-i18n="lbl.serialHint">Produit non sérialisé → saisir <strong>NS</strong></div></div>
+          <div class="field"><label data-i18n="lbl.softVersion">Version programme <span style="color:#999;font-weight:400">(facultatif)</span></label><input type="text" id="versionProg" placeholder="Ex: v2.4.1"></div>
         </div>
         <div class="row">
-          <div class="field"><label>Quantité d'unités concernées <span style="color:#999;font-weight:400">(facultatif)</span></label><input type="number" id="quantiteUnites" min="1" step="1" placeholder="Ex: 3"></div>
+          <div class="field"><label data-i18n="lbl.quantity">Quantité d'unités concernées <span style="color:#999;font-weight:400">(facultatif)</span></label><input type="number" id="quantiteUnites" min="1" step="1" data-i18n-ph="ph.quantity" placeholder="Ex: 3"></div>
         </div>
       </div>
     </div>
 
     <!-- CLIENT -->
     <div class="section">
-      <div class="section-title">🏢 Client</div>
+      <div class="section-title" data-i18n="sec.client">🏢 Client</div>
       <div class="section-body">
         <div class="row">
-          <div class="field"><label>Code SAP Client <span style="color:#c0392b">*</span></label><input type="text" id="sapCode" placeholder="Code client SAP"><div style="font-size:0.72rem;color:#888;margin-top:3px">Au moins un des deux codes SAP est obligatoire</div></div>
-          <div class="field"><label>Code SAP Distributeur <span style="color:#c0392b">*</span></label><input type="text" id="sapCodeDistributeur" placeholder="Code distributeur SAP"></div>
-          <div class="field"><label>Nom client *</label><input type="text" id="nomClient" placeholder="Raison sociale" required></div>
+          <div class="field"><label data-i18n="lbl.sapClient">Code SAP Client <span style="color:#c0392b">*</span></label><input type="text" id="sapCode" data-i18n-ph="ph.sapClient" placeholder="Code client SAP"><div style="font-size:0.72rem;color:#888;margin-top:3px" data-i18n="lbl.sapHint">Au moins un des deux codes SAP est obligatoire</div></div>
+          <div class="field"><label data-i18n="lbl.sapDist">Code SAP Distributeur <span style="color:#c0392b">*</span></label><input type="text" id="sapCodeDistributeur" data-i18n-ph="ph.sapDist" placeholder="Code distributeur SAP"></div>
+          <div class="field"><label data-i18n="lbl.clientName">Nom client *</label><input type="text" id="nomClient" data-i18n-ph="ph.clientName" placeholder="Raison sociale" required></div>
         </div>
         <div class="row">
-          <div class="field"><label>Code postal</label><input type="text" id="cp" placeholder="75000 / SW1A 1AA / ..."></div>
-          <div class="field"><label>Ville</label><input type="text" id="ville" placeholder="Paris, London, ..."></div>
-          <div class="field"><label>Pays</label><input type="text" id="pays" placeholder="France"></div>
+          <div class="field"><label data-i18n="lbl.postCode">Code postal</label><input type="text" id="cp" placeholder="75000 / SW1A 1AA / ..."></div>
+          <div class="field"><label data-i18n="lbl.city">Ville</label><input type="text" id="ville" data-i18n-ph="ph.city" placeholder="Paris, London, ..."></div>
+          <div class="field"><label data-i18n="lbl.country">Pays</label><input type="text" id="pays" data-i18n-ph="ph.country" placeholder="France"></div>
         </div>
       </div>
     </div>
 
     <!-- PROBLÈME -->
     <div class="section">
-      <div class="section-title">⚠️ Caractérisation du problème</div>
+      <div class="section-title" data-i18n="sec.problem">⚠️ Caractérisation du problème</div>
       <div class="section-body">
         <div class="row">
-          <div class="field full"><label>Description du problème *</label>
-            <textarea id="probleme" rows="4" placeholder="Décrire précisément le problème observé, les conditions d'apparition, la fréquence…" required></textarea>
+          <div class="field full"><label data-i18n="lbl.problem">Description du problème *</label>
+            <textarea id="probleme" rows="4" data-i18n-ph="ph.problem" placeholder="Décrire précisément le problème observé, les conditions d'apparition, la fréquence…" required></textarea>
           </div>
         </div>
         <!-- MÉDIAS -->
         <div class="row" style="margin-top:8px">
           <div class="field full">
-            <label>Photos / Vidéos</label>
+            <label data-i18n="lbl.photos">Photos / Vidéos</label>
             <div class="drop-zone" id="drop-zone">
               <input type="file" id="file-input" multiple accept="image/*,video/*" onchange="handleFiles(this.files)">
               <span class="drop-zone-icon">📷</span>
-              <p><strong>Glissez vos photos ou vidéos ici</strong></p>
-              <p style="margin-top:4px">ou importez depuis votre galerie</p>
-              <small style="display:block;margin-top:6px">📱 Sur téléphone : appuyez pour ouvrir la galerie ou prendre une photo</small>
-              <small>JPG, PNG, MP4, MOV… jusqu'à 200 Mo par fichier</small>
+              <p><strong data-i18n="drop.title">Glissez vos photos ou vidéos ici</strong></p>
+              <p style="margin-top:4px" data-i18n="drop.gallery">ou importez depuis votre galerie</p>
+              <small style="display:block;margin-top:6px" data-i18n="drop.mobile">📱 Sur téléphone : appuyez pour ouvrir la galerie ou prendre une photo</small>
+              <small data-i18n="drop.formats">JPG, PNG, MP4, MOV… jusqu'à 200 Mo par fichier</small>
             </div>
             <button type="button" class="camera-btn" style="margin-top:8px">
-              📸 Prendre une photo en direct
+              <span data-i18n="drop.camera">📸 Prendre une photo en direct</span>
               <input type="file" accept="image/*" capture="environment" onchange="handleFiles(this.files)">
             </button>
             <div class="preview-grid" id="preview-grid"></div>
@@ -247,32 +251,32 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
 
     <!-- TRAITEMENT -->
     <div class="section">
-      <div class="section-title">🛠 Traitement</div>
+      <div class="section-title" data-i18n="sec.treatment">🛠 Traitement</div>
       <div class="section-body">
         <div class="row">
-          <div class="field full"><label>Description de la réparation</label>
-            <textarea id="reparation" rows="3" placeholder="Solution apportée ou envisagée…"></textarea>
+          <div class="field full"><label data-i18n="lbl.repair">Description de la réparation</label>
+            <textarea id="reparation" rows="3" data-i18n-ph="ph.repair" placeholder="Solution apportée ou envisagée…"></textarea>
           </div>
         </div>
         <div class="row">
-          <div class="field full"><label>Suggestion d'amélioration</label>
-            <textarea id="suggestion" rows="2" placeholder="Piste d'amélioration pour éviter la récurrence…"></textarea>
+          <div class="field full"><label data-i18n="lbl.suggestion">Suggestion d'amélioration</label>
+            <textarea id="suggestion" rows="2" data-i18n-ph="ph.suggestion" placeholder="Piste d'amélioration pour éviter la récurrence…"></textarea>
           </div>
         </div>
         <!-- MÉDIAS TRAITEMENT -->
         <div class="row" style="margin-top:8px">
           <div class="field full">
-            <label>Photos / Vidéos du traitement</label>
+            <label data-i18n="lbl.treatmentPhotos">Photos / Vidéos du traitement</label>
             <div class="drop-zone" id="drop-zone-traitement">
               <input type="file" id="file-input-traitement" multiple accept="image/*,video/*" onchange="handleFilesTraitement(this.files)">
               <span class="drop-zone-icon">🔧</span>
-              <p><strong>Glissez vos photos ou vidéos ici</strong></p>
-              <p style="margin-top:4px">ou importez depuis votre galerie</p>
-              <small style="display:block;margin-top:6px">📱 Sur téléphone : appuyez pour ouvrir la galerie ou prendre une photo</small>
-              <small>JPG, PNG, MP4, MOV…</small>
+              <p><strong data-i18n="drop.title">Glissez vos photos ou vidéos ici</strong></p>
+              <p style="margin-top:4px" data-i18n="drop.gallery">ou importez depuis votre galerie</p>
+              <small style="display:block;margin-top:6px" data-i18n="drop.mobile">📱 Sur téléphone : appuyez pour ouvrir la galerie ou prendre une photo</small>
+              <small data-i18n="drop.formatsTrt">JPG, PNG, MP4, MOV…</small>
             </div>
             <button type="button" class="camera-btn" style="margin-top:8px">
-              📸 Prendre une photo en direct
+              <span data-i18n="drop.camera">📸 Prendre une photo en direct</span>
               <input type="file" accept="image/*" capture="environment" onchange="handleFilesTraitement(this.files)">
             </button>
             <div class="preview-grid" id="preview-grid-traitement"></div>
@@ -282,16 +286,16 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
       </div>
     </div>
 
-    <button type="submit" class="btn-submit" id="btn-submit">✅ Valider la déclaration</button>
+    <button type="submit" class="btn-submit" id="btn-submit" data-i18n="btn.submit">✅ Valider la déclaration</button>
   </form>
 
   <!-- SUCCESS -->
   <div id="success-screen">
     <div class="success-icon">✅</div>
-    <div style="font-size:1rem;color:#555">Non-conformité enregistrée</div>
+    <div style="font-size:1rem;color:#555" data-i18n="success.title">Non-conformité enregistrée</div>
     <div id="success-numero"></div>
-    <div class="success-msg">Le formulaire a été envoyé par email au pôle SAV.<br>Conservez ce numéro pour le suivi.</div>
-    <button class="btn-new" onclick="nouvelleNC()">+ Nouvelle déclaration</button>
+    <div class="success-msg" data-i18n="success.msg">Le formulaire a été envoyé par email au pôle SAV.<br>Conservez ce numéro pour le suivi.</div>
+    <button class="btn-new" onclick="nouvelleNC()" data-i18n="btn.new">+ Nouvelle déclaration</button>
   </div>
 </div>
 
@@ -865,6 +869,175 @@ function toast(msg, warn=false) {
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
+})();
+
+// ── Système bilingue FR / EN ─────────────────────────────────
+const I18N = {
+  fr: {
+    'page.title':       'Déclaration Non-Conformité — Muller Automotive',
+    'header.subtitle':  'Muller Automotive — SAV',
+    'header.console':   '→ Console suivi',
+    'info.number':      'Le numéro sera attribué à la validation',
+    'suivi.title':      '🔍 Suivre une non-conformité existante',
+    'suivi.btn':        'Rechercher',
+    'sec.identification':'🧑 Identification',
+    'sec.product':      '🔧 Produit',
+    'sec.client':       '🏢 Client',
+    'sec.problem':      '⚠️ Caractérisation du problème',
+    'sec.treatment':    '🛠 Traitement',
+    'lbl.reporter':     'Rédacteur *',
+    'lbl.date':         'Date de découverte *',
+    'lbl.email':        'Email rédacteur <span style="color:#c0392b">*</span>',
+    'lbl.scope':        'Périmètre concerné <span style="color:#c0392b">*</span>',
+    'lbl.source':       'Source de détection <span style="color:#c0392b">*</span>',
+    'lbl.orderNum':     'N° de Commande',
+    'lbl.productRef':   'Référence produit <span style="color:#c0392b">*</span>',
+    'lbl.productFamily':'Famille de produit <span style="color:#c0392b">*</span>',
+    'lbl.serialNum':    'N° de série <span style="color:#c0392b">*</span>',
+    'lbl.serialHint':   'Produit non sérialisé → saisir <strong>NS</strong>',
+    'lbl.softVersion':  'Version programme <span style="color:#999;font-weight:400">(facultatif)</span>',
+    'lbl.quantity':     'Quantité d\'unités concernées <span style="color:#999;font-weight:400">(facultatif)</span>',
+    'lbl.sapClient':    'Code SAP Client <span style="color:#c0392b">*</span>',
+    'lbl.sapDist':      'Code SAP Distributeur <span style="color:#c0392b">*</span>',
+    'lbl.sapHint':      'Au moins un des deux codes SAP est obligatoire',
+    'lbl.clientName':   'Nom client *',
+    'lbl.postCode':     'Code postal',
+    'lbl.city':         'Ville',
+    'lbl.country':      'Pays',
+    'lbl.problem':      'Description du problème *',
+    'lbl.photos':       'Photos / Vidéos',
+    'lbl.repair':       'Description de la réparation',
+    'lbl.suggestion':   'Suggestion d\'amélioration',
+    'lbl.treatmentPhotos':'Photos / Vidéos du traitement',
+    'drop.title':       'Glissez vos photos ou vidéos ici',
+    'drop.gallery':     'ou importez depuis votre galerie',
+    'drop.mobile':      '📱 Sur téléphone : appuyez pour ouvrir la galerie ou prendre une photo',
+    'drop.formats':     'JPG, PNG, MP4, MOV… jusqu\'à 200 Mo par fichier',
+    'drop.formatsTrt':  'JPG, PNG, MP4, MOV…',
+    'drop.camera':      '📸 Prendre une photo en direct',
+    'btn.submit':       '✅ Valider la déclaration',
+    'btn.new':          '+ Nouvelle déclaration',
+    'success.title':    'Non-conformité enregistrée',
+    'success.msg':      'Le formulaire a été envoyé par email au pôle SAV.<br>Conservez ce numéro pour le suivi.',
+    'ph.reporter':      'Prénom Nom',
+    'ph.email':         'votre@email.fr',
+    'ph.orderNum':      'Ex: CMD-2026-001',
+    'ph.serialNum':     'Ex : SN-12345 — saisir NS si non sérialisé',
+    'ph.quantity':      'Ex: 3',
+    'ph.sapClient':     'Code client SAP',
+    'ph.sapDist':       'Code distributeur SAP',
+    'ph.clientName':    'Raison sociale',
+    'ph.city':          'Paris, London, ...',
+    'ph.country':       'France',
+    'ph.problem':       'Décrire précisément le problème observé, les conditions d\'apparition, la fréquence…',
+    'ph.repair':        'Solution apportée ou envisagée…',
+    'ph.suggestion':    'Piste d\'amélioration pour éviter la récurrence…',
+  },
+  en: {
+    'page.title':       'Non-Conformity Declaration — Muller Automotive',
+    'header.subtitle':  'Muller Automotive — After-Sales',
+    'header.console':   '→ Tracking console',
+    'info.number':      'Reference number will be assigned upon submission',
+    'suivi.title':      '🔍 Track an existing non-conformity',
+    'suivi.btn':        'Search',
+    'sec.identification':'🧑 Identification',
+    'sec.product':      '🔧 Product',
+    'sec.client':       '🏢 Customer',
+    'sec.problem':      '⚠️ Problem description',
+    'sec.treatment':    '🛠 Treatment',
+    'lbl.reporter':     'Reported by *',
+    'lbl.date':         'Discovery date *',
+    'lbl.email':        'Reporter email <span style="color:#c0392b">*</span>',
+    'lbl.scope':        'Scope concerned <span style="color:#c0392b">*</span>',
+    'lbl.source':       'Detection source <span style="color:#c0392b">*</span>',
+    'lbl.orderNum':     'Order number',
+    'lbl.productRef':   'Product reference <span style="color:#c0392b">*</span>',
+    'lbl.productFamily':'Product family <span style="color:#c0392b">*</span>',
+    'lbl.serialNum':    'Serial number <span style="color:#c0392b">*</span>',
+    'lbl.serialHint':   'Non-serialised product → enter <strong>NS</strong>',
+    'lbl.softVersion':  'Software version <span style="color:#999;font-weight:400">(optional)</span>',
+    'lbl.quantity':     'Number of units affected <span style="color:#999;font-weight:400">(optional)</span>',
+    'lbl.sapClient':    'SAP Customer Code <span style="color:#c0392b">*</span>',
+    'lbl.sapDist':      'SAP Distributor Code <span style="color:#c0392b">*</span>',
+    'lbl.sapHint':      'At least one SAP code (Customer or Distributor) is required',
+    'lbl.clientName':   'Customer name *',
+    'lbl.postCode':     'Post code',
+    'lbl.city':         'City',
+    'lbl.country':      'Country',
+    'lbl.problem':      'Problem description *',
+    'lbl.photos':       'Photos / Videos',
+    'lbl.repair':       'Repair description',
+    'lbl.suggestion':   'Improvement suggestion',
+    'lbl.treatmentPhotos':'Treatment photos / videos',
+    'drop.title':       'Drag your photos or videos here',
+    'drop.gallery':     'or import from your gallery',
+    'drop.mobile':      '📱 On mobile: tap to open your gallery or take a photo',
+    'drop.formats':     'JPG, PNG, MP4, MOV… up to 200 MB per file',
+    'drop.formatsTrt':  'JPG, PNG, MP4, MOV…',
+    'drop.camera':      '📸 Take a photo now',
+    'btn.submit':       '✅ Submit declaration',
+    'btn.new':          '+ New declaration',
+    'success.title':    'Non-conformity recorded',
+    'success.msg':      'The form has been sent by email to the After-Sales team.<br>Keep this reference number for tracking.',
+    'ph.reporter':      'First Last name',
+    'ph.email':         'your@email.com',
+    'ph.orderNum':      'Ex: CMD-2026-001',
+    'ph.serialNum':     'Ex: SN-12345 — enter NS if not serialised',
+    'ph.quantity':      'Ex: 3',
+    'ph.sapClient':     'Customer SAP code',
+    'ph.sapDist':       'Distributor SAP code',
+    'ph.clientName':    'Company name',
+    'ph.city':          'Paris, London, ...',
+    'ph.country':       'France',
+    'ph.problem':       'Describe the problem observed, occurrence conditions, frequency…',
+    'ph.repair':        'Solution applied or planned…',
+    'ph.suggestion':    'Improvement idea to avoid recurrence…',
+  }
+};
+
+let _currentLang = 'fr';
+
+function setLang(lang) {
+  _currentLang = lang;
+  localStorage.setItem('nc_lang', lang);
+  applyLang(lang);
+  // Mettre en évidence le drapeau actif
+  document.getElementById('flag-fr').style.borderColor = lang==='fr' ? '#c0392b' : 'transparent';
+  document.getElementById('flag-en').style.borderColor = lang==='en' ? '#c0392b' : 'transparent';
+  document.documentElement.lang = lang;
+  document.title = I18N[lang]['page.title'] || document.title;
+}
+
+function applyLang(lang) {
+  const d = I18N[lang] || I18N['fr'];
+  // Textes innerHTML
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    if (d[key] !== undefined) el.innerHTML = d[key];
+  });
+  // Placeholders
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-ph');
+    if (d[key] !== undefined) el.placeholder = d[key];
+  });
+}
+
+// Détection automatique de la langue navigateur
+(function() {
+  var saved = localStorage.getItem('nc_lang');
+  var lang;
+  if (saved === 'fr' || saved === 'en') {
+    lang = saved;
+  } else {
+    var bl = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
+    lang = bl.startsWith('fr') ? 'fr' : 'en';
+  }
+  // Appliquer après le chargement du DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setLang(lang); });
+  } else {
+    setLang(lang);
+  }
 })();
 </script>
 
