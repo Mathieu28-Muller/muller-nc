@@ -30,6 +30,7 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 ### Modifié
 - Export CSV : colonnes **"Code SAP Client"** et **"Code SAP Distributeur"** ajoutées
 - Formulaire : label "Code SAP" renommé en "Code SAP Client"
+- **Passage En traitement** : commentaire admin supprimé — un message automatique est généré et envoyé par email au rédacteur : *"Votre NC N° XXXXXX-XXXX est prise en charge et passée En traitement. Vous serez tenu(e) informé(e) au prochain changement de statut."* — commentaire clôture inchangé
 
 ---
 

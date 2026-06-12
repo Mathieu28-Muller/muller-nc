@@ -272,7 +272,7 @@ PLANIFICATION — ÉTAT AU 03/06/2026
   ✅ 05/06 — v4.6 : forçage MDP première connexion + PDF restructuré par action
   ✅ 05/06 — v4.7 : SMTP NC → noreply-nc@mullerautomotive.fr (OVH ssl0.ovh.net:465)
   ✅ 10/06 — v4.8 : satellites NC Parent cliquables + chargement automatique mode Pilote
-  ✅ 12/06 — v4.9 : formulaire bilingue FR/EN + champ Code SAP Distributeur + guide aide traduit
+  ✅ 12/06 — v4.9 : formulaire bilingue FR/EN + Code SAP Distributeur + guide aide traduit + commentaire automatique En traitement
 
   ☐ Phase 4 sécurité (juin 2026) :
                → pg_dump automatique quotidien (tâche planifiée Windows)

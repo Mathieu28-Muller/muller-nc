@@ -195,7 +195,8 @@ const NC_VERSION_HISTORY = [
       'Détection automatique de la langue du navigateur (mémorisée entre les sessions)',
       'Guide d\'aide (bulles ?) et panneau latéral entièrement traduits en anglais',
       'Zones d\'upload : instructions claires (galerie, photo en direct) dans les deux langues',
-      'Export CSV : colonnes "Code SAP Client" et "Code SAP Distributeur" ajoutées'
+      'Export CSV : colonnes "Code SAP Client" et "Code SAP Distributeur" ajoutées',
+      'Passage En traitement : commentaire automatique généré (plus de saisie obligatoire admin) — email rédacteur conservé avec message automatique'
     ]
   }
 ];
