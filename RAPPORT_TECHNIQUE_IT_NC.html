@@ -110,7 +110,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-header">
     <div class="ma-badge">MA</div>
     <h1>Rapport Technique IT<br>Module NC</h1>
-    <div class="ver">Version 13 — 10/06/2026</div>
+    <div class="ver">Version 14 — 12/06/2026</div>
   </div>
   <nav>
     <div class="nav-section">Avancement</div>
@@ -146,7 +146,7 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div id="sidebar-footer">
     Muller Automotive<br>
     avet.mat@gmail.com<br>
-    MàJ : 10/06/2026 — v4.8 satellites NC Parent cliquables
+    MàJ : 12/06/2026 — v4.9 formulaire bilingue FR/EN + SAP Distributeur
   </div>
 </div>
 
@@ -155,10 +155,10 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
 <div id="top-banner">
   <h1>Rapport Technique IT — Module Non-Conformités</h1>
   <div class="sub">Muller Automotive — Document destiné au responsable IT</div>
-  <div class="ver-badge">Version 13 — 10/06/2026</div>
+  <div class="ver-badge">Version 14 — 12/06/2026</div>
   <div class="meta-row">
     <div class="meta-item"><strong>Auteur :</strong> Support technique Muller Automotive</div>
-    <div class="meta-item"><strong>Mis à jour :</strong> 10/06/2026 (v4.8 — Satellites NC Parent cliquables)</div>
+    <div class="meta-item"><strong>Mis à jour :</strong> 12/06/2026 (v4.9 — Formulaire bilingue FR/EN + SAP Distributeur)</div>
     <div class="meta-item"><strong>Contact :</strong> avet.mat@gmail.com</div>
   </div>
 </div>
@@ -170,7 +170,20 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
   <div class="section-title"><span class="section-num">0</span>Journal des mises à jour — Avancement et planification</div>
 
   <div class="subsection">
-    <div class="subsection-title">Réalisé — 10/06/2026 — v4.8 (état actuel)</div>
+    <div class="subsection-title">Réalisé — 12/06/2026 — v4.9 (état actuel)</div>
+    <div class="box box-green">
+      <strong>Formulaire bilingue FR/EN + SAP Distributeur — déployé le 12/06/2026</strong>
+    </div>
+    <table>
+      <tr><th>Tâche</th><th>Statut</th><th>Détail technique</th></tr>
+      <tr><td>Code SAP Distributeur</td><td><span class="badge badge-green">✅ Actif</span></td><td>Nouveau champ dans le formulaire public et la console admin. Au moins un code SAP (Client ou Distributeur) obligatoire. Colonne <code class="inline">sap_code_distributeur</code> en PostgreSQL + export CSV.</td></tr>
+      <tr><td>Formulaire bilingue FR / EN</td><td><span class="badge badge-green">✅ Actif</span></td><td>Sélecteur FR/EN dans l'en-tête. Détection automatique langue navigateur. Choix mémorisé (localStorage). Système <code class="inline">data-i18n</code> / <code class="inline">data-i18n-ph</code> sur tous les éléments.</td></tr>
+      <tr><td>Guide d'aide traduit EN</td><td><span class="badge badge-green">✅ Actif</span></td><td>Bulles ?, panneau latéral, bouton FAB, fiches champ par champ entièrement en anglais. Bulles ré-injectées à chaque changement de langue via <code class="inline">data-i18n</code> → guide ID mapping.</td></tr>
+      <tr><td>Zones d'upload clarifiées</td><td><span class="badge badge-green">✅ Actif</span></td><td>Instructions galerie + photo en direct dans les deux langues. Textes traduits dans le dictionnaire I18N.</td></tr>
+    </table>
+
+    <div class="subsection">
+    <div class="subsection-title">Réalisé — 10/06/2026 — v4.8</div>
     <div class="box box-green">
       <strong>Satellites NC Parent cliquables — déployé le 10/06/2026</strong>
     </div>
@@ -178,8 +191,9 @@ details[open] summary{background:#eff5ff;color:var(--blue)}
       <tr><th>Tâche</th><th>Statut</th><th>Détail technique</th></tr>
       <tr><td>Satellites cliquables dans fiche NC Parent</td><td><span class="badge badge-green">✅ Actif</span></td><td>Badges (en-tête bleu) et lignes "NC Satellites rattachées" ouvrent la fiche satellite dans la même fenêtre. <code class="inline">openModal(id)</code> sans <code class="inline">closeOverlay()</code>.</td></tr>
       <tr><td>Chargement automatique satellites mode Pilote</td><td><span class="badge badge-green">✅ Actif</span></td><td>Dans <code class="inline">openModal()</code> : fetch des satellites absents de <code class="inline">allNC</code> filtré. Ajout temporaire pour le rendu.</td></tr>
-      <tr><td>Navigation bidirectionnelle</td><td><span class="badge badge-green">✅ Actif</span></td><td>Satellite → bouton "Ouvrir NC Parent ↗" déjà présent. Parent → satellites via badges/lignes. Fiche satellite en lecture seule pour pilote non assigné.</td></tr>
+      <tr><td>Navigation bidirectionnelle</td><td><span class="badge badge-green">✅ Actif</span></td><td>Satellite → bouton "Ouvrir NC Parent ↗". Parent → satellites via badges/lignes. Fiche satellite en lecture seule pour pilote non assigné.</td></tr>
     </table>
+    </div>
 
     <div class="subsection">
     <div class="subsection-title">Réalisé — 05/06/2026 — v4.6</div>

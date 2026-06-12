@@ -6,7 +6,7 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
-## [Non publié] — v4.9 (prévu juin 2026)
+## [Non publié] — v5.0 (prévu juin 2026)
 
 ### Infrastructure
 - Déploiement VPS OVH — serveur dédié KS-1-S (Xeon D-2123IT, 32 Go RAM, 2×4 To RAID 1)
@@ -16,6 +16,20 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 - CORS restreint aux origines autorisées (suppression du wildcard `*`)
 - Helmet CSP (Content Security Policy) activé
 - `pg_dump` automatique quotidien (tâche planifiée)
+
+---
+
+## [4.9] — 12/06/2026
+
+### Ajouté
+- **Code SAP Distributeur** — nouveau champ dans le formulaire public et la console admin. Au moins un des deux codes SAP (Client ou Distributeur) est obligatoire. Colonne `sap_code_distributeur` ajoutée en PostgreSQL et dans l'export CSV
+- **Formulaire bilingue français / anglais** — sélecteur `FR` / `EN` dans l'en-tête, détection automatique de la langue du navigateur, choix mémorisé entre les sessions
+- Guide d'aide (bulles `?`) et panneau latéral entièrement traduits en anglais
+- Zones d'upload : instructions claires dans les deux langues (galerie, photo en direct depuis l'appareil photo)
+
+### Modifié
+- Export CSV : colonnes **"Code SAP Client"** et **"Code SAP Distributeur"** ajoutées
+- Formulaire : label "Code SAP" renommé en "Code SAP Client"
 
 ---
 

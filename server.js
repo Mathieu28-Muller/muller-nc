@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.8';
+const NC_APP_VERSION = '4.9';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -179,12 +179,23 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.8', date: '2026-06-10', label: 'Navigation NC Parent — satellites cliquables',
-    current: true,
     changes: [
       'NC satellites cliquables depuis la fiche NC Parent — ouverture directe dans la même fenêtre',
       'Badges satellites (en-tête bleu) et lignes de la section "NC Satellites rattachées" cliquables',
       'Chargement automatique des satellites non présents dans la liste filtrée du pilote',
       'Navigation bidirectionnelle : satellite → bouton "Ouvrir NC Parent ↗" déjà présent'
+    ]
+  },
+  {
+    version: '4.9', date: '2026-06-12', label: 'Formulaire bilingue FR/EN + SAP Distributeur',
+    current: true,
+    changes: [
+      'Nouveau champ "Code SAP Distributeur" — au moins un des deux codes SAP obligatoire (client ou distributeur)',
+      'Formulaire de déclaration bilingue français / anglais — sélecteur FR/EN dans l\'en-tête',
+      'Détection automatique de la langue du navigateur (mémorisée entre les sessions)',
+      'Guide d\'aide (bulles ?) et panneau latéral entièrement traduits en anglais',
+      'Zones d\'upload : instructions claires (galerie, photo en direct) dans les deux langues',
+      'Export CSV : colonnes "Code SAP Client" et "Code SAP Distributeur" ajoutées'
     ]
   }
 ];
