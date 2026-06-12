@@ -251,12 +251,12 @@ function pgSyncFiche(nc, parentSet, satSet) {
                     commentaire_cloture, analyse_5p, preuve_efficacite,
                     is_parent, is_satellite, parent_id, parent_label, satellites,
                     groupe_label, groupe_motif, groupe_created_at, groupe_created_by,
-                    groupe_perimetre, rattachement_date, rattachement_by
+                    groupe_perimetre, rattachement_date, rattachement_by, sap_code_distributeur
                 ) VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,
                     $19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,
                     $35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,
-                    $51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65
+                    $51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66
                 )
                 ON CONFLICT (numero) DO UPDATE SET
                     updated_at=EXCLUDED.updated_at, statut=EXCLUDED.statut,
@@ -277,7 +277,8 @@ function pgSyncFiche(nc, parentSet, satSet) {
                     parent_id=EXCLUDED.parent_id, satellites=EXCLUDED.satellites,
                     groupe_label=EXCLUDED.groupe_label, groupe_motif=EXCLUDED.groupe_motif,
                     media_files=EXCLUDED.media_files,
-                    media_files_traitement=EXCLUDED.media_files_traitement
+                    media_files_traitement=EXCLUDED.media_files_traitement,
+                    sap_code_distributeur=EXCLUDED.sap_code_distributeur
             `, [
                 nc.numero, nc.createdAt||null, nc.updatedAt||null, nc.statut||'ouvert',
                 nc.closedAt||null, nc.closPar||null, nc.clotureViaParent||null,
@@ -306,6 +307,7 @@ function pgSyncFiche(nc, parentSet, satSet) {
                 nc.groupeCreatedAt||null, nc.groupeCreatedBy||null,
                 nc.groupePerimetre?.length ? nc.groupePerimetre : null,
                 nc.rattachementDate||null, nc.rattachementBy||null,
+                nc.sapCodeDistributeur||null,
             ]);
 
             // ── 2. Resync nc_historique (delete + insert) ────────
@@ -1259,11 +1261,11 @@ app.post('/api/nc/upload-temp', uploadTempNC.single('file'), (req,res) => {
 app.post('/api/nc', async (req,res) => {
     const { redacteur,emailRedacteur,dateDecouverte,decouvreur,perimetre,sourceDetection,noCommande,refProduit,familleProduit,noSerie,versionProg,
             quantiteUnites,
-            sapCode,nomClient,cp,ville,pays,probleme,reparation,suggestion,
+            sapCode,sapCodeDistributeur,nomClient,cp,ville,pays,probleme,reparation,suggestion,
             mediaFiles,mediaFilesTraitement,pdfBase64 } = req.body||{};
     if (!probleme) return res.status(400).json({error:'Champ problème obligatoire'});
     if (!familleProduit) return res.status(400).json({error:'Famille de produit obligatoire'});
-    if (!sapCode?.trim()) return res.status(400).json({error:'Code SAP client obligatoire'});
+    if (!sapCode?.trim() && !sapCodeDistributeur?.trim()) return res.status(400).json({error:'Au moins un code SAP (Client ou Distributeur) est obligatoire'});
     if (!noSerie?.trim()) return res.status(400).json({error:'Numéro de série obligatoire (saisir NS si non sérialisé)'});
 
     const data = loadNC();
@@ -1307,7 +1309,7 @@ app.post('/api/nc', async (req,res) => {
         noCommande:noCommande||'',
         refProduit:refProduit||'', familleProduit:familleProduit||'', noSerie:noSerie||'', versionProg:versionProg||'',
         quantiteUnites:quantiteUnites||null,
-        sapCode:sapCode||'', nomClient:nomClient||'', cp:cp||'', ville:ville||'', pays:pays||'',
+        sapCode:sapCode||'', sapCodeDistributeur:sapCodeDistributeur||'', nomClient:nomClient||'', cp:cp||'', ville:ville||'', pays:pays||'',
         probleme:probleme||'',
         reparation:reparation||'', suggestion:suggestion||'',
         mediaFiles:prob.saved, mediaFilesTraitement:trt.saved,
@@ -2408,6 +2410,8 @@ app.get('/api/nc/export/csv', requireNCAuth, (req,res) => {
         'Statut final',
         'Nb transitions',
         // ── Client / Produit ────────────────────────────────────
+        'Code SAP Client',
+        'Code SAP Distributeur',
         'Client',
         'Code postal',
         'Ville',
@@ -2499,6 +2503,8 @@ app.get('/api/nc/export/csv', requireNCAuth, (req,res) => {
             statutFinal,
             hist.length,
             // Client / Produit
+            q(r.sapCode),
+            q(r.sapCodeDistributeur),
             q(r.nomClient),
             q(r.cp),
             q(r.ville),
@@ -2746,7 +2752,7 @@ function ncBodyHtml(nc, showQualite){
 
   <div class="psec"><div class="psec-title">Client</div>
     <div class="fgrid">
-      ${pf('Code SAP',nc.sapCode)}${pf('Nom client',nc.nomClient)}
+      ${pf('Code SAP Client',nc.sapCode)}${pf('Code SAP Distributeur',nc.sapCodeDistributeur)}${pf('Nom client',nc.nomClient)}
       ${pf('CP',nc.cp)}${pf('Ville',nc.ville)}${pf('Pays',nc.pays)}
     </div>
   </div>

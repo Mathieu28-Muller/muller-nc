@@ -1718,7 +1718,7 @@ function applyFilters() {
       const h=[
         nc.numero, nc.redacteur, nc.emailRedacteur, nc.perimetre, nc.sourceDetection,
         nc.noCommande, nc.refProduit, nc.noSerie, nc.versionProg, nc.familleProduit,
-        nc.sapCode, nc.nomClient, nc.cp, nc.ville, nc.pays,
+        nc.sapCode, nc.sapCodeDistributeur, nc.nomClient, nc.cp, nc.ville, nc.pays,
         nc.probleme, nc.reparation, nc.suggestion,
         nc.pilote, nc.typeCause, nc.commentaireQualite,
         ...actionFields
@@ -3072,7 +3072,8 @@ function renderModal(nc) {
 
   // ── Client (masqué pour NC Parent) ──────────────────────────
   if (!isParent) html+=`<div class="msec"><h3>Client</h3><div class="mgrid">
-    <div class="mfield"><label>Code SAP</label><span>${esc(nc.sapCode||'—')}</span></div>
+    <div class="mfield"><label>Code SAP Client</label><span>${esc(nc.sapCode||'—')}</span></div>
+    <div class="mfield"><label>Code SAP Distributeur</label><span>${esc(nc.sapCodeDistributeur||'—')}</span></div>
     <div class="mfield"><label>Client</label><span>${esc(nc.nomClient||'—')}</span></div>
     <div class="mfield"><label>CP</label><span>${esc(nc.cp||'—')}</span></div>
     <div class="mfield"><label>Ville</label><span>${esc(nc.ville||'—')}</span></div>

@@ -201,7 +201,8 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
       <div class="section-title">🏢 Client</div>
       <div class="section-body">
         <div class="row">
-          <div class="field"><label>Code SAP <span style="color:#c0392b">*</span></label><input type="text" id="sapCode" placeholder="Code client SAP" required></div>
+          <div class="field"><label>Code SAP Client <span style="color:#c0392b">*</span></label><input type="text" id="sapCode" placeholder="Code client SAP"><div style="font-size:0.72rem;color:#888;margin-top:3px">Au moins un des deux codes SAP est obligatoire</div></div>
+          <div class="field"><label>Code SAP Distributeur <span style="color:#c0392b">*</span></label><input type="text" id="sapCodeDistributeur" placeholder="Code distributeur SAP"></div>
           <div class="field"><label>Nom client *</label><input type="text" id="nomClient" placeholder="Raison sociale" required></div>
         </div>
         <div class="row">
@@ -319,7 +320,8 @@ header small{color:#888;font-size:0.75rem;display:block;margin-top:2px}
   <div class="pdf-section">
     <div class="pdf-section-title">Client</div>
     <div class="pdf-grid">
-      <div class="pdf-field"><div class="pdf-label">Code SAP</div><div class="pdf-value" id="pdf-sap">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Code SAP Client</div><div class="pdf-value" id="pdf-sap">—</div></div>
+      <div class="pdf-field"><div class="pdf-label">Code SAP Distributeur</div><div class="pdf-value" id="pdf-sap-dist">—</div></div>
       <div class="pdf-field"><div class="pdf-label">Nom client</div><div class="pdf-value" id="pdf-client">—</div></div>
       <div class="pdf-field"><div class="pdf-label">CP</div><div class="pdf-value" id="pdf-cp">—</div></div>
       <div class="pdf-field"><div class="pdf-label">Ville</div><div class="pdf-value" id="pdf-ville">—</div></div>
@@ -483,6 +485,17 @@ document.getElementById('nc-form').addEventListener('submit', async e => {
     selSource.focus();
     return;
   }
+  const sapClient = document.getElementById('sapCode');
+  const sapDist   = document.getElementById('sapCodeDistributeur');
+  if (!sapClient.value.trim() && !sapDist.value.trim()) {
+    sapClient.style.borderColor = '#c0392b';
+    sapDist.style.borderColor   = '#c0392b';
+    sapClient.scrollIntoView({ behavior:'smooth', block:'center' });
+    sapClient.focus();
+    return;
+  }
+  sapClient.style.borderColor = '';
+  sapDist.style.borderColor   = '';
   const btn = document.getElementById('btn-submit');
   btn.disabled = true; btn.textContent = '⏳ Génération du PDF…';
 
@@ -498,7 +511,8 @@ document.getElementById('nc-form').addEventListener('submit', async e => {
   document.getElementById('pdf-famille').textContent    = v('familleProduit');
   document.getElementById('pdf-serie').textContent      = v('noSerie');
   document.getElementById('pdf-ver').textContent        = v('versionProg');
-  document.getElementById('pdf-sap').textContent        = v('sapCode');
+  document.getElementById('pdf-sap').textContent        = v('sapCode')||'—';
+  document.getElementById('pdf-sap-dist').textContent   = v('sapCodeDistributeur')||'—';
   document.getElementById('pdf-client').textContent     = v('nomClient');
   document.getElementById('pdf-cp').textContent         = v('cp');
   document.getElementById('pdf-ville').textContent      = v('ville');
@@ -532,7 +546,7 @@ document.getElementById('nc-form').addEventListener('submit', async e => {
     sourceDetection: document.getElementById('sourceDetection').value,
     noCommande:v('noCommande'), refProduit:v('refProduit'), familleProduit:v('familleProduit'), noSerie:v('noSerie'), versionProg:v('versionProg'),
     quantiteUnites: document.getElementById('quantiteUnites').value ? parseInt(document.getElementById('quantiteUnites').value, 10) : null,
-    sapCode:v('sapCode'), nomClient:v('nomClient'), cp:v('cp'), ville:v('ville'), pays:v('pays'),
+    sapCode:v('sapCode'), sapCodeDistributeur:v('sapCodeDistributeur'), nomClient:v('nomClient'), cp:v('cp'), ville:v('ville'), pays:v('pays'),
     probleme:v('probleme'),
     reparation:v('reparation'), suggestion:v('suggestion'),
     mediaFiles: uploadedFiles,

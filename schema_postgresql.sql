@@ -115,6 +115,7 @@ CREATE TABLE nc_fiches (
     version_prog        TEXT,
     quantite_unites     INTEGER,
     sap_code            TEXT,
+    sap_code_distributeur TEXT,
 
     -- ── Client ───────────────────────────────────────────────
     nom_client          TEXT,
