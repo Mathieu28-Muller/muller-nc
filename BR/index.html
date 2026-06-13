@@ -668,7 +668,7 @@ const API_BASE = '/api/br'; // chemin de l'API sur formation-sav.fr
    STATE
 ════════════════════════════════ */
 let USER = {};
-let timerSec = 15 * 60;
+let timerSec = 13 * 60;
 let timerInt = null;
 let moduleStart = null;
 
@@ -746,6 +746,14 @@ async function startModule() {
 ════════════════════════════════ */
 function startGlobalTimer() {
   document.getElementById('timerBox').style.display = 'flex';
+  // Mettre à jour le bouton questionnaire avec le temps restant
+  const btnQ = document.getElementById('btn-quiz');
+  function updateBtnQ() {
+    if (!btnQ || !btnQ.disabled) return;
+    const m = Math.floor(timerSec/60), s = timerSec%60;
+    btnQ.textContent = `🔒 Questionnaire — disponible dans ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  updateBtnQ();
   timerInt = setInterval(() => {
     timerSec--;
     const m = Math.floor(timerSec/60), s = timerSec%60;
@@ -753,6 +761,7 @@ function startGlobalTimer() {
     document.getElementById('timerVal').textContent = str;
     document.getElementById('nav-t').textContent = str;
     if (timerSec <= 60) document.getElementById('timerBox').classList.add('urgent');
+    updateBtnQ();
     if (timerSec <= 0) { clearInterval(timerInt); unlockAllAndProceed(); }
   }, 1000);
 }
@@ -763,16 +772,8 @@ function stopGlobalTimer() { clearInterval(timerInt); }
    BLOC TIMERS (lecture progressive)
 ════════════════════════════════ */
 function startBlocTimers() {
-  // Déverrouiller le bloc 1 immédiatement (déjà visible)
-  unlockBloc(0);
-
-  // Pour les blocs suivants, déverrouillage en cascade
-  // Chaque bloc se déverrouille quand son timer atteint 0
-  let cumulDelay = 0;
-  for (let i = 0; i < BLOC_DURATIONS.length; i++) {
-    cumulDelay += BLOC_DURATIONS[i];
-    scheduleUnlock(i, cumulDelay * 1000);
-  }
+  // Tous les blocs déverrouillés immédiatement — seul le questionnaire est bloqué (13 min)
+  for (let i = 0; i < 6; i++) unlockBloc(i);
 }
 
 function scheduleUnlock(idx, delayMs) {
@@ -810,20 +811,17 @@ function unlockBloc(idx) {
   const lk = document.getElementById('lk-'+(idx+1));
   const card = document.getElementById('card-'+(idx+1));
   if (lk) lk.classList.add('unlocked');
-  if (card && idx > 0) {
+  if (card) {
     card.classList.add('new-unlock');
     setTimeout(() => card.classList.remove('new-unlock'), 600);
-    // Scroll doux vers le nouveau bloc
-    setTimeout(() => {
-      document.getElementById('bw-'+(idx+1)).scrollIntoView({ behavior:'smooth', block:'start' });
-    }, 200);
   }
   updateModuleProgress();
 }
 
 function unlockAllAndProceed() {
-  for (let i = 0; i < 6; i++) unlockBloc(i);
-  document.getElementById('btn-quiz').disabled = false;
+  // Les blocs sont déjà tous déverrouillés — on débloque uniquement le questionnaire
+  const btnQ = document.getElementById('btn-quiz');
+  if (btnQ) { btnQ.disabled = false; btnQ.textContent = 'Questionnaire →'; }
   document.getElementById('timerVal').textContent = '00:00';
   document.getElementById('nav-t').textContent = '00:00';
   updateModuleProgress();
