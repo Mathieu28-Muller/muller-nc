@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Console Formation BR — Pôle Formation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root {
+  --bg:#0f1117;--surface:#181c27;--panel:#1f2436;--border:#2a3048;--border2:#3a4060;
+  --text:#e8eaf0;--muted:#8890a8;
+  --accent:#f5a623;--accent2:#e8892e;
+  --green:#2dd4a0;--green-dim:#1a7a5e;--green-bg:#0d2e24;
+  --red:#f04a4a;--red-dim:#7a1f1f;--red-bg:#2a0f0f;
+  --amber:#f5a623;--amber-bg:#2a1e08;
+  --r:14px;--r-sm:8px;--ff:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100vh}
+
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.login-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden}
+.login-top{background:linear-gradient(135deg,#0a1a10,#0d3d24);
+  border-bottom:1px solid rgba(45,212,160,.2);padding:2rem 1.75rem 1.5rem}
+.login-top .lticon{font-size:36px;margin-bottom:12px}
+.login-top h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.login-top p{font-size:13px;color:var(--muted)}
+.login-form{padding:1.5rem}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+.field input{width:100%;padding:10px 14px;background:var(--panel);
+  border:1px solid var(--border2);border-radius:var(--r-sm);
+  font-family:var(--ff);font-size:14px;color:var(--text);transition:border-color .2s}
+.field input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(45,212,160,.1)}
+.btn-login{width:100%;padding:12px;background:var(--green);color:#031a12;
+  border:none;border-radius:var(--r-sm);font-family:var(--ff);font-size:14px;
+  font-weight:700;cursor:pointer;transition:background .2s;margin-top:.25rem}
+.btn-login:hover{background:#25c494}
+.login-err{font-size:12px;color:var(--red);text-align:center;margin-top:.75rem;display:none}
+.login-err.show{display:block}
+
+/* CONSOLE */
+.console{display:none}
+.topbar{background:rgba(15,17,23,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.topbar-brand .pill{background:var(--green);color:#031a12;border-radius:4px;padding:2px 8px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;font-family:var(--mono)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.admin-name{font-size:12px;color:var(--muted)}
+.btn-sm{padding:6px 14px;border-radius:6px;font-family:var(--ff);font-size:12px;
+  font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--border2);
+  background:var(--panel);color:var(--text)}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm.green{background:var(--green);border-color:var(--green);color:#031a12}
+.btn-sm.green:hover{background:#25c494}
+.btn-sm.red{background:transparent;border-color:rgba(240,74,74,.4);color:var(--red)}
+.btn-sm.red:hover{background:var(--red-bg)}
+
+.main{max-width:1100px;margin:0 auto;padding:2rem 1rem}
+.page-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:2rem}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:2rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:1.25rem;text-align:center}
+.stat-card .sn{font-family:var(--mono);font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
+.stat-card .sl{font-size:12px;color:var(--muted)}
+.stat-card.tot .sn{color:var(--text)}
+.stat-card.ok  .sn{color:var(--green)}
+.stat-card.mid .sn{color:var(--accent)}
+.stat-card.ko  .sn{color:var(--red)}
+.stat-card.avg .sn{color:var(--blue,#5b9cf6)}
+
+/* FILTERS */
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.search-inp{padding:9px 14px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-sm);font-family:var(--ff);font-size:13px;color:var(--text);
+  width:240px;transition:border-color .2s}
+.search-inp:focus{outline:none;border-color:var(--green)}
+.filter-sel{padding:9px 12px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-sm);font-family:var(--ff);font-size:13px;color:var(--text);cursor:pointer}
+.filter-sel:focus{outline:none}
+
+/* TABLE */
+.table-wrap{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table thead tr{background:var(--panel)}
+.data-table th{padding:10px 14px;text-align:left;font-weight:600;color:var(--muted);
+  font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+  border-bottom:1px solid var(--border)}
+.data-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tbody tr:hover td{background:rgba(255,255,255,.02);cursor:pointer}
+
+.badge-score{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;
+  font-size:12px;font-weight:700;font-family:var(--mono)}
+.badge-score.pass{background:rgba(45,212,160,.15);color:var(--green);border:1px solid rgba(45,212,160,.3)}
+.badge-score.mid {background:rgba(245,166,35,.15);color:var(--accent);border:1px solid rgba(245,166,35,.3)}
+.badge-score.fail{background:rgba(240,74,74,.15); color:var(--red);  border:1px solid rgba(240,74,74,.3)}
+
+.badge-verdict{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-verdict.pass{background:rgba(45,212,160,.15);color:var(--green)}
+.badge-verdict.mid {background:rgba(245,166,35,.15);color:var(--accent)}
+.badge-verdict.fail{background:rgba(240,74,74,.15); color:var(--red)}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 1.25rem;border-top:1px solid var(--border)}
+.page-info{font-size:12px;color:var(--muted)}
+.page-btns{display:flex;gap:6px}
+.page-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border2);
+  background:var(--panel);color:var(--text);font-size:12px;cursor:pointer;transition:all .15s}
+.page-btn:hover{border-color:var(--green);color:var(--green)}
+.page-btn:disabled{opacity:.3;cursor:default;pointer-events:none}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+  z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  width:100%;max-width:580px;max-height:85vh;overflow-y:auto}
+.modal-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-size:16px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;
+  width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--panel);color:var(--text)}
+.modal-body{padding:1.5rem}
+.detail-row{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.detail-k{color:var(--muted);min-width:120px;flex-shrink:0}
+.detail-v{color:var(--text)}
+.detail-q{background:var(--panel);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;font-size:13px}
+.detail-q .dq-num{font-size:11px;color:var(--muted);margin-bottom:3px;font-family:var(--mono)}
+.detail-q .dq-text{margin-bottom:4px;line-height:1.4}
+.detail-q .dq-ans{font-size:12px}
+
+/* LOADING */
+.loading{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
+.empty{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-page" class="login-page">
+  <div class="login-card">
+    <div class="login-top">
+      <div class="lticon">🛡️</div>
+      <h1>Console Formation BR</h1>
+      <p>Pôle Formation — Muller Automotive<br>Accès réservé aux responsables formation</p>
+    </div>
+    <div class="login-form">
+      <div class="field">
+        <label>Identifiant</label>
+        <input type="text" id="l-user" placeholder="Votre identifiant" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn-login" onclick="doLogin()">Accéder à la console →</button>
+      <div class="login-err" id="l-err">Identifiants incorrects. Veuillez réessayer.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONSOLE ══ -->
+<div id="console" class="console">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="pill">BR</span>Console Formation
+    </div>
+    <div class="topbar-right">
+      <span class="admin-name" id="admin-name"></span>
+      <a href="/api/br/export.csv" class="btn-sm green" id="btn-export">⬇ Export CSV</a>
+      <button class="btn-sm red" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="page-title">Suivi des passations</div>
+    <div class="page-sub">Rappel Sécurité Électrique — Habilitation BR + EPI</div>
+
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card tot"><div class="sn" id="s-tot">—</div><div class="sl">Total passations</div></div>
+      <div class="stat-card ok" ><div class="sn" id="s-ok" >—</div><div class="sl">Validés ≥ 70 %</div></div>
+      <div class="stat-card mid"><div class="sn" id="s-mid">—</div><div class="sl">Action corrective</div></div>
+      <div class="stat-card ko" ><div class="sn" id="s-ko" >—</div><div class="sl">Recyclage requis</div></div>
+      <div class="stat-card avg"><div class="sn" id="s-avg">—</div><div class="sl">Score moyen</div></div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters">
+      <input type="text" class="search-inp" id="f-search" placeholder="🔍  Nom, prénom ou e-mail…"
+        oninput="debounceSearch()">
+      <select class="filter-sel" id="f-verdict" onchange="loadData(1)">
+        <option value="">Tous les verdicts</option>
+        <option value="Validation acquise">✅ Validation acquise</option>
+        <option value="Action corrective requise">⚠ Action corrective</option>
+        <option value="Recyclage obligatoire">🔄 Recyclage obligatoire</option>
+      </select>
+      <button class="btn-sm" onclick="loadData(1)">Actualiser</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Collaborateur</th>
+            <th>E-mail</th>
+            <th>Score</th>
+            <th>Verdict</th>
+            <th>Durée</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <tr><td colspan="7" class="loading">Chargement…</td></tr>
+        </tbody>
+      </table>
+      <div class="pagination" id="pagination" style="display:none">
+        <span class="page-info" id="page-info"></span>
+        <div class="page-btns">
+          <button class="page-btn" id="btn-prev" onclick="changePage(-1)">← Préc.</button>
+          <button class="page-btn" id="btn-next" onclick="changePage(1)">Suiv. →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL DÉTAIL -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">Détail passation</h3>
+      <button class="modal-close" onclick="closeModalForce()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const API = '/api/br';
+let currentPage = 1;
+let totalItems  = 0;
+let searchTimer = null;
+
+/* ════ AUTH via JWT NC (même token que la console NC) ════ */
+function getToken() { return localStorage.getItem('nc_jwt') || ''; }
+function authHdr()  { return { 'Authorization': 'Bearer ' + getToken(), 'Content-Type': 'application/json' }; }
+
+async function doLogin() {
+  // Connexion via le login NC (route /api/nc-auth/login)
+  const user = document.getElementById('l-user').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const err  = document.getElementById('l-err');
+  err.classList.remove('show');
+  try {
+    const r = await fetch('/api/nc-auth/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user, pass })
+    });
+    const d = await r.json();
+    if (d.result === 'ok' && d.role === 'nc_admin') {
+      localStorage.setItem('nc_jwt', d.token);
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('console').style.display = 'block';
+      document.getElementById('admin-name').textContent = '👤 ' + d.name;
+      loadStats(); loadData(1); loadWhitelist();
+    } else if (d.result === 'ok') {
+      err.textContent = 'Accès réservé aux administrateurs NC.';
+      err.classList.add('show');
+    } else {
+      err.classList.add('show');
+    }
+  } catch(e) {
+    err.textContent = 'Erreur réseau — vérifiez la connexion.';
+    err.classList.add('show');
+  }
+}
+
+// Vérifier si déjà connecté au chargement
+(function() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    if (p.scope === 'nc' && p.role === 'nc_admin' && p.exp > Date.now()/1000) {
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('console').style.display = 'block';
+      document.getElementById('admin-name').textContent = '👤 ' + p.name;
+      loadStats(); loadData(1); loadWhitelist();
+    }
+  } catch(e) {}
+})();
+
+function doLogout() {
+  localStorage.removeItem('nc_jwt');
+  location.reload();
+}
+
+/* ════ WHITELIST ════ */
+async function loadWhitelist() {
+  try {
+    const r = await fetch(`${API}/whitelist`, { headers: authHdr() });
+    const rows = await r.json();
+    const el = document.getElementById('wl-body');
+    if (!el) return;
+    const total = document.getElementById('wl-total');
+    if (total) total.textContent = rows.length + ' personne(s) autorisée(s)';
+    el.innerHTML = rows.map(function(w) {
+      return '<tr>' +
+        '<td style="padding:6px 10px">' + (w.prenom||'') + ' ' + (w.nom||'') + '</td>' +
+        '<td style="padding:6px 10px;font-family:monospace;font-size:0.82rem">' + w.email + '</td>' +
+        '<td style="padding:6px 10px;text-align:center">' +
+          '<span style="font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:10px;background:' + (w.actif?'#0d2e24':'#2a0f0f') + ';color:' + (w.actif?'#2dd4a0':'#f04a4a') + '">' + (w.actif?'Actif':'Inactif') + '</span>' +
+        '</td>' +
+        '<td style="padding:6px 10px;text-align:center">' +
+          '<button onclick="toggleWL(' + w.id + ',' + !w.actif + ')" style="font-size:0.7rem;padding:2px 8px;background:none;border:1px solid #3a4060;border-radius:4px;color:#8890a8;cursor:pointer">' + (w.actif?'Désactiver':'Activer') + '</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  } catch(e) { console.warn('Whitelist error', e); }
+}
+async function toggleWL(id, actif) {
+  await fetch(API+'/whitelist/'+id, { method:'PATCH', headers:authHdr(), body:JSON.stringify({actif}) });
+  loadWhitelist();
+}
+
+/* ════ STATS ════ */
+async function loadStats() {
+  try {
+    const r = await fetch(`${API}/stats`, { headers: authHdr() });
+    const d = await r.json();
+    document.getElementById('s-tot').textContent = d.total   || 0;
+    document.getElementById('s-ok' ).textContent = d.valides || 0;
+    document.getElementById('s-mid').textContent = d.moyens  || 0;
+    document.getElementById('s-ko' ).textContent = d.echecs  || 0;
+    document.getElementById('s-avg').textContent = (d.moy_pct||0) + '%';
+  } catch(e) { console.warn('Stats error', e); }
+}
+
+/* ════ TABLE ════ */
+async function loadData(page) {
+  currentPage = page;
+  const search  = document.getElementById('f-search').value.trim();
+  const verdict = document.getElementById('f-verdict').value;
+  const body    = document.getElementById('table-body');
+  body.innerHTML = '<tr><td colspan="7" class="loading">Chargement…</td></tr>';
+
+  try {
+    let url = `${API}/resultats?page=${page}&limit=20`;
+    if (search)  url += `&search=${encodeURIComponent(search)}`;
+    if (verdict) url += `&verdict=${encodeURIComponent(verdict)}`;
+
+    const r = await fetch(url, { headers: authHdr() });
+    if (r.status === 401) { location.reload(); return; }
+    const d = await r.json();
+    totalItems = d.total;
+    renderTable(d.rows);
+    renderPagination(d.total, page, d.limit);
+  } catch(e) {
+    body.innerHTML = '<tr><td colspan="7" class="empty">Erreur de chargement.</td></tr>';
+  }
+}
+
+function renderTable(rows) {
+  const body = document.getElementById('table-body');
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="7" class="empty">Aucun résultat trouvé.</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map(r => {
+    const pct  = r.score_pct;
+    const cls  = pct>=70?'pass':pct>=50?'mid':'fail';
+    const dur  = r.duree_sec ? fmtDuration(r.duree_sec) : '—';
+    const date = new Date(r.created_at).toLocaleString('fr-FR',
+      {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+    return `<tr onclick="openDetail(${r.id})">
+      <td style="color:var(--muted);font-family:var(--mono)">#${r.id}</td>
+      <td><strong>${esc(r.prenom)} ${esc(r.nom)}</strong></td>
+      <td style="color:var(--muted)">${esc(r.email)}</td>
+      <td><span class="badge-score ${cls}">${r.score}/10 · ${pct}%</span></td>
+      <td><span class="badge-verdict ${cls}">${esc(r.verdict)}</span></td>
+      <td style="color:var(--muted);font-family:var(--mono)">${dur}</td>
+      <td style="color:var(--muted)">${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPagination(total, page, limit) {
+  const pag = document.getElementById('pagination');
+  const pages = Math.ceil(total/limit);
+  if (pages <= 1) { pag.style.display='none'; return; }
+  pag.style.display = 'flex';
+  document.getElementById('page-info').textContent = `Page ${page}/${pages} — ${total} résultats`;
+  document.getElementById('btn-prev').disabled = (page<=1);
+  document.getElementById('btn-next').disabled = (page>=pages);
+}
+
+function changePage(dir) {
+  loadData(currentPage + dir);
+}
+
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadData(1), 350);
+}
+
+/* ════ DETAIL MODAL ════ */
+async function openDetail(id) {
+  try {
+    const r = await fetch(`${API}/resultats/${id}`);
+    const d = await r.json();
+    document.getElementById('modal-title').textContent = `Passation #${d.id} — ${d.prenom} ${d.nom}`;
+    const pct = d.score_pct;
+    const cls = pct>=70?'pass':pct>=50?'mid':'fail';
+    const date = new Date(d.created_at).toLocaleString('fr-FR',
+      {weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const reponses = d.reponses || [];
+
+    let repHtml = '';
+    if (reponses.length) {
+      repHtml = `<div style="margin-top:1.25rem">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;
+          letter-spacing:.05em;margin-bottom:.75rem;padding-bottom:6px;border-bottom:1px solid var(--border)">
+          Détail des réponses
+        </div>` +
+        reponses.map((q,i) => {
+          const ok = q.ok;
+          return `<div class="detail-q">
+            <div class="dq-num">Q${i+1}</div>
+            <div class="dq-text">${esc(q.question)}</div>
+            <div class="dq-ans" style="color:${ok?'var(--green)':'var(--red)'}">
+              ${ok?'✓':'✗'} ${esc(q.reponse)}${!ok?' <span style="color:var(--muted)">· Correct : '+esc(q.correcte)+'</span>':''}
+            </div>
+          </div>`;
+        }).join('') + '</div>';
+    }
+
+    document.getElementById('modal-body').innerHTML = `
+      <div class="detail-row"><span class="detail-k">Collaborateur</span><span class="detail-v"><strong>${esc(d.prenom)} ${esc(d.nom)}</strong></span></div>
+      <div class="detail-row"><span class="detail-k">E-mail</span><span class="detail-v">${esc(d.email)}</span></div>
+      <div class="detail-row"><span class="detail-k">Date</span><span class="detail-v">${date}</span></div>
+      <div class="detail-row"><span class="detail-k">Score</span><span class="detail-v"><span class="badge-score ${cls}">${d.score}/10 · ${pct}%</span></span></div>
+      <div class="detail-row"><span class="detail-k">Verdict</span><span class="detail-v"><span class="badge-verdict ${cls}">${esc(d.verdict)}</span></span></div>
+      <div class="detail-row"><span class="detail-k">Durée</span><span class="detail-v">${d.duree_sec?fmtDuration(d.duree_sec):'—'}</span></div>
+      ${repHtml}`;
+
+    document.getElementById('modal-bg').classList.add('open');
+  } catch(e) { console.error(e); }
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModalForce();
+}
+function closeModalForce() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+/* ════ UTILS ════ */
+function fmtDuration(sec) {
+  if (sec < 60) return sec+'s';
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${m}min ${String(s).padStart(2,'0')}s`;
+}
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+// Entrée clavier pour login
+document.getElementById('l-user')
+  .addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('l-pass').focus(); });
+</script>
+</body>
+</html>

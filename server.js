@@ -431,6 +431,11 @@ app.use(cors({
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '20mb' }));
 
+// ── Module BR (Rappel Sécurité Basse Tension) ─────────────────
+const brRouter = require('./BR/br_backend');
+app.use(brRouter);
+app.use('/BR', express.static(path.join(__dirname, 'BR')));
+
 // HTML jamais mis en cache par Cloudflare ni le navigateur
 app.use((req, res, next) => {
     if (req.path.endsWith('.html') || req.path === '/' || !req.path.includes('.')) {

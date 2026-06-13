@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rappel Sécurité BR — Habilitation Électrique</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root {
+  --bg:#0f1117; --surface:#181c27; --panel:#1f2436; --border:#2a3048; --border2:#3a4060;
+  --text:#e8eaf0; --muted:#8890a8;
+  --accent:#f5a623; --accent2:#e8892e;
+  --green:#2dd4a0; --green-dim:#1a7a5e; --green-bg:#0d2e24;
+  --red:#f04a4a; --red-dim:#7a1f1f; --red-bg:#2a0f0f;
+  --amber:#f5a623; --amber-bg:#2a1e08;
+  --blue:#5b9cf6; --blue-bg:#0d1a3a;
+  --r:14px; --r-sm:8px;
+  --ff:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:200;background:rgba(15,17,23,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;
+  display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.brand .pill{background:var(--accent);color:#1a0e00;border-radius:4px;padding:2px 8px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;font-family:var(--mono)}
+.timer-box{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);
+  background:var(--amber-bg);border:1px solid rgba(245,166,35,.3);padding:4px 12px;
+  border-radius:var(--r-sm);display:none;align-items:center;gap:6px}
+.timer-box.urgent{color:var(--red);background:var(--red-bg);border-color:rgba(240,74,74,.3);
+  animation:blink 1s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.55}}
+
+/* PROGRESS */
+.pstrip{height:3px;background:var(--border);position:fixed;top:56px;left:0;right:0;z-index:199}
+.pfill{height:100%;background:linear-gradient(90deg,var(--green),var(--accent));
+  transition:width .5s ease;width:0%}
+
+/* SCREENS */
+.screen{display:none}.screen.active{display:block}
+
+/* ─── INSCRIPTION ─── */
+.reg-page{min-height:calc(100vh - 56px);display:flex;align-items:center;
+  justify-content:center;padding:2rem 1rem}
+.reg-card{width:100%;max-width:480px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.reg-hero{background:linear-gradient(135deg,#1a0e00,#2a1e08);
+  border-bottom:1px solid rgba(245,166,35,.2);padding:2rem 2rem 1.75rem;position:relative;overflow:hidden}
+.reg-hero::before{content:'⚡';position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);
+  font-size:80px;opacity:.06}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:8px}
+.reg-hero h1{font-size:20px;font-weight:700;margin-bottom:6px}
+.reg-hero p{font-size:13px;color:var(--muted);line-height:1.55}
+.reg-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem}
+.tag{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid}
+.tag-a{color:var(--accent);border-color:rgba(245,166,35,.35);background:rgba(245,166,35,.08)}
+.tag-g{color:var(--green);border-color:rgba(45,212,160,.35);background:rgba(45,212,160,.08)}
+.inc-banner{margin:1.5rem 1.5rem 0;background:var(--red-bg);
+  border:1px solid rgba(240,74,74,.35);border-radius:var(--r-sm);
+  padding:1rem 1.25rem;display:flex;gap:12px;align-items:flex-start}
+.inc-banner p{font-size:13px;line-height:1.6;color:#f5c0c0}
+.inc-banner strong{color:var(--red)}
+.reg-form{padding:1.5rem}
+.field{margin-bottom:1.1rem}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+.field input{width:100%;padding:10px 14px;background:var(--panel);
+  border:1px solid var(--border2);border-radius:var(--r-sm);
+  font-family:var(--ff);font-size:14px;color:var(--text);
+  transition:border-color .2s,box-shadow .2s}
+.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,166,35,.12)}
+.field input.err{border-color:var(--red)}
+.ferr{font-size:11px;color:var(--red);margin-top:4px;display:none}
+.ferr.show{display:block}
+.btn-go{width:100%;padding:12px;background:var(--accent);color:#1a0e00;
+  border:none;border-radius:var(--r-sm);font-family:var(--ff);font-size:14px;
+  font-weight:700;cursor:pointer;transition:background .2s,transform .1s;margin-top:.25rem}
+.btn-go:hover{background:var(--accent2)}.btn-go:active{transform:scale(.98)}
+.reg-note{font-size:11px;color:var(--muted);text-align:center;margin-top:1rem;line-height:1.5}
+
+/* ─── MODULE ─── */
+.mod-wrap{max-width:760px;margin:0 auto;padding:2rem 1rem 5rem}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* bloc verrouillé */
+.block-wrap{position:relative;margin-bottom:1.25rem}
+.block-lock{position:absolute;inset:0;background:rgba(15,17,23,.85);
+  backdrop-filter:blur(4px);border-radius:var(--r);z-index:10;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  border:1px dashed var(--border2)}
+.block-lock .lock-icon{font-size:32px;opacity:.5}
+.block-lock .lock-msg{font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+.block-lock .lock-timer{font-family:var(--mono);font-size:18px;font-weight:700;
+  color:var(--accent);margin-top:4px}
+.block-lock .progress-ring{width:60px;height:60px}
+.block-lock.unlocked{display:none}
+
+.card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.card.new-unlock{animation:unlockPop .5s ease}
+@keyframes unlockPop{
+  0%{transform:scale(.97);box-shadow:0 0 0 0 rgba(45,212,160,.4)}
+  50%{transform:scale(1.01);box-shadow:0 0 0 8px rgba(45,212,160,.1)}
+  100%{transform:scale(1);box-shadow:0 4px 24px rgba(0,0,0,.4)}
+}
+.card-head{padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:1rem}
+.card-icon{width:42px;height:42px;border-radius:10px;display:flex;
+  align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.card-head h2{font-size:17px;font-weight:600;margin-bottom:3px}
+.card-head p{font-size:13px;color:var(--muted);line-height:1.4}
+.card-body{padding:1.25rem 1.5rem}
+
+/* blocs info */
+.blk{border-radius:var(--r-sm);padding:1rem 1.25rem;margin-bottom:1rem;
+  font-size:14px;line-height:1.65;border-left:3px solid}
+.blk:last-child{margin-bottom:0}
+.blk-red   {background:var(--red-bg);  border-color:var(--red);  color:#f5c0c0}
+.blk-amber {background:var(--amber-bg);border-color:var(--amber);color:#f5d9a0}
+.blk-green {background:var(--green-bg);border-color:var(--green);color:#a0f0d8}
+.blk-blue  {background:var(--blue-bg); border-color:var(--blue); color:#b0ccf8}
+.blk strong{filter:brightness(1.3)}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:10px;margin-bottom:1rem}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:1rem;text-align:center}
+.stat-n{font-family:var(--mono);font-size:26px;font-weight:700;line-height:1;margin-bottom:4px}
+.stat-l{font-size:11px;color:var(--muted);line-height:1.4}
+.stat.r .stat-n{color:var(--red)}.stat.a .stat-n{color:var(--accent)}.stat.g .stat-n{color:var(--green)}
+
+.dt{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:.75rem}
+.dt th{background:var(--panel);color:var(--muted);padding:9px 12px;text-align:left;
+  font-weight:600;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+  border-bottom:1px solid var(--border)}
+.dt td{padding:9px 12px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:top}
+.dt tr:last-child td{border-bottom:none}
+
+.steps{list-style:none}
+.steps li{display:flex;gap:12px;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;line-height:1.5}
+.steps li:last-child{border-bottom:none}
+.sbadge{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a0e00;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;flex-shrink:0;font-family:var(--mono);margin-top:1px}
+.chks{list-style:none}.chks li,.cros li{display:flex;gap:10px;align-items:flex-start;
+  padding:6px 0;font-size:14px;line-height:1.5}
+.chks li::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0;margin-top:1px}
+.cros{list-style:none}
+.cros li::before{content:'✗';color:var(--red);font-weight:800;flex-shrink:0;margin-top:1px}
+
+.epi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:.75rem}
+.epi{background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:1rem;transition:border-color .2s}
+.epi:hover{border-color:var(--accent)}
+.epi .ei{font-size:26px;margin-bottom:8px}
+.epi .en{font-size:13px;font-weight:600;margin-bottom:4px}
+.epi .es{font-size:11px;color:var(--muted);line-height:1.4}
+.epi.mand{border-color:rgba(240,74,74,.4)}
+.epi.mand .en::after{content:' OBLIGATOIRE';font-size:9px;color:var(--red);
+  letter-spacing:.06em;display:block;font-weight:700;margin-top:2px}
+
+.csq-flow{display:flex;flex-wrap:wrap;gap:0;margin:1rem 0}
+.csq{flex:1;min-width:100px;background:var(--panel);padding:1rem;text-align:center;
+  position:relative;border:1px solid var(--border);border-right:none}
+.csq:last-child{border-right:1px solid var(--border);border-radius:0 var(--r-sm) var(--r-sm) 0}
+.csq:first-child{border-radius:var(--r-sm) 0 0 var(--r-sm)}
+.csq::after{content:'→';position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  color:var(--accent);font-size:16px;z-index:1;background:var(--bg);padding:0 2px}
+.csq:last-child::after{display:none}
+.csq .cn{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.csq .ct{font-size:12px;font-weight:600}.csq .cs{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* NAV bas module */
+.mod-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,17,23,.95);
+  backdrop-filter:blur(12px);border-top:1px solid var(--border);
+  padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;z-index:150}
+.btn-nav{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r-sm);
+  font-family:var(--ff);font-size:13px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border2);background:var(--panel);color:var(--text);transition:all .15s}
+.btn-nav:hover{border-color:var(--accent);color:var(--accent)}
+.btn-nav:disabled{opacity:.3;cursor:default;pointer-events:none}
+.btn-nav.gold{background:var(--accent);border-color:var(--accent);color:#1a0e00}
+.btn-nav.gold:hover{background:var(--accent2)}
+.nav-info{text-align:center;font-size:12px;color:var(--muted)}
+.nav-info strong{color:var(--text);font-family:var(--mono);font-size:14px;display:block}
+
+/* ─── QUIZ ─── */
+.quiz-wrap{max-width:680px;margin:0 auto;padding:2rem 1rem 6rem}
+.quiz-hdr{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--accent);
+  border-radius:var(--r);padding:1.5rem;margin-bottom:1.5rem}
+.quiz-hdr h2{font-size:18px;font-weight:700;margin-bottom:6px}
+.quiz-hdr p{font-size:13px;color:var(--muted);line-height:1.5}
+.qcard{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;animation:slin .3s ease}
+@keyframes slin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.qtop{padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border)}
+.qtag{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--accent);
+  text-transform:uppercase;font-family:var(--mono);margin-bottom:6px}
+.qtext{font-size:15px;font-weight:500;line-height:1.5}
+.qopts{padding:1rem 1.5rem 1.25rem;display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:center;gap:12px;padding:11px 14px;
+  background:var(--panel);border:1px solid var(--border2);border-radius:var(--r-sm);
+  font-family:var(--ff);font-size:14px;color:var(--text);cursor:pointer;
+  transition:all .15s;text-align:left;width:100%}
+.opt:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:rgba(245,166,35,.06)}
+.opt.selected{border-color:var(--accent);background:rgba(245,166,35,.1);color:var(--accent)}
+.opt.correct{border-color:var(--green);background:rgba(45,212,160,.1);color:var(--green)}
+.opt.wrong  {border-color:var(--red);  background:rgba(240,74,74,.1); color:var(--red)}
+.opt.reveal {border-color:var(--green);background:rgba(45,212,160,.06);color:var(--green)}
+.opt:disabled{cursor:default;pointer-events:none}
+.okey{width:24px;height:24px;border-radius:5px;background:var(--border);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+  flex-shrink:0;font-family:var(--mono)}
+.opt.correct .okey{background:var(--green-dim);color:var(--green)}
+.opt.wrong   .okey{background:var(--red-dim);  color:var(--red)}
+.opt.reveal  .okey{background:var(--green-dim);color:var(--green)}
+.qexpl{margin:0 1.5rem 1.25rem;padding:10px 14px;border-radius:var(--r-sm);
+  font-size:13px;line-height:1.6;border-left:3px solid}
+.qexpl.ok{background:var(--green-bg);border-color:var(--green);color:#a0f0d8}
+.qexpl.ko{background:var(--red-bg);  border-color:var(--red);  color:#f5c0c0}
+.quiz-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,17,23,.95);
+  backdrop-filter:blur(12px);border-top:1px solid var(--border);
+  padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;z-index:150}
+
+/* ─── RÉSULTATS ─── */
+.res-page{min-height:calc(100vh - 56px);padding:2rem 1rem 4rem}
+.res-wrap{max-width:600px;margin:0 auto}
+.res-hero{border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem}
+.res-top{padding:2.5rem 2rem;text-align:center}
+.res-top.pass{background:linear-gradient(135deg,#082818,#0d3d24);border-bottom:1px solid rgba(45,212,160,.25)}
+.res-top.mid {background:linear-gradient(135deg,#1a1000,#2a1e08);border-bottom:1px solid rgba(245,166,35,.25)}
+.res-top.fail{background:linear-gradient(135deg,#1a0808,#2a0f0f);border-bottom:1px solid rgba(240,74,74,.25)}
+.res-icon{font-size:52px;margin-bottom:12px}
+.res-pct{font-family:var(--mono);font-size:60px;font-weight:700;line-height:1;margin-bottom:6px}
+.res-top.pass .res-pct{color:var(--green)}.res-top.mid .res-pct{color:var(--accent)}.res-top.fail .res-pct{color:var(--red)}
+.res-score{font-size:14px;color:var(--muted);margin-bottom:1rem}
+.res-verdict{display:inline-block;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid}
+.res-top.pass .res-verdict{color:var(--green);border-color:rgba(45,212,160,.4);background:rgba(45,212,160,.1)}
+.res-top.mid  .res-verdict{color:var(--accent);border-color:rgba(245,166,35,.4);background:rgba(245,166,35,.1)}
+.res-top.fail .res-verdict{color:var(--red);   border-color:rgba(240,74,74,.4); background:rgba(240,74,74,.1)}
+.res-body{background:var(--surface);border:1px solid var(--border);
+  border-top:none;border-radius:0 0 var(--r) var(--r);padding:1.5rem}
+.res-meta{font-size:14px;line-height:2;color:var(--muted);margin-bottom:1.25rem}
+.res-meta strong{color:var(--text)}
+.recap-i{display:flex;gap:10px;align-items:flex-start;
+  padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.5}
+.recap-i:last-child{border-bottom:none}
+.rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.rdot.ok{background:var(--green)}.rdot.ko{background:var(--red)}
+.save-status{font-size:12px;margin-top:.75rem;padding:8px 12px;border-radius:var(--r-sm);text-align:center}
+.save-status.ok{background:var(--green-bg);color:#a0f0d8;border:1px solid rgba(45,212,160,.25)}
+.save-status.err{background:var(--red-bg);color:#f5c0c0;border:1px solid rgba(240,74,74,.25)}
+.mail-blk{margin-top:1.25rem;background:var(--green-bg);
+  border:1px solid rgba(45,212,160,.25);border-radius:var(--r-sm);padding:1.25rem}
+.mail-blk p{font-size:13px;color:#a0f0d8;margin-bottom:1rem;line-height:1.5}
+.btn-mail{display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px;background:var(--green);color:#031a12;border:none;
+  border-radius:var(--r-sm);font-family:var(--ff);font-size:14px;font-weight:700;
+  cursor:pointer;text-decoration:none;transition:background .2s}
+.btn-mail:hover{background:#25c494}
+.btn-restart{display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:11px;background:transparent;color:var(--muted);
+  border:1px solid var(--border2);border-radius:var(--r-sm);
+  font-family:var(--ff);font-size:13px;cursor:pointer;margin-top:10px;transition:all .2s}
+.btn-restart:hover{border-color:var(--accent);color:var(--accent)}
+
+@media(max-width:600px){
+  .topbar{padding:0 1rem}
+  .mod-wrap,.quiz-wrap{padding:1rem .75rem 5rem}
+  .csq-flow{flex-direction:column}
+  .csq{border-right:1px solid var(--border);border-bottom:none;border-radius:0}
+  .csq:first-child{border-radius:var(--r-sm) var(--r-sm) 0 0}
+  .csq:last-child{border-bottom:1px solid var(--border);border-radius:0 0 var(--r-sm) var(--r-sm)}
+  .csq::after{content:'↓';right:auto;left:50%;top:auto;bottom:-12px;transform:translateX(-50%)}
+  .epi-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="pill">BR</span>Rappel Sécurité Électrique</div>
+  <div class="timer-box" id="timerBox">⏱ <span id="timerVal">15:00</span></div>
+</header>
+<div class="pstrip"><div class="pfill" id="pfill"></div></div>
+
+<!-- ══ INSCRIPTION ══ -->
+<div id="s-reg" class="screen active">
+  <div class="reg-page">
+    <div class="reg-card">
+      <div class="reg-hero">
+        <div class="eyebrow">⚡ Muller Automotive — Formation Sécurité</div>
+        <h1>Rappel Habilitation BR & EPI</h1>
+        <p>Module de sensibilisation obligatoire suite à un événement terrain.<br>Durée : 15 min de lecture minutée + questionnaire final.</p>
+        <div class="reg-tags">
+          <span class="tag tag-a">⏱ 15 min minutées</span>
+          <span class="tag tag-a">✅ 10 questions</span>
+          <span class="tag tag-g">🎯 Seuil 70 %</span>
+          <span class="tag tag-g">NF C 18-510</span>
+        </div>
+      </div>
+      <div class="inc-banner">
+        <span style="font-size:20px;flex-shrink:0;margin-top:1px">🚨</span>
+        <p><strong>Pourquoi ce module ?</strong> Un incident d'électrisation a récemment eu lieu au sein de notre organisation. Le collaborateur est heureusement sain et sauf. Cet événement nous rappelle que le risque électrique est réel, même dans nos interventions quotidiennes. <strong>Ce rappel est obligatoire pour tous les habilités BR.</strong></p>
+      </div>
+      <div class="reg-form">
+        <div class="field">
+          <label>Nom</label>
+          <input type="text" id="i-nom" placeholder="Votre nom de famille">
+          <div class="ferr" id="e-nom">Champ obligatoire</div>
+        </div>
+        <div class="field">
+          <label>Prénom</label>
+          <input type="text" id="i-prenom" placeholder="Votre prénom">
+          <div class="ferr" id="e-prenom">Champ obligatoire</div>
+        </div>
+        <div class="field">
+          <label>E-mail professionnel</label>
+          <input type="email" id="i-email" placeholder="prenom.nom@muller-automotive.fr">
+          <div class="ferr" id="e-email">Adresse e-mail invalide</div>
+        </div>
+        <button class="btn-go" onclick="startModule()">Commencer le module →</button>
+        <p class="reg-note">Vos résultats seront enregistrés et transmis au pôle formation pour suivi des actions correctives.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODULE ══ -->
+<div id="s-module" class="screen">
+  <div class="mod-wrap">
+
+    <!-- BLOC 1 : Incident -->
+    <div class="sec-label">01 — Pourquoi ce rappel</div>
+    <div class="block-wrap" id="bw-1">
+      <div class="card" id="card-1">
+        <div class="card-head">
+          <div class="card-icon" style="background:rgba(240,74,74,.15)">🚨</div>
+          <div><h2>L'incident : leçons à retenir</h2><p>Analyse d'un événement réel pour ne pas le reproduire</p></div>
+        </div>
+        <div class="card-body">
+          <div class="blk blk-red"><strong>Un de nos collaborateurs BR</strong> a subi une électrisation lors d'une intervention basse tension. Il est heureusement indemne. Mais sans <strong>gants isolants portés</strong> ni <strong>écran facial</strong>, et sans avoir réalisé une <strong>VAT avant de toucher les câbles</strong>, les conséquences auraient pu être <strong>irréversibles</strong>.</div>
+          <div class="stat-row">
+            <div class="stat r"><div class="stat-n">×15</div><div class="stat-l">Plus mortel qu'un autre accident du travail</div></div>
+            <div class="stat a"><div class="stat-n">51 %</div><div class="stat-l">Des victimes sont des techniciens non-électriciens</div></div>
+            <div class="stat g"><div class="stat-n">2 300</div><div class="stat-l">Accidents électriques/an en France</div></div>
+          </div>
+          <div class="blk blk-amber"><strong>Causes identifiées :</strong> gants isolants non portés — écran facial absent — câble débranché sans réaliser de VAT préalable.<br><em style="font-size:12px;opacity:.7;display:block;margin-top:4px">Sources : INRS / Observatoire National Sécurité Électrique (ONSE)</em></div>
+          <ul class="chks">
+            <li>Un accident électrique <strong>n'est jamais un accident de malchance</strong>, c'est un accident de méthode</li>
+            <li>Les règles d'habilitation existent précisément pour éviter ce type d'incident</li>
+            <li>La conformité aux procédures est une <strong>obligation réglementaire</strong>, pas une option</li>
+          </ul>
+        </div>
+      </div>
+      <div class="block-lock" id="lk-1"><div class="lock-icon">🔒</div><div class="lock-msg">Lecture en cours…<div class="lock-timer" id="lt-1">2:30</div></div></div>
+    </div>
+
+    <!-- BLOC 2 : BR périmètre -->
+    <div class="sec-label">02 — Rappel habilitation BR</div>
+    <div class="block-wrap" id="bw-2">
+      <div class="card" id="card-2">
+        <div class="card-head">
+          <div class="card-icon" style="background:rgba(245,166,35,.15)">⚡</div>
+          <div><h2>Périmètre et limites du BR</h2><p>Ce que vous pouvez faire — et ce qui est hors périmètre</p></div>
+        </div>
+        <div class="card-body">
+          <div class="blk blk-blue"><strong>BR = Chargé d'Interventions Générales BT.</strong> Délivré et signé par l'employeur. Valable pour les interventions de courte durée sur circuits BT en exploitation. Réévaluation obligatoire tous les <strong>3 ans minimum</strong>.</div>
+          <table class="dt">
+            <tr><th>✅ Autorisé BR</th><th>🚫 Hors périmètre BR</th></tr>
+            <tr>
+              <td><ul class="chks" style="margin:0"><li>Dépannage et diagnostic BT</li><li>Connexions / déconnexions BT</li><li>Mesurages, essais, vérifications</li><li>Remplacement à l'identique</li><li>Travaux hors tension (consignation)</li></ul></td>
+              <td><ul class="cros" style="margin:0"><li>Travaux sous tension (BTT)</li><li>Consignation d'ouvrage (BC)</li><li>Toute intervention HTA/HTB</li><li>Direction d'équipe (B2)</li><li>Déconnecter un câble sans VAT préalable</li></ul></td>
+            </tr>
+          </table>
+          <div class="blk blk-red">⚠ <strong>Domaine BT :</strong> jusqu'à <strong>1 000 V CA</strong> / <strong>1 500 V CC</strong>. Le réseau 230 V et 400 V triphasé sont en BT. Ne sous-estimez jamais leur danger.</div>
+        </div>
+      </div>
+      <div class="block-lock" id="lk-2"><div class="lock-icon">🔒</div><div class="lock-msg">Déverrouillage dans<div class="lock-timer" id="lt-2">—</div></div></div>
+    </div>
+
+    <!-- BLOC 3 : Zones -->
+    <div class="sec-label">03 — Zones et distances</div>
+    <div class="block-wrap" id="bw-3">
+      <div class="card" id="card-3">
+        <div class="card-head">
+          <div class="card-icon" style="background:rgba(91,156,246,.15)">🗺️</div>
+          <div><h2>Zones de voisinage — DMA BT</h2><p>Adapter votre comportement selon la distance aux pièces nues</p></div>
+        </div>
+        <div class="card-body">
+          <div class="blk blk-blue">La <strong>Distance Minimale d'Approche</strong> définit des zones concentriques autour des pièces nues sous tension. Plus on s'approche, plus les mesures sont strictes.</div>
+          <table class="dt">
+            <tr><th>Zone</th><th>Situation</th><th>Obligation</th></tr>
+            <tr><td>🟢 Libre BT</td><td>Au-delà de la DMA BT</td><td>Aucune précaution spécifique</td></tr>
+            <tr><td>🟡 Voisinage BT</td><td>Entre DMA et 30 cm des pièces nues</td><td>Vigilance, EPI recommandés</td></tr>
+            <tr><td>🔴 Voisinage renforcé</td><td><strong>&lt; 30 cm des pièces nues</strong></td><td><strong>EPI isolants OBLIGATOIRES</strong></td></tr>
+            <tr><td>⛔ Contact direct</td><td>Toucher les pièces nues</td><td>Interdit sans habilitation BTT</td></tr>
+          </table>
+          <div class="blk blk-amber">⚠ <strong>Lien direct avec l'incident :</strong> intervenir sans EPI dans la zone renforcée expose au même risque. Un geste imprécis ou un outil conducteur mal orienté — et le contact est immédiat.</div>
+        </div>
+      </div>
+      <div class="block-lock" id="lk-3"><div class="lock-icon">🔒</div><div class="lock-msg">Déverrouillage dans<div class="lock-timer" id="lt-3">—</div></div></div>
+    </div>
+
+    <!-- BLOC 4 : EPI avec vidéos -->
+    <div class="sec-label">04 — EPI obligatoires + vidéos de contrôle</div>
+    <div class="block-wrap" id="bw-4">
+      <div class="card" id="card-4">
+        <div class="card-head">
+          <div class="card-icon" style="background:rgba(45,212,160,.15)">🦺</div>
+          <div><h2>EPI électriques — Port, vérification & contrôle</h2><p>Regardez chaque vidéo — elle fait partie intégrante de la formation</p></div>
+        </div>
+        <div class="card-body">
+
+          <div class="blk blk-red">🚨 <strong>Règle n°1 :</strong> tout EPI présentant un défaut visible (coupure, fissure, craquelure, isolation abîmée, rayure sur l'écran) doit être <strong>immédiatement mis hors service</strong> et signalé au responsable pour remplacement. Un EPI défectueux = aucune protection.</div>
+
+          <!-- === VIDÉO 1 : Gants isolants === -->
+          <div style="margin-bottom:1.5rem">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:36px;height:36px;background:rgba(45,212,160,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🧤</div>
+              <div>
+                <div style="font-size:15px;font-weight:600">Gants isolants classe 00 — Contrôle avant usage</div>
+                <div style="font-size:12px;color:var(--muted)">Port obligatoire · Vérification visuelle et par gonflage</div>
+              </div>
+              <span style="margin-left:auto;font-size:10px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(240,74,74,.3);padding:3px 10px;border-radius:20px;white-space:nowrap">OBLIGATOIRE</span>
+            </div>
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
+              <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/gzadNZeyLNA" title="Habilitation électrique - EPI - Gants isolants - vérification" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+            <div class="blk blk-green" style="margin-top:10px;margin-bottom:0">
+              <strong>Points clés gants classe 00 :</strong>
+              <ul class="chks" style="margin-top:6px">
+                <li><strong>Mettre les gants AVANT tout geste</strong> — pas après avoir inspecté à mains nues</li>
+                <li>Contrôle visuel : absence de coupures, perforations, craquelures, décoloration</li>
+                <li>Contrôle par gonflage : enrouler le revers sur lui-même pour emprisonner l'air — aucune fuite ne doit apparaître</li>
+                <li>Les gants classe 00 <strong>n'ont pas de date de péremption</strong> — c'est l'état physique qui détermine leur utilisation</li>
+                <li>Ranger à plat, à l'abri de la chaleur et des produits chimiques — ne jamais plier</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- === VIDÉO 2 : Écran facial === -->
+          <div style="margin-bottom:1.5rem">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:36px;height:36px;background:rgba(45,212,160,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🥽</div>
+              <div>
+                <div style="font-size:15px;font-weight:600">Écran facial — Port et vérification</div>
+                <div style="font-size:12px;color:var(--muted)">Obligatoire à l'ouverture d'armoire et lors de la VAT · EN 166 anti-arc</div>
+              </div>
+              <span style="margin-left:auto;font-size:10px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(240,74,74,.3);padding:3px 10px;border-radius:20px;white-space:nowrap">OBLIGATOIRE</span>
+            </div>
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
+              <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/WzFRmN3SdsI" title="Visière écran facial protection arc électrique - vérification et port" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+            <div class="blk blk-green" style="margin-top:10px;margin-bottom:0">
+              <strong>Points clés écran facial :</strong>
+              <ul class="chks" style="margin-top:6px">
+                <li><strong>Port obligatoire</strong> dès l'ouverture d'une armoire ou boîte de connexion sous tension</li>
+                <li><strong>Port obligatoire lors de la VAT</strong> : risque de court-circuit entre les sondes (page 8 de votre document Muller)</li>
+                <li>Contrôle visuel : absence de rayures profondes, fissures, impacts sur la visière — une rayure réduit la visibilité et peut fragiliser la protection</li>
+                <li>Vérifier le système de fixation serre-tête et l'articulation de relevage</li>
+                <li>Les lunettes de sécurité ordinaires <strong>ne remplacent pas</strong> l'écran facial — elles ne protègent pas contre un arc électrique</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- === VIDÉO 3 : Outils isolés === -->
+          <div style="margin-bottom:1rem">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:36px;height:36px;background:rgba(245,166,35,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔧</div>
+              <div>
+                <div style="font-size:15px;font-weight:600">Outillage isolé 1 000 V — Contrôle et identification</div>
+                <div style="font-size:12px;color:var(--muted)">Norme NF EN 60900 · Double triangle · Testé à 10 000 V</div>
+              </div>
+            </div>
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
+              <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/LBf_noJHqnA" title="Outils isolés 1000V - contrôle et vérification" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+            <div class="blk blk-amber" style="margin-top:10px;margin-bottom:0">
+              <strong>Points clés outils isolés :</strong>
+              <ul class="chks" style="margin-top:6px">
+                <li>Identifier le marquage <strong>Double triangle + 1000V + NF EN 60900</strong> sur chaque outil — sans ce marquage, l'outil n'est pas homologué</li>
+                <li>Contrôle visuel de l'isolation : absence de coupures, décollements, fissures du gainage isolant — notamment sur le manche et la jonction manche/lame</li>
+                <li><strong>Jamais d'outil conducteur nu</strong> (tournevis standard, pince non isolée) à proximité de pièces sous tension</li>
+                <li>Un outil isolé endommagé doit être retiré immédiatement du service — ne pas réparer avec du ruban isolant</li>
+                <li>Vérification régulière du stock d'outillage isolé — chaque technicien est responsable de ses outils</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="blk blk-amber">⚠ <strong>Avant toute déconnexion de câble :</strong> réaliser impérativement une <strong>VAT</strong> sur le câble concerné, <strong>gants et écran facial portés</strong>, même si l'installation semble hors tension. Ne jamais présupposer l'absence de tension.</div>
+
+        </div>
+      </div>
+      <div class="block-lock" id="lk-4"><div class="lock-icon">🔒</div><div class="lock-msg">Déverrouillage dans<div class="lock-timer" id="lt-4">—</div></div></div>
+    </div>
+
+    <!-- BLOC 5 : Consignation 6 étapes Muller -->
+    <div class="sec-label">05 — Consignation Muller Automotive</div>
+    <div class="block-wrap" id="bw-5">
+      <div class="card" id="card-5">
+        <div class="card-head">
+          <div class="card-icon" style="background:rgba(245,166,35,.15)">🔒</div>
+          <div><h2>Consignation — 6 opérations impératives</h2><p>Procédure Muller Automotive — Chapitre 12 NF C 18-510</p></div>
+        </div>
+        <div class="card-body">
+
+          <!-- Tableau 6 étapes -->
+          <div style="display:grid;gap:8px;margin-bottom:1.25rem">
+
+            <div style="display:flex;align-items:stretch;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)">
+              <div style="background:#b85c00;color:white;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 14px;display:flex;align-items:center;min-width:110px;flex-shrink:0">1ère OPÉRATION</div>
+              <div style="background:var(--panel);padding:10px 14px;flex:1;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span><strong>PRÉ-IDENTIFICATION</strong> — Repérer l'ouvrage sur schéma, identifier le circuit à consigner, connaître l'environnement électrique.</span>
+                <span style="font-size:20px;flex-shrink:0">🗺️</span>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:stretch;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)">
+              <div style="background:#b85c00;color:white;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 14px;display:flex;align-items:center;min-width:110px;flex-shrink:0">2ème OPÉRATION</div>
+              <div style="background:var(--panel);padding:10px 14px;flex:1;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span><strong>SÉPARER</strong> — Séparation électrique de tous les conducteurs actifs (phases + neutre) des sources de tension. Par sectionneur, disjoncteur, retrait de fusibles ou fiche de prise.</span>
+                <span style="font-size:20px;flex-shrink:0">✂️</span>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:stretch;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)">
+              <div style="background:#b85c00;color:white;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 14px;display:flex;align-items:center;min-width:110px;flex-shrink:0">3ème OPÉRATION</div>
+              <div style="background:var(--panel);padding:10px 14px;flex:1;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span><strong>CONDAMNER</strong> — Immobilisation par serrure-cadenas en position ouverte + <strong>pancarte "Défense de manœuvrer"</strong>. Empêche tout ré-enclenchement par un tiers.</span>
+                <span style="font-size:20px;flex-shrink:0">🔐</span>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:stretch;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)">
+              <div style="background:#b85c00;color:white;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 14px;display:flex;align-items:center;min-width:110px;flex-shrink:0">4ème OPÉRATION</div>
+              <div style="background:var(--panel);padding:10px 14px;flex:1;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span><strong>IDENTIFIER</strong> — Identification sur le lieu de travail de la partie consignée. Repérage sur schéma, plans, connaissance des installations. Confirmer qu'on intervient sur le bon circuit.</span>
+                <span style="font-size:20px;flex-shrink:0">🏷️</span>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:stretch;border-radius:var(--r-sm);overflow:hidden;border:1px solid rgba(240,74,74,.4)">
+              <div style="background:var(--red);color:white;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 14px;display:flex;align-items:center;min-width:110px;flex-shrink:0">5ème OPÉRATION</div>
+              <div style="background:var(--red-bg);padding:10px 14px;flex:1;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#f5c0c0">
+                <span><strong style="color:var(--red)">VAT — Vérification d'Absence de Tension</strong> — Aussi près que possible du lieu de travail. VAT testé <strong>AVANT et APRÈS</strong> utilisation. En BT : mesure entre chaque conducteur actif et la terre (L1/T, L2/T, L3/T, N/T). <strong>Pas d'appareil de mesure — uniquement un VAT homologué.</strong></span>
+                <span style="font-size:20px;flex-shrink:0">⚡</span>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:stretch;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)">
+              <div style="background:#555;color:white;font-family:var(--mono);font-size:11px;font-weight:700;padding:10px 14px;display:flex;align-items:center;min-width:110px;flex-shrink:0">6ème OPÉRATION</div>
+              <div style="background:var(--panel);padding:10px 14px;flex:1;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span><strong>MALT CC</strong> <em style="color:var(--muted)">(si nécessaire)</em> — Mise À la Terre et Court-Circuit si risque de remise sous tension par dispositif extérieur (groupe électrogène, batterie, condensateur, tension induite). <strong>Pose : Terre en premier → conducteurs. Dépose : conducteurs → Terre en dernier.</strong></span>
+                <span style="font-size:20px;flex-shrink:0">🌍</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="blk blk-red">⚡ <strong>Ordre INTANGIBLE — 6 opérations, jamais dans un autre ordre, jamais une étape sautée.</strong> La VAT est l'opération critique : un VAT défaillant affiche "absence de tension" alors qu'elle est présente. Testez-le avant ET après chaque utilisation.</div>
+          <div class="blk blk-amber"><strong>VAT avant toute déconnexion de câble :</strong> même si l'installation semble coupée, même si vous l'avez coupée vous-même. Une tension résiduelle, un condensateur chargé, une erreur de circuit — la VAT est la seule certitude. Vérifiez régulièrement votre appareil VAT : piles, sondes, affichage, test sur source connue.</div>
+        </div>
+      </div>
+      <div class="block-lock" id="lk-5"><div class="lock-icon">🔒</div><div class="lock-msg">Déverrouillage dans<div class="lock-timer" id="lt-5">—</div></div></div>
+    </div>
+
+    <!-- BLOC 6 : Autorisation + Situations -->
+    <div class="sec-label">06 — Documents & conduite à tenir</div>
+    <div class="block-wrap" id="bw-6">
+      <div class="card" id="card-6">
+        <div class="card-head">
+          <div class="card-icon" style="background:rgba(91,156,246,.15)">📋</div>
+          <div><h2>Autorisation, situations imprévues, fin d'intervention</h2><p>Les bons réflexes avant, pendant et après</p></div>
+        </div>
+        <div class="card-body">
+          <div class="blk blk-blue"><strong>Avant toute intervention :</strong> s'assurer d'avoir reçu l'autorisation du responsable ou du chargé d'exploitation. Porter les EPI <strong>avant de commencer</strong> — gants isolants et écran facial en priorité. Réaliser une <strong>VAT systématique avant de toucher ou déconnecter tout câble</strong>, même supposé hors tension.</div>
+          <div class="blk blk-red">
+            🚨 <strong>Situation dangereuse imprévue — 3 réflexes :</strong><br><br>
+            <strong style="color:var(--red)">① STOP</strong> — Interrompre immédiatement<br>
+            <strong style="color:var(--accent)">② ALERTER</strong> — Prévenir le chargé d'exploitation<br>
+            <strong style="color:var(--green)">③ ATTENDRE</strong> — Reprendre uniquement sur accord explicite
+          </div>
+          <ol class="steps">
+            <li><span class="sbadge">1</span><div><strong>Avant :</strong> autorisation obtenue, <strong>gants isolants et écran facial portés</strong>, VAT en main et testée, risques analysés, position sur le côté de l'armoire à l'ouverture.</div></li>
+            <li><span class="sbadge">2</span><div><strong>Pendant :</strong> <strong>VAT systématique avant tout contact ou déconnexion de câble.</strong> Aucun outil conducteur nu à proximité des pièces nues. Gestes contrôlés dans la zone renforcée.</div></li>
+            <li><span class="sbadge">3</span><div><strong>Fin :</strong> libérer l'ouvrage, retirer les protections temporaires, remettre les protections permanentes, informer le chargé d'exploitation, attendre l'autorisation de remise sous tension.</div></li>
+          </ol>
+          <div class="blk blk-amber"><strong>En cas d'accident :</strong> couper l'alimentation AVANT de secourir (ne jamais toucher une victime encore en contact). Composer le 15, 18 ou 112. Gestes de premiers secours si formé.</div>
+        </div>
+      </div>
+      <div class="block-lock" id="lk-6"><div class="lock-icon">🔒</div><div class="lock-msg">Déverrouillage dans<div class="lock-timer" id="lt-6">—</div></div></div>
+    </div>
+
+  </div><!-- /mod-wrap -->
+
+  <div class="mod-nav">
+    <div class="nav-info">Temps restant<strong id="nav-t">15:00</strong></div>
+    <div style="text-align:center;font-size:12px;color:var(--muted)">Lisez chaque bloc — le questionnaire<br>se déverrouille à la fin des 15 min</div>
+    <button class="btn-nav gold" id="btn-quiz" onclick="goQuiz()" disabled>Questionnaire →</button>
+  </div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div id="s-quiz" class="screen">
+  <div class="quiz-wrap">
+    <div class="quiz-hdr">
+      <h2>Questionnaire de validation</h2>
+      <p>10 questions sur le module. <strong>Seuil : 70 % (7/10).</strong> Vos résultats sont enregistrés dans la base de données et transmis au pôle formation.</p>
+    </div>
+    <div id="quiz-area"></div>
+    <div class="quiz-nav">
+      <button class="btn-nav" id="qp" onclick="qPrev()" disabled>← Préc.</button>
+      <span style="font-size:12px;color:var(--muted)" id="qctr">1 / 10</span>
+      <button class="btn-nav gold" id="qn" onclick="qNext()" disabled>Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RÉSULTATS ══ -->
+<div id="s-res" class="screen">
+  <div class="res-page"><div class="res-wrap"><div id="res-card"></div></div></div>
+</div>
+
+<script>
+/* ════════════════════════════════
+   CONFIG — adapter à ton serveur
+════════════════════════════════ */
+const API_BASE = '/api/br'; // chemin de l'API sur formation-sav.fr
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let USER = {};
+let timerSec = 15 * 60;
+let timerInt = null;
+let moduleStart = null;
+
+// Durées de lecture par bloc (en secondes) — total = 15 min = 900 s
+// Bloc 4 allongé car 3 vidéos à visionner (~4 min)
+const BLOC_DURATIONS = [120, 100, 100, 210, 180, 190]; // 900 s total
+let blocUnlocked = [false, false, false, false, false, false];
+let blocTimers   = [...BLOC_DURATIONS]; // compte à rebours par bloc
+let blocInterval = null;
+
+let curQ = 0;
+let answers  = new Array(10).fill(null);
+let answered = new Array(10).fill(false);
+
+/* ════════════════════════════════
+   QUESTIONS
+════════════════════════════════ */
+const QQ = [
+  {q:"Suite à l'incident dans notre équipe, quelle est la cause principale identifiée ?",opts:["Une panne imprévue de l'installation","Gants isolants non portés, écran facial absent et câble débranché sans VAT préalable","Une défaillance du matériel entreprise","Un manque d'expérience du collaborateur"],ans:1,expl:"Les causes identifiées sont : gants isolants non portés, écran facial absent, câble débranché sans réaliser de VAT préalable. Ce n'est pas un problème de matériel ou d'expérience — c'est un problème de méthode et de port des EPI."},
+  {q:"Jusqu'à quelle tension s'étend le domaine BT en courant alternatif ?",opts:["500 V","750 V","1 000 V","1 500 V"],ans:2,expl:"Le domaine BT s'étend de 50 V à 1 000 V en courant alternatif. En courant continu, la limite est 1 500 V. Le réseau 230 V mono et 400 V triphasé sont donc en BT."},
+  {q:"Face à une situation dangereuse imprévue, quel est le premier réflexe du BR ?",opts:["Continuer prudemment","Appeler le 15 immédiatement","Interrompre et alerter le chargé d'exploitation","Couper l'alimentation générale seul"],ans:2,expl:"STOP → ALERTER le chargé d'exploitation → ATTENDRE son accord. On ne reprend qu'après accord explicite. Les secours ne sont appelés qu'en cas de blessé."},
+  {q:"Quelle est la vérification obligatoire à faire sur vos gants isolants classe 00 avant chaque usage ?",opts:["Vérifier la date de péremption imprimée dessus","Contrôler visuellement et en les pliant l'absence de coupures, perforations et craquelures","Vérifier uniquement qu'ils ne sont pas mouillés","Aucune vérification nécessaire s'ils ont été rangés correctement"],ans:1,expl:"Les gants isolants classe 00 en dotation n'ont pas de date de péremption. La vérification obligatoire est visuelle et mécanique : plier doucement les gants pour détecter les craquelures invisibles à l'œil nu, contrôler l'absence de coupures ou perforations. Tout défaut = mise hors service immédiate."},
+  {q:"Dans quel ordre impératif se réalisent les 4 étapes de la consignation ?",opts:["VAT → Séparation → Condamnation → MALT-CC","Séparation → Condamnation → VAT → MALT-CC","Condamnation → Séparation → VAT → MALT-CC","Séparation → VAT → Condamnation → MALT-CC"],ans:1,expl:"L'ordre impératif est : 1. Séparation 2. Condamnation 3. VAT 4. MALT-CC. Cet ordre ne peut jamais être modifié ni une étape sautée."},
+  {q:"La zone de voisinage renforcé BT est définie à quelle distance des pièces nues ?",opts:["Moins de 1 m","Moins de 50 cm","Moins de 30 cm","Moins de 10 cm"],ans:2,expl:"La zone de voisinage renforcé BT = moins de 30 cm des pièces nues sous tension. Dans cette zone, les EPI isolants (gants classe 00, protection faciale) sont obligatoires."},
+  {q:"Avant de déconnecter un câble sur une installation supposée hors tension, que faites-vous ?",opts:["On déconnecte directement si l'interrupteur est ouvert","On réalise une VAT sur le câble concerné avant tout contact","On demande à un collègue de confirmer visuellement","On touche brièvement le câble avec le dos de la main pour tester"],ans:1,expl:"Même si l'installation semble hors tension, une VAT systématique est obligatoire avant tout contact ou déconnexion. Une tension résiduelle, un ré-enclenchement, une erreur de circuit — la VAT est la seule garantie réelle."},
+  {q:"Un gant isolant présente une légère craquelure. Que faites-vous ?",opts:["Utilisation pour une intervention rapide uniquement","Mise hors service immédiate et remplacement avant toute intervention","Réparation avec du ruban isolant","Signalement mais utilisation jusqu'au prochain contrôle EPI"],ans:1,expl:"Tout EPI avec un défaut visible — même mineur — est immédiatement mis hors service. Un gant craquelé n'offre aucune garantie d'isolation. Il n'existe aucune réparation acceptable."},
+  {q:"Pourquoi faut-il vérifier régulièrement son appareil VAT, et pas seulement au moment de l'utiliser ?",opts:["Ce n'est pas nécessaire si l'appareil est récent","Un VAT défaillant peut afficher 'absence de tension' même sous tension — la vérification régulière garantit sa fiabilité","La vérification régulière est facultative, seul le test avant mesure compte","Il suffit de vérifier que les sondes sont branchées"],ans:1,expl:"Un VAT dont les piles sont faibles ou dont l'électronique est défaillante peut afficher une absence de tension même lorsque la tension est présente. C'est l'erreur la plus dangereuse. La vérification régulière (piles, sondes, affichage, test sur source connue) est indispensable."},
+  {q:"Quelle affirmation est FAUSSE concernant l'habilitation BR ?",opts:["Le BR peut réaliser des interventions de dépannage seul en BT","Le BR est autorisé à consigner des ouvrages sans restriction","L'habilitation BR est délivrée et signée par l'employeur","L'habilitation doit être réévaluée au minimum tous les 3 ans"],ans:1,expl:"FAUX : la consignation d'ouvrage est réservée au BC (Chargé de Consignation). Le BR n'est pas habilité à consigner. Les 3 autres propositions sont vraies."}
+];
+
+/* ════════════════════════════════
+   REGISTRATION
+════════════════════════════════ */
+async function startModule() {
+  const nom    = document.getElementById('i-nom').value.trim();
+  const prenom = document.getElementById('i-prenom').value.trim();
+  const email  = document.getElementById('i-email').value.trim();
+  let ok = true;
+  [['nom',nom],['prenom',prenom]].forEach(([id,v]) => {
+    const inp = document.getElementById('i-'+id), err = document.getElementById('e-'+id);
+    if (!v) { inp.classList.add('err'); err.classList.add('show'); ok=false; }
+    else    { inp.classList.remove('err'); err.classList.remove('show'); }
+  });
+  const ei = document.getElementById('i-email'), ee = document.getElementById('e-email');
+  if (!email || !/.+@.+\..+/.test(email)) { ei.classList.add('err'); ee.classList.add('show'); ok=false; }
+  else { ei.classList.remove('err'); ee.classList.remove('show'); }
+  if (!ok) return;
+
+  // Vérification liste blanche
+  const btn = document.querySelector('.btn-go');
+  if (btn) { btn.disabled = true; btn.textContent = 'Vérification…'; }
+  try {
+    const r = await fetch(`${API_BASE}/check-email`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email })
+    });
+    const d = await r.json();
+    if (!d.authorized) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Commencer le module →'; }
+      ei.classList.add('err');
+      const errEl = document.getElementById('e-email');
+      if (errEl) { errEl.textContent = 'Cet email n\'est pas autorisé à accéder à ce module. Contactez votre responsable.'; errEl.classList.add('show'); }
+      return;
+    }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Commencer le module →'; }
+    console.warn('Vérification email impossible — accès accordé par défaut');
+  }
+
+  USER = { nom, prenom, email };
+  showScreen('s-module');
+  moduleStart = Date.now();
+  startGlobalTimer();
+  startBlocTimers();
+  setProgress(0);
+  window.scrollTo(0,0);
+}
+
+/* ════════════════════════════════
+   GLOBAL TIMER (15 min)
+════════════════════════════════ */
+function startGlobalTimer() {
+  document.getElementById('timerBox').style.display = 'flex';
+  timerInt = setInterval(() => {
+    timerSec--;
+    const m = Math.floor(timerSec/60), s = timerSec%60;
+    const str = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    document.getElementById('timerVal').textContent = str;
+    document.getElementById('nav-t').textContent = str;
+    if (timerSec <= 60) document.getElementById('timerBox').classList.add('urgent');
+    if (timerSec <= 0) { clearInterval(timerInt); unlockAllAndProceed(); }
+  }, 1000);
+}
+
+function stopGlobalTimer() { clearInterval(timerInt); }
+
+/* ════════════════════════════════
+   BLOC TIMERS (lecture progressive)
+════════════════════════════════ */
+function startBlocTimers() {
+  // Déverrouiller le bloc 1 immédiatement (déjà visible)
+  unlockBloc(0);
+
+  // Pour les blocs suivants, déverrouillage en cascade
+  // Chaque bloc se déverrouille quand son timer atteint 0
+  let cumulDelay = 0;
+  for (let i = 0; i < BLOC_DURATIONS.length; i++) {
+    cumulDelay += BLOC_DURATIONS[i];
+    scheduleUnlock(i, cumulDelay * 1000);
+  }
+}
+
+function scheduleUnlock(idx, delayMs) {
+  // Met à jour le compte à rebours affiché pour ce bloc
+  let remaining = BLOC_DURATIONS[idx];
+  // Calcul du délai de début d'affichage (cumul des blocs précédents)
+  let startDelay = 0;
+  for (let i = 0; i < idx; i++) startDelay += BLOC_DURATIONS[i];
+
+  setTimeout(() => {
+    // Commencer à afficher le compte à rebours de CE bloc
+    const ltEl = document.getElementById('lt-'+(idx+1));
+    if (ltEl) {
+      let cnt = BLOC_DURATIONS[idx];
+      const interval = setInterval(() => {
+        cnt--;
+        if (ltEl) {
+          const m2 = Math.floor(cnt/60), s2 = cnt%60;
+          ltEl.textContent = cnt >= 60
+            ? `${m2}:${String(s2).padStart(2,'0')}`
+            : `${cnt}s`;
+        }
+        if (cnt <= 0) {
+          clearInterval(interval);
+          unlockBloc(idx);
+        }
+      }, 1000);
+    }
+  }, startDelay * 1000);
+}
+
+function unlockBloc(idx) {
+  if (blocUnlocked[idx]) return;
+  blocUnlocked[idx] = true;
+  const lk = document.getElementById('lk-'+(idx+1));
+  const card = document.getElementById('card-'+(idx+1));
+  if (lk) lk.classList.add('unlocked');
+  if (card && idx > 0) {
+    card.classList.add('new-unlock');
+    setTimeout(() => card.classList.remove('new-unlock'), 600);
+    // Scroll doux vers le nouveau bloc
+    setTimeout(() => {
+      document.getElementById('bw-'+(idx+1)).scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 200);
+  }
+  updateModuleProgress();
+}
+
+function unlockAllAndProceed() {
+  for (let i = 0; i < 6; i++) unlockBloc(i);
+  document.getElementById('btn-quiz').disabled = false;
+  document.getElementById('timerVal').textContent = '00:00';
+  document.getElementById('nav-t').textContent = '00:00';
+  updateModuleProgress();
+}
+
+function updateModuleProgress() {
+  const done = blocUnlocked.filter(Boolean).length;
+  const pct = Math.round((done / 6) * 50); // 0-50% pour le module
+  setProgress(pct);
+  if (done >= 6) {
+    document.getElementById('btn-quiz').disabled = false;
+  }
+}
+
+/* ════════════════════════════════
+   QUIZ
+════════════════════════════════ */
+function goQuiz() {
+  stopGlobalTimer();
+  document.getElementById('timerBox').textContent = '✅ Module terminé';
+  showScreen('s-quiz');
+  renderQ();
+  setProgress(50);
+  window.scrollTo(0,0);
+}
+
+function renderQ() {
+  const q = QQ[curQ];
+  const L = ['A','B','C','D'];
+  document.getElementById('qctr').textContent = `${curQ+1} / ${QQ.length}`;
+  document.getElementById('qp').disabled = (curQ === 0);
+  document.getElementById('qn').disabled = !answered[curQ];
+  const isLast = curQ === QQ.length-1;
+  document.getElementById('qn').textContent = isLast ? '✅ Voir mes résultats' : 'Suivant →';
+
+  const optsHtml = q.opts.map((o,i) => {
+    let cls = 'opt';
+    if (answered[curQ]) {
+      if (i === q.ans) cls += ' correct';
+      else if (i === answers[curQ] && i !== q.ans) cls += ' wrong';
+      return `<button class="${cls}" disabled><span class="okey">${L[i]}</span>${o}</button>`;
+    } else {
+      if (answers[curQ] === i) cls += ' selected';
+      return `<button class="${cls}" onclick="chooseQ(${i})"><span class="okey">${L[i]}</span>${o}</button>`;
+    }
+  }).join('');
+
+  const explHtml = answered[curQ]
+    ? `<div class="qexpl ${answers[curQ]===q.ans?'ok':'ko'}">
+        <strong>${answers[curQ]===q.ans?'✓ Correct — ':'✗ Incorrect — '}</strong>${q.expl}
+       </div>`
+    : '';
+
+  setProgress(50 + Math.round(((curQ+1)/QQ.length)*50));
+
+  document.getElementById('quiz-area').innerHTML = `
+    <div class="qcard">
+      <div class="qtop">
+        <div class="qtag">Question ${curQ+1} / ${QQ.length}</div>
+        <div class="qtext">${q.q}</div>
+      </div>
+      <div class="qopts">${optsHtml}</div>
+      ${explHtml}
+    </div>`;
+}
+
+function chooseQ(i) {
+  if (answered[curQ]) return;
+  answers[curQ] = i; answered[curQ] = true;
+  document.getElementById('qn').disabled = false;
+  renderQ();
+}
+function qNext() { if(curQ===QQ.length-1){showResults();return;} curQ++; renderQ(); window.scrollTo(0,0); }
+function qPrev() { if(curQ>0){curQ--;renderQ();window.scrollTo(0,0);} }
+
+/* ════════════════════════════════
+   RÉSULTATS + SAUVEGARDE API
+════════════════════════════════ */
+async function showResults() {
+  setProgress(100);
+  showScreen('s-res');
+  window.scrollTo(0,0);
+
+  const score  = answers.reduce((s,a,i) => s+(a===QQ[i].ans?1:0), 0);
+  const pct    = Math.round(score/QQ.length*100);
+  const pass   = pct >= 70;
+  const mid    = pct >= 50 && pct < 70;
+  const cls    = pass?'pass':mid?'mid':'fail';
+  const emoji  = pass?'✅':mid?'📚':'🔄';
+  const verdict= pass?'Validation acquise':mid?'Action corrective requise':'Recyclage obligatoire';
+
+  const now      = new Date();
+  const dateStr  = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+  const timeStr  = now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const dureeSec = Math.round((Date.now() - moduleStart) / 1000);
+
+  const reponsesDetail = QQ.map((q,i) => ({
+    question: q.q,
+    reponse: answers[i] !== null ? q.opts[answers[i]] : 'Non répondu',
+    correcte: q.opts[q.ans],
+    ok: answers[i] === q.ans
+  }));
+
+  const recapHtml = QQ.map((q,i) => {
+    const ok = answers[i] === q.ans;
+    const chosen  = answers[i]!==null ? q.opts[answers[i]] : 'Non répondu';
+    return `<div class="recap-i">
+      <span class="rdot ${ok?'ok':'ko'}"></span>
+      <span>
+        <strong style="color:var(--text)">Q${i+1}</strong> — ${q.q}<br>
+        <span style="font-size:12px;color:${ok?'var(--green)':'var(--red)'}">
+          ${ok?'✓ '+q.opts[q.ans]:'✗ Réponse : '+chosen+' · Correct : '+q.opts[q.ans]}
+        </span>
+      </span>
+    </div>`;
+  }).join('');
+
+  // Affichage immédiat
+  document.getElementById('res-card').innerHTML = `
+    <div class="res-hero">
+      <div class="res-top ${cls}">
+        <div class="res-icon">${emoji}</div>
+        <div class="res-pct">${pct}%</div>
+        <div class="res-score">${score} bonne${score>1?'s':''} réponse${score>1?'s':''} sur ${QQ.length}</div>
+        <span class="res-verdict">${verdict}</span>
+      </div>
+      <div class="res-body">
+        <div class="res-meta">
+          <strong>Collaborateur :</strong> ${USER.prenom} ${USER.nom}<br>
+          <strong>E-mail :</strong> ${USER.email}<br>
+          <strong>Module :</strong> Rappel Sécurité BR + EPI<br>
+          <strong>Date :</strong> ${dateStr} à ${timeStr}<br>
+          <strong>Score :</strong> ${score}/10 (${pct}%) — ${verdict}
+        </div>
+        <div id="save-status" class="save-status">⏳ Enregistrement en cours…</div>
+        <div style="font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.05em;
+          text-transform:uppercase;margin:1.25rem 0 .75rem;padding-bottom:6px;
+          border-bottom:1px solid var(--border)">Détail des réponses</div>
+        ${recapHtml}
+        <div class="mail-blk">
+          <p>📧 En complément de l'enregistrement automatique, vous pouvez aussi envoyer un e-mail de confirmation au pôle formation.</p>
+          <a class="btn-mail" href="${buildMailto(score,pct,verdict,dateStr,timeStr)}" target="_blank">
+            ✉️ Envoyer la confirmation par e-mail
+          </a>
+        </div>
+        <button class="btn-restart" onclick="restart()">↩ Recommencer depuis l'inscription</button>
+      </div>
+    </div>`;
+
+  // Sauvegarde API
+  try {
+    const resp = await fetch(`${API_BASE}/resultat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nom: USER.nom, prenom: USER.prenom, email: USER.email,
+        score, score_pct: pct, verdict,
+        reponses: reponsesDetail,
+        duree_sec: dureeSec
+      })
+    });
+    const data = await resp.json();
+    const el = document.getElementById('save-status');
+    if (resp.ok && data.ok) {
+      el.className = 'save-status ok';
+      el.textContent = `✅ Résultats enregistrés — Réf. #${data.id}`;
+    } else {
+      el.className = 'save-status err';
+      el.textContent = '⚠ Enregistrement échoué — pensez à envoyer l\'e-mail de confirmation.';
+    }
+  } catch(e) {
+    const el = document.getElementById('save-status');
+    el.className = 'save-status err';
+    el.textContent = '⚠ Serveur inaccessible — pensez à envoyer l\'e-mail de confirmation.';
+  }
+}
+
+/* ════════════════════════════════
+   MAILTO FALLBACK
+════════════════════════════════ */
+function buildMailto(score,pct,verdict,dateStr,timeStr) {
+  const to  = 'formations.muller@gmail.com';
+  const sub = encodeURIComponent(`[Rappel BR] ${USER.prenom} ${USER.nom} — ${pct}% — ${verdict} — ${dateStr}`);
+  const details = QQ.map((q,i) => {
+    const ok = answers[i]===q.ans;
+    const chosen = answers[i]!==null?q.opts[answers[i]]:'Non répondu';
+    return `Q${i+1} : ${ok?'✓':'✗'}  ${q.q}\n   Réponse : ${chosen}${ok?'':'\n   Correct  : '+q.opts[q.ans]}`;
+  }).join('\n\n');
+  const body = encodeURIComponent(
+`RAPPEL SÉCURITÉ BR — CONFIRMATION DE PASSATION
+══════════════════════════════════════════
+Collaborateur : ${USER.prenom} ${USER.nom}
+E-mail        : ${USER.email}
+Date          : ${dateStr} à ${timeStr}
+Score         : ${score}/10 (${pct}%)
+Verdict       : ${verdict}
+══════════════════════════════════════════
+${details}
+══════════════════════════════════════════
+${pct<70?'⚠ ACTION CORRECTIVE REQUISE.':'✅ Score satisfaisant — à archiver.'}
+Enregistré automatiquement sur formation-sav.fr`
+  );
+  return `mailto:${to}?subject=${sub}&body=${body}`;
+}
+
+/* ════════════════════════════════
+   UTILS
+════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function setProgress(pct) {
+  document.getElementById('pfill').style.width = pct+'%';
+}
+function restart() {
+  stopGlobalTimer();
+  timerSec = 15*60; moduleStart = null;
+  blocUnlocked = [false,false,false,false,false,false];
+  curQ=0; answers=new Array(10).fill(null); answered=new Array(10).fill(false);
+  document.getElementById('timerBox').style.display='none';
+  document.getElementById('timerBox').classList.remove('urgent');
+  document.getElementById('timerBox').innerHTML='⏱ <span id="timerVal">15:00</span>';
+  setProgress(0);
+  // Remettre tous les locks
+  for(let i=1;i<=6;i++){
+    const lk=document.getElementById('lk-'+i);
+    if(lk)lk.classList.remove('unlocked');
+  }
+  document.getElementById('btn-quiz').disabled=true;
+  showScreen('s-reg');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
