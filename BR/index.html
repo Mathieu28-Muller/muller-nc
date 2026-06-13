@@ -421,8 +421,10 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
               </div>
               <span style="margin-left:auto;font-size:10px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(240,74,74,.3);padding:3px 10px;border-radius:20px;white-space:nowrap">OBLIGATOIRE</span>
             </div>
-            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
-              <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/gzadNZeyLNA" title="Habilitation électrique - EPI - Gants isolants - vérification" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            <div style="display:flex;justify-content:center">
+              <div style="position:relative;width:min(100%,320px);padding-bottom:min(177.78%,568px);height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
+                <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/AZ_jY8tEBU0" title="VAT — Vérification d'Absence de Tension" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+              </div>
             </div>
             <div class="blk blk-green" style="margin-top:10px;margin-bottom:0">
               <strong>Points clés gants classe 00 :</strong>
@@ -473,7 +475,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
             <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
               <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/LBf_noJHqnA" title="Outils isolés 1000V - contrôle et vérification" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
             </div>
-            <div class="blk blk-amber" style="margin-top:10px;margin-bottom:0">
+            <div class="blk blk-amber" style="margin-top:10px;margin-bottom:10px">
               <strong>Points clés outils isolés :</strong>
               <ul class="chks" style="margin-top:6px">
                 <li>Identifier le marquage <strong>Double triangle + 1000V + NF EN 60900</strong> sur chaque outil — sans ce marquage, l'outil n'est pas homologué</li>
@@ -482,6 +484,28 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
                 <li>Un outil isolé endommagé doit être retiré immédiatement du service — ne pas réparer avec du ruban isolant</li>
                 <li>Vérification régulière du stock d'outillage isolé — chaque technicien est responsable de ses outils</li>
               </ul>
+            </div>
+
+            <!-- Images marquage + tournevis -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden">
+                <div style="background:rgba(245,166,35,.1);padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--accent)">🔖 MARQUAGE RÉGLEMENTAIRE</div>
+                <div style="padding:10px;text-align:center">
+                  <img src="/BR/img/marquage_electrique.jpg" alt="Marquage électrique 1000V double triangle NF EN 60900"
+                    style="max-width:100%;border-radius:6px;border:1px solid var(--border)"
+                    onerror="this.parentNode.innerHTML='<div style=\'padding:20px;text-align:center;color:var(--muted);font-size:12px\'>⚡ Double triangle<br><strong style=\'font-size:18px;color:var(--accent)\'>◇◇ 1000V</strong><br>NF EN 60900</div>'">
+                </div>
+                <div style="padding:8px 12px;font-size:11px;color:var(--muted)">Double triangle + 1000V + norme NF EN 60900 obligatoires</div>
+              </div>
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden">
+                <div style="background:rgba(45,212,160,.1);padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--green)">✅ TOURNEVIS 1000V — BON ÉTAT</div>
+                <div style="padding:10px;text-align:center">
+                  <img src="/BR/img/tournevis_1000v.jpg" alt="Tournevis isolé 1000V en bon état — gainage intact sans fissure"
+                    style="max-width:100%;border-radius:6px;border:1px solid var(--border)"
+                    onerror="this.parentNode.innerHTML='<div style=\'padding:20px;text-align:center;color:var(--muted);font-size:12px\'>🔧 Gainage intact<br>Pas de coupure<br>Pas de fissure<br><span style=\'color:var(--green);font-weight:700\'>✓ Utilisable</span></div>'">
+                </div>
+                <div style="padding:8px 12px;font-size:11px;color:var(--muted)">Gainage intact, aucune fissure ni coupure visible</div>
+              </div>
             </div>
           </div>
 
@@ -557,6 +581,21 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
 
           <div class="blk blk-red">⚡ <strong>Ordre INTANGIBLE — 6 opérations, jamais dans un autre ordre, jamais une étape sautée.</strong> La VAT est l'opération critique : un VAT défaillant affiche "absence de tension" alors qu'elle est présente. Testez-le avant ET après chaque utilisation.</div>
           <div class="blk blk-amber"><strong>VAT avant toute déconnexion de câble :</strong> même si l'installation semble coupée, même si vous l'avez coupée vous-même. Une tension résiduelle, un condensateur chargé, une erreur de circuit — la VAT est la seule certitude. Vérifiez régulièrement votre appareil VAT : piles, sondes, affichage, test sur source connue.</div>
+
+          <!-- Vidéo VAT — consignation -->
+          <div style="margin-top:1.25rem">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:36px;height:36px;background:rgba(240,74,74,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚡</div>
+              <div>
+                <div style="font-size:15px;font-weight:600">VAT — Geste en situation réelle (consignation)</div>
+                <div style="font-size:12px;color:var(--muted)">Vérification d'Absence de Tension · Procédure complète étape par étape</div>
+              </div>
+              <span style="margin-left:auto;font-size:10px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(240,74,74,.3);padding:3px 10px;border-radius:20px;white-space:nowrap">ÉTAPE CRITIQUE</span>
+            </div>
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
+              <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/dS5YZ3-WRDM" title="VAT Vérification Absence Tension — consignation BT" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+          </div>
         </div>
       </div>
       <div class="block-lock" id="lk-5"><div class="lock-icon">🔒</div><div class="lock-msg">Déverrouillage dans<div class="lock-timer" id="lt-5">—</div></div></div>
