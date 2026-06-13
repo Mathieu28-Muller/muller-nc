@@ -257,15 +257,25 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
           <button class="btn-sm green" onclick="addToWhitelist()">+ Ajouter</button>
         </div>
       </div>
+      <!-- Barre de sélection / relance -->
+      <div id="wl-action-bar" style="display:none;background:var(--panel);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:none;align-items:center;gap:12px;flex-wrap:wrap">
+        <span id="wl-sel-count" style="font-size:13px;font-weight:600;color:var(--accent)">0 sélectionné(s)</span>
+        <textarea id="wl-msg" placeholder="Message optionnel à inclure dans l'email de relance…"
+          style="flex:1;min-width:220px;padding:7px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;font-family:inherit;font-size:12px;color:var(--text);resize:vertical;min-height:36px"></textarea>
+        <button class="btn-sm green" onclick="envoyerRelance()">📧 Envoyer relance</button>
+        <button class="btn-sm" onclick="deselAll()">✕ Tout désélectionner</button>
+      </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
         <table style="width:100%;border-collapse:collapse;font-size:13px">
           <thead><tr style="background:var(--panel)">
+            <th style="padding:10px 10px;width:36px"><input type="checkbox" id="wl-check-all" onchange="toggleAllWL(this.checked)" title="Tout sélectionner"></th>
             <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--muted)">Nom Prénom</th>
             <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--muted)">E-mail</th>
-            <th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--muted)">Statut</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--muted)">Module</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--muted)">Accès</th>
             <th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--muted)">Actions</th>
           </tr></thead>
-          <tbody id="wl-body"><tr><td colspan="4" style="padding:20px;text-align:center;color:var(--muted)">Chargement…</td></tr></tbody>
+          <tbody id="wl-body"><tr><td colspan="6" style="padding:20px;text-align:center;color:var(--muted)">Chargement…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -353,17 +363,28 @@ async function loadWhitelist() {
     if (!el) return;
     const total = document.getElementById('wl-total');
     if (total) total.textContent = rows.length + ' personne(s) autorisée(s)';
+    var nonFait = rows.filter(function(w){return parseInt(w.nb_passations||0)===0&&w.actif;}).length;
+    if (total) total.textContent = rows.length + ' personne(s) — ' + nonFait + ' n\'ont pas encore fait le module';
     el.innerHTML = rows.map(function(w) {
       var nom = ((w.prenom||'') + ' ' + (w.nom||'')).trim() || '—';
+      var nb  = parseInt(w.nb_passations||0);
+      var fait = nb > 0;
+      var moduleTag = fait
+        ? '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#0d2e24;color:#2dd4a0">✓ Fait ('+ nb +'×)</span>'
+        : '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#2a1e08;color:#f5a623">⏳ Non fait</span>';
       return '<tr style="border-bottom:1px solid var(--border)">' +
+        '<td style="padding:9px 10px;text-align:center"><input type="checkbox" class="wl-cb" data-id="' + w.id + '" data-email="' + w.email + '" onchange="updateSelCount()"></td>' +
         '<td style="padding:9px 14px;font-weight:600">' + nom + '</td>' +
         '<td style="padding:9px 14px;font-family:monospace;font-size:12px;color:var(--muted)">' + w.email + '</td>' +
+        '<td style="padding:9px 14px;text-align:center">' + moduleTag + '</td>' +
         '<td style="padding:9px 14px;text-align:center">' +
-          '<span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;background:' + (w.actif?'#0d2e24':'#2a0f0f') + ';color:' + (w.actif?'#2dd4a0':'#f04a4a') + '">' + (w.actif?'✓ Actif':'✗ Inactif') + '</span>' +
+          '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:' + (w.actif?'#0d2e24':'#2a0f0f') + ';color:' + (w.actif?'#2dd4a0':'#f04a4a') + '">' + (w.actif?'Actif':'Inactif') + '</span>' +
         '</td>' +
-        '<td style="padding:9px 14px;text-align:center;display:flex;gap:6px;justify-content:center">' +
-          '<button onclick="toggleWL(' + w.id + ',' + !w.actif + ')" style="font-size:11px;padding:3px 10px;background:none;border:1px solid var(--border2);border-radius:4px;color:var(--muted);cursor:pointer">' + (w.actif?'Désactiver':'Activer') + '</button>' +
-          '<button onclick="deleteWL(' + w.id + ',\'' + w.email + '\')" style="font-size:11px;padding:3px 10px;background:none;border:1px solid rgba(240,74,74,.3);border-radius:4px;color:var(--red);cursor:pointer">Supprimer</button>' +
+        '<td style="padding:9px 14px;text-align:center">' +
+          '<div style="display:flex;gap:5px;justify-content:center">' +
+          '<button onclick="toggleWL(' + w.id + ',' + !w.actif + ')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid var(--border2);border-radius:4px;color:var(--muted);cursor:pointer">' + (w.actif?'Désactiver':'Activer') + '</button>' +
+          '<button onclick="deleteWL(' + w.id + ',\'' + w.email + '\')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid rgba(240,74,74,.3);border-radius:4px;color:var(--red);cursor:pointer">✕</button>' +
+          '</div>' +
         '</td>' +
       '</tr>';
     }).join('');
@@ -377,6 +398,39 @@ async function deleteWL(id, email) {
   if (!confirm('Supprimer ' + email + ' de la liste des personnes autorisées ?')) return;
   await fetch(API+'/whitelist/'+id, { method:'DELETE', headers:authHdr() });
   loadWhitelist();
+}
+function updateSelCount() {
+  var cbs = document.querySelectorAll('.wl-cb:checked');
+  var bar = document.getElementById('wl-action-bar');
+  var cnt = document.getElementById('wl-sel-count');
+  if (bar) bar.style.display = cbs.length > 0 ? 'flex' : 'none';
+  if (cnt) cnt.textContent = cbs.length + ' sélectionné(s)';
+}
+function toggleAllWL(checked) {
+  document.querySelectorAll('.wl-cb').forEach(function(cb){ cb.checked = checked; });
+  updateSelCount();
+}
+function deselAll() {
+  document.querySelectorAll('.wl-cb').forEach(function(cb){ cb.checked = false; });
+  var all = document.getElementById('wl-check-all');
+  if (all) all.checked = false;
+  updateSelCount();
+}
+async function envoyerRelance() {
+  var cbs  = document.querySelectorAll('.wl-cb:checked');
+  var ids  = Array.from(cbs).map(function(cb){ return parseInt(cb.getAttribute('data-id')); });
+  var msg  = document.getElementById('wl-msg')?.value.trim() || '';
+  if (!ids.length) { alert('Sélectionnez au moins une personne.'); return; }
+  if (!confirm('Envoyer une relance par email à ' + ids.length + ' personne(s) ?')) return;
+  try {
+    var r = await fetch(API+'/relance', { method:'POST', headers:authHdr(), body:JSON.stringify({ids, message:msg}) });
+    var d = await r.json();
+    if (d.ok) {
+      alert('✅ ' + d.sent + '/' + d.total + ' email(s) envoyé(s).' + (d.errors?.length ? '\n⚠ Erreurs : ' + d.errors.join(', ') : ''));
+      deselAll();
+      document.getElementById('wl-msg').value = '';
+    } else { alert('Erreur : ' + (d.error||'?')); }
+  } catch(e) { alert('Erreur réseau : ' + e.message); }
 }
 async function addToWhitelist() {
   const email  = document.getElementById('wl-new-email').value.trim();

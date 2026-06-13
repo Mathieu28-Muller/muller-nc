@@ -137,10 +137,20 @@ router.get('/api/br/resultats/:id', requireBRAdmin, async (req, res) => {
 // ══════════════════════════════════════════════════════════════
 //  ADMIN — Liste blanche (whitelist)
 // ══════════════════════════════════════════════════════════════
+// Liste blanche avec statut de complétion
 router.get('/api/br/whitelist', requireBRAdmin, async (req, res) => {
     try {
-        const { rows } = await pool.query(
-            'SELECT * FROM br_emails_autorises ORDER BY nom, prenom');
+        const { rows } = await pool.query(`
+            SELECT w.*,
+                COUNT(r.id)            AS nb_passations,
+                MAX(r.score_pct)       AS meilleur_score,
+                MAX(r.created_at)      AS derniere_passation,
+                MAX(r.verdict)         AS dernier_verdict
+            FROM br_emails_autorises w
+            LEFT JOIN br_resultats r ON LOWER(r.email) = LOWER(w.email)
+            GROUP BY w.id
+            ORDER BY w.nom, w.prenom
+        `);
         res.json(rows);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -180,6 +190,61 @@ router.delete('/api/br/whitelist/:id', requireBRAdmin, async (req, res) => {
 // ══════════════════════════════════════════════════════════════
 router.get('/api/br/me', requireBRAdmin, (req, res) => {
     res.json({ ok: true, name: req.brAdmin.name, role: req.brAdmin.role });
+});
+
+// ══════════════════════════════════════════════════════════════
+//  ADMIN — Envoyer relance par email aux personnes sélectionnées
+// ══════════════════════════════════════════════════════════════
+router.post('/api/br/relance', requireBRAdmin, async (req, res) => {
+    const { ids, message } = req.body || {};
+    if (!ids?.length) return res.status(400).json({ error: 'Aucune personne sélectionnée' });
+    try {
+        const nodemailer = require('nodemailer');
+        const tr = nodemailer.createTransport({
+            host:   process.env.NC_SMTP_HOST   || 'ssl0.ovh.net',
+            port:   parseInt(process.env.NC_SMTP_PORT || '465'),
+            secure: process.env.NC_SMTP_SECURE !== 'false',
+            auth: { user: process.env.NC_SMTP_USER, pass: process.env.NC_SMTP_PASS }
+        });
+        const from = process.env.NC_SMTP_FROM || process.env.NC_SMTP_USER;
+        const { rows } = await pool.query(
+            'SELECT id,email,nom,prenom FROM br_emails_autorises WHERE id = ANY($1) AND actif=true',
+            [ids]
+        );
+        const lienModule = process.env.BR_URL || 'https://formation-sav.fr/BR/';
+        let sent = 0, errors = [];
+        for (const p of rows) {
+            const prenom = p.prenom || '';
+            const textePerso = message?.trim() || '';
+            try {
+                await tr.sendMail({
+                    from, to: p.email,
+                    subject: '[Formation Muller] Rappel — Module Sécurité Électrique BR',
+                    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto">
+<div style="background:#1a0e00;border-bottom:3px solid #f5a623;padding:18px 24px">
+  <h2 style="color:#f5a623;margin:0;font-size:1rem">⚡ Rappel — Module Sécurité Électrique BR</h2>
+  <p style="color:#888;margin:4px 0 0;font-size:0.82rem">Muller Automotive — Pôle Formation</p>
+</div>
+<div style="padding:22px 24px;border:1px solid #eee;border-top:none">
+  <p style="font-size:0.9rem">Bonjour <strong>${prenom}</strong>,</p>
+  ${textePerso ? `<div style="background:#fff8e1;border-left:4px solid #f5a623;padding:10px 14px;margin:12px 0;font-size:0.88rem;border-radius:0 6px 6px 0">${textePerso.replace(/\n/g,'<br>')}</div>` : ''}
+  <p style="font-size:0.9rem">Nous vous invitons à compléter le <strong>module de rappel sécurité électrique</strong> (habilitation BR) en cliquant sur le lien ci-dessous :</p>
+  <p style="margin:20px 0;text-align:center">
+    <a href="${lienModule}" style="background:#f5a623;color:#1a0e00;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:700;font-size:0.95rem">Accéder au module →</a>
+  </p>
+  <p style="font-size:0.8rem;color:#888">Durée estimée : 20 à 30 minutes. Votre identifiant d'accès est votre adresse email professionnelle.</p>
+</div>
+<div style="background:#f5f5f5;padding:8px 24px;font-size:0.72rem;color:#aaa">Muller Automotive — Service Formation</div>
+</div>`
+                });
+                sent++;
+            } catch(e2) { errors.push(p.email + ' : ' + e2.message); }
+        }
+        res.json({ ok: true, sent, total: rows.length, errors });
+    } catch (e) {
+        console.error('[BR] relance:', e.message);
+        res.status(500).json({ error: e.message });
+    }
 });
 
 module.exports = router;
