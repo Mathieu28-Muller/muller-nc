@@ -238,6 +238,38 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
         </div>
       </div>
     </div>
+
+    <!-- ══ GESTION LISTE BLANCHE ══ -->
+    <div style="margin-top:2.5rem;border-top:1px solid var(--border);padding-top:2rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.25rem">
+        <div>
+          <div class="page-title" style="font-size:18px">Personnes autorisées</div>
+          <div class="page-sub" style="margin-bottom:0" id="wl-total">Chargement…</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="email" id="wl-new-email" placeholder="email@mullerautomotive.fr"
+            style="padding:7px 12px;background:var(--panel);border:1px solid var(--border2);border-radius:6px;font-family:inherit;font-size:13px;color:var(--text);width:240px"
+            onkeydown="if(event.key==='Enter')addToWhitelist()">
+          <input type="text" id="wl-new-nom" placeholder="Nom"
+            style="padding:7px 10px;background:var(--panel);border:1px solid var(--border2);border-radius:6px;font-family:inherit;font-size:13px;color:var(--text);width:110px">
+          <input type="text" id="wl-new-prenom" placeholder="Prénom"
+            style="padding:7px 10px;background:var(--panel);border:1px solid var(--border2);border-radius:6px;font-family:inherit;font-size:13px;color:var(--text);width:110px">
+          <button class="btn-sm green" onclick="addToWhitelist()">+ Ajouter</button>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead><tr style="background:var(--panel)">
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--muted)">Nom Prénom</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--muted)">E-mail</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--muted)">Statut</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--muted)">Actions</th>
+          </tr></thead>
+          <tbody id="wl-body"><tr><td colspan="4" style="padding:20px;text-align:center;color:var(--muted)">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -322,14 +354,16 @@ async function loadWhitelist() {
     const total = document.getElementById('wl-total');
     if (total) total.textContent = rows.length + ' personne(s) autorisée(s)';
     el.innerHTML = rows.map(function(w) {
-      return '<tr>' +
-        '<td style="padding:6px 10px">' + (w.prenom||'') + ' ' + (w.nom||'') + '</td>' +
-        '<td style="padding:6px 10px;font-family:monospace;font-size:0.82rem">' + w.email + '</td>' +
-        '<td style="padding:6px 10px;text-align:center">' +
-          '<span style="font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:10px;background:' + (w.actif?'#0d2e24':'#2a0f0f') + ';color:' + (w.actif?'#2dd4a0':'#f04a4a') + '">' + (w.actif?'Actif':'Inactif') + '</span>' +
+      var nom = ((w.prenom||'') + ' ' + (w.nom||'')).trim() || '—';
+      return '<tr style="border-bottom:1px solid var(--border)">' +
+        '<td style="padding:9px 14px;font-weight:600">' + nom + '</td>' +
+        '<td style="padding:9px 14px;font-family:monospace;font-size:12px;color:var(--muted)">' + w.email + '</td>' +
+        '<td style="padding:9px 14px;text-align:center">' +
+          '<span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;background:' + (w.actif?'#0d2e24':'#2a0f0f') + ';color:' + (w.actif?'#2dd4a0':'#f04a4a') + '">' + (w.actif?'✓ Actif':'✗ Inactif') + '</span>' +
         '</td>' +
-        '<td style="padding:6px 10px;text-align:center">' +
-          '<button onclick="toggleWL(' + w.id + ',' + !w.actif + ')" style="font-size:0.7rem;padding:2px 8px;background:none;border:1px solid #3a4060;border-radius:4px;color:#8890a8;cursor:pointer">' + (w.actif?'Désactiver':'Activer') + '</button>' +
+        '<td style="padding:9px 14px;text-align:center;display:flex;gap:6px;justify-content:center">' +
+          '<button onclick="toggleWL(' + w.id + ',' + !w.actif + ')" style="font-size:11px;padding:3px 10px;background:none;border:1px solid var(--border2);border-radius:4px;color:var(--muted);cursor:pointer">' + (w.actif?'Désactiver':'Activer') + '</button>' +
+          '<button onclick="deleteWL(' + w.id + ',\'' + w.email + '\')" style="font-size:11px;padding:3px 10px;background:none;border:1px solid rgba(240,74,74,.3);border-radius:4px;color:var(--red);cursor:pointer">Supprimer</button>' +
         '</td>' +
       '</tr>';
     }).join('');
@@ -338,6 +372,25 @@ async function loadWhitelist() {
 async function toggleWL(id, actif) {
   await fetch(API+'/whitelist/'+id, { method:'PATCH', headers:authHdr(), body:JSON.stringify({actif}) });
   loadWhitelist();
+}
+async function deleteWL(id, email) {
+  if (!confirm('Supprimer ' + email + ' de la liste des personnes autorisées ?')) return;
+  await fetch(API+'/whitelist/'+id, { method:'DELETE', headers:authHdr() });
+  loadWhitelist();
+}
+async function addToWhitelist() {
+  const email  = document.getElementById('wl-new-email').value.trim();
+  const nom    = document.getElementById('wl-new-nom').value.trim();
+  const prenom = document.getElementById('wl-new-prenom').value.trim();
+  if (!email) { alert('Email obligatoire.'); return; }
+  const r = await fetch(API+'/whitelist', { method:'POST', headers:authHdr(), body:JSON.stringify({email,nom,prenom}) });
+  const d = await r.json();
+  if (d.ok) {
+    document.getElementById('wl-new-email').value = '';
+    document.getElementById('wl-new-nom').value   = '';
+    document.getElementById('wl-new-prenom').value = '';
+    loadWhitelist();
+  } else { alert('Erreur : ' + (d.error||'?')); }
 }
 
 /* ════ STATS ════ */

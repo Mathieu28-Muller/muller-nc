@@ -312,19 +312,9 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
       </div>
       <div class="reg-form">
         <div class="field">
-          <label>Nom</label>
-          <input type="text" id="i-nom" placeholder="Votre nom de famille">
-          <div class="ferr" id="e-nom">Champ obligatoire</div>
-        </div>
-        <div class="field">
-          <label>Prénom</label>
-          <input type="text" id="i-prenom" placeholder="Votre prénom">
-          <div class="ferr" id="e-prenom">Champ obligatoire</div>
-        </div>
-        <div class="field">
           <label>E-mail professionnel</label>
-          <input type="email" id="i-email" placeholder="prenom.nom@muller-automotive.fr">
-          <div class="ferr" id="e-email">Adresse e-mail invalide</div>
+          <input type="email" id="i-email" placeholder="prenom.nom@mullerautomotive.fr" autocomplete="email">
+          <div class="ferr" id="e-email">Adresse e-mail invalide ou non autorisée</div>
         </div>
         <button class="btn-go" onclick="startModule()">Commencer le module →</button>
         <p class="reg-note">Vos résultats seront enregistrés et transmis au pôle formation pour suivi des actions correctives.</p>
@@ -674,21 +664,14 @@ const QQ = [
    REGISTRATION
 ════════════════════════════════ */
 async function startModule() {
-  const nom    = document.getElementById('i-nom').value.trim();
-  const prenom = document.getElementById('i-prenom').value.trim();
-  const email  = document.getElementById('i-email').value.trim();
-  let ok = true;
-  [['nom',nom],['prenom',prenom]].forEach(([id,v]) => {
-    const inp = document.getElementById('i-'+id), err = document.getElementById('e-'+id);
-    if (!v) { inp.classList.add('err'); err.classList.add('show'); ok=false; }
-    else    { inp.classList.remove('err'); err.classList.remove('show'); }
-  });
+  const email = document.getElementById('i-email').value.trim();
   const ei = document.getElementById('i-email'), ee = document.getElementById('e-email');
-  if (!email || !/.+@.+\..+/.test(email)) { ei.classList.add('err'); ee.classList.add('show'); ok=false; }
-  else { ei.classList.remove('err'); ee.classList.remove('show'); }
-  if (!ok) return;
+  if (!email || !/.+@.+\..+/.test(email)) {
+    ei.classList.add('err'); ee.classList.add('show'); return;
+  }
+  ei.classList.remove('err'); ee.classList.remove('show');
 
-  // Vérification liste blanche
+  // Vérification liste blanche + récupération nom/prénom
   const btn = document.querySelector('.btn-go');
   if (btn) { btn.disabled = true; btn.textContent = 'Vérification…'; }
   try {
@@ -700,16 +683,17 @@ async function startModule() {
     if (!d.authorized) {
       if (btn) { btn.disabled = false; btn.textContent = 'Commencer le module →'; }
       ei.classList.add('err');
-      const errEl = document.getElementById('e-email');
-      if (errEl) { errEl.textContent = 'Cet email n\'est pas autorisé à accéder à ce module. Contactez votre responsable.'; errEl.classList.add('show'); }
+      ee.textContent = 'Cet email n\'est pas autorisé. Contactez votre responsable formation.';
+      ee.classList.add('show');
       return;
     }
+    // Utiliser nom/prénom de la whitelist
+    USER = { nom: d.nom || '', prenom: d.prenom || '', email };
   } catch(e) {
     if (btn) { btn.disabled = false; btn.textContent = 'Commencer le module →'; }
-    console.warn('Vérification email impossible — accès accordé par défaut');
+    console.warn('Vérification impossible');
+    USER = { nom: '', prenom: '', email };
   }
-
-  USER = { nom, prenom, email };
   showScreen('s-module');
   moduleStart = Date.now();
   startGlobalTimer();

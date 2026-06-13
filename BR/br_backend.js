@@ -63,8 +63,8 @@ router.post('/api/br/check-email', async (req, res) => {
 // ══════════════════════════════════════════════════════════════
 router.post('/api/br/resultat', async (req, res) => {
     const { nom, prenom, email, score, score_pct, verdict, reponses, duree_sec } = req.body || {};
-    if (!nom || !prenom || !email || score === undefined)
-        return res.status(400).json({ error: 'Champs obligatoires manquants' });
+    if (!email || score === undefined)
+        return res.status(400).json({ error: 'Email et score obligatoires' });
     try {
         const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').substring(0, 60);
         const { rows } = await pool.query(
