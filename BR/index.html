@@ -715,7 +715,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
   <div class="quiz-wrap">
     <div class="quiz-hdr">
       <h2>Questionnaire de validation</h2>
-      <p>11 questions sur le module. <strong>Seuil : 70 % minimum.</strong> Questions et réponses présentées dans un ordre aléatoire. Vos résultats sont enregistrés et transmis au pôle formation.</p>
+      <p>11 questions sur le module. <strong>Seuil : 70 % minimum.</strong> Questions et réponses dans un ordre aléatoire. Vos résultats sont enregistrés et transmis au pôle formation.</p>
     </div>
     <div id="quiz-area"></div>
     <div class="quiz-nav">
@@ -771,7 +771,7 @@ const API_BASE = '/api/br'; // chemin de l'API sur formation-sav.fr
    STATE
 ════════════════════════════════ */
 let USER = {};
-let timerSec = 13 * 60;
+let timerSec = 10 * 60;
 let timerInt = null;
 let moduleStart = null;
 
