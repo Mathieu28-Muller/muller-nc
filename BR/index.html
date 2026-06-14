@@ -975,14 +975,14 @@ async function showResults() {
   const timeStr  = now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
   const dureeSec = Math.round((Date.now() - moduleStart) / 1000);
 
-  const reponsesDetail = QQ.map((q,i) => ({
+  const reponsesDetail = QQ_SHUFFLED.map((q,i) => ({
     question: q.q,
     reponse: answers[i] !== null ? q.opts[answers[i]] : 'Non répondu',
     correcte: q.opts[q.ans],
     ok: answers[i] === q.ans
   }));
 
-  const recapHtml = QQ.map((q,i) => {
+  const recapHtml = QQ_SHUFFLED.map((q,i) => {
     const ok = answers[i] === q.ans;
     const chosen  = answers[i]!==null ? q.opts[answers[i]] : 'Non répondu';
     return `<div class="recap-i">
