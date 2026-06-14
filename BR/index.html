@@ -282,6 +282,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
   .epi-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -318,6 +319,42 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
         </div>
         <button class="btn-go" onclick="startModule()">Commencer le module →</button>
         <p class="reg-note">Vos résultats seront enregistrés et transmis au pôle formation pour suivi des actions correctives.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ÉCRAN PDF ══ -->
+<div id="s-pdf" class="screen">
+  <div style="min-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:20px 16px 80px">
+    <div style="width:100%;max-width:760px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">
+        <div style="background:linear-gradient(135deg,#1a0e00,#2a1e08);border-bottom:1px solid rgba(245,166,35,.2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:4px">Document obligatoire</div>
+            <div style="font-size:15px;font-weight:700;color:#fff">Protocole de Sécurité Absolue</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:var(--muted)">Page <span id="pdf-page-cur">1</span> / <span id="pdf-page-tot">—</span></div>
+            <div style="width:140px;height:4px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden">
+              <div id="pdf-prog" style="height:100%;background:var(--accent);transition:width .5s ease;width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div id="pdf-auto-msg" style="background:rgba(245,166,35,.08);border-bottom:1px solid rgba(245,166,35,.15);padding:8px 16px;font-size:12px;color:var(--accent);text-align:center">
+          ⏱ Défilement automatique — page suivante dans <strong id="pdf-countdown">10</strong>s
+        </div>
+        <div style="padding:16px;min-height:60vh;display:flex;align-items:center;justify-content:center;background:#1a1a1a">
+          <canvas id="pdf-canvas" style="max-width:100%;border-radius:6px;box-shadow:0 4px 24px rgba(0,0,0,.5)"></canvas>
+        </div>
+        <div style="padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:12px;border-top:1px solid var(--border)">
+          <button id="pdf-prev" onclick="pdfGo(-1)" style="padding:7px 16px;background:var(--panel);border:1px solid var(--border2);border-radius:6px;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">← Précédent</button>
+          <button id="pdf-next" onclick="pdfGo(1)"  style="padding:7px 16px;background:var(--panel);border:1px solid var(--border2);border-radius:6px;color:var(--text);cursor:pointer;font-family:inherit;font-size:13px">Suivant →</button>
+          <button id="pdf-start-btn" onclick="startModuleAfterPdf()" disabled
+            style="display:none;padding:10px 28px;background:var(--accent);color:#1a0e00;border:none;border-radius:8px;font-weight:700;font-family:inherit;font-size:14px;cursor:pointer">
+            Commencer le module →
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -689,6 +726,36 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
   </div>
 </div>
 
+<!-- ══ ÉCRAN VIDÉO OBLIGATOIRE ══ -->
+<div id="s-video" class="screen">
+  <div style="min-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px 80px">
+    <div style="width:100%;max-width:760px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#1a0500,#2a0f0f);border-bottom:1px solid rgba(240,74,74,.2);padding:14px 20px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:4px">Visionnage obligatoire</div>
+          <div style="font-size:15px;font-weight:700;color:#fff">Sécurité Électrique — Film de sensibilisation</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Regardez la vidéo en entier pour accéder au questionnaire</div>
+        </div>
+        <div style="padding:16px;background:#000">
+          <video id="safety-video" controls controlsList="nodownload" style="width:100%;border-radius:8px;max-height:70vh" onended="onVideoEnded()" ontimeupdate="onVideoProgress(this)">
+            <source src="/BR/securite_electrique.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div style="padding:14px 20px;border-top:1px solid var(--border)">
+          <div id="video-status" style="font-size:13px;color:var(--muted);margin-bottom:10px;text-align:center">⏯ Regardez la vidéo jusqu'à la fin pour débloquer le questionnaire</div>
+          <div style="width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:14px">
+            <div id="video-prog-bar" style="height:100%;background:var(--red);border-radius:3px;width:0%;transition:width .5s"></div>
+          </div>
+          <button id="btn-go-quiz" onclick="goQuiz()" disabled
+            style="width:100%;padding:13px;background:#555;color:#888;border:none;border-radius:8px;font-weight:700;font-family:inherit;font-size:15px;cursor:default;transition:all .3s">
+            🔒 Questionnaire — regardez la vidéo en entier
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ RÉSULTATS ══ -->
 <div id="s-res" class="screen">
   <div class="res-page"><div class="res-wrap"><div id="res-card"></div></div></div>
@@ -771,9 +838,16 @@ async function startModule() {
     console.warn('Vérification impossible');
     USER = { nom: '', prenom: '', email };
   }
-  showScreen('s-module');
+  // Aller d'abord vers le PDF, puis le module
+  showScreen('s-pdf');
   moduleStart = Date.now();
   startGlobalTimer();
+  initPdf();
+  window.scrollTo(0,0);
+}
+
+function startModuleAfterPdf() {
+  showScreen('s-module');
   startBlocTimers();
   setProgress(0);
   window.scrollTo(0,0);
@@ -856,13 +930,29 @@ function unlockBloc(idx) {
   updateModuleProgress();
 }
 
+let videoWatched = false;
+let timerDone = false;
+
 function unlockAllAndProceed() {
-  // Les blocs sont déjà tous déverrouillés — on débloque uniquement le questionnaire
-  const btnQ = document.getElementById('btn-quiz');
-  if (btnQ) { btnQ.disabled = false; btnQ.textContent = 'Questionnaire →'; }
+  timerDone = true;
   document.getElementById('timerVal').textContent = '00:00';
   document.getElementById('nav-t').textContent = '00:00';
-  updateModuleProgress();
+  // Basculer vers l'écran vidéo obligatoire
+  showScreen('s-video');
+  window.scrollTo(0,0);
+  checkQuizUnlock();
+}
+
+function checkQuizUnlock() {
+  const btn = document.getElementById('btn-go-quiz');
+  if (!btn) return;
+  if (videoWatched) {
+    btn.disabled = false;
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#1a0e00';
+    btn.style.cursor = 'pointer';
+    btn.textContent = '✅ Accéder au questionnaire →';
+  }
 }
 
 function updateModuleProgress() {
@@ -883,6 +973,21 @@ function shuffleArray(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+function onVideoEnded() {
+  videoWatched = true;
+  document.getElementById('video-status').textContent = '✅ Vidéo visionnée — questionnaire débloqué';
+  document.getElementById('video-status').style.color = 'var(--green)';
+  checkQuizUnlock();
+}
+function onVideoProgress(video) {
+  if (!video.duration) return;
+  var pct = Math.min(100, Math.round((video.currentTime / video.duration) * 100));
+  var bar = document.getElementById('video-prog-bar');
+  if (bar) bar.style.width = pct + '%';
+  // Considérer comme regardée si >= 90%
+  if (pct >= 90 && !videoWatched) onVideoEnded();
 }
 
 function goQuiz() {
@@ -1108,6 +1213,77 @@ function restart() {
   document.getElementById('btn-quiz').disabled=true;
   showScreen('s-reg');
   window.scrollTo(0,0);
+}
+
+/* ════ PDF.js — Visionneuse protocole ════ */
+let pdfDoc = null, pdfPage = 1, pdfAutoTimer = null, pdfCountdown = 10;
+
+function initPdf() {
+  if (typeof pdfjsLib === 'undefined') {
+    console.warn('PDF.js non chargé');
+    startModuleAfterPdf();
+    return;
+  }
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  pdfjsLib.getDocument('/BR/safety_protocol.pdf').promise.then(function(doc) {
+    pdfDoc = doc;
+    document.getElementById('pdf-page-tot').textContent = doc.numPages;
+    renderPdfPage(1);
+    startPdfAutoAdvance();
+  }).catch(function(e) {
+    console.error('PDF error:', e);
+    startModuleAfterPdf(); // fallback si PDF inaccessible
+  });
+}
+
+function renderPdfPage(num) {
+  if (!pdfDoc) return;
+  pdfDoc.getPage(num).then(function(page) {
+    var canvas = document.getElementById('pdf-canvas');
+    var ctx = canvas.getContext('2d');
+    var viewport = page.getViewport({ scale: Math.min(window.innerWidth * 0.85 / page.getViewport({scale:1}).width, 2) });
+    canvas.height = viewport.height;
+    canvas.width  = viewport.width;
+    page.render({ canvasContext: ctx, viewport: viewport });
+    pdfPage = num;
+    document.getElementById('pdf-page-cur').textContent = num;
+    var pct = Math.round((num / pdfDoc.numPages) * 100);
+    document.getElementById('pdf-prog').style.width = pct + '%';
+    // Dernière page : afficher bouton
+    if (num >= pdfDoc.numPages) {
+      clearInterval(pdfAutoTimer);
+      document.getElementById('pdf-auto-msg').textContent = '✅ Document complet — vous pouvez commencer le module';
+      document.getElementById('pdf-auto-msg').style.color = 'var(--green)';
+      var btn = document.getElementById('pdf-start-btn');
+      btn.style.display = 'inline-block';
+      btn.disabled = false;
+      document.getElementById('pdf-next').style.display = 'none';
+    }
+  });
+}
+
+function startPdfAutoAdvance() {
+  pdfCountdown = 10;
+  pdfAutoTimer = setInterval(function() {
+    pdfCountdown--;
+    var el = document.getElementById('pdf-countdown');
+    if (el) el.textContent = pdfCountdown;
+    if (pdfCountdown <= 0) {
+      pdfCountdown = 10;
+      if (pdfDoc && pdfPage < pdfDoc.numPages) {
+        renderPdfPage(pdfPage + 1);
+      }
+    }
+  }, 1000);
+}
+
+function pdfGo(dir) {
+  if (!pdfDoc) return;
+  var next = pdfPage + dir;
+  if (next < 1 || next > pdfDoc.numPages) return;
+  pdfCountdown = 10; // réinitialiser le compte à rebours
+  renderPdfPage(next);
 }
 </script>
 </body>
