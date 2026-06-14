@@ -338,9 +338,9 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
         <div class="card-body">
           <div class="blk blk-red"><strong>Un de nos collaborateurs BR</strong> a subi une électrisation lors d'une intervention basse tension. Il est heureusement indemne. Mais sans <strong>gants isolants portés</strong> ni <strong>écran facial</strong>, et sans avoir réalisé une <strong>VAT avant de toucher les câbles</strong>, les conséquences auraient pu être <strong>irréversibles</strong>.</div>
           <div class="stat-row">
-            <div class="stat r"><div class="stat-n">×15</div><div class="stat-l">Plus mortel qu'un autre accident du travail</div></div>
+            <div class="stat r"><div class="stat-n">×12</div><div class="stat-l">Plus mortel qu'un autre accident du travail <span style="font-size:10px;opacity:.6">(source OPPBTP)</span></div></div>
             <div class="stat a"><div class="stat-n">51 %</div><div class="stat-l">Des victimes sont des techniciens non-électriciens</div></div>
-            <div class="stat g"><div class="stat-n">2 300</div><div class="stat-l">Accidents électriques/an en France</div></div>
+            <div class="stat g"><div class="stat-n">~2 000</div><div class="stat-l">Accidents électriques/an en France <span style="font-size:10px;opacity:.6">(source ONSE — 2 000 à 2 500/an)</span></div></div>
           </div>
           <div class="blk blk-amber"><strong>Causes identifiées :</strong> gants isolants non portés — écran facial absent — câble débranché sans réaliser de VAT préalable.<br><em style="font-size:12px;opacity:.7;display:block;margin-top:4px">Sources : INRS / Observatoire National Sécurité Électrique (ONSE)</em></div>
           <ul class="chks">
@@ -366,11 +366,11 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
           <table class="dt">
             <tr><th>✅ Autorisé BR</th><th>🚫 Hors périmètre BR</th></tr>
             <tr>
-              <td><ul class="chks" style="margin:0"><li>Dépannage et diagnostic BT</li><li>Connexions / déconnexions BT</li><li>Mesurages, essais, vérifications</li><li>Remplacement à l'identique</li><li>Travaux hors tension (consignation)</li></ul></td>
-              <td><ul class="cros" style="margin:0"><li>Travaux sous tension (BTT)</li><li>Consignation d'ouvrage (BC)</li><li>Toute intervention HTA/HTB</li><li>Direction d'équipe (B2)</li><li>Déconnecter un câble sans VAT préalable</li></ul></td>
+              <td><ul class="chks" style="margin:0"><li>Dépannage et diagnostic BT</li><li>Connexions / déconnexions BT sur circuits ≤ 63 A</li><li>Mesurages, essais, vérifications</li><li>Remplacement à l'identique</li><li>Travaux hors tension (consignation)</li></ul></td>
+              <td><ul class="cros" style="margin:0"><li>Travaux sous tension (BTT) au-delà de 63 A</li><li>Consignation d'ouvrage (BC)</li><li>Toute intervention HTA/HTB</li><li>Direction d'équipe (B2)</li><li>Déconnecter un câble sans VAT préalable</li></ul></td>
             </tr>
           </table>
-          <div class="blk blk-red">⚠ <strong>Domaine BT :</strong> jusqu'à <strong>1 000 V CA</strong> / <strong>1 500 V CC</strong>. Le réseau 230 V et 400 V triphasé sont en BT. Ne sous-estimez jamais leur danger.</div>
+          <div class="blk blk-red">⚠ <strong>Domaine BT :</strong> jusqu'à <strong>1 000 V CA</strong> / <strong>1 500 V CC</strong>. Le réseau 230 V et 400 V triphasé sont en BT. Ne sous-estimez jamais leur danger. <strong style="color:#ff6b6b">⚡ Mortel à partir de 50 V CA</strong> — le courant domestique 230 V est 4× au-dessus du seuil létal.</div>
         </div>
       </div>
       <div class="block-lock" id="lk-2"><div class="lock-icon">🔒</div><div class="lock-msg">Déverrouillage dans<div class="lock-timer" id="lt-2">—</div></div></div>
@@ -394,6 +394,14 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
             <tr><td>⛔ Contact direct</td><td>Toucher les pièces nues</td><td>Interdit sans habilitation BTT</td></tr>
           </table>
           <div class="blk blk-amber">⚠ <strong>Lien direct avec l'incident :</strong> intervenir sans EPI dans la zone renforcée expose au même risque. Un geste imprécis ou un outil conducteur mal orienté — et le contact est immédiat.</div>
+
+          <!-- Image Zone BT -->
+          <div style="margin-top:1.25rem;text-align:center">
+            <img src="/BR/img/zone_bt.jpg" alt="Zone d'environnement en basse tension — ZVR, ZVS, Zone d'investigation"
+              style="max-width:100%;border-radius:var(--r-sm);border:1px solid var(--border)"
+              onerror="this.style.display='none'">
+            <div style="font-size:11px;color:var(--muted);margin-top:6px">Zone d'environnement en Basse Tension — NF C 18-510 · DLVR = 30 cm · DLVS = 3 m · DLI = 50 m</div>
+          </div>
         </div>
       </div>
       <div class="block-lock" id="lk-3"><div class="lock-icon">🔒</div><div class="lock-msg">Déverrouillage dans<div class="lock-timer" id="lt-3">—</div></div></div>
@@ -421,17 +429,15 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
               </div>
               <span style="margin-left:auto;font-size:10px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(240,74,74,.3);padding:3px 10px;border-radius:20px;white-space:nowrap">OBLIGATOIRE</span>
             </div>
-            <div style="display:flex;justify-content:center">
-              <div style="position:relative;width:min(100%,320px);padding-bottom:min(177.78%,568px);height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
-                <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/AZ_jY8tEBU0" title="VAT — Vérification d'Absence de Tension" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-              </div>
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
+              <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/gzadNZeyLNA" title="Gants isolants classe 00 — vérification visuelle et gonflage" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="blk blk-green" style="margin-top:10px;margin-bottom:0">
               <strong>Points clés gants classe 00 :</strong>
               <ul class="chks" style="margin-top:6px">
                 <li><strong>Mettre les gants AVANT tout geste</strong> — pas après avoir inspecté à mains nues</li>
                 <li>Contrôle visuel : absence de coupures, perforations, craquelures, décoloration</li>
-                <li>Contrôle par gonflage : enrouler le revers sur lui-même pour emprisonner l'air — aucune fuite ne doit apparaître</li>
+                <li><strong>Mise sous pression obligatoire</strong> : enrouler le revers sur lui-même pour emprisonner l'air — maintenir 10 secondes — aucune fuite, aucun ramollissement ne doit apparaître</li>
                 <li>Les gants classe 00 <strong>n'ont pas de date de péremption</strong> — c'est l'état physique qui détermine leur utilisation</li>
                 <li>Ranger à plat, à l'abri de la chaleur et des produits chimiques — ne jamais plier</li>
               </ul>
@@ -472,8 +478,11 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
                 <div style="font-size:12px;color:var(--muted)">Norme NF EN 60900 · Double triangle · Testé à 10 000 V</div>
               </div>
             </div>
-            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
-              <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/LBf_noJHqnA" title="Outils isolés 1000V - contrôle et vérification" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            <div style="text-align:center;margin-bottom:8px">
+              <img src="/BR/img/outillage_1000v.jpg" alt="Outillage isolé 1000V — marquage IEC 60417-5216 double triangle"
+                style="max-width:100%;border-radius:var(--r-sm);border:1px solid var(--border)"
+                onerror="this.style.display='none'">
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Outillage isolé 1000V · Marquage IEC 60417-5216 (double triangle) · NF EN 60900</div>
             </div>
             <div class="blk blk-amber" style="margin-top:10px;margin-bottom:10px">
               <strong>Points clés outils isolés :</strong>
@@ -510,6 +519,21 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
           </div>
 
           <div class="blk blk-amber">⚠ <strong>Avant toute déconnexion de câble :</strong> réaliser impérativement une <strong>VAT</strong> sur le câble concerné, <strong>gants et écran facial portés</strong>, même si l'installation semble hors tension. Ne jamais présupposer l'absence de tension.</div>
+
+          <!-- Module VAT -->
+          <div style="margin-top:1.25rem">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:36px;height:36px;background:rgba(240,74,74,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚡</div>
+              <div>
+                <div style="font-size:15px;font-weight:600">VAT — Vérification d'Absence de Tension</div>
+                <div style="font-size:12px;color:var(--muted)">Geste obligatoire avant tout contact · Procédure complète</div>
+              </div>
+              <span style="margin-left:auto;font-size:10px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(240,74,74,.3);padding:3px 10px;border-radius:20px;white-space:nowrap">ÉTAPE CRITIQUE</span>
+            </div>
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r-sm);border:1px solid var(--border);background:#000">
+              <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/TI37C73erhQ" title="VAT — Vérification d'Absence de Tension" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -622,6 +646,18 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
             <li><span class="sbadge">2</span><div><strong>Pendant :</strong> <strong>VAT systématique avant tout contact ou déconnexion de câble.</strong> Aucun outil conducteur nu à proximité des pièces nues. Gestes contrôlés dans la zone renforcée.</div></li>
             <li><span class="sbadge">3</span><div><strong>Fin :</strong> libérer l'ouvrage, retirer les protections temporaires, remettre les protections permanentes, informer le chargé d'exploitation, attendre l'autorisation de remise sous tension.</div></li>
           </ol>
+          <!-- Signalement électrisation -->
+          <div class="blk blk-red" style="margin-bottom:12px">
+            <strong>⚡ Toute électrisation doit être signalée — même sans douleur immédiate</strong>
+            <ul class="chks" style="margin-top:8px">
+              <li><strong>Consultation médicale obligatoire dans les 24h</strong> — même si vous vous sentez bien</li>
+              <li>Les tissus internes (muscles, cœur, nerfs) sont <strong>40× moins résistants que la peau</strong> — les lésions ne sont pas toujours visibles extérieurement</li>
+              <li>Des séquelles peuvent apparaître <strong>jusqu'à 72 h après</strong> l'accident : troubles du rythme cardiaque, lésions neurologiques, nécrose musculaire</li>
+              <li>Signalez systématiquement à votre responsable et remplissez une fiche de déclaration d'accident même bénin</li>
+            </ul>
+            <div style="margin-top:8px;font-size:11px;opacity:.75">Sources : INRS ED 1901 — Effets du courant électrique sur l'organisme humain · OPPBTP — Risque électrique BT</div>
+          </div>
+
           <div class="blk blk-amber"><strong>En cas d'accident :</strong> couper l'alimentation AVANT de secourir (ne jamais toucher une victime encore en contact). Composer le 15, 18 ou 112. Gestes de premiers secours si formé.</div>
         </div>
       </div>
@@ -642,7 +678,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
   <div class="quiz-wrap">
     <div class="quiz-hdr">
       <h2>Questionnaire de validation</h2>
-      <p>10 questions sur le module. <strong>Seuil : 70 % (7/10).</strong> Vos résultats sont enregistrés dans la base de données et transmis au pôle formation.</p>
+      <p>11 questions sur le module. <strong>Seuil : 70 % minimum.</strong> Questions et réponses présentées dans un ordre aléatoire. Vos résultats sont enregistrés et transmis au pôle formation.</p>
     </div>
     <div id="quiz-area"></div>
     <div class="quiz-nav">
@@ -680,8 +716,9 @@ let blocTimers   = [...BLOC_DURATIONS]; // compte à rebours par bloc
 let blocInterval = null;
 
 let curQ = 0;
-let answers  = new Array(10).fill(null);
-let answered = new Array(10).fill(false);
+let QQ_SHUFFLED = []; // version mélangée au démarrage du quiz
+let answers  = [];
+let answered = [];
 
 /* ════════════════════════════════
    QUESTIONS
@@ -690,13 +727,14 @@ const QQ = [
   {q:"Suite à l'incident dans notre équipe, quelle est la cause principale identifiée ?",opts:["Une panne imprévue de l'installation","Gants isolants non portés, écran facial absent et câble débranché sans VAT préalable","Une défaillance du matériel entreprise","Un manque d'expérience du collaborateur"],ans:1,expl:"Les causes identifiées sont : gants isolants non portés, écran facial absent, câble débranché sans réaliser de VAT préalable. Ce n'est pas un problème de matériel ou d'expérience — c'est un problème de méthode et de port des EPI."},
   {q:"Jusqu'à quelle tension s'étend le domaine BT en courant alternatif ?",opts:["500 V","750 V","1 000 V","1 500 V"],ans:2,expl:"Le domaine BT s'étend de 50 V à 1 000 V en courant alternatif. En courant continu, la limite est 1 500 V. Le réseau 230 V mono et 400 V triphasé sont donc en BT."},
   {q:"Face à une situation dangereuse imprévue, quel est le premier réflexe du BR ?",opts:["Continuer prudemment","Appeler le 15 immédiatement","Interrompre et alerter le chargé d'exploitation","Couper l'alimentation générale seul"],ans:2,expl:"STOP → ALERTER le chargé d'exploitation → ATTENDRE son accord. On ne reprend qu'après accord explicite. Les secours ne sont appelés qu'en cas de blessé."},
-  {q:"Quelle est la vérification obligatoire à faire sur vos gants isolants classe 00 avant chaque usage ?",opts:["Vérifier la date de péremption imprimée dessus","Contrôler visuellement et en les pliant l'absence de coupures, perforations et craquelures","Vérifier uniquement qu'ils ne sont pas mouillés","Aucune vérification nécessaire s'ils ont été rangés correctement"],ans:1,expl:"Les gants isolants classe 00 en dotation n'ont pas de date de péremption. La vérification obligatoire est visuelle et mécanique : plier doucement les gants pour détecter les craquelures invisibles à l'œil nu, contrôler l'absence de coupures ou perforations. Tout défaut = mise hors service immédiate."},
-  {q:"Dans quel ordre impératif se réalisent les 4 étapes de la consignation ?",opts:["VAT → Séparation → Condamnation → MALT-CC","Séparation → Condamnation → VAT → MALT-CC","Condamnation → Séparation → VAT → MALT-CC","Séparation → VAT → Condamnation → MALT-CC"],ans:1,expl:"L'ordre impératif est : 1. Séparation 2. Condamnation 3. VAT 4. MALT-CC. Cet ordre ne peut jamais être modifié ni une étape sautée."},
+  {q:"Quelle est la vérification complète à effectuer sur vos gants isolants classe 00 avant chaque usage ?",opts:["Vérifier la date de péremption imprimée dessus","Contrôler visuellement l'absence de coupures/craquelures ET réaliser une mise sous pression (gonflage) pour détecter les micro-fuites","Vérifier uniquement qu'ils ne sont pas mouillés","Aucune vérification si rangés correctement après usage"],ans:1,expl:"Deux étapes obligatoires : 1) Contrôle visuel (coupures, craquelures, perforations, décoloration) 2) Mise sous pression : enrouler le revers pour emprisonner l'air et maintenir 10 secondes — toute fuite = mise hors service immédiate. Les gants classe 00 n'ont pas de date de péremption."},
+  {q:"Quelles sont les 6 opérations impératives de la consignation dans l'ordre ?",opts:["Séparation → Condamnation → VAT → MALT-CC (4 étapes)","Pré-identification → Séparation → Condamnation → Identification → VAT → MALT-CC","VAT → Séparation → Condamnation → Identification → MALT-CC → Autorisation","Condamnation → Séparation → Identification → VAT → MALT-CC → Pré-identification"],ans:1,expl:"Les 6 opérations impératives de la consignation sont dans cet ordre : 1. Pré-identification 2. Séparation 3. Condamnation 4. Identification 5. VAT (Vérification d'Absence de Tension) 6. MALT-CC (si nécessaire). Cet ordre est intangible — aucune étape ne peut être sautée ni inversée."},
   {q:"La zone de voisinage renforcé BT est définie à quelle distance des pièces nues ?",opts:["Moins de 1 m","Moins de 50 cm","Moins de 30 cm","Moins de 10 cm"],ans:2,expl:"La zone de voisinage renforcé BT = moins de 30 cm des pièces nues sous tension. Dans cette zone, les EPI isolants (gants classe 00, protection faciale) sont obligatoires."},
   {q:"Avant de déconnecter un câble sur une installation supposée hors tension, que faites-vous ?",opts:["On déconnecte directement si l'interrupteur est ouvert","On réalise une VAT sur le câble concerné avant tout contact","On demande à un collègue de confirmer visuellement","On touche brièvement le câble avec le dos de la main pour tester"],ans:1,expl:"Même si l'installation semble hors tension, une VAT systématique est obligatoire avant tout contact ou déconnexion. Une tension résiduelle, un ré-enclenchement, une erreur de circuit — la VAT est la seule garantie réelle."},
   {q:"Un gant isolant présente une légère craquelure. Que faites-vous ?",opts:["Utilisation pour une intervention rapide uniquement","Mise hors service immédiate et remplacement avant toute intervention","Réparation avec du ruban isolant","Signalement mais utilisation jusqu'au prochain contrôle EPI"],ans:1,expl:"Tout EPI avec un défaut visible — même mineur — est immédiatement mis hors service. Un gant craquelé n'offre aucune garantie d'isolation. Il n'existe aucune réparation acceptable."},
   {q:"Pourquoi faut-il vérifier régulièrement son appareil VAT, et pas seulement au moment de l'utiliser ?",opts:["Ce n'est pas nécessaire si l'appareil est récent","Un VAT défaillant peut afficher 'absence de tension' même sous tension — la vérification régulière garantit sa fiabilité","La vérification régulière est facultative, seul le test avant mesure compte","Il suffit de vérifier que les sondes sont branchées"],ans:1,expl:"Un VAT dont les piles sont faibles ou dont l'électronique est défaillante peut afficher une absence de tension même lorsque la tension est présente. C'est l'erreur la plus dangereuse. La vérification régulière (piles, sondes, affichage, test sur source connue) est indispensable."},
-  {q:"Quelle affirmation est FAUSSE concernant l'habilitation BR ?",opts:["Le BR peut réaliser des interventions de dépannage seul en BT","Le BR est autorisé à consigner des ouvrages sans restriction","L'habilitation BR est délivrée et signée par l'employeur","L'habilitation doit être réévaluée au minimum tous les 3 ans"],ans:1,expl:"FAUX : la consignation d'ouvrage est réservée au BC (Chargé de Consignation). Le BR n'est pas habilité à consigner. Les 3 autres propositions sont vraies."}
+  {q:"Quelle affirmation est FAUSSE concernant l'habilitation BR ?",opts:["Le BR peut réaliser des interventions de dépannage seul en BT","Le BR est autorisé à consigner des ouvrages sans restriction","L'habilitation BR est délivrée et signée par l'employeur","L'habilitation doit être réévaluée au minimum tous les 3 ans"],ans:1,expl:"FAUX : la consignation d'ouvrage est réservée au BC (Chargé de Consignation). Le BR n'est pas habilité à consigner. Les 3 autres propositions sont vraies."},
+  {q:"À partir de quelle tension le courant électrique alternatif est-il potentiellement mortel pour l'être humain ?",opts:["110 V CA","230 V CA","50 V CA","25 V CA"],ans:2,expl:"Le seuil de tension mortelle en courant alternatif est fixé à 50 V CA (norme NF EN 50110 / NF C 18-510). En-dessous de 25 V CA en milieu sec, le risque est limité. Le courant domestique 230 V est donc 4× au-dessus du seuil létal — même un circuit 48 V doit être considéré avec précaution en milieu humide."}
 ];
 
 /* ════════════════════════════════
@@ -829,19 +867,38 @@ function unlockAllAndProceed() {
 
 function updateModuleProgress() {
   const done = blocUnlocked.filter(Boolean).length;
-  const pct = Math.round((done / 6) * 50); // 0-50% pour le module
+  const pct = Math.round((done / 6) * 50);
   setProgress(pct);
-  if (done >= 6) {
-    document.getElementById('btn-quiz').disabled = false;
-  }
+  // Le questionnaire ne s'active QUE quand le timer 13 min est écoulé
+  // (géré uniquement par unlockAllAndProceed)
 }
 
 /* ════════════════════════════════
    QUIZ
 ════════════════════════════════ */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function goQuiz() {
   stopGlobalTimer();
   document.getElementById('timerBox').textContent = '✅ Module terminé';
+  // Mélange aléatoire des questions et des réponses
+  QQ_SHUFFLED = shuffleArray(QQ).map(function(q) {
+    const indices = q.opts.map(function(_,i){return i;});
+    const shuffledIdx = shuffleArray(indices);
+    const newOpts = shuffledIdx.map(function(i){return q.opts[i];});
+    const newAns  = shuffledIdx.indexOf(q.ans);
+    return { q: q.q, opts: newOpts, ans: newAns, expl: q.expl };
+  });
+  answers  = new Array(QQ_SHUFFLED.length).fill(null);
+  answered = new Array(QQ_SHUFFLED.length).fill(false);
+  curQ = 0;
   showScreen('s-quiz');
   renderQ();
   setProgress(50);
@@ -849,12 +906,12 @@ function goQuiz() {
 }
 
 function renderQ() {
-  const q = QQ[curQ];
+  const q = QQ_SHUFFLED[curQ];
   const L = ['A','B','C','D'];
-  document.getElementById('qctr').textContent = `${curQ+1} / ${QQ.length}`;
+  document.getElementById('qctr').textContent = `${curQ+1} / ${QQ_SHUFFLED.length}`;
   document.getElementById('qp').disabled = (curQ === 0);
   document.getElementById('qn').disabled = !answered[curQ];
-  const isLast = curQ === QQ.length-1;
+  const isLast = curQ === QQ_SHUFFLED.length-1;
   document.getElementById('qn').textContent = isLast ? '✅ Voir mes résultats' : 'Suivant →';
 
   const optsHtml = q.opts.map((o,i) => {
@@ -875,12 +932,12 @@ function renderQ() {
        </div>`
     : '';
 
-  setProgress(50 + Math.round(((curQ+1)/QQ.length)*50));
+  setProgress(50 + Math.round(((curQ+1)/QQ_SHUFFLED.length)*50));
 
   document.getElementById('quiz-area').innerHTML = `
     <div class="qcard">
       <div class="qtop">
-        <div class="qtag">Question ${curQ+1} / ${QQ.length}</div>
+        <div class="qtag">Question ${curQ+1} / ${QQ_SHUFFLED.length}</div>
         <div class="qtext">${q.q}</div>
       </div>
       <div class="qopts">${optsHtml}</div>
@@ -894,7 +951,7 @@ function chooseQ(i) {
   document.getElementById('qn').disabled = false;
   renderQ();
 }
-function qNext() { if(curQ===QQ.length-1){showResults();return;} curQ++; renderQ(); window.scrollTo(0,0); }
+function qNext() { if(curQ===QQ_SHUFFLED.length-1){showResults();return;} curQ++; renderQ(); window.scrollTo(0,0); }
 function qPrev() { if(curQ>0){curQ--;renderQ();window.scrollTo(0,0);} }
 
 /* ════════════════════════════════
@@ -905,8 +962,8 @@ async function showResults() {
   showScreen('s-res');
   window.scrollTo(0,0);
 
-  const score  = answers.reduce((s,a,i) => s+(a===QQ[i].ans?1:0), 0);
-  const pct    = Math.round(score/QQ.length*100);
+  const score  = answers.reduce((s,a,i) => s+(a===QQ_SHUFFLED[i].ans?1:0), 0);
+  const pct    = Math.round(score/QQ_SHUFFLED.length*100);
   const pass   = pct >= 70;
   const mid    = pct >= 50 && pct < 70;
   const cls    = pass?'pass':mid?'mid':'fail';
@@ -945,7 +1002,7 @@ async function showResults() {
       <div class="res-top ${cls}">
         <div class="res-icon">${emoji}</div>
         <div class="res-pct">${pct}%</div>
-        <div class="res-score">${score} bonne${score>1?'s':''} réponse${score>1?'s':''} sur ${QQ.length}</div>
+        <div class="res-score">${score} bonne${score>1?'s':''} réponse${score>1?'s':''} sur ${QQ_SHUFFLED.length}</div>
         <span class="res-verdict">${verdict}</span>
       </div>
       <div class="res-body">
@@ -961,11 +1018,8 @@ async function showResults() {
           text-transform:uppercase;margin:1.25rem 0 .75rem;padding-bottom:6px;
           border-bottom:1px solid var(--border)">Détail des réponses</div>
         ${recapHtml}
-        <div class="mail-blk">
-          <p>📧 En complément de l'enregistrement automatique, vous pouvez aussi envoyer un e-mail de confirmation au pôle formation.</p>
-          <a class="btn-mail" href="${buildMailto(score,pct,verdict,dateStr,timeStr)}" target="_blank">
-            ✉️ Envoyer la confirmation par e-mail
-          </a>
+        <div style="background:var(--green-bg);border:1px solid rgba(45,212,160,.3);border-radius:8px;padding:12px 16px;margin-top:1rem;font-size:13px;color:#a0f0d8">
+          ✅ Vos résultats ont été automatiquement enregistrés et transmis au pôle formation.
         </div>
         <button class="btn-restart" onclick="restart()">↩ Recommencer depuis l'inscription</button>
       </div>
