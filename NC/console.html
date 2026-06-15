@@ -73,6 +73,9 @@ header h1{color:#fff;font-size:0.95rem;font-weight:700;flex:1}
 .yr-pill.all-yr{border-color:#999;color:#888}
 .yr-pill.all-yr.active{border-color:#555;background:#555;color:#fff}
 .filters input,.filters select{padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:0.81rem;background:#fafafa;font-family:inherit}
+.statut-opt{display:flex;align-items:center;gap:8px;padding:5px 10px;cursor:pointer;font-size:0.82rem}
+.statut-opt:hover{background:#f5f5f5}
+.statut-opt input[type=checkbox]{cursor:pointer;width:14px;height:14px;accent-color:var(--red)}
 .filters input:focus,.filters select:focus{outline:none;border-color:var(--red)}
 .filters input[type=text]{flex:1;min-width:160px}
 .btn-sm{border:none;padding:7px 14px;border-radius:6px;font-size:0.81rem;cursor:pointer;font-family:inherit;white-space:nowrap}
@@ -350,14 +353,41 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
   <div id="liste-prev-alert"></div>
   <div class="filters">
     <input type="text" id="f-search" placeholder="🔍  N°, client, machine, problème…" oninput="applyFilters()">
-    <select id="f-statut" onchange="applyFilters()">
-      <option value="">Tous les statuts</option>
-      <option value="ouvert">Réceptionné</option>
-      <option value="en_cours">En traitement</option>
-      <option value="resolu">En attente validation</option>
-      <option value="clos">Clos</option>
-      <option value="non_pertinent">Non pertinent</option>
-    </select>
+    <!-- Multi-sélection statuts -->
+    <div style="position:relative" id="statut-dropdown-wrap">
+      <button id="statut-btn" onclick="toggleStatutDropdown()" type="button"
+        style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:0.81rem;background:#fafafa;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;min-width:140px">
+        <span id="statut-btn-label">Tous les statuts</span>
+        <span style="margin-left:auto;opacity:.5;font-size:0.7rem">▼</span>
+      </button>
+      <div id="statut-panel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:500;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:8px 0;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:200px">
+        <div style="padding:4px 10px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#aaa;border-bottom:1px solid #f0f0f0;margin-bottom:4px">Afficher les statuts</div>
+        <label class="statut-opt" onclick="toggleStatut('ouvert')">
+          <input type="checkbox" id="sc-ouvert" checked onchange="applyFilters();saveStatuts()">
+          <span class="pill pill-ouvert" style="font-size:0.7rem">Réceptionné</span>
+        </label>
+        <label class="statut-opt" onclick="toggleStatut('en_cours')">
+          <input type="checkbox" id="sc-en_cours" checked onchange="applyFilters();saveStatuts()">
+          <span class="pill pill-en_cours" style="font-size:0.7rem">En traitement</span>
+        </label>
+        <label class="statut-opt" onclick="toggleStatut('resolu')">
+          <input type="checkbox" id="sc-resolu" checked onchange="applyFilters();saveStatuts()">
+          <span class="pill pill-resolu" style="font-size:0.7rem">En attente valid.</span>
+        </label>
+        <label class="statut-opt" onclick="toggleStatut('clos')">
+          <input type="checkbox" id="sc-clos" checked onchange="applyFilters();saveStatuts()">
+          <span class="pill pill-clos" style="font-size:0.7rem">Clos</span>
+        </label>
+        <label class="statut-opt" onclick="toggleStatut('non_pertinent')">
+          <input type="checkbox" id="sc-non_pertinent" checked onchange="applyFilters();saveStatuts()">
+          <span class="pill pill-non_pertinent" style="font-size:0.7rem">Non pertinent</span>
+        </label>
+        <div style="border-top:1px solid #f0f0f0;margin-top:4px;padding:4px 10px;display:flex;gap:6px">
+          <button onclick="setAllStatuts(true)" type="button" style="flex:1;font-size:0.7rem;padding:3px;border:1px solid #ddd;border-radius:4px;background:#f8f8f8;cursor:pointer">Tout cocher</button>
+          <button onclick="setAllStatuts(false)" type="button" style="flex:1;font-size:0.7rem;padding:3px;border:1px solid #ddd;border-radius:4px;background:#f8f8f8;cursor:pointer">Tout décocher</button>
+        </div>
+      </div>
+    </div>
     <select id="f-machine" onchange="applyFilters()"><option value="">Toutes familles</option></select>
     <select id="f-perimetre" onchange="applyFilters()"><option value="">Tous périmètres</option></select>
     <select id="f-source" onchange="applyFilters()"><option value="">Toutes sources</option></select>
@@ -1461,6 +1491,7 @@ async function loadNC() {
     buildPiloteFilter();
     buildPerimetreSourceFilters();
     buildListYearBand();
+    loadStatuts(); // restaurer les statuts cochés depuis localStorage
     updateStats();
     renderDashboard();
     renderModeBanner();
@@ -1691,9 +1722,67 @@ function renderDashboard() {
 }
 
 /* ════════ FILTERS + SORT ════════ */
+function getActiveStatuts() {
+  const all=['ouvert','en_cours','resolu','clos','non_pertinent'];
+  const checked=all.filter(v=>{const el=document.getElementById('sc-'+v);return el&&el.checked;});
+  // Si tout coché = pas de filtre ; sinon filtre sur la sélection
+  return checked.length===all.length ? null : new Set(checked);
+}
+function updateStatutBtnLabel() {
+  const all=['ouvert','en_cours','resolu','clos','non_pertinent'];
+  const lbls={ouvert:'Réceptionné',en_cours:'En traitement',resolu:'En att. valid.',clos:'Clos',non_pertinent:'Non pertinent'};
+  const checked=all.filter(v=>{const el=document.getElementById('sc-'+v);return el&&el.checked;});
+  const btn=document.getElementById('statut-btn-label');
+  if(!btn)return;
+  if(checked.length===all.length||checked.length===0) btn.textContent='Tous les statuts';
+  else if(checked.length===1) btn.textContent=lbls[checked[0]];
+  else btn.textContent=checked.length+' statuts';
+}
+function toggleStatut(val) {
+  // Empêche le double-déclenchement du label onclick + checkbox onchange
+  const el=document.getElementById('sc-'+val);
+  if(el){el.checked=!el.checked;}
+  applyFilters(); saveStatuts(); updateStatutBtnLabel();
+}
+function toggleStatutDropdown() {
+  const p=document.getElementById('statut-panel');
+  if(p) p.style.display=p.style.display==='none'?'block':'none';
+}
+function setAllStatuts(checked) {
+  ['ouvert','en_cours','resolu','clos','non_pertinent'].forEach(v=>{
+    const el=document.getElementById('sc-'+v); if(el)el.checked=checked;
+  });
+  applyFilters(); saveStatuts(); updateStatutBtnLabel();
+}
+function saveStatuts() {
+  const vals=['ouvert','en_cours','resolu','clos','non_pertinent'].filter(v=>{
+    const el=document.getElementById('sc-'+v);return el&&el.checked;
+  });
+  localStorage.setItem('nc_filter_statuts', JSON.stringify(vals));
+  updateStatutBtnLabel();
+}
+function loadStatuts() {
+  try {
+    const saved=JSON.parse(localStorage.getItem('nc_filter_statuts'));
+    if(!Array.isArray(saved))return;
+    ['ouvert','en_cours','resolu','clos','non_pertinent'].forEach(v=>{
+      const el=document.getElementById('sc-'+v); if(el)el.checked=saved.includes(v);
+    });
+    updateStatutBtnLabel();
+  } catch(e){}
+}
+// Fermer le dropdown si clic en dehors
+document.addEventListener('click',function(e){
+  const wrap=document.getElementById('statut-dropdown-wrap');
+  if(wrap&&!wrap.contains(e.target)){
+    const p=document.getElementById('statut-panel');
+    if(p)p.style.display='none';
+  }
+});
+
 function applyFilters() {
   const search=document.getElementById('f-search').value.toLowerCase().trim();
-  const statut=document.getElementById('f-statut').value;
+  const activeStatuts=getActiveStatuts(); // Set ou null
   const famille=document.getElementById('f-machine').value;
   const perimetre=document.getElementById('f-perimetre').value;
   const source=document.getElementById('f-source').value;
@@ -1704,7 +1793,7 @@ function applyFilters() {
   filtered=allNC.filter(nc=>{
     if(_listYear&&new Date(nc.createdAt).getFullYear()!==parseInt(_listYear)) return false;
     const s=nc.statut||nc.status||'ouvert';
-    if(statut&&s!==statut) return false;
+    if(activeStatuts&&!activeStatuts.has(s)) return false;
     if(famille&&(nc.familleProduit||'')!==famille) return false;
     if(perimetre&&(nc.perimetre||'')!==perimetre) return false;
     if(source&&(nc.sourceDetection||'')!==source) return false;
@@ -1745,7 +1834,9 @@ function resetFilters(){
   _listYear=String(new Date().getFullYear());
   buildListYearBand();
   ['f-search','f-from','f-to'].forEach(id=>document.getElementById(id).value='');
-  ['f-statut','f-machine','f-perimetre','f-source','f-pilote','f-gravite'].forEach(id=>document.getElementById(id).selectedIndex=0);
+  setAllStatuts(true);
+  ['f-machine','f-perimetre','f-source','f-pilote','f-gravite'].forEach(id=>document.getElementById(id).selectedIndex=0);
+  localStorage.removeItem('nc_filter_statuts');
   applyFilters();
 }
 /* ════════ COLONNES ════════ */
@@ -3975,7 +4066,8 @@ function closeLightbox(){
 
 /* ════════ EXPORTS ════════ */
 function exportCSV(){
-  const statut=encodeURIComponent(document.getElementById('f-statut').value);
+  const activeS=getActiveStatuts();
+  const statut=encodeURIComponent(activeS?[...activeS].join(','):'');
   const famille=encodeURIComponent(document.getElementById('f-machine').value);
   const search=encodeURIComponent(document.getElementById('f-search').value);
   const from=encodeURIComponent(document.getElementById('f-from').value);
