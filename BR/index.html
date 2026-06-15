@@ -302,19 +302,19 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
         <p>Module de sensibilisation obligatoire suite à un événement terrain.<br>Durée : 15 min de lecture minutée + questionnaire final.</p>
         <div class="reg-tags">
           <span class="tag tag-a">⏱ 15 min minutées</span>
-          <span class="tag tag-a">✅ 10 questions</span>
+          <span class="tag tag-a">✅ 11 questions</span>
           <span class="tag tag-g">🎯 Seuil 70 %</span>
           <span class="tag tag-g">NF C 18-510</span>
         </div>
       </div>
       <div class="inc-banner">
         <span style="font-size:20px;flex-shrink:0;margin-top:1px">🚨</span>
-        <p><strong>Pourquoi ce module ?</strong> Un incident d'électrisation a récemment eu lieu au sein de notre organisation. Le collaborateur est heureusement sain et sauf. Cet événement nous rappelle que le risque électrique est réel, même dans nos interventions quotidiennes. <strong>Ce rappel est obligatoire pour tous les habilités BR.</strong></p>
+        <p><strong>Pourquoi ce module ?</strong> Un incident d'électrisation a récemment eu lieu au sein de notre organisation. Le collaborateur est heureusement sain et sauf. Cet événement nous rappelle que le risque électrique est réel, même dans nos interventions quotidiennes. <strong>Ce rappel est obligatoire pour tous les habilités .</strong></p>
       </div>
       <div class="reg-form">
         <div class="field">
           <label>E-mail professionnel</label>
-          <input type="email" id="i-email" placeholder="prenom.nom@mullerautomotive.fr" autocomplete="email">
+          <input type="email" id="i-email" placeholder="Pnom@mullerautomotive.fr" autocomplete="email">
           <div class="ferr" id="e-email">Adresse e-mail invalide ou non autorisée</div>
         </div>
         <button class="btn-go" onclick="startModule()">Commencer le module →</button>
@@ -705,7 +705,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
 
   <div class="mod-nav">
     <div class="nav-info">Temps restant<strong id="nav-t">15:00</strong></div>
-    <div style="text-align:center;font-size:12px;color:var(--muted)">Lisez chaque bloc — le questionnaire<br>se déverrouille à la fin des 15 min</div>
+    <div style="text-align:center;font-size:12px;color:var(--muted)">Lisez chaque bloc — le questionnaire<br>se déverrouille à la fin des 10 min</div>
     <button class="btn-nav gold" id="btn-quiz" onclick="goQuiz()" disabled>Questionnaire →</button>
   </div>
 </div>
@@ -937,10 +937,21 @@ function unlockAllAndProceed() {
   timerDone = true;
   document.getElementById('timerVal').textContent = '00:00';
   document.getElementById('nav-t').textContent = '00:00';
-  // Basculer vers l'écran vidéo obligatoire
+  // Débloquer le bouton questionnaire — l'utilisateur clique manuellement
+  const btnQ = document.getElementById('btn-quiz');
+  if (btnQ) {
+    btnQ.disabled = false;
+    btnQ.textContent = 'Questionnaire →';
+    btnQ.setAttribute('onclick', 'goToVideo()');
+  }
+}
+
+function goToVideo() {
   showScreen('s-video');
-  window.scrollTo(0,0);
-  checkQuizUnlock();
+  window.scrollTo(0, 0);
+  // Lancer la vidéo automatiquement
+  const v = document.getElementById('safety-video');
+  if (v) { v.play().catch(function(){}); }
 }
 
 function checkQuizUnlock() {
