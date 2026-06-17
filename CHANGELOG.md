@@ -19,6 +19,21 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
+## [4.10] — 17/06/2026
+
+### Ajouté
+- **Menus déroulants bilingues complets** — familles produit (31), périmètre (7), sources de détection (8) traduits FR↔EN avec les traductions officielles Muller Automotive. La valeur stockée en base reste toujours en français, garantissant la cohérence des statistiques et filtres console.
+- **Champ `langue` en base** — colonne `langue CHAR(2) DEFAULT 'fr'` ajoutée automatiquement à `nc_fiches` au démarrage du serveur (`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`). Chaque nouvelle déclaration enregistre la langue utilisée par le rédacteur.
+- **Emails changement de statut bilingues** — si la NC a été soumise en anglais (`langue = 'en'`), les emails de notification envoyés au rédacteur utilisent un template anglais complet : sujet, corps, tableau d'historique et libellés de statut traduits.
+- **Module BR** — affichage du score sur 11 questions dans la console admin et le rapport imprimable
+- **Déploiement OVH** — `https://quali-form.mullerautomotive.fr` en production : HTTPS Let's Encrypt (auto-renouvellement), PM2 + systemd (démarrage auto), Nginx reverse proxy, `pg_dump` quotidien automatique à 02h00 avec rétention 7 jours
+
+### Modifié
+- **Sujet des emails NC enrichi** — code SAP Client (ou Distributeur si absent) et nom client ajoutés dans l'objet de 9 types de notifications (création, changement statut, clôture, action requise, nouvelle action, retour action, réponse pilote, relance, satellite clôturée). Facilite la recherche et le tri dans la boîte mail.
+- Console admin : reste 100 % française indépendamment de la langue du formulaire — statistiques et filtres non impactés
+
+---
+
 ## [4.9] — 12/06/2026
 
 ### Ajouté

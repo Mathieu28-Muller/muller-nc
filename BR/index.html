@@ -1127,7 +1127,7 @@ async function showResults() {
           <strong>E-mail :</strong> ${USER.email}<br>
           <strong>Module :</strong> Rappel Sécurité BR + EPI<br>
           <strong>Date :</strong> ${dateStr} à ${timeStr}<br>
-          <strong>Score :</strong> ${score}/10 (${pct}%) — ${verdict}
+          <strong>Score :</strong> ${score}/11 (${pct}%) — ${verdict}
         </div>
         <div id="save-status" class="save-status">⏳ Enregistrement en cours…</div>
         <div style="font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.05em;
@@ -1186,7 +1186,7 @@ function buildMailto(score,pct,verdict,dateStr,timeStr) {
 Collaborateur : ${USER.prenom} ${USER.nom}
 E-mail        : ${USER.email}
 Date          : ${dateStr} à ${timeStr}
-Score         : ${score}/10 (${pct}%)
+Score         : ${score}/11 (${pct}%)
 Verdict       : ${verdict}
 ══════════════════════════════════════════
 ${details}

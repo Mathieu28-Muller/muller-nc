@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.9';
+const NC_APP_VERSION = '4.10';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -188,7 +188,7 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.9', date: '2026-06-12', label: 'Formulaire bilingue FR/EN + SAP Distributeur',
-    current: true,
+    current: false,
     changes: [
       'Nouveau champ "Code SAP Distributeur" — au moins un des deux codes SAP obligatoire (client ou distributeur)',
       'Formulaire de déclaration bilingue français / anglais — sélecteur FR/EN dans l\'en-tête',
@@ -197,6 +197,18 @@ const NC_VERSION_HISTORY = [
       'Zones d\'upload : instructions claires (galerie, photo en direct) dans les deux langues',
       'Export CSV : colonnes "Code SAP Client" et "Code SAP Distributeur" ajoutées',
       'Passage En traitement : commentaire automatique généré (plus de saisie obligatoire admin) — email rédacteur conservé avec message automatique'
+    ]
+  },
+  {
+    version: '4.10', date: '2026-06-17', label: 'Menus déroulants bilingues + emails enrichis',
+    current: true,
+    changes: [
+      'Menus déroulants bilingues (familles produit, périmètre, sources détection) — 31+8+7 valeurs traduits FR↔EN avec traductions officielles. Valeur stockée en base toujours en français.',
+      'Champ "langue" ajouté en base PostgreSQL (nc_fiches.langue CHAR(2) DEFAULT fr) — enregistre la langue de chaque déclaration',
+      'Emails changement de statut bilingues — template anglais complet (sujet, corps, historique, statuts) si NC soumise en anglais',
+      'Sujet de tous les emails NC enrichi : code SAP + nom client ajoutés dans l\'objet (9 types de notifications) — facilite la recherche dans la boîte mail',
+      'Déploiement OVH quali-form.mullerautomotive.fr — HTTPS Let\'s Encrypt, PM2 systemd, Nginx reverse proxy, pg_dump quotidien automatique',
+      'Module BR : affichage du score /11 dans la console admin et le rapport imprimable'
     ]
   }
 ];
@@ -216,7 +228,12 @@ if (DATA_SOURCE !== 'json') {
     });
     pgPool.on('error', (err) => console.error('[pg] pool error:', err.message));
     pgPool.connect()
-        .then(c => { c.release(); console.log(`[pg] connecté (DATA_SOURCE=${DATA_SOURCE})`); })
+        .then(c => {
+            c.release();
+            console.log(`[pg] connecté (DATA_SOURCE=${DATA_SOURCE})`);
+            pgPool.query("ALTER TABLE nc_fiches ADD COLUMN IF NOT EXISTS langue CHAR(2) DEFAULT 'fr'")
+                .catch(e => console.error('[pg] migration langue:', e.message));
+        })
         .catch(e => console.error('[pg] connexion échouée:', e.message));
 }
 
@@ -263,12 +280,12 @@ function pgSyncFiche(nc, parentSet, satSet) {
                     commentaire_cloture, analyse_5p, preuve_efficacite,
                     is_parent, is_satellite, parent_id, parent_label, satellites,
                     groupe_label, groupe_motif, groupe_created_at, groupe_created_by,
-                    groupe_perimetre, rattachement_date, rattachement_by, sap_code_distributeur
+                    groupe_perimetre, rattachement_date, rattachement_by, sap_code_distributeur, langue
                 ) VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,
                     $19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,
                     $35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,
-                    $51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66
+                    $51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67
                 )
                 ON CONFLICT (numero) DO UPDATE SET
                     updated_at=EXCLUDED.updated_at, statut=EXCLUDED.statut,
@@ -290,7 +307,8 @@ function pgSyncFiche(nc, parentSet, satSet) {
                     groupe_label=EXCLUDED.groupe_label, groupe_motif=EXCLUDED.groupe_motif,
                     media_files=EXCLUDED.media_files,
                     media_files_traitement=EXCLUDED.media_files_traitement,
-                    sap_code_distributeur=EXCLUDED.sap_code_distributeur
+                    sap_code_distributeur=EXCLUDED.sap_code_distributeur,
+                    langue=EXCLUDED.langue
             `, [
                 nc.numero, nc.createdAt||null, nc.updatedAt||null, nc.statut||'ouvert',
                 nc.closedAt||null, nc.closPar||null, nc.clotureViaParent||null,
@@ -320,6 +338,7 @@ function pgSyncFiche(nc, parentSet, satSet) {
                 nc.groupePerimetre?.length ? nc.groupePerimetre : null,
                 nc.rattachementDate||null, nc.rattachementBy||null,
                 nc.sapCodeDistributeur||null,
+                nc.langue||'fr',
             ]);
 
             // ── 2. Resync nc_historique (delete + insert) ────────
@@ -1279,6 +1298,7 @@ app.post('/api/nc', async (req,res) => {
     const { redacteur,emailRedacteur,dateDecouverte,decouvreur,perimetre,sourceDetection,noCommande,refProduit,familleProduit,noSerie,versionProg,
             quantiteUnites,
             sapCode,sapCodeDistributeur,nomClient,cp,ville,pays,probleme,reparation,suggestion,
+            langue,
             mediaFiles,mediaFilesTraitement,pdfBase64 } = req.body||{};
     if (!probleme) return res.status(400).json({error:'Champ problème obligatoire'});
     if (!familleProduit) return res.status(400).json({error:'Famille de produit obligatoire'});
@@ -1320,6 +1340,7 @@ app.post('/api/nc', async (req,res) => {
     const emailAttachments = [...prob.attachments, ...trt.attachments];
 
     const nc = { numero, createdAt:now.toISOString(), statut:'ouvert',
+        langue: langue === 'en' ? 'en' : 'fr',
         redacteur:redacteur||'', emailRedacteur:emailRedacteur||'',
         dateDecouverte:dateDecouverte||'', decouvreur:decouvreur||'',
         perimetre:perimetre||'', sourceDetection:sourceDetection||'',
@@ -1344,7 +1365,7 @@ app.post('/api/nc', async (req,res) => {
         const ccList = emailRedacteur ? emailRedacteur : undefined;
         await tr.sendMail({
             from:EMAIL_CFG.from, to:ncMailTo(), ...(ccList ? {cc: ccList} : {}),
-            subject:`[NC ${numero}] ${nomClient||'?'} — ${refProduit||''}`,
+            subject:`[NC ${numero}] ${sapCode||sapCodeDistributeur||''} — ${nomClient||'?'} — ${refProduit||''}`,
             html:`<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
 <div style="background:#c0392b;padding:18px 24px"><h2 style="color:#fff;margin:0;font-size:1.1rem">🔴 Non-Conformité N° ${numero}</h2><p style="color:#ffaaaa;margin:4px 0 0;font-size:0.85rem">${dateStr}</p></div>
 <div style="padding:20px;border:1px solid #eee;border-top:none">
@@ -1832,7 +1853,7 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
             try {
                 const tr3=nodemailer.createTransport({host:EMAIL_CFG.host,port:EMAIL_CFG.port,secure:EMAIL_CFG.secure,auth:{user:EMAIL_CFG.user,pass:EMAIL_CFG.pass}});
                 await tr3.sendMail({ from:EMAIL_CFG.from, to:sat.emailRedacteur,
-                    subject:`[NC ${sat.numero}] Clôturée — Traitement groupe parent ${nc.numero}`,
+                    subject:`[NC ${sat.numero}] ${sat.sapCode||sat.sapCodeDistributeur||''} — ${sat.nomClient||'?'} — Clôturée — Traitement groupe parent ${nc.numero}`,
                     html:`<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto"><div style="background:#0c447c;padding:18px 24px;border-bottom:3px solid #27ae60"><h2 style="color:#fff;margin:0;font-size:1rem">✅ Votre NC ${sat.numero} est clôturée</h2><p style="color:#b8d9f0;margin:5px 0 0;font-size:0.82rem">Via le groupe d'analyse NC Parent ${nc.numero}</p></div><div style="padding:20px 24px;border:1px solid #eee;border-top:none"><p style="font-size:0.9rem">Bonjour <strong>${sat.redacteur||''}</strong>,</p><p style="font-size:0.9rem">Votre non-conformité <strong>${sat.numero}</strong> a été clôturée dans le cadre du groupe d'analyse <strong>${nc.numero} — ${nc.groupe_label||''}</strong>.</p>${commentaire?`<div style="background:#f4f8fd;border-left:4px solid #0c447c;padding:10px 14px;margin:12px 0;font-size:0.88rem">${commentaire.replace(/\n/g,'<br>')}</div>`:''}<p style="font-size:0.78rem;color:#888;margin-top:16px">Muller Automotive — Service Qualité NC</p></div></div>`
                 });
             } catch(e2) { console.error('[cascade close email]', e2.message); }
@@ -1855,7 +1876,7 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
                 from: EMAIL_CFG.from,
                 to:   piloteEmail,
                 ...(ccQualite ? { cc: ccQualite } : {}),
-                subject: `[NC ${nc.numero}] Action requise — Délai : ${delaiStr} — ${nc.nomClient||'?'}`,
+                subject: `[NC ${nc.numero}] ${nc.sapCode||nc.sapCodeDistributeur||''} — ${nc.nomClient||'?'} — Action requise — Délai : ${delaiStr}`,
                 html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
 <div style="background:#2980b9;padding:18px 24px;border-bottom:3px solid #1a6fa0">
   <h2 style="color:#fff;margin:0;font-size:1.05rem">📋 Action requise — Non-Conformité N° ${nc.numero}</h2>
@@ -1908,19 +1929,57 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
         if (ncMailEnabled('changementStatut')) try {
             const ccQualiteStatut = ncMailEnabled('changementStatut_qualite') ? ncMailTo() : null;
             const tr = nodemailer.createTransport({host:EMAIL_CFG.host,port:EMAIL_CFG.port,secure:EMAIL_CFG.secure,auth:{user:EMAIL_CFG.user,pass:EMAIL_CFG.pass}});
+            const isEN = (nc.langue||'fr') === 'en';
+            const SLBL_EN = { ouvert:'Open', en_cours:'In progress', resolu:'Resolved', clos:'Closed', non_pertinent:'Not relevant', en_attente:'On hold' };
+            const statutLabelEN = SLBL_EN[statut] || statutLabel;
+            const histLinesEN = (nc.historique||[]).map(h =>
+                `<tr style="background:${nc.historique.indexOf(h)%2?'#fff':'#f9f9f9'}">
+                  <td style="padding:6px 10px;color:#888;font-size:0.82rem">${new Date(h.date).toLocaleString('en-GB')}</td>
+                  <td style="padding:6px 10px;font-weight:600;color:${colorMap[h.statut]||'#555'};font-size:0.82rem">${SLBL_EN[h.statut]||h.statut}</td>
+                  <td style="padding:6px 10px;font-size:0.82rem;font-style:italic;color:#555">${h.commentaire||'—'}</td>
+                </tr>`
+            ).join('');
             await tr.sendMail({
                 from: EMAIL_CFG.from,
                 to:   nc.emailRedacteur,
                 ...(ccQualiteStatut ? { cc: ccQualiteStatut } : {}),
-                subject: `[NC ${nc.numero}] Mise à jour : ${statutLabel}`,
-                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
+                subject: `[NC ${nc.numero}] ${nc.sapCode||nc.sapCodeDistributeur||''} — ${nc.nomClient||'?'} — ${isEN ? 'Status update' : 'Mise à jour'} : ${isEN ? statutLabelEN : statutLabel}`,
+                html: isEN
+                ? `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
+<div style="background:#1a1a1a;padding:18px 24px;border-bottom:3px solid ${couleur}">
+  <h2 style="color:#fff;margin:0;font-size:1.05rem">Update on your non-conformity</h2>
+  <p style="color:#aaa;margin:5px 0 0;font-size:0.82rem">Ref. ${nc.numero} — ${new Date(now).toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})} at ${timeStr}</p>
+</div>
+<div style="padding:20px 24px;border:1px solid #eee;border-top:none">
+  <p style="margin-bottom:16px;font-size:0.9rem">Dear <strong>${nc.redacteur||''}</strong>,</p>
+  <p style="margin-bottom:16px;font-size:0.9rem">The status of your non-conformity declaration has been updated:</p>
+  <div style="background:${couleur}18;border-left:4px solid ${couleur};padding:12px 16px;border-radius:0 6px 6px 0;margin-bottom:20px">
+    <span style="font-size:1rem;font-weight:700;color:${couleur}">${statutLabelEN}</span>
+    ${commentaireEffectif ? `<p style="margin:8px 0 0;color:#444;font-size:0.88rem">${commentaireEffectif.replace(/\n/g,'<br>')}</p>` : ''}
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:20px">
+    <thead><tr style="background:#2b2b2b;color:#fff">
+      <th style="padding:8px 10px;text-align:left">Date</th>
+      <th style="padding:8px 10px;text-align:left">Status</th>
+      <th style="padding:8px 10px;text-align:left">Comment</th>
+    </tr></thead>
+    <tbody>${histLinesEN}</tbody>
+  </table>
+  <p style="font-size:0.78rem;color:#888">
+    You can track the full history of your NC on the declaration form.<br>
+    Product reference: <strong>${nc.refProduit||'—'}</strong> — Customer: <strong>${nc.nomClient||'—'}</strong>
+  </p>
+</div>
+<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">
+  Automated notification — Muller Automotive After-Sales
+</div></div>`
+                : `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
 <div style="background:#1a1a1a;padding:18px 24px;border-bottom:3px solid ${couleur}">
   <h2 style="color:#fff;margin:0;font-size:1.05rem">Mise à jour de votre non-conformité</h2>
   <p style="color:#aaa;margin:5px 0 0;font-size:0.82rem">N° ${nc.numero} — ${dateStr} à ${timeStr}</p>
 </div>
 <div style="padding:20px 24px;border:1px solid #eee;border-top:none">
-  <p style="margin-bottom:16px;font-size:0.9rem">Bonjour <strong>${nc.redacteur||''}
-</strong>,</p>
+  <p style="margin-bottom:16px;font-size:0.9rem">Bonjour <strong>${nc.redacteur||''}</strong>,</p>
   <p style="margin-bottom:16px;font-size:0.9rem">Le statut de votre déclaration a été mis à jour :</p>
   <div style="background:${couleur}18;border-left:4px solid ${couleur};padding:12px 16px;border-radius:0 6px 6px 0;margin-bottom:20px">
     <span style="font-size:1rem;font-weight:700;color:${couleur}">${statutLabel}</span>
@@ -1960,7 +2019,7 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
             await tr.sendMail({
                 from: EMAIL_CFG.from,
                 to:   ncMailTo(),
-                subject: `[NC ${nc.numero}] Clôturée — ${SLBL2[statut]||statut} — ${nc.nomClient||'?'}`,
+                subject: `[NC ${nc.numero}] ${nc.sapCode||nc.sapCodeDistributeur||''} — ${nc.nomClient||'?'} — Clôturée — ${SLBL2[statut]||statut}`,
                 html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
 <div style="background:#2b2b2b;padding:18px 24px;border-bottom:3px solid ${couleur2}">
   <h2 style="color:#fff;margin:0;font-size:1.05rem">✅ Non-conformité clôturée — N° ${nc.numero}</h2>
@@ -2071,7 +2130,7 @@ app.post('/api/nc/:numero/actions', requireNCAuth, async (req,res) => {
             const tr = nodemailer.createTransport({host:EMAIL_CFG.host,port:EMAIL_CFG.port,secure:EMAIL_CFG.secure,auth:{user:EMAIL_CFG.user,pass:EMAIL_CFG.pass}});
             await tr.sendMail({
                 from:EMAIL_CFG.from, to:piloteEmail, ...(ccQualiteAction?{cc:ccQualiteAction}:{}),
-                subject:`[NC ${nc.numero}] Nouvelle action ${typeLabel} — Délai : ${delaiStr} — ${nc.nomClient||'?'}`,
+                subject:`[NC ${nc.numero}] ${nc.sapCode||nc.sapCodeDistributeur||''} — ${nc.nomClient||'?'} — Nouvelle action ${typeLabel} — Délai : ${delaiStr}`,
                 html:`<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
 <div style="background:#2980b9;padding:18px 24px;border-bottom:3px solid #1a6fa0">
   <h2 style="color:#fff;margin:0;font-size:1.05rem">📋 Nouvelle action — NC N° ${nc.numero}</h2>
@@ -2272,7 +2331,7 @@ app.post('/api/nc/action/:id/reponse-pilote', requireNCAuth, async (req,res) => 
                     from: EMAIL_CFG.from,
                     to:   piloteEmail,
                     cc:   ncMailEnabled('creationAction_qualite') ? ncMailTo() : undefined,
-                    subject: `[NC ${nc.numero}] Retour — Action ${typeLabel} à compléter — ${nc.nomClient||'?'}`,
+                    subject: `[NC ${nc.numero}] ${nc.sapCode||nc.sapCodeDistributeur||''} — ${nc.nomClient||'?'} — Retour — Action ${typeLabel} à compléter`,
                     html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
 <div style="background:#8e44ad;padding:18px 24px;border-bottom:3px solid #6c3483">
   <h2 style="color:#fff;margin:0;font-size:1.05rem">↩ Retour sur votre action — NC N° ${nc.numero}</h2>
@@ -2306,7 +2365,7 @@ app.post('/api/nc/action/:id/reponse-pilote', requireNCAuth, async (req,res) => 
                 await tr.sendMail({
                     from:    EMAIL_CFG.from,
                     to:      ncMailTo(),
-                    subject: `[NC ${nc.numero}] Réponse pilote — ${action.pilote} — ${typeLabel} — ${nc.nomClient||'?'}`,
+                    subject: `[NC ${nc.numero}] ${nc.sapCode||nc.sapCodeDistributeur||''} — ${nc.nomClient||'?'} — Réponse pilote — ${action.pilote} — ${typeLabel}`,
                     html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
 <div style="background:#27ae60;padding:18px 24px;border-bottom:3px solid #1e8449">
   <h2 style="color:#fff;margin:0;font-size:1.05rem">✅ Réponse reçue — NC N° ${nc.numero}</h2>
@@ -2362,7 +2421,7 @@ app.post('/api/nc/action/:id/relance', requireNCAuth, async (req,res) => {
         const tr = nodemailer.createTransport({host:EMAIL_CFG.host,port:EMAIL_CFG.port,secure:EMAIL_CFG.secure,auth:{user:EMAIL_CFG.user,pass:EMAIL_CFG.pass}});
         await tr.sendMail({
             from:EMAIL_CFG.from, to:piloteEmail, ...(ccQualiteRelance?{cc:ccQualiteRelance}:{}),
-            subject:`[NC ${nc.numero}] 🔔 Relance — Action ${typeLabel} — Délai : ${delaiStr}`,
+            subject:`[NC ${nc.numero}] 🔔 ${nc.sapCode||nc.sapCodeDistributeur||''} — ${nc.nomClient||'?'} — Relance — Action ${typeLabel} — Délai : ${delaiStr}`,
             html:`<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
 <div style="background:#e67e22;padding:18px 24px;border-bottom:3px solid #d35400">
   <h2 style="color:#fff;margin:0;font-size:1.05rem">🔔 Relance — NC N° ${nc.numero}</h2>

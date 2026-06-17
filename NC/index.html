@@ -366,6 +366,47 @@ const FAMILLES_FALLBACK = [
   'SOFT LCT','SOFT POLL','SOFT RPH','SONOMETRE','SPEEDOMETRE','STATION MOBILE','SYSTÈME'
 ];
 
+// ── Traductions EN des listes déroulantes (valeur BDD toujours en FR) ──
+const DROPDOWN_EN = {
+  perimetre: {
+    'Approvisionnement / Réception':        'Procurement / Receiving',
+    'Bureau d\'études / Développement':     'Engineering / R&D',
+    'Fabrication / Production':             'Manufacturing / Production',
+    'Garantie / Retour client':             'Warranty / Customer return',
+    'Logistique / Entrepôt':               'Logistics / Warehouse',
+    'Logistique / Transport - Expédition':  'Logistics / Shipping & Transport',
+    'SAV / Installation terrain':           'After-sales service / Field installation',
+  },
+  sourceDetection: {
+    'Autocontrôle opérateur':               'Operator self-inspection',
+    'Contrôle en cours de production':      'In-process quality control',
+    'Contrôle final avant expédition':      'Final inspection before shipment',
+    'Contrôle réception':                   'Incoming inspection',
+    'Préparation de commande / Inventaire': 'Order picking / Inventory',
+    'Revue de conception / Validation BE':  'Design review / Engineering validation',
+    'Signalement client':                   'Customer complaint / Customer report',
+    'Technicien terrain':                   'Field technician',
+  },
+  familleProduit: {
+    'ANALYSEUR DE GAZ':    'GAS ANALYSER',        'BANC EXPERT':         'EXPERT BENCH',
+    'BANC FREINAGE MOTO':  'MOTORCYCLE BRAKE TESTER', 'BANC FREINAGE PL': 'HGV BRAKE TESTER',
+    'BANC FREINAGE VL':    'CAR BRAKE TESTER',    'BANC SUSPENSION':     'SUSPENSION TESTER',
+    'BANC TACHY':          'TACHOGRAPH TEST BENCH','CELEROMETRE':         'ACCELEROMETER',
+    'CLIMATISATION':       'CLIMATE STATION',      'DECELEROMETRE':       'DECELEROMETER',
+    'DIAG':                'DIAGNOSTICS',          'EQUILIBREUSE':        'WHEEL BALANCER',
+    'GEOMETRIE':           'WHEEL ALIGNMENT',      'KIT SECURITE':        'SAFETY KIT',
+    'MONTE DEMONTE PNEUS': 'TYRE CHANGER',         'OBD':                 'OBD',
+    'OPACIMETRE':          'SMOKE METER',          'PAJ PL':              'HGV AXLE PLAY DETECTOR PLATES',
+    'PAJ VL':              'CAR AXLE PLAY DETECTOR PLATES', 'PONT':        'VEHICLE LIFT',
+    'PUPITRE LCT':         'LCT CONTROL PANEL',   'PUPITRE POLLUTION':   'EMISSIONS CONTROL PANEL',
+    'REGLE PHARES':        'HEADLIGHT',            'RIPAGE':              'SIDE SLIP TESTER',
+    'SOFT LCT':            'LCT SOFTWARE',         'SOFT POLL':           'EMISSIONS SOFTWARE',
+    'SOFT RPH':            'HEADLIGHT SOFTWARE',   'SONOMETRE':           'SOUND LEVEL METER',
+    'SPEEDOMETRE':         'SPEEDOMETER TESTER',   'STATION MOBILE':      'MOBILE STATION',
+    'SYSTÈME':             'SYSTEM',
+  }
+};
+
 // ── Chargement dynamique périmètre, source & famille ──
 (async function chargerListesFormulaire() {
   try {
@@ -375,14 +416,16 @@ const FAMILLES_FALLBACK = [
     const selP = document.getElementById('perimetre');
     const selS = document.getElementById('sourceDetection');
     const selF = document.getElementById('familleProduit');
-    (data.perimetres||[]).forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;selP.appendChild(o);});
-    (data.sourcesDetection||[]).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;selS.appendChild(o);});
+    (data.perimetres||[]).forEach(p=>{const o=document.createElement('option');o.value=p;o.dataset.fr=p;o.dataset.en=DROPDOWN_EN.perimetre[p]||p;o.textContent=p;selP.appendChild(o);});
+    (data.sourcesDetection||[]).forEach(s=>{const o=document.createElement('option');o.value=s;o.dataset.fr=s;o.dataset.en=DROPDOWN_EN.sourceDetection[s]||s;o.textContent=s;selS.appendChild(o);});
     const familles = (data.famillesProduit&&data.famillesProduit.length) ? data.famillesProduit : FAMILLES_FALLBACK;
-    familles.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;selF.appendChild(o);});
+    familles.forEach(f=>{const o=document.createElement('option');o.value=f;o.dataset.fr=f;o.dataset.en=DROPDOWN_EN.familleProduit[f]||f;o.textContent=f;selF.appendChild(o);});
+    if (typeof _currentLang !== 'undefined' && _currentLang === 'en') applyDropdownLang('en');
   } catch(e){
     console.warn('Chargement listes dynamiques échoué — utilisation du fallback',e);
     const selF = document.getElementById('familleProduit');
-    FAMILLES_FALLBACK.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;selF.appendChild(o);});
+    FAMILLES_FALLBACK.forEach(f=>{const o=document.createElement('option');o.value=f;o.dataset.fr=f;o.dataset.en=DROPDOWN_EN.familleProduit[f]||f;o.textContent=f;selF.appendChild(o);});
+    if (typeof _currentLang !== 'undefined' && _currentLang === 'en') applyDropdownLang('en');
   }
 })();
 
@@ -557,6 +600,7 @@ document.getElementById('nc-form').addEventListener('submit', async e => {
     sapCode:v('sapCode'), sapCodeDistributeur:v('sapCodeDistributeur'), nomClient:v('nomClient'), cp:v('cp'), ville:v('ville'), pays:v('pays'),
     probleme:v('probleme'),
     reparation:v('reparation'), suggestion:v('suggestion'),
+    langue: _currentLang || 'fr',
     mediaFiles: uploadedFiles,
     mediaFilesTraitement: uploadedFilesTraitement,
     pdfBase64
@@ -1071,6 +1115,22 @@ function applyLang(lang) {
   if (fabTxt) fabTxt.textContent = lang==='en' ? 'Form help' : 'Aide formulaire';
   // Ré-injecter les boutons ?
   if (window._fgaInjectTriggers) window._fgaInjectTriggers();
+  // Mettre à jour les options des listes déroulantes
+  applyDropdownLang(lang);
+}
+
+function applyDropdownLang(lang) {
+  ['perimetre', 'sourceDetection', 'familleProduit'].forEach(function(selId) {
+    var sel = document.getElementById(selId);
+    if (!sel) return;
+    if (sel.options[0] && !sel.options[0].value)
+      sel.options[0].textContent = lang === 'en' ? '— Select —' : '— Sélectionner —';
+    Array.from(sel.options).forEach(function(opt) {
+      if (!opt.value) return;
+      opt.textContent = lang === 'en' ? (opt.dataset.en || opt.dataset.fr || opt.textContent)
+                                      : (opt.dataset.fr || opt.textContent);
+    });
+  });
 }
 
 // Détection automatique de la langue navigateur
