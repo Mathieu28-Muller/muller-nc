@@ -206,9 +206,7 @@ const NC_VERSION_HISTORY = [
       'Menus déroulants bilingues (familles produit, périmètre, sources détection) — 31+8+7 valeurs traduits FR↔EN avec traductions officielles. Valeur stockée en base toujours en français.',
       'Champ "langue" ajouté en base PostgreSQL (nc_fiches.langue CHAR(2) DEFAULT fr) — enregistre la langue de chaque déclaration',
       'Emails changement de statut bilingues — template anglais complet (sujet, corps, historique, statuts) si NC soumise en anglais',
-      'Sujet de tous les emails NC enrichi : code SAP + nom client ajoutés dans l\'objet (9 types de notifications) — facilite la recherche dans la boîte mail',
-      'Déploiement OVH quali-form.mullerautomotive.fr — HTTPS Let\'s Encrypt, PM2 systemd, Nginx reverse proxy, pg_dump quotidien automatique',
-      'Module BR : affichage du score /11 dans la console admin et le rapport imprimable'
+      'Sujet de tous les emails NC enrichi : code SAP + nom client ajoutés dans l\'objet (9 types de notifications) — facilite la recherche dans la boîte mail'
     ]
   }
 ];
