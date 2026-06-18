@@ -2189,7 +2189,7 @@ function renderStats(){
   const tauxEff=ncClos2.length>0?Math.round(((ncClos2.length-ncInef.length)/ncClos2.length)*100):0;
   let actRet2=0,actTot2=0;
   const now3=new Date();
-  allNC.forEach(nc=>{(nc.actions||[]).forEach(a=>{if(a.statut==='cloturé')return;actTot2++;if(a.echeance&&new Date(a.echeance)<now3)actRet2++;});});
+  allNC.forEach(nc=>{(nc.actions||[]).forEach(a=>{if(a.statut==='cloturé')return;actTot2++;if(a.echeance&&new Date(a.echeance)<now3&&(!a.datePiloteReponse||new Date(a.datePiloteReponse)>new Date(a.echeance)))actRet2++;});});
   const kpiEl=document.getElementById('st-kpi');
   if(kpiEl){
     kpiEl.innerHTML=`<div class="kpi-grid">

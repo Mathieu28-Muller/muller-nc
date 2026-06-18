@@ -19,6 +19,19 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
+## [4.11] — 18/06/2026
+
+### Ajouté
+- **Email création NC bilingue complet** — quand le formulaire est soumis en anglais : titre "Non-Conformity N°", date en anglais, labels traduits (Reporter, Scope, Detection source, Product family…), valeurs des listes traduites (After-sales service / Field installation, Field technician, Smoke Meter, HGV Axle Play Detector Plates…), footer "Automated notification — Muller Automotive After-Sales"
+- **PDF joint bilingue** — zone PDF traduite via `data-i18n` : tous les labels (Reporter, Scope, Product family, Serial no…) et les valeurs des listes déroulantes affichées dans la langue du formulaire
+
+### Corrigé
+- **Commentaire automatique "En traitement" traduit** — si NC soumise en anglais : "Your NC N° … is now being processed. An analysis is underway. You will be kept informed at the next status update."
+- **Historique NC** — "Déclaration créée" → "Declaration created" si langue = EN
+- **Stats onglet 13 "Actions en retard"** — correction du calcul : une action ayant reçu une réponse pilote avant l'échéance n'est plus comptée en retard. Alignement avec la logique du dashboard onglet 6.
+
+---
+
 ## [4.10] — 17/06/2026
 
 ### Ajouté

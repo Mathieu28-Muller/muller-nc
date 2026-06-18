@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.10';
+const NC_APP_VERSION = '4.11';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -201,12 +201,23 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.10', date: '2026-06-17', label: 'Menus déroulants bilingues + emails enrichis',
-    current: true,
+    current: false,
     changes: [
       'Menus déroulants bilingues (familles produit, périmètre, sources détection) — 31+8+7 valeurs traduits FR↔EN avec traductions officielles. Valeur stockée en base toujours en français.',
       'Champ "langue" ajouté en base PostgreSQL (nc_fiches.langue CHAR(2) DEFAULT fr) — enregistre la langue de chaque déclaration',
       'Emails changement de statut bilingues — template anglais complet (sujet, corps, historique, statuts) si NC soumise en anglais',
       'Sujet de tous les emails NC enrichi : code SAP + nom client ajoutés dans l\'objet (9 types de notifications) — facilite la recherche dans la boîte mail'
+    ]
+  },
+  {
+    version: '4.11', date: '2026-06-18', label: 'Correctifs bilingues complets + stats actions',
+    current: true,
+    changes: [
+      'Email création NC entièrement bilingue : titre, date, labels (Reporter/Scope/Detection source…), valeurs des listes traduites (Smoke Meter, Field technician…), footer EN',
+      'PDF joint bilingue : tous les labels traduits (data-i18n sur zone PDF), valeurs des listes en langue du formulaire',
+      'Commentaire automatique "en_cours" traduit EN : "Your NC N° … is now being processed…"',
+      '"Déclaration créée" → "Declaration created" dans l\'historique si NC soumise en anglais',
+      'Stats onglet 13 "Actions en retard" : correction du calcul — une action répondue avant l\'échéance n\'est plus comptée en retard (alignement avec dashboard onglet 6)'
     ]
   }
 ];
@@ -411,6 +422,48 @@ function ncMailEnabled(key) {
     const n=cfg.notificationsEmail||{};
     return n[key]!==false; // true par défaut si non défini
 }
+
+// Traductions EN des listes pour les emails (miroir de DROPDOWN_EN côté formulaire)
+const NC_EN = {
+    perimetre: {
+        'Approvisionnement / Réception':'Procurement / Receiving',
+        'Bureau d\'études / Développement':'Engineering / R&D',
+        'Fabrication / Production':'Manufacturing / Production',
+        'Garantie / Retour client':'Warranty / Customer return',
+        'Logistique / Entrepôt':'Logistics / Warehouse',
+        'Logistique / Transport - Expédition':'Logistics / Shipping & Transport',
+        'SAV / Installation terrain':'After-sales service / Field installation',
+    },
+    sourceDetection: {
+        'Autocontrôle opérateur':'Operator self-inspection',
+        'Contrôle en cours de production':'In-process quality control',
+        'Contrôle final avant expédition':'Final inspection before shipment',
+        'Contrôle réception':'Incoming inspection',
+        'Préparation de commande / Inventaire':'Order picking / Inventory',
+        'Revue de conception / Validation BE':'Design review / Engineering validation',
+        'Signalement client':'Customer complaint / Customer report',
+        'Technicien terrain':'Field technician',
+    },
+    familleProduit: {
+        'ANALYSEUR DE GAZ':'GAS ANALYSER','BANC EXPERT':'EXPERT BENCH',
+        'BANC FREINAGE MOTO':'MOTORCYCLE BRAKE TESTER','BANC FREINAGE PL':'HGV BRAKE TESTER',
+        'BANC FREINAGE VL':'CAR BRAKE TESTER','BANC SUSPENSION':'SUSPENSION TESTER',
+        'BANC TACHY':'TACHOGRAPH TEST BENCH','CELEROMETRE':'ACCELEROMETER',
+        'CLIMATISATION':'CLIMATE STATION','DECELEROMETRE':'DECELEROMETER',
+        'DIAG':'DIAGNOSTICS','EQUILIBREUSE':'WHEEL BALANCER',
+        'GEOMETRIE':'WHEEL ALIGNMENT','KIT SECURITE':'SAFETY KIT',
+        'MONTE DEMONTE PNEUS':'TYRE CHANGER','OBD':'OBD',
+        'OPACIMETRE':'SMOKE METER','PAJ PL':'HGV AXLE PLAY DETECTOR PLATES',
+        'PAJ VL':'CAR AXLE PLAY DETECTOR PLATES','PONT':'VEHICLE LIFT',
+        'PUPITRE LCT':'LCT CONTROL PANEL','PUPITRE POLLUTION':'EMISSIONS CONTROL PANEL',
+        'REGLE PHARES':'HEADLIGHT','RIPAGE':'SIDE SLIP TESTER',
+        'SOFT LCT':'LCT SOFTWARE','SOFT POLL':'EMISSIONS SOFTWARE',
+        'SOFT RPH':'HEADLIGHT SOFTWARE','SONOMETRE':'SOUND LEVEL METER',
+        'SPEEDOMETRE':'SPEEDOMETER TESTER','STATION MOBILE':'MOBILE STATION',
+        'SYSTÈME':'SYSTEM',
+    },
+};
+function ncTr(cat, val) { return (NC_EN[cat]&&NC_EN[cat][val]) || val; }
 
 // ── Configuration email ─────────────────────────────────────────
 // Renseignez vos paramètres SMTP ici ou via variables d'environnement
@@ -1349,7 +1402,7 @@ app.post('/api/nc', async (req,res) => {
         probleme:probleme||'',
         reparation:reparation||'', suggestion:suggestion||'',
         mediaFiles:prob.saved, mediaFilesTraitement:trt.saved,
-        historique:[{date:now.toISOString(),statut:'ouvert',commentaire:'Déclaration créée',par:redacteur||'Anonyme'}]
+        historique:[{date:now.toISOString(),statut:'ouvert',commentaire:langue==='en'?'Declaration created':'Déclaration créée',par:redacteur||'Anonyme'}]
     };
     data.declarations.unshift(nc);
     saveNC(data);
@@ -1358,13 +1411,32 @@ app.post('/api/nc', async (req,res) => {
     if (pdfBase64) emailAttachments.unshift({filename:`NC_${numero}.pdf`,content:Buffer.from(pdfBase64,'base64'),contentType:'application/pdf'});
     if (ncMailEnabled('creationNC')) try {
         const tr = nodemailer.createTransport({host:EMAIL_CFG.host,port:EMAIL_CFG.port,secure:EMAIL_CFG.secure,auth:{user:EMAIL_CFG.user,pass:EMAIL_CFG.pass}});
-        const dateStr = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+        const isENcreation = langue === 'en';
+        const dateStr = now.toLocaleDateString(isENcreation?'en-GB':'fr-FR',{day:'2-digit',month:'long',year:'numeric'});
         const totalMedias = prob.saved.length + trt.saved.length;
         const ccList = emailRedacteur ? emailRedacteur : undefined;
-        await tr.sendMail({
-            from:EMAIL_CFG.from, to:ncMailTo(), ...(ccList ? {cc: ccList} : {}),
-            subject:`[NC ${numero}] ${sapCode||sapCodeDistributeur||''} — ${nomClient||'?'} — ${refProduit||''}`,
-            html:`<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
+        const htmlCreation = isENcreation
+        ? `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
+<div style="background:#c0392b;padding:18px 24px"><h2 style="color:#fff;margin:0;font-size:1.1rem">🔴 Non-Conformity N° ${numero}</h2><p style="color:#ffaaaa;margin:4px 0 0;font-size:0.85rem">${dateStr}</p></div>
+<div style="padding:20px;border:1px solid #eee;border-top:none">
+<table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+<tr style="background:#fafafa"><td style="padding:7px 10px;color:#888;width:38%">Reporter</td><td style="padding:7px 10px">${redacteur||'—'}${emailRedacteur?' &lt;'+emailRedacteur+'&gt;':''}</td></tr>
+<tr><td style="padding:7px 10px;color:#888">Scope</td><td style="padding:7px 10px"><strong>${ncTr('perimetre',perimetre)||'—'}</strong></td></tr>
+<tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Detection source</td><td style="padding:7px 10px">${ncTr('sourceDetection',sourceDetection)||'—'}</td></tr>
+<tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Discovery date</td><td style="padding:7px 10px">${dateDecouverte||'—'}</td></tr>
+<tr><td style="padding:7px 10px;color:#888">Customer</td><td style="padding:7px 10px"><strong>${nomClient||'—'}</strong>${ville?' — '+ville:''}</td></tr>
+<tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Product ref.</td><td style="padding:7px 10px">${refProduit||'—'}</td></tr>
+<tr><td style="padding:7px 10px;color:#888">Product family</td><td style="padding:7px 10px">${ncTr('familleProduit',familleProduit)||'—'}</td></tr>
+<tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Serial no.</td><td style="padding:7px 10px">${noSerie||'—'}</td></tr>
+<tr><td style="padding:7px 10px;color:#888">Order no.</td><td style="padding:7px 10px">${noCommande||'—'}</td></tr>
+${quantiteUnites?`<tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Units affected</td><td style="padding:7px 10px"><strong>${quantiteUnites}</strong></td></tr>`:''}
+<tr><td colspan="2" style="padding:10px;background:#fff5f5;border-top:2px solid #f5c6c6"><strong style="color:#c00">Problem description:</strong><br><div style="margin-top:6px">${(probleme||'').replace(/\n/g,'<br>')}</div></td></tr>
+${reparation?`<tr><td style="padding:7px 10px;color:#888">Repair</td><td style="padding:7px 10px">${(reparation).replace(/\n/g,'<br>')}</td></tr>`:''}
+${suggestion?`<tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Improvement suggestion</td><td style="padding:7px 10px">${suggestion}</td></tr>`:''}
+${totalMedias?`<tr><td style="padding:7px 10px;color:#888">Attachments</td><td style="padding:7px 10px">${prob.saved.length} problem photo(s) + ${trt.saved.length} treatment photo(s)</td></tr>`:''}
+</table></div>
+<div style="background:#f5f5f5;padding:10px 24px;font-size:0.75rem;color:#aaa">Automated notification — Muller Automotive After-Sales</div></div>`
+        : `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
 <div style="background:#c0392b;padding:18px 24px"><h2 style="color:#fff;margin:0;font-size:1.1rem">🔴 Non-Conformité N° ${numero}</h2><p style="color:#ffaaaa;margin:4px 0 0;font-size:0.85rem">${dateStr}</p></div>
 <div style="padding:20px;border:1px solid #eee;border-top:none">
 <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
@@ -1383,7 +1455,11 @@ ${reparation?`<tr><td style="padding:7px 10px;color:#888">Réparation</td><td st
 ${suggestion?`<tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Suggestion</td><td style="padding:7px 10px">${suggestion}</td></tr>`:''}
 ${totalMedias?`<tr><td style="padding:7px 10px;color:#888">Pièces jointes</td><td style="padding:7px 10px">${prob.saved.length} photo(s) problème + ${trt.saved.length} photo(s) traitement</td></tr>`:''}
 </table></div>
-<div style="background:#f5f5f5;padding:10px 24px;font-size:0.75rem;color:#aaa">Envoi automatique — formation-sav.fr/NC/</div></div>`,
+<div style="background:#f5f5f5;padding:10px 24px;font-size:0.75rem;color:#aaa">Envoi automatique — Muller Automotive, Pôle Qualité NC</div></div>`;
+        await tr.sendMail({
+            from:EMAIL_CFG.from, to:ncMailTo(), ...(ccList ? {cc: ccList} : {}),
+            subject:`[NC ${numero}] ${sapCode||sapCodeDistributeur||''} — ${nomClient||'?'} — ${refProduit||''}`,
+            html: htmlCreation,
             attachments: emailAttachments
         });
         console.log(`[NC] ${numero} créée et email envoyé${ccList?' (CC: '+ccList+')':''}`);
@@ -1802,7 +1878,9 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
     if (commentaireCloture !== undefined) nc.commentaireCloture = commentaireCloture || '';
     // Commentaire automatique pour le passage en traitement si aucun commentaire fourni
     const commentaireEffectif = (statut === 'en_cours' && !commentaire?.trim())
-        ? `Votre NC N° ${nc.numero} est prise en charge et passée En traitement. Une analyse est en cours. Vous serez tenu(e) informé(e) au prochain changement de statut.`
+        ? ((nc.langue||'fr') === 'en'
+            ? `Your NC N° ${nc.numero} is now being processed. An analysis is underway. You will be kept informed at the next status update.`
+            : `Votre NC N° ${nc.numero} est prise en charge et passée En traitement. Une analyse est en cours. Vous serez tenu(e) informé(e) au prochain changement de statut.`)
         : commentaire||'';
     if (!nc.historique) nc.historique = [];
     nc.historique.push({
