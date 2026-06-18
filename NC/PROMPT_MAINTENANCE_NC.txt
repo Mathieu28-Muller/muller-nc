@@ -273,6 +273,9 @@ PLANIFICATION — ÉTAT AU 03/06/2026
   ✅ 05/06 — v4.7 : SMTP NC → noreply-nc@mullerautomotive.fr (OVH ssl0.ovh.net:465)
   ✅ 10/06 — v4.8 : satellites NC Parent cliquables + chargement automatique mode Pilote
   ✅ 12/06 — v4.9 : formulaire bilingue FR/EN + Code SAP Distributeur + guide aide traduit + commentaire automatique En traitement
+  ✅ 17/06 — v4.10 : menus déroulants bilingues FR/EN (31+8+7 valeurs), emails changement statut bilingues, sujets enrichis SAP+client
+  ✅ 18/06 — v4.11 : email création NC bilingue complet, PDF bilingue, stats "actions en retard" alignées dashboard
+  ✅ 18/06 — v4.12 : console utilisateurs tri/recherche/pagination 20/page, section Usage interne masquée Lecteur, fiche HTML pièce jointe clôture, Super Admin Matsupport, 6 Codir + 53 Lecteurs créés
 
   ☐ Phase 4 sécurité (juin 2026) :
                → pg_dump automatique quotidien (tâche planifiée Windows)
@@ -368,5 +371,5 @@ SMTP NC — ÉTAT AU 05/06/2026 (v4.7)
   JAMAIS hardcoder les credentials SMTP dans server.js — toujours passer par .env
 
 ================================================================================
-FIN PROMPT MAINTENANCE — version 12/06/2026 — v4.9
+FIN PROMPT MAINTENANCE — version 18/06/2026 — v4.12
 ================================================================================

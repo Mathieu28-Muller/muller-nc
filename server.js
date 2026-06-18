@@ -44,7 +44,7 @@ const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.11';
+const NC_APP_VERSION = '4.12';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -211,13 +211,24 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.11', date: '2026-06-18', label: 'Correctifs bilingues complets + stats actions',
-    current: true,
+    current: false,
     changes: [
       'Email création NC entièrement bilingue : titre, date, labels (Reporter/Scope/Detection source…), valeurs des listes traduites (Smoke Meter, Field technician…), footer EN',
       'PDF joint bilingue : tous les labels traduits (data-i18n sur zone PDF), valeurs des listes en langue du formulaire',
       'Commentaire automatique "en_cours" traduit EN : "Your NC N° … is now being processed…"',
       '"Déclaration créée" → "Declaration created" dans l\'historique si NC soumise en anglais',
       'Stats onglet 13 "Actions en retard" : correction du calcul — une action répondue avant l\'échéance n\'est plus comptée en retard (alignement avec dashboard onglet 6)'
+    ]
+  },
+  {
+    version: '4.12', date: '2026-06-18', label: 'Console utilisateurs + sécurité lecture + pièce jointe clôture',
+    current: true,
+    changes: [
+      'Console utilisateurs : recherche par nom/identifiant en temps réel, filtre par rôle, pagination 20 utilisateurs/page',
+      'Sécurité lecture : section "🔒 Clôture — Usage interne Service Qualité" masquée pour le rôle Lecteur dans la modale fiche NC',
+      'Email clôture : fiche NC HTML en pièce jointe automatique (version lecteur, sans données internes qualité)',
+      'Super Admin Matsupport : compte inviolable — modification, suppression et reset MDP bloqués pour tout autre administrateur',
+      'Création 6 comptes Codir + 53 comptes Lecteur — identifiants envoyés aux Codir, Lecteurs en attente bascule OVH'
     ]
   }
 ];
