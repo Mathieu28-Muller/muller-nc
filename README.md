@@ -9,8 +9,8 @@ Développée par **Mathieu Avet** avec [Claude Code](https://claude.ai/code) (An
 
 | Environnement | URL | Usage |
 |---|---|---|
-| Développement | `https://formation-sav.fr/NC/` | Tests, évolutions |
-| Production (cible) | `https://espace-client.muller-automotive.fr/NC/` | Utilisateurs finaux |
+| **Production OVH** ✅ | `https://quali-form.mullerautomotive.fr/NC/` | Utilisateurs finaux |
+| Développement (PC) | `https://formation-sav.fr/NC/` | Tests, évolutions locales |
 
 ---
 
@@ -75,12 +75,14 @@ PG_DB=nc_muller
 # JWT — générer avec : node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 JWT_SECRET=<cle_aleatoire_64_caracteres>
 
-# SMTP
-SMTP_HOST=<hote_smtp>
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=qualite@mullerautomotive.fr
-SMTP_PASS=<mot_de_passe_smtp>
+# SMTP (OVH ssl0.ovh.net)
+NC_SMTP_HOST=ssl0.ovh.net
+NC_SMTP_PORT=465
+NC_SMTP_SECURE=true
+NC_SMTP_USER=noreply-nc@mullerautomotive.fr
+NC_SMTP_PASS=<mot_de_passe_smtp>
+NC_SMTP_FROM=Qualité NC Muller Automotive <noreply-nc@mullerautomotive.fr>
+NC_MAIL_TO=mavet@mullerautomotive.fr
 ```
 
 > ⚠️ Ne jamais committer le fichier `.env` — il contient les credentials de production.
@@ -121,9 +123,10 @@ C:\formation\          (dev)   /opt/nc/          (production OVH)
 
 | Rôle | Droits |
 |---|---|
-| `nc_admin` | Accès total — création, qualification, analyse, clôture, configuration, export |
-| `nc_chef_produit` | Réponse aux actions CAPA assignées + lecture de toutes les NC |
-| `nc_lecteur` | Consultation seule — toutes NC, statistiques, archives |
+| `nc_admin` | Accès total — création, qualification, analyse, clôture, configuration, export, gestion utilisateurs |
+| `nc_chef_produit` | Réponse aux actions CAPA assignées + double profil Pilote/Lecteur (toggle ⇄) |
+| `nc_codir` | Lecture complète — tableau de bord, statistiques, liste, archives (sans données internes qualité) |
+| `nc_lecteur` | Consultation seule — liste NC et archives uniquement |
 
 ---
 
@@ -226,4 +229,4 @@ pg_dump -U <user> -h <host> nc_muller | gzip > /opt/backups/pg-nc-$(date +%Y%m%d
 
 *Propriétaire : Mathieu Avet — avet.mat@gmail.com*  
 *Développé avec Claude Code (Anthropic) — abonnement personnel*  
-*Version actuelle : v4.9 — voir [CHANGELOG.md](CHANGELOG.md)*
+*Version actuelle : v4.12 — voir [CHANGELOG.md](CHANGELOG.md)*

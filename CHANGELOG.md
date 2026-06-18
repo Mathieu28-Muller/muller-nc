@@ -6,16 +6,23 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
-## [Non publié] — v5.0 (prévu juin 2026)
+## [Non publié] — Phase 4 sécurité (post-OVH)
 
-### Infrastructure
-- Déploiement VPS OVH — serveur dédié KS-1-S (Xeon D-2123IT, 32 Go RAM, 2×4 To RAID 1)
-- OS Ubuntu 24.04 LTS — PostgreSQL 16 en local sur le VPS
-
-### Sécurité
+### Sécurité (à faire)
 - CORS restreint aux origines autorisées (suppression du wildcard `*`)
 - Helmet CSP (Content Security Policy) activé
-- `pg_dump` automatique quotidien (tâche planifiée)
+- PDF natif `.pdf` en pièce jointe clôture (Puppeteer headless Chrome)
+
+---
+
+## [4.12] — 18/06/2026
+
+### Ajouté
+- **Console utilisateurs** — recherche par nom/identifiant en temps réel, filtre par rôle, pagination 20 utilisateurs/page, compteur dynamique
+- **Email clôture** — fiche NC HTML en pièce jointe automatique (version lecteur, sans données internes qualité) — ouvrable dans navigateur pour impression PDF
+
+### Corrigé
+- **Sécurité lecture** — section "🔒 Clôture — Usage interne Service Qualité" masquée pour le rôle `nc_lecteur` dans la modale fiche NC (visible uniquement Admin / Pilote / Codir)
 
 ---
 
@@ -263,4 +270,5 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 ---
 
 *Propriétaire : Mathieu Avet — avet.mat@gmail.com*  
-*Développé avec Claude Code (Anthropic) — abonnement personnel*
+*Développé avec Claude Code (Anthropic) — abonnement personnel*  
+*Version actuelle : v4.12 — Production : https://quali-form.mullerautomotive.fr/NC/*

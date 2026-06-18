@@ -1,208 +1,190 @@
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║          DOSSIER DE REPRISE — FORMATION-SAV.FR / MULLER AUTOMOTIVE          ║
-║          Sauvegarde du 06/05/2026 — Généré automatiquement                  ║
+║          DOSSIER DE REPRISE — MULLER AUTOMOTIVE / NC v4.12                  ║
+║          Mis à jour le 18/06/2026                                            ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-Ce dossier contient l'intégralité du site formation-sav.fr prêt à être
-redémarré sur un nouveau PC Windows en cas de panne.
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. ARCHITECTURE GLOBALE DU SITE
+⭐ PRODUCTION = SERVEUR OVH (DEPUIS 17/06/2026)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Internet
-     │
-     ▼
-  Cloudflare (proxy DNS + tunnel)
-     │
-     ▼ port 80
-  Nginx 1.29.7  (reverse proxy local — C:\tools\nginx-1.29.7\)
-     │
-     ├─► port 3001 ── Node.js / Express  (C:\formation\server.js)
-     │                 · Site formation-sav.fr (NC, certificats, accueil)
-     │                 · API REST + auth JWT
-     │                 · Gestion NC avec module NC Parent complet
-     │
-     ├─► port 3003 ── Node.js / Express  (C:\formation\certificat-conformite\server.js)
-     │                 · Module certificats de conformité
-     │
-     └─► port 3002 ── Node.js  (site Lilin'ART — dossier séparé)
+  URL production  : https://quali-form.mullerautomotive.fr/NC/
+  IP OVH          : 217.182.136.194
+  SSH             : ssh qualiform@217.182.136.194 -p 7255
+  PuTTY           : C:\Users\MULLER\Desktop\putty.exe — session "Serveur Qualite"
+  App             : /opt/nc/   (PM2 process "formation-sav")
+  DB PostgreSQL   : nc_muller (localhost:5432, user: nc_user)
+  Backups auto    : /opt/backups/nc_muller_AAAAMMJJ.sql.gz  (cron 02h00, rétention 7j)
+  Secrets         : C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt
 
-
-ROUTING NGINX (résumé) :
-  /api/*                     → localhost:3001  (API principale)
-  /NC/*                      → C:\formation\NC\  (fichiers statiques NC)
-  /certificat-conformite/*   → localhost:3003
-  /certificat-conformite/api/* → localhost:3003/api/
-  /*                         → C:\formation\  (fichiers statiques accueil)
-  lilin-art.fr               → localhost:3002  (virtual host séparé)
-
-DONNÉES IMPORTANTES (JSON — pas de base de données) :
-  C:\formation\nc-data.json            ← toutes les NC + NC Parents ⭐ CRITIQUE
-  C:\formation\nc-parent-groups.json   ← notifications/journal NC Parents
-  C:\formation\nc-users.json           ← utilisateurs du module NC
-  C:\formation\nc-config.json          ← configuration NC (emails, familles, causes)
-  C:\formation\users.json              ← utilisateurs certificats/accueil
-  C:\formation\data.json               ← données formations/sessions
-  C:\formation\NC\media\               ← pièces jointes NC (photos, PDF…) ⭐ CRITIQUE
-  C:\formation\certificat-conformite\db.json  ← base certificats
+  PC Windows (C:\formation\) = développement + backup uniquement
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-2. LOGICIELS REQUIS (à installer sur le nouveau PC)
+1. ARCHITECTURE GLOBALE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  ① Node.js v25.x (ou LTS ≥ 20)
-      https://nodejs.org/en/download
-      → Cocher "Add to PATH" lors de l'installation
+  PRODUCTION OVH (source de vérité) :
 
-  ② PM2 (gestionnaire de processus Node.js)
-      En invite de commande admin :
-        npm install -g pm2
-        npm install -g pm2-windows-startup
-        pm2-startup install     ← démarrage automatique avec Windows
+    Internet
+       │
+       ▼
+    Nginx (OVH) — SSL Let's Encrypt — port 443
+       │
+       ▼ port 3001
+    Node.js / Express  (/opt/nc/server.js)
+       │
+       ▼
+    PostgreSQL 16 (localhost:5432 — base nc_muller)
 
-  ③ Nginx 1.29.7 (ou plus récent)
-      Copier le dossier C:\tools\nginx-1.29.7\ tel quel
-      (config incluse dans ce dossier de sauvegarde → _nginx_conf\)
-      Le fichier nginx.conf et conf.d\ sont pré-configurés.
 
-  ④ Cloudflare Tunnel (cloudflared)
-      Nécessaire pour exposer le serveur local sur Internet.
-      → Voir section 5 pour la configuration.
+  DÉVELOPPEMENT PC (accès via Cloudflare Tunnel) :
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-3. PROCÉDURE DE REPRISE PAS À PAS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    Internet
+       │
+       ▼
+    Cloudflare Tunnel → formation-sav.fr
+       │
+       ▼ port 80
+    Nginx local (C:\tools\nginx-1.29.7\)
+       │
+       ▼ port 3001
+    Node.js PM2 (C:\formation\server.js)
+       │
+       ▼
+    PostgreSQL 16 local (port 5432 — base nc_muller)
 
-ÉTAPE 1 — Copier les fichiers
-  Copier tout ce dossier D:\formation vers C:\formation
 
-  robocopy D:\formation C:\formation /MIR /XD node_modules
-
-ÉTAPE 2 — Installer les dépendances Node.js
-  cd C:\formation && npm install
-  cd C:\formation\certificat-conformite && npm install
-
-ÉTAPE 3 — Installer Nginx
-  Copier D:\formation\_nginx_conf\  →  C:\tools\nginx-1.29.7\conf\
-  Démarrer nginx :
-    nssm install nginx "C:\tools\nginx-1.29.7\nginx.exe"
-  Ou manuellement : C:\tools\nginx-1.29.7\nginx.exe
-
-ÉTAPE 4 — Démarrer les serveurs Node avec PM2
-  cd C:\formation
-  pm2 start ecosystem.config.js
-  pm2 save
-  pm2-startup install
-
-  Vérifier : pm2 list
-    formation-sav        → online  (port 3001)
-    certificat-conformite → online  (port 3003)
-
-ÉTAPE 5 — Vérifier en local
-  http://localhost/NC/console.html → console admin NC
+  DONNÉES (source de vérité = PostgreSQL en mode DATA_SOURCE=postgres) :
+    nc-data.json     ← ARCHIVE uniquement — ne plus modifier manuellement
+    nc-users.json    ← sync PG au démarrage
+    nc-config.json   ← config emails, familles, types
+    NC\media\        ← pièces jointes (photos, PDF, vidéos) ⭐ CRITIQUE
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-4. PARAMÈTRES SERVEUR NODE.JS (server.js)
+2. REPRENDRE APRÈS INCIDENT — OVH (procédure rapide)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-PORT              : 3001  (défini dans ecosystem.config.js → env.PORT)
-JWT_SECRET        : 'muller-automotive-secret-2026-changez-moi!'
-                    ⚠ À changer en production via ecosystem.config.js → env.JWT_SECRET
-TOKEN JWT NC      : durée de vie 8h
+  Depuis PuTTY (session "Serveur Qualite") ou SSH :
 
-EMAIL SMTP :
-  Serveur   : smtp.gmail.com  port 587  STARTTLS
-  Compte    : formations.muller@gmail.com
-  Mot passe : mot de passe d'application Gmail (server.js ligne ~45)
+  REDÉMARRER l'application :
+    pm2 reload formation-sav --update-env
 
-PROTECTION ÉCRITURE JSON (depuis 06/05/2026) :
-  Toutes les sauvegardes utilisent atomicWriteSync() :
-    1. Écriture dans fichier .tmp
-    2. Rename atomique .tmp → fichier final (crash-safe)
-  Sérialise les écritures simultanées (2 admins en même temps).
-  atomicWriteAsync() disponible pour migration OVH async.
+  VÉRIFIER l'état :
+    pm2 status
+    pm2 logs formation-sav --lines 20 --nostream
 
-  Fichiers protégés : nc-data.json, nc-parent-groups.json,
-                      nc-users.json, nc-config.json, users.json
+  DÉPLOYER une mise à jour depuis GitHub :
+    cd /opt/nc && git pull origin master && pm2 reload formation-sav --update-env
+
+  VÉRIFIER la base PostgreSQL :
+    psql -U nc_user -d nc_muller -c "SELECT COUNT(*) FROM nc_fiches;"
+
+  RESTAURER un backup PostgreSQL :
+    gunzip -c /opt/backups/nc_muller_DATE.sql.gz | psql -U nc_user -d nc_muller
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-5. CLOUDFLARE TUNNEL (accès Internet)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Le site est exposé via Cloudflare Tunnel (cloudflared).
-
-Sur le nouveau PC :
-  ① Installer cloudflared
-  ② Se connecter au compte Cloudflare Muller Automotive
-  ③ Zero Trust → Networks → Tunnels → récupérer le token
-  ④ cloudflared service install <token>  &&  sc start cloudflared
-
-  Le tunnel pointe :  formation-sav.fr → localhost:80  (Nginx)
-                      lilin-art.fr     → localhost:80  (Nginx → 3002)
-
-NOTE CONNEXION ETHERNET (06/05/2026) :
-  PC connecté en ethernet filaire à la box fibre (performances supérieures).
-  Recommandé : assigner une IP locale fixe dans la box pour stabilité.
-
-⚠️  INCIDENT RÉSOLU (06/05/2026) — TÂCHE PLANIFIÉE PARASITE :
-  Après redémarrage PC, la console NC affichait 404 sur toutes les routes /api/nc*.
-  CAUSE : Une tâche planifiée Windows nommée "MullerAuthAPI" démarrait
-          C:\server-muller\server.js (ancien serveur de test) sur le port
-          127.0.0.1:3001, interceptant toutes les requêtes Nginx avant le
-          bon serveur PM2 (formation-sav, C:\formation\server.js).
-  RÉSOLUTION : Tâche "MullerAuthAPI" supprimée définitivement via PowerShell.
-               PM2 sauvegardé (pm2 save) — seuls 3 processus légitimes :
-               · formation-sav (port 3001)
-               · certificat-conformite (port 3003)
-               · lilinart-site (port 3002)
-  DOSSIER C:\server-muller\ : ancien serveur, NE PAS DÉMARRER, NE PAS recréer
-                               la tâche planifiée. Peut être archivé/supprimé.
-  DIAGNOSTIC FUTUR : si 404 sur /api/nc* → vérifier avec :
-    netstat -ano | findstr :3001   (doit n'afficher qu'un seul PID)
-    pm2 list                        (formation-sav doit être "online")
-    Get-ScheduledTask | Where-Object {$_.Actions.Execute -like '*node*'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-6. DÉMARRAGE / ARRÊT RAPIDE (PC opérationnel)
+3. REPRENDRE APRÈS INCIDENT — PC Windows (développement)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   DÉMARRER tout  : double-cliquer C:\formation\start.bat
   ARRÊTER tout   : double-cliquer C:\formation\stop.bat
   LOGS           : pm2 logs formation-sav --lines 50
-  REDÉMARRER API : pm2 restart formation-sav
+  REDÉMARRER API : pm2 reload formation-sav --update-env
 
-  Nginx :
+  Nginx local :
     Démarrer : C:\tools\nginx-1.29.7\nginx.exe
     Arrêter  : C:\tools\nginx-1.29.7\nginx.exe -s stop
     Recharger: C:\tools\nginx-1.29.7\nginx.exe -s reload
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-7. RÔLES ET COMPTES NC (nc-users.json)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PostgreSQL local :
+    Démarrer service : net start "postgresql-x64-16"
+    Arrêter service  : net stop "postgresql-x64-16"
 
-  nc_admin        : accès total — créer/valider/clôturer NC et NC Parents,
-                    gérer utilisateurs, ⚙ Configuration
-  nc_chef_produit : pilote — répondre aux actions assignées (NC + NC Parents)
-  nc_lecteur      : consultation seule
-
-  Comptes admin actuels :
-    Matsupport       (admin — support technique)
-    Estelle Gouache  (admin)
-
-  Fichier : C:\formation\nc-users.json
-  Gestion : console NC → onglet Utilisateurs
-
-  CAPACITÉ SIMULTANÉE :
-    Field test local (appareils distincts via réseau) : 15-25 utilisateurs
-    Profil testé : 2 admins + 5 pilotes + 2 lecteurs → confort total
-    RAM serveur Node.js : ~50 MB (JWT stateless, pas de session stockée)
+  ROLLBACK si problème PG (retour mode JSON) :
+    1. .env → DATA_SOURCE=dual
+    2. pm2 reload formation-sav --update-env
+    3. Vérifier logs : "[pg] connecté (DATA_SOURCE=dual)"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-8. MODULE NC PARENT (depuis 06/05/2026) — ISO 9001 §10.2.1 / LNE
+4. REPRENDRE SUR NOUVEAU PC (panne matérielle)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  NC Parents = NC réelles dans nc-data.json (is_parent:true, satellites:[...])
+  NOTE : la production continue sur OVH même si le PC est en panne.
+  Le PC n'est que l'environnement de développement.
+
+  ÉTAPE 1 — Cloner le dépôt GitHub
+    git clone https://github.com/Mathieu28-Muller/muller-nc.git C:\formation
+
+  ÉTAPE 2 — Installer les dépendances Node.js
+    cd C:\formation && npm install
+    cd C:\formation\certificat-conformite && npm install
+
+  ÉTAPE 3 — Installer PostgreSQL 16
+    Télécharger depuis https://www.postgresql.org/download/windows/
+    Créer la base : psql -U postgres -c "CREATE DATABASE nc_muller;"
+    Appliquer le schéma : psql -U postgres -d nc_muller -f schema_postgresql.sql
+    Migrer les données : node migrate.js
+
+  ÉTAPE 4 — Créer le fichier .env
+    Copier depuis C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt
+    (gabarit complet .env PC inclus dans ce fichier)
+
+  ÉTAPE 5 — Installer PM2 et démarrer
+    npm install -g pm2
+    npm install -g pm2-windows-startup
+    pm2-startup install
+    cd C:\formation && pm2 start ecosystem.config.js && pm2 save
+
+  ÉTAPE 6 — Installer Nginx
+    Copier C:\tools\nginx-1.29.7\ depuis backup D:\
+    Démarrer : C:\tools\nginx-1.29.7\nginx.exe
+
+  ÉTAPE 7 — Vérifier
+    pm2 list  →  formation-sav online (port 3001)
+    http://localhost/NC/console.html  →  console admin NC
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. PARAMÈTRES SERVEUR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  PORT              : 3001  (défini dans ecosystem.config.js → env.PORT)
+  JWT_SECRET        : clé 64 chars aléatoire — voir SECRETS_DEPLOIEMENT_NC.txt
+  TOKEN JWT NC      : durée de vie 8h
+
+  EMAIL SMTP :
+    Serveur   : ssl0.ovh.net  port 465  SSL
+    Compte    : noreply-nc@mullerautomotive.fr
+    Variables : NC_SMTP_HOST / NC_SMTP_PORT / NC_SMTP_SECURE
+                NC_SMTP_USER / NC_SMTP_PASS / NC_SMTP_FROM / NC_MAIL_TO
+    MDP SMTP  : voir SECRETS_DEPLOIEMENT_NC.txt
+
+  POSTGRESQL :
+    DATA_SOURCE=postgres  (source de vérité unique)
+    PG_HOST / PG_PORT / PG_USER / PG_PASSWORD / PG_DB=nc_muller
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. RÔLES ET COMPTES NC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  nc_admin        : accès total — créer/valider/clôturer NC, gérer utilisateurs
+  nc_chef_produit : pilote — répondre aux actions CAPA assignées, double profil ⇄
+  nc_codir        : lecture complète — dashboard, stats, liste, archives
+  nc_lecteur      : consultation seule — liste NC et archives
+
+  Comptes admins :
+    Matsupport       (admin support technique — compte protégé)
+    Estelle Gouache  (admin — estelle.gouache)
+
+  Total utilisateurs au 18/06/2026 : 80 comptes
+    2 admins · 16 pilotes · 6 codir · 56 lecteurs
+
+  Gestion : console NC → onglet 👥 Utilisateurs
+  Fichier : C:\formation\nc-users.json (sync PostgreSQL au démarrage)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. MODULE NC PARENT — ISO 9001 §10.2.1 / LNE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  NC Parents = NC réelles dans PostgreSQL (is_parent:true, satellites:[...])
 
   CRÉATION : console NC → grouper 2+ NC → numéro NC-P-XXXXX
   WORKFLOW  : ouvert → en_cours → resolu → clos (identique NC standard)
@@ -213,98 +195,88 @@ NOTE CONNEXION ETHERNET (06/05/2026) :
     · Ishikawa : au moins une cause renseignée          (LNE diagnostic)
     · Type de cause, Coût NC, Commentaire clôture       (standard)
 
-  FICHE SATELLITE :
-    · Bannière parent + fil de discussion enrichi (événements parent inclus)
-    · Badge 📋 NC-P-XXXXX sur chaque événement provenant du parent
-
-  STATISTIQUES :
-    · Coût NC Parent compté normalement
-    · Coût satellites EXCLU du total (pas de double-comptage)
-
-  LISTE NC : tous visibles (parents + satellites) avec badges dédiés
-    Filtre : Toutes NC / Standards / NC Parents / Satellites
-
-  MODULES JS (C:\formation\NC\) :
-    nc_parent_satellites.js   ← logique métier groupes
-    nc_parent_avance.js       ← scénarios avancés (résiduel, réouverture)
-    nc_liste_accordeon.js     ← liste accordéon + filtres
-    nc_droits_pilote.js       ← droits pilotes
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-9. STRUCTURE DES DOSSIERS (sauvegarde)
+8. STRUCTURE DES DOSSIERS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  D:\formation\
-    server.js                 ← API Node.js principale (port 3001)
-    ecosystem.config.js       ← config PM2
-    package.json              ← dépendances npm
-    nc-data.json              ← ⭐ NC + NC Parents — sauvegarder régulièrement
-    nc-parent-groups.json     ← notifications et journal NC Parents
-    nc-users.json             ← comptes NC
-    nc-config.json            ← configuration NC
-    users.json / data.json    ← autres modules
-    start.bat / stop.bat      ← démarrage/arrêt rapide
-    DEMARRAGE_URGENCE.txt     ← ce fichier (mis à jour 06/05/2026)
+  C:\formation\  (dev PC)    /opt/nc/  (production OVH)
+    server.js                ← API Node.js principale (port 3001)
+    ecosystem.config.js      ← config PM2
+    package.json             ← dépendances npm
+    .env                     ← credentials (NE PAS COMMITTER)
+    schema_postgresql.sql    ← schéma PG complet (12 tables, 3 vues)
+    migrate.js               ← migration JSON → PostgreSQL (idempotent)
+    plan_controle.js         ← vérification parité données (8 sections)
+    nc-data.json             ← ARCHIVE JSON (source = PostgreSQL)
+    nc-users.json            ← utilisateurs NC (sync PG au démarrage)
+    nc-config.json           ← configuration NC (emails, familles, causes)
     NC\
-      console.html            ← console admin (NC + NC Parents)
-      index.html              ← formulaire déclaration
-      login.html              ← connexion NC
-      synoptique.html         ← synoptique utilisateurs
-      synoptique_nc_groupe.html ← synoptique NC Parents
+      console.html           ← console admin (NC + NC Parents)
+      index.html             ← formulaire déclaration public
+      login.html             ← connexion NC
+      guide-utilisateur.html ← guide utilisateur
       nc_parent_satellites.js
       nc_parent_avance.js
       nc_liste_accordeon.js
       nc_droits_pilote.js
-      media\                  ← ⭐ pièces jointes — sauvegarder régulièrement
-    certificat-conformite\    ← module certificats (port 3003)
-    _nginx_conf\              ← config nginx sauvegardée
+      nc_stats.js
+      media\                 ← ⭐ pièces jointes — CRITIQUE
+    certificat-conformite\   ← module certificats (port 3003)
 
-  ⭐ FICHIERS CRITIQUES à sauvegarder régulièrement :
-     nc-data.json, nc-parent-groups.json, nc-users.json,
-     nc-config.json, NC\media\, certificat-conformite\db.json
+  BACKUPS :
+    D:\formation\                              ← miroir PC (robocopy /MIR)
+    D:\formation_backup_20260525_avant_postgres\ ← backup avant bascule PG
+    /opt/backups/                              ← dumps PG quotidiens OVH (7j)
+
+  SYNCHRONISER PC → D:\ :
+    robocopy C:\formation D:\formation /MIR /XD node_modules /XF "*.log" "*.tmp"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-10. DÉPENDANCES NPM (pour npm install)
+9. DÉPENDANCES NPM (pour npm install)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   C:\formation\ :
-    express, cors, jsonwebtoken, multer, nodemailer
+    express, cors, jsonwebtoken, multer, nodemailer,
+    bcryptjs, pg, helmet, express-rate-limit, dotenv
 
   C:\formation\certificat-conformite\ :
     express, cors, multer, nodemailer, pdf-lib, pdfkit, xlsx, xlsx-populate
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-11. COMMANDES DE DIAGNOSTIC
+10. COMMANDES DE DIAGNOSTIC
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  pm2 list                        → état des serveurs
-  pm2 logs formation-sav          → logs temps réel
-  pm2 restart all                 → redémarrer tout
-  pm2 monit                       → monitoring CPU/RAM
+  pm2 list                           → état des serveurs
+  pm2 logs formation-sav --lines 50  → logs temps réel
+  pm2 reload formation-sav --update-env → redémarrer + recharger .env
+  pm2 monit                          → monitoring CPU/RAM
 
-  netstat -an | findstr ":80 "    → vérifier nginx
-  netstat -an | findstr ":3001"   → vérifier Node.js
+  node plan_controle.js              → vérification parité JSON ↔ PostgreSQL
+  node migrate.js --dry-run          → simulation migration sans écriture
+
+  netstat -an | findstr ":3001"      → vérifier Node.js (Windows PC)
   curl http://localhost:3001/api/health → test API
 
+  ⚠️  SI 404 SUR /api/nc/* (PC uniquement) :
+    netstat -ano | findstr :3001   → doit n'afficher qu'un seul PID (PM2)
+    pm2 list                       → formation-sav doit être "online"
+    Get-ScheduledTask | Where-Object {$_.Actions.Execute -like '*node*'}
+    → Chercher tâche parasite sur port 3001 (ex: "MullerAuthAPI" — supprimée 06/05/2026)
+    → Dossier C:\server-muller\ : NE PAS DÉMARRER
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-12. DÉPLOIEMENT OVH (production future)
+11. CLOUDFLARE TUNNEL (accès Internet depuis le PC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Serveur recommandé : VPS Value OVH — 2 vCPU / 4 GB RAM (~6 €/mois)
-  Capacité validée   : 2 admins + 15-20 pilotes simultanés
-  Stack              : Nginx (SSL Let's Encrypt) → Node.js (port 3001)
+  Utilisé uniquement pour le PC de développement (formation-sav.fr).
+  En production, les utilisateurs passent par OVH (quali-form.mullerautomotive.fr).
 
-  Écriture atomique déjà en place : atomicWriteSync() sur tous les save*
-  atomicWriteAsync() disponible pour migration async complète OVH.
-
-  Checklist avant déploiement OVH :
-    · Changer JWT_SECRET (ecosystem.config.js → env.JWT_SECRET)
-    · HTTPS via Nginx + Certbot (Let's Encrypt)
-    · Droits fichiers Linux : chmod 755 media/
-    · Chemins path.join() déjà compatibles Windows/Linux
+  Le tunnel pointe : formation-sav.fr → localhost:80 (Nginx → 3001)
+  À couper après validation complète OVH (étape 15 — en attente).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Contact support technique : avet.mat@gmail.com
-  Sauvegarde générée le     : 06/05/2026
-  Mises à jour v06/05 :     NC Parent complet, écriture atomique, ethernet
+  Secrets de déploiement    : C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt
+  Dépôt GitHub              : https://github.com/Mathieu28-Muller/muller-nc
+  Mis à jour le             : 18/06/2026 — v4.12
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
