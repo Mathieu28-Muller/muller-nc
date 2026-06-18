@@ -580,7 +580,21 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
         <span>Utilisateurs NC</span>
         <button class="btn-hdr" onclick="showUserForm()">+ Nouvel utilisateur</button>
       </div>
+      <div style="display:flex;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center;flex-wrap:wrap">
+        <input type="text" id="users-search" placeholder="Rechercher par nom…" oninput="filterUsers()"
+          style="border:1.5px solid var(--border);border-radius:6px;padding:6px 10px;font-size:0.82rem;width:210px;outline:none">
+        <select id="users-role-filter" onchange="filterUsers()"
+          style="border:1.5px solid var(--border);border-radius:6px;padding:6px 10px;font-size:0.82rem;background:#fff;cursor:pointer">
+          <option value="">Tous les rôles</option>
+          <option value="nc_admin">Admin NC</option>
+          <option value="nc_chef_produit">Pilote</option>
+          <option value="nc_codir">Codir</option>
+          <option value="nc_lecteur">Lecteur</option>
+        </select>
+        <span id="users-count" style="font-size:0.78rem;color:#888;margin-left:auto"></span>
+      </div>
       <div class="card-body" style="padding:0" id="users-list"><div class="loader"></div></div>
+      <div id="users-pagination" style="display:flex;gap:5px;justify-content:center;align-items:center;padding:10px;border-top:1px solid var(--border);flex-wrap:wrap;min-height:42px"></div>
     </div>
 
     <!-- FORMULAIRE CRÉATION / ÉDITION -->
@@ -2478,16 +2492,66 @@ function genererRapportRevue() {
 }
 
 /* ════════ USERS ════════ */
+let _allUsers = [];
+let _usersPage = 1;
+const USERS_PER_PAGE = 20;
+
 async function loadUsers() {
   try {
     const res = await fetch('/api/nc-auth/users', { headers: authHdr() });
     if (!res.ok) throw new Error('HTTP '+res.status);
-    const users = await res.json();
-    renderUsers(users);
+    _allUsers = await res.json();
+    _usersPage = 1;
+    filterUsers();
   } catch(e) {
     document.getElementById('users-list').innerHTML=`<div class="empty">Erreur : ${e.message}</div>`;
   }
 }
+
+function filterUsers() {
+  const search = (document.getElementById('users-search')?.value || '').trim().toLowerCase();
+  const roleFilter = document.getElementById('users-role-filter')?.value || '';
+  const order = { nc_admin:0, nc_chef_produit:1, nc_codir:2, nc_lecteur:3, nc_viewer:3 };
+
+  let filtered = _allUsers.filter(u => {
+    const matchName = !search || u.name.toLowerCase().includes(search) || u.user.toLowerCase().includes(search);
+    const matchRole = !roleFilter || u.role === roleFilter;
+    return matchName && matchRole;
+  });
+  filtered.sort((a,b) => (order[a.role]??3)-(order[b.role]??3) || a.name.localeCompare(b.name,'fr'));
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / USERS_PER_PAGE));
+  if (_usersPage > totalPages) _usersPage = totalPages;
+
+  const countEl = document.getElementById('users-count');
+  if (countEl) countEl.textContent = total ? `${total} utilisateur${total>1?'s':''}` : '';
+
+  const start = (_usersPage - 1) * USERS_PER_PAGE;
+  renderUsers(filtered.slice(start, start + USERS_PER_PAGE), search);
+  renderUsersPagination(totalPages, total);
+}
+
+function renderUsersPagination(totalPages, total) {
+  const el = document.getElementById('users-pagination');
+  if (!el) return;
+  if (totalPages <= 1) { el.innerHTML=''; return; }
+  const start = (_usersPage - 1) * USERS_PER_PAGE + 1;
+  const end   = Math.min(_usersPage * USERS_PER_PAGE, total);
+  const btnStyle = 'padding:4px 10px;font-size:0.78rem;border:1.5px solid var(--border);background:#fff;border-radius:5px;cursor:pointer';
+  const activeStyle = btnStyle+';background:#1a6fa0;color:#fff;border-color:#1a6fa0';
+  let html = `<span style="font-size:0.78rem;color:#888">${start}–${end} / ${total}</span>`;
+  html += `<button style="${btnStyle}" onclick="goUsersPage(1)" ${_usersPage===1?'disabled':''}>«</button>`;
+  html += `<button style="${btnStyle}" onclick="goUsersPage(${_usersPage-1})" ${_usersPage===1?'disabled':''}>‹</button>`;
+  const from = Math.max(1, _usersPage-2), to = Math.min(totalPages, _usersPage+2);
+  for (let p=from; p<=to; p++)
+    html += `<button style="${p===_usersPage?activeStyle:btnStyle}" onclick="goUsersPage(${p})">${p}</button>`;
+  html += `<button style="${btnStyle}" onclick="goUsersPage(${_usersPage+1})" ${_usersPage===totalPages?'disabled':''}>›</button>`;
+  html += `<button style="${btnStyle}" onclick="goUsersPage(${totalPages})" ${_usersPage===totalPages?'disabled':''}>»</button>`;
+  el.innerHTML = html;
+}
+
+function goUsersPage(p) { _usersPage = p; filterUsers(); }
 
 const ROLE_BADGE = {
   nc_admin:        { label:'Admin NC', col:'#1a6fa0' },
@@ -2550,13 +2614,12 @@ function hideUserForm() {
   document.getElementById('user-form-card').style.display='none';
 }
 
-function renderUsers(users) {
+function renderUsers(users, search) {
   const el = document.getElementById('users-list');
-  if (!users.length) { el.innerHTML='<div class="empty" style="padding:20px">Aucun utilisateur</div>'; return; }
-  const sorted = [...users].sort((a,b)=>{
-    const order = { nc_admin:0, nc_chef_produit:1, nc_codir:2, nc_lecteur:3, nc_viewer:3 };
-    return (order[a.role]??3)-(order[b.role]??3) || a.name.localeCompare(b.name,'fr');
-  });
+  if (!users.length) {
+    el.innerHTML='<div class="empty" style="padding:20px">Aucun utilisateur'+(search?' correspondant à la recherche':'')+'</div>';
+    return;
+  }
   el.innerHTML = `<table class="stat-table" style="font-size:0.78rem;table-layout:fixed;width:100%">
     <colgroup>
       <col style="width:16%">
@@ -2570,7 +2633,7 @@ function renderUsers(users) {
       <th>Nom</th><th>Identifiant</th><th>Email</th><th>Rôle</th>
       <th>Dernière connexion</th><th style="text-align:center">Actions</th>
     </tr></thead>
-    <tbody>${sorted.map(u=>{
+    <tbody>${users.map(u=>{
       const rb = ROLE_BADGE[u.role] || { label:u.role, col:'#888' };
       return `<tr>
         <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(u.name)}"><strong>${esc(u.name)}</strong></td>
@@ -2579,10 +2642,13 @@ function renderUsers(users) {
         <td><span style="font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:10px;background:${rb.col}22;color:${rb.col};border:1px solid ${rb.col}44;white-space:nowrap">${rb.label}</span></td>
         <td style="font-size:0.7rem;color:#888;white-space:nowrap">${u.lastLogin?fmtDT(u.lastLogin):'Jamais'}</td>
         <td style="text-align:center;white-space:nowrap">
-          <button class="btn-sm" style="padding:3px 8px;font-size:0.7rem;background:#2980b9;color:#fff;margin-right:3px"
-            onclick='showUserForm(${JSON.stringify({user:u.user,name:u.name,email:u.email||"",role:u.role})})'>Modifier</button>
-          ${u.email?`<button class="btn-sm" style="padding:3px 8px;font-size:0.7rem;background:#27ae60;color:#fff;margin-right:3px" title="Envoyer identifiants + MDP temporaire par email" onclick="sendCredentials('${esc(u.user)}','${esc(u.name)}')">📧 Identif.</button>`:''}
-          ${u.user!==session.user?`<button class="btn-del" style="font-size:0.7rem;padding:3px 8px" onclick="deleteUser('${esc(u.user)}','${esc(u.name)}')">Supprimer</button>`:'<span style="color:#ccc;font-size:0.7rem">(vous)</span>'}
+          ${u.user==='Matsupport'&&session.user!=='Matsupport'
+            ? `<span style="font-size:0.7rem;color:#aaa;font-style:italic">🔒 Compte protégé</span>`
+            : `<button class="btn-sm" style="padding:3px 8px;font-size:0.7rem;background:#2980b9;color:#fff;margin-right:3px"
+                onclick='showUserForm(${JSON.stringify({user:u.user,name:u.name,email:u.email||"",role:u.role})})'>Modifier</button>
+              ${u.email?`<button class="btn-sm" style="padding:3px 8px;font-size:0.7rem;background:#27ae60;color:#fff;margin-right:3px" title="Envoyer identifiants + MDP temporaire par email" onclick="sendCredentials('${esc(u.user)}','${esc(u.name)}')">📧 Identif.</button>`:''}
+              ${u.user!==session.user?`<button class="btn-del" style="font-size:0.7rem;padding:3px 8px" onclick="deleteUser('${esc(u.user)}','${esc(u.name)}')">Supprimer</button>`:'<span style="color:#ccc;font-size:0.7rem">(vous)</span>'}`
+          }
         </td>
       </tr>`;
     }).join('')}</tbody>
@@ -3083,7 +3149,7 @@ function renderModal(nc) {
         ${nc.delaiAction?`<div class="mfield"><label>Respect échéance</label><span>${joursChip(nc)}</span></div>`:''}
       </div>
     </div>
-    ${(nc.typeCause||nc.cout!=null&&nc.cout!==''||nc.commentaireCloture)?`
+    ${!isLecteur&&(nc.typeCause||nc.cout!=null&&nc.cout!==''||nc.commentaireCloture)?`
     <div class="mfield full" style="grid-column:1/-1;margin-top:8px;padding:10px 14px;background:#f5f0fc;border-radius:8px;border:1px solid #c9a8e8">
       <label style="color:#7d3c98">🔒 Clôture — Usage interne Service Qualité</label>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:8px">

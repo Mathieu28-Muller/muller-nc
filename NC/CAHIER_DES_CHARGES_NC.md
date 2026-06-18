@@ -1,6 +1,6 @@
 # CAHIER DES CHARGES FONCTIONNEL ET TECHNIQUE
 ## Système de Gestion des Non-Conformités — Muller Automotive
-### Version 4.0 — 29/05/2026
+### Version 4.12 — 18/06/2026
 
 ---
 
@@ -35,7 +35,9 @@
 | 1.0 | 01/05/2026 | Mathieu Avet | Création initiale — module NC de base |
 | 2.0 | 09/05/2026 | Mathieu Avet | Phase 1 sécurité, dual-write PostgreSQL, NC parent-satellites |
 | 3.0 | 07/05/2026 | Mathieu Avet | Double profil Pilote/Lecteur, présentation.html, capaLabel global |
-| **4.0** | **29/05/2026** | **Mathieu Avet** | **Bascule DATA_SOURCE=postgres (source de vérité unique), schéma PG documenté, correction filtre "en retard réel" (ISO §10.2), nc_stats.js, planification Phase 4 + OVH** |
+| 4.0 | 29/05/2026 | Mathieu Avet | Bascule DATA_SOURCE=postgres (source de vérité unique), schéma PG documenté, correction filtre "en retard réel" (ISO §10.2), nc_stats.js, planification Phase 4 + OVH |
+| 4.1–4.11 | 03/06–17/06/2026 | Mathieu Avet | Gestion MDP utilisateurs (envoi identifiants, réinitialisation, force MDP), module BR, déploiement OVH (étapes 3→15), SMTP migré `noreply-nc@mullerautomotive.fr`, migration réelle PG OVH, PM2 + Nginx + SSL + cron backup |
+| **4.12** | **18/06/2026** | **Mathieu Avet** | **Console utilisateurs : tri rôle + recherche nom + pagination 20/page. Sécurité lecture : section "Usage interne Qualité" masquée pour nc_lecteur dans la modale. Email clôture : fiche NC HTML en pièce jointe (version lecteur). Super Admin Matsupport inviolable. Création 6 comptes Codir + 53 comptes Lecteur.** |
 
 ---
 
@@ -362,6 +364,54 @@ net start "postgresql-x64-16"   # si arrêté
 | PUT | `/api/nc-auth/users/:user` | nc_admin | Modifier utilisateur |
 | PUT | `/api/nc-auth/users/:user/password` | requireNCAuth | Changer mot de passe |
 | DELETE | `/api/nc-auth/users/:user` | nc_admin | Supprimer utilisateur |
+| POST | `/api/nc-auth/users/:user/send-credentials` | nc_admin | Générer MDP temporaire + envoyer identifiants par email |
+| POST | `/api/nc-auth/forgot-password` | — | Demander réinitialisation MDP (lien email) |
+| POST | `/api/nc-auth/reset-password` | — | Appliquer nouveau MDP via token de reset |
+
+### 4.5 Console de gestion des utilisateurs (v4.12)
+
+**Fichier** : `NC/console.html` — onglet 👥 Utilisateurs (nc_admin uniquement)
+
+#### Fonctionnalités de l'onglet
+
+| Fonctionnalité | Détail |
+|---|---|
+| **Recherche en temps réel** | Filtre instantané sur le nom complet ET l'identifiant (`oninput`) |
+| **Filtre par rôle** | Dropdown : Tous / Admin NC / Pilote / Codir / Lecteur |
+| **Compteur dynamique** | Affiche `N utilisateur(s)` selon le filtre actif |
+| **Pagination** | 20 utilisateurs par page — contrôles `«` `‹` pages `›` `»` + indicateur `1–20 / N` |
+| **Tri automatique** | Admin NC → Pilote → Codir → Lecteur, puis alphabétique FR par nom |
+| **Super Admin** | Compte `Matsupport` : boutons masqués pour tout autre admin → affiche `🔒 Compte protégé` |
+
+#### Protection Super Admin Matsupport (server.js)
+
+Le compte `Matsupport` est inviolable par tout autre administrateur :
+
+| Opération | Comportement si autre admin |
+|---|---|
+| `PUT /api/nc-auth/users/Matsupport` | 403 — modification refusée |
+| `DELETE /api/nc-auth/users/Matsupport` | 403 — suppression refusée |
+| `PUT /api/nc-auth/users/Matsupport/password` | 403 — changement MDP refusé |
+| `POST /api/nc-auth/users/Matsupport/send-credentials` | 403 — reset identifiants refusé |
+
+Seul `Matsupport` connecté sous son propre compte peut modifier ses propres données.
+
+#### Rôles disponibles
+
+| Rôle | Identifiant | Droits |
+|---|---|---|
+| Administrateur NC | `nc_admin` | Tous les droits + gestion utilisateurs |
+| Pilote | `nc_chef_produit` | Réponse CAPA assignées + double profil Pilote/Lecteur |
+| Codir | `nc_codir` | Dashboard + stats + liste NC en lecture (sans section interne qualité) |
+| Lecteur | `nc_lecteur` | Liste NC + archives uniquement — section "Usage interne" masquée |
+
+#### Convention d'identifiants
+
+| Situation | Convention | Exemples |
+|---|---|---|
+| Nouveau compte | Préfixe email | `abaloul`, `fmarin` |
+| 2e compte (double rôle Pilote + Codir) | Suffix `.codir` | `evernier.codir`, `jprolland.codir` |
+| MDP temporaire à la création | `Lecteur2026` / `Codir2026` | `mustChangePass: true` |
 
 ### 4.4 Hachage des mots de passe — bcryptjs (Phase 1)
 
@@ -879,23 +929,38 @@ window.NcStats = {
 
 | Paramètre | Valeur |
 |---|---|
-| Hôte | `smtp.gmail.com` |
-| Port | 587 (STARTTLS) |
-| Expéditeur | `formations.muller@gmail.com` |
+| Hôte | `ssl0.ovh.net` |
+| Port | 465 (SSL) |
+| Expéditeur | `noreply-nc@mullerautomotive.fr` |
 | Destinataires qualité | `mavet@mullerautomotive.fr` + `emailsQualite[]` depuis `nc-config.json` |
-| Mot de passe | `process.env.MAIL_PASS` — ne jamais coder en dur |
+| Variables d'environnement | `NC_SMTP_HOST`, `NC_SMTP_PORT`, `NC_SMTP_SECURE`, `NC_SMTP_USER`, `NC_SMTP_PASS`, `NC_SMTP_FROM` |
 
 ### 13.2 Emails déclenchés
 
-| Événement | Route | Destinataires | Toggle |
-|---|---|---|:---:|
-| Création NC | `POST /api/nc` | Emails qualité + CC rédacteur | `creationNC` |
-| Changement statut | `PUT /api/nc/:numero/status` | Emails qualité + rédacteur | `changementStatut` |
-| Nouvelle action CAPA | `POST /api/nc/:numero/actions` | Pilote (via map PILOTES) | `nouvelleAction` |
-| Réponse pilote | `POST /api/nc/action/:id/reponse-pilote` | Emails qualité | `reponsePilote` |
-| Relance pilote | `POST /api/nc/action/:id/relance` | Pilote | toujours |
-| Clôture NC | `PUT /api/nc/:numero/status` (clos) | Rédacteur | configurable |
-| Clôture groupe parent | Business.cloturerGroupe() | Déclarants de chaque satellite | configurable |
+| Événement | Route | Destinataires | Toggle | Pièce jointe |
+|---|---|---|:---:|---|
+| Création NC | `POST /api/nc` | Emails qualité + CC rédacteur | `creationNC` | — |
+| Changement statut | `PUT /api/nc/:numero/status` | Emails qualité + rédacteur | `changementStatut` | — |
+| **Clôture NC** | `PUT /api/nc/:numero/status` (clos) | **Rédacteur + emails qualité** | `changementStatut` | **`NC-XXXX.html` — fiche version lecteur** |
+| Nouvelle action CAPA | `POST /api/nc/:numero/actions` | Pilote (via map PILOTES) | `nouvelleAction` | — |
+| Réponse pilote | `POST /api/nc/action/:id/reponse-pilote` | Emails qualité | `reponsePilote` | — |
+| Relance pilote | `POST /api/nc/action/:id/relance` | Pilote | toujours | — |
+| Clôture groupe parent | Business.cloturerGroupe() | Déclarants de chaque satellite | configurable | — |
+| Envoi identifiants | `POST /api/nc-auth/users/:user/send-credentials` | Utilisateur concerné | toujours | — |
+| Réinitialisation MDP | `POST /api/nc-auth/forgot-password` | Utilisateur concerné | toujours | — |
+
+### 13.3 Pièce jointe HTML à la clôture (v4.12)
+
+Lors du passage au statut `clos`, l'email envoyé au rédacteur contient en pièce jointe la fiche NC complète au format HTML :
+
+- **Nom du fichier** : `NC-XXXXXX-XXXX.html`
+- **Génération** : `ncBodyHtml(nc, false)` — version lecteur (sans section "Usage interne Qualité")
+- **Stockage** : en mémoire uniquement — aucun fichier écrit sur le disque
+- **CSS embarqué** : `PRINT_CSS` inclus — rendu A4 identique à la vue impression console
+- **Bouton intégré** : "🖨 Imprimer / Sauvegarder PDF" visible à l'ouverture dans le navigateur
+- **Bilingue** : mention de la pièce jointe traduite en français et en anglais selon `nc.langue`
+
+**Évolution prévue post-OVH** : remplacement de la pièce jointe HTML par un vrai fichier `.pdf` généré via Puppeteer (headless Chrome) — zéro action manuelle pour le destinataire.
 
 ### 13.3 Map pilotes → emails
 
@@ -982,9 +1047,12 @@ app.get('/api/nc/:numero', ...)          // Wildcard — EN DERNIER
 | GET | `/api/nc-auth/users` | nc_admin | Liste utilisateurs |
 | GET | `/api/nc-auth/pilotes` | requireNCAuth | Liste pilotes |
 | POST | `/api/nc-auth/users` | nc_admin | Créer utilisateur |
-| PUT | `/api/nc-auth/users/:user` | nc_admin | Modifier utilisateur |
-| PUT | `/api/nc-auth/users/:user/password` | requireNCAuth | Changer mot de passe |
-| DELETE | `/api/nc-auth/users/:user` | nc_admin | Supprimer utilisateur |
+| PUT | `/api/nc-auth/users/:user` | nc_admin | Modifier utilisateur ⚠ bloqué sur `Matsupport` |
+| PUT | `/api/nc-auth/users/:user/password` | requireNCAuth | Changer mot de passe ⚠ bloqué sur `Matsupport` si autre admin |
+| DELETE | `/api/nc-auth/users/:user` | nc_admin | Supprimer utilisateur ⚠ bloqué sur `Matsupport` |
+| POST | `/api/nc-auth/users/:user/send-credentials` | nc_admin | MDP temporaire + email identifiants ⚠ bloqué sur `Matsupport` |
+| POST | `/api/nc-auth/forgot-password` | — | Demande reset MDP (lien email TTL 1h) |
+| POST | `/api/nc-auth/reset-password` | — | Appliquer nouveau MDP via token |
 
 ---
 
@@ -1226,7 +1294,16 @@ Référence complète : `D:\formation\RAPPORT_TECHNIQUE_IT_NC.html`
 
 **JWT_SECRET — clé 64 chars aléatoire active depuis 29/05/2026** (sauvegardée dans `C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt`).
 
-### 18.4 Évolutions fonctionnelles futures (backlog)
+### 18.4 Évolutions post-bascule OVH
+
+| Fonctionnalité | Détail technique | Priorité |
+|---|---|---|
+| **PDF natif en pièce jointe clôture** | Remplacer `NC-XXXX.html` par un vrai `.pdf` — `npm install puppeteer`, headless Chrome, `page.pdf({format:'A4'})` — nécessite libs système OVH (`libgbm`, `libasound2`, etc.) | Haute |
+| **Envoi identifiants aux 53 Lecteurs** | 53 comptes créés le 18/06/2026 en attente d'envoi — déclencher via console admin (bouton 📧 Identif.) ou script masse après validation OVH | Haute |
+| Couper accès externe PC (tunnel Cloudflare) | Après validation OVH stable | Haute |
+| SMTP OVH `.env` à jour | Mettre à jour `NC_SMTP_PASS` dans `/opt/nc/.env` via WinSCP | Moyenne |
+
+### 18.5 Évolutions fonctionnelles futures (backlog)
 
 | Fonctionnalité | Valeur métier | Priorité |
 |---|---|---|

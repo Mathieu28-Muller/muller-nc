@@ -1154,6 +1154,8 @@ app.post('/api/nc-auth/users', requireNCAdmin, (req,res) => {
 
 // PUT /api/nc-auth/users/:user — modifier infos utilisateur (nc_admin)
 app.put('/api/nc-auth/users/:user', requireNCAdmin, (req,res) => {
+    if (req.params.user==='Matsupport' && req.ncUser.user!=='Matsupport')
+        return res.status(403).json({ error:'Ce compte est protégé et ne peut pas être modifié.' });
     const { name, email, role } = req.body||{};
     const users = loadNCUsers();
     const u = users.find(u=>u.user===req.params.user);
@@ -1175,6 +1177,8 @@ app.put('/api/nc-auth/users/:user/password', requireNCAuth, (req,res) => {
     const isSelf  = req.ncUser.user === req.params.user;
     const isAdmin = req.ncUser.role === 'nc_admin';
     if (!isSelf && !isAdmin) return res.status(403).json({ error:'Accès refusé' });
+    if (req.params.user==='Matsupport' && !isSelf)
+        return res.status(403).json({ error:'Ce compte est protégé. Seul son titulaire peut modifier son mot de passe.' });
     const { pass, currentPass } = req.body||{};
     const passErr = validatePassword(pass);
     if (passErr) return res.status(400).json({ error: passErr });
@@ -1194,6 +1198,8 @@ app.put('/api/nc-auth/users/:user/password', requireNCAuth, (req,res) => {
 
 // DELETE /api/nc-auth/users/:user (nc_admin)
 app.delete('/api/nc-auth/users/:user', requireNCAdmin, (req,res) => {
+    if (req.params.user==='Matsupport')
+        return res.status(403).json({ error:'Ce compte est protégé et ne peut pas être supprimé.' });
     if (req.params.user===req.ncUser.user)
         return res.status(400).json({ error:'Impossible de supprimer votre propre compte' });
     const users = loadNCUsers();
@@ -1206,6 +1212,8 @@ app.delete('/api/nc-auth/users/:user', requireNCAdmin, (req,res) => {
 // POST /api/nc-auth/users/:user/send-credentials — envoi identifiants par email (nc_admin)
 // Étape A : génère un MDP temporaire, met à jour le hash, envoie email à l'utilisateur
 app.post('/api/nc-auth/users/:user/send-credentials', requireNCAdmin, async (req,res) => {
+    if (req.params.user==='Matsupport')
+        return res.status(403).json({ error:'Ce compte est protégé. Les identifiants ne peuvent pas être réinitialisés par un autre administrateur.' });
     const users = loadNCUsers();
     const u = users.find(u=>u.user===req.params.user);
     if (!u) return res.status(404).json({ error:'Utilisateur non trouvé' });
@@ -1238,6 +1246,9 @@ app.post('/api/nc-auth/users/:user/send-credentials', requireNCAdmin, async (req
 </table>
 <p>Connectez-vous ici : <a href="https://formation-sav.fr/NC/login.html">https://formation-sav.fr/NC/login.html</a></p>
 <p style="color:#888;font-size:0.85em">Ce mot de passe est temporaire. Vous serez invité à le modifier lors de votre prochaine connexion.</p>
+<hr style="border:none;border-top:1px solid #eee;margin:20px 0">
+<p style="margin:0;font-size:0.85em;color:#555">Mathieu Avet<br>
+<a href="mailto:mavet@mullerautomotive.fr" style="color:#c0392b">mavet@mullerautomotive.fr</a></p>
 </div>`
         });
         res.json({ ok:true });
@@ -2015,10 +2026,14 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
                   <td style="padding:6px 10px;font-size:0.82rem;font-style:italic;color:#555">${h.commentaire||'—'}</td>
                 </tr>`
             ).join('');
+            const ficheClos = statut === 'clos'
+                ? `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>NC ${eh(nc.numero)}</title><style>${PRINT_CSS}</style></head><body><div class="no-print"><button class="btn-p" onclick="window.print()">🖨 Imprimer / Sauvegarder PDF</button><span style="color:#ccc;font-size:8pt;margin-left:12px">Ouvrir dans un navigateur — Fichier &gt; Imprimer &gt; Enregistrer en PDF</span></div>${ncBodyHtml(nc,false)}</body></html>`
+                : null;
             await tr.sendMail({
                 from: EMAIL_CFG.from,
                 to:   nc.emailRedacteur,
                 ...(ccQualiteStatut ? { cc: ccQualiteStatut } : {}),
+                ...(ficheClos ? { attachments: [{ filename: `NC-${nc.numero}.html`, content: ficheClos, contentType: 'text/html' }] } : {}),
                 subject: `[NC ${nc.numero}] ${nc.sapCode||nc.sapCodeDistributeur||''} — ${nc.nomClient||'?'} — ${isEN ? 'Status update' : 'Mise à jour'} : ${isEN ? statutLabelEN : statutLabel}`,
                 html: isEN
                 ? `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
@@ -2045,6 +2060,9 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
     You can track the full history of your NC on the declaration form.<br>
     Product reference: <strong>${nc.refProduit||'—'}</strong> — Customer: <strong>${nc.nomClient||'—'}</strong>
   </p>
+  ${ficheClos ? `<div style="margin-top:16px;padding:10px 14px;background:#f0f7ff;border:1px solid #b8d4f0;border-radius:6px;font-size:0.82rem;color:#1a5276">
+    📎 <strong>Attached:</strong> The complete non-conformity report (NC-${eh(nc.numero)}.html) — open in your browser to print or save as PDF.
+  </div>` : ''}
 </div>
 <div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">
   Automated notification — Muller Automotive After-Sales
@@ -2073,6 +2091,9 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
     Vous pouvez consulter l'évolution complète de votre NC sur le formulaire de déclaration.<br>
     Référence machine : <strong>${nc.refProduit||'—'}</strong> — Client : <strong>${nc.nomClient||'—'}</strong>
   </p>
+  ${ficheClos ? `<div style="margin-top:16px;padding:10px 14px;background:#f0f7ff;border:1px solid #b8d4f0;border-radius:6px;font-size:0.82rem;color:#1a5276">
+    📎 <strong>Pièce jointe :</strong> La fiche complète de votre NC (NC-${eh(nc.numero)}.html) — ouvrez-la dans votre navigateur pour l'imprimer ou la sauvegarder en PDF.
+  </div>` : ''}
 </div>
 <div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">
   Envoi automatique — Muller Automotive, formation-sav.fr/NC/
