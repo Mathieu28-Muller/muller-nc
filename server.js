@@ -226,9 +226,7 @@ const NC_VERSION_HISTORY = [
     changes: [
       'Console utilisateurs : recherche par nom/identifiant en temps réel, filtre par rôle, pagination 20 utilisateurs/page',
       'Sécurité lecture : section "🔒 Clôture — Usage interne Service Qualité" masquée pour le rôle Lecteur dans la modale fiche NC',
-      'Email clôture : fiche NC HTML en pièce jointe automatique (version lecteur, sans données internes qualité)',
-      'Super Admin Matsupport : compte inviolable — modification, suppression et reset MDP bloqués pour tout autre administrateur',
-      'Création 6 comptes Codir + 53 comptes Lecteur — identifiants envoyés aux Codir, Lecteurs en attente bascule OVH'
+      'Email clôture : fiche NC HTML en pièce jointe automatique (version lecteur, sans données internes qualité)'
     ]
   }
 ];
