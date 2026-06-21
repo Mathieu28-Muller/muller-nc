@@ -247,5 +247,51 @@ router.post('/api/br/relance', requireBRAdmin, async (req, res) => {
     }
 });
 
+// ══════════════════════════════════════════════════════════════
+//  ADMIN — Export CSV résultats + participants
+// ══════════════════════════════════════════════════════════════
+router.get('/api/br/export.csv', requireBRAdmin, async (req, res) => {
+    try {
+        const { rows } = await pool.query(`
+            SELECT
+                r.created_at,
+                r.nom,
+                r.prenom,
+                r.email,
+                r.score,
+                r.score_pct,
+                r.verdict,
+                r.duree_sec,
+                CASE WHEN w.id IS NOT NULL THEN 'Oui' ELSE 'Non' END AS autorise
+            FROM br_resultats r
+            LEFT JOIN br_emails_autorises w ON LOWER(w.email)=LOWER(r.email) AND w.actif=true
+            ORDER BY r.created_at DESC
+        `);
+
+        const VERDICT_FR = { valide:'Validé', moyen:'Moyen', echec:'Échec' };
+        const esc = v => v == null ? '' : '"' + String(v).replace(/"/g, '""') + '"';
+        const fmtDate = d => d ? new Date(d).toLocaleString('fr-FR') : '';
+        const fmtDuree = s => s == null ? '' : Math.floor(s/60) + 'min ' + (s%60) + 's';
+
+        const header = ['Date', 'Nom', 'Prénom', 'Email', 'Score', 'Score %', 'Verdict', 'Durée', 'Autorisé'];
+        const lines  = rows.map(r => [
+            fmtDate(r.created_at),
+            r.nom, r.prenom, r.email,
+            r.score, r.score_pct,
+            VERDICT_FR[r.verdict] || r.verdict,
+            fmtDuree(r.duree_sec),
+            r.autorise
+        ].map(esc).join(';'));
+
+        const csv = '﻿' + header.map(esc).join(';') + '\r\n' + lines.join('\r\n');
+        res.setHeader('Content-Type', 'text/csv;charset=utf-8');
+        res.setHeader('Content-Disposition', 'attachment;filename=br-resultats.csv');
+        res.send(csv);
+    } catch (e) {
+        console.error('[BR] export csv:', e.message);
+        res.status(500).json({ error: e.message });
+    }
+});
+
 module.exports = router;
 module.exports.brPool = pool;
