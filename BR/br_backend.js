@@ -250,7 +250,19 @@ router.post('/api/br/relance', requireBRAdmin, async (req, res) => {
 // ══════════════════════════════════════════════════════════════
 //  ADMIN — Export CSV résultats + participants
 // ══════════════════════════════════════════════════════════════
-router.get('/api/br/export.csv', requireBRAdmin, async (req, res) => {
+router.get('/api/br/export.csv', (req, res, next) => {
+    // Accepte le token en query param pour les téléchargements directs (href)
+    const token = (req.headers.authorization || '').replace('Bearer ', '').trim()
+                  || (req.query.token || '').trim();
+    if (!token) return res.status(401).json({ error: 'Non authentifié' });
+    try {
+        const p = jwt.verify(token, JWT_SECRET);
+        if (p.scope !== 'nc' || p.role !== 'nc_admin')
+            return res.status(403).json({ error: 'Accès réservé aux administrateurs NC' });
+        req.brAdmin = p;
+        next();
+    } catch { return res.status(401).json({ error: 'Token invalide ou expiré' }); }
+}, async (req, res) => {
     try {
         const { rows } = await pool.query(`
             SELECT

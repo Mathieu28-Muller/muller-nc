@@ -181,7 +181,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
     </div>
     <div class="topbar-right">
       <span class="admin-name" id="admin-name"></span>
-      <a href="/api/br/export.csv" class="btn-sm green" id="btn-export">⬇ Export CSV</a>
+      <a href="#" class="btn-sm green" id="btn-export" onclick="exportCSV(event)">⬇ Export CSV</a>
       <button class="btn-sm red" onclick="doLogout()">Déconnexion</button>
     </div>
   </header>
@@ -352,6 +352,13 @@ async function doLogin() {
 function doLogout() {
   localStorage.removeItem('nc_jwt');
   location.reload();
+}
+
+function exportCSV(e) {
+  e.preventDefault();
+  const token = getToken();
+  if (!token) { alert('Session expirée — reconnectez-vous.'); return; }
+  window.location.href = '/api/br/export.csv?token=' + encodeURIComponent(token);
 }
 
 /* ════ WHITELIST ════ */
