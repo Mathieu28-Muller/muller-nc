@@ -46,3 +46,4 @@ $RECYCLE.BIN/
 .vscode/
 .idea/
 *.swp
+*.sql.gz
