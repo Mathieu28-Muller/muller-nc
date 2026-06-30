@@ -38,6 +38,7 @@
 | 4.0 | 29/05/2026 | Mathieu Avet | Bascule DATA_SOURCE=postgres (source de vérité unique), schéma PG documenté, correction filtre "en retard réel" (ISO §10.2), nc_stats.js, planification Phase 4 + OVH |
 | 4.1–4.11 | 03/06–17/06/2026 | Mathieu Avet | Gestion MDP utilisateurs (envoi identifiants, réinitialisation, force MDP), module BR, déploiement OVH (étapes 3→15), SMTP migré `noreply-nc@mullerautomotive.fr`, migration réelle PG OVH, PM2 + Nginx + SSL + cron backup |
 | **4.12** | **18/06/2026** | **Mathieu Avet** | **Console utilisateurs : tri rôle + recherche nom + pagination 20/page. Sécurité lecture : section "Usage interne Qualité" masquée pour nc_lecteur dans la modale. Email clôture : fiche NC HTML en pièce jointe (version lecteur). Super Admin Matsupport inviolable. Création 6 comptes Codir + 53 comptes Lecteur.** |
+| **5.0** | **22/06/2026** | **Mathieu Avet** | **Mise en production définitive sur OVH. SITE_URL dynamique (env var) — PC garde formation-sav.fr, OVH utilise quali-form.mullerautomotive.fr. BR conditionnel (BR_ENABLED=false sur OVH). Contrainte nc_codir ajoutée PostgreSQL (PC + OVH). Pages NC formation-sav.fr remplacées par page de bascule. Base de cas formation-sav.fr idem. 80 utilisateurs actifs en production.** |
 
 ---
 
@@ -1277,31 +1278,31 @@ set DATE_STR=%date:~6,4%-%date:~3,2%-%date:~0,2%
 ```
 À planifier via Tâche planifiée Windows, déclenchement quotidien à 2h.
 
-### 18.3 Déploiement OVH (juin 2026)
+### 18.3 ✅ Déploiement OVH — EFFECTUÉ le 22/06/2026
 
-Référence complète : `D:\formation\RAPPORT_TECHNIQUE_IT_NC.html`
+**URL production :** `https://quali-form.mullerautomotive.fr/NC/`  
+**Rapport complet :** `C:\formation\RAPPORT_DEPLOIEMENT_OVH_20260617.md`
 
-| Étape | Action | Notes |
-|---|---|---|
-| Base de données | PostgreSQL OVH (Managed DB ou VPS dédié) | Adapter `PG_HOST`, `PG_PORT`, `PG_USER`, `PG_PASSWORD`, `PG_DB` dans `.env` |
-| DATA_SOURCE | `postgres` en production OVH | Idem configuration locale actuelle |
-| SMTP | Configurer `@mullerautomotive.fr` (Outlook/Exchange OVH) | Remplacer Gmail SMTP |
-| JWT_SECRET | ✅ Clé 64 chars active depuis 29/05/2026 — voir `SECRETS_DEPLOIEMENT_NC.txt` | Fait |
-| Fichiers sensibles | Supprimer `nc-data.json`, `nc-users.json` du dépôt OVH | Source = PG uniquement |
-| Nginx | Reverse proxy + Let's Encrypt SSL | Configuration standard |
-| PM2 | `pm2 startup` pour redémarrage automatique | |
-| Sécurité | CORS restreint, Helmet CSP actif (trust proxy ✅ déjà fait) | Phase 4 préalable |
-
-**JWT_SECRET — clé 64 chars aléatoire active depuis 29/05/2026** (sauvegardée dans `C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt`).
+| Composant | État |
+|---|---|
+| Node.js 20 LTS + PM2 + systemd | ✅ Opérationnel |
+| PostgreSQL 16 — base nc_muller | ✅ 22 fiches, 80 utilisateurs |
+| Nginx + HTTPS Let's Encrypt | ✅ SSL actif |
+| SMTP noreply-nc@mullerautomotive.fr | ✅ Validé 22/06/2026 |
+| Sauvegardes pg_dump 02h00 | ✅ /opt/backups/ — 7j rétention |
+| SITE_URL dynamique | ✅ process.env.SITE_URL dans server.js |
+| BR_ENABLED=false (OVH) | ✅ Module BR non chargé sur OVH |
+| Contrainte nc_codir | ✅ Appliquée PC + OVH le 22/06/2026 |
+| formation-sav.fr/NC | ✅ Page de bascule active |
 
 ### 18.4 Évolutions post-bascule OVH
 
 | Fonctionnalité | Détail technique | Priorité |
 |---|---|---|
 | **PDF natif en pièce jointe clôture** | Remplacer `NC-XXXX.html` par un vrai `.pdf` — `npm install puppeteer`, headless Chrome, `page.pdf({format:'A4'})` — nécessite libs système OVH (`libgbm`, `libasound2`, etc.) | Haute |
-| **Envoi identifiants aux 53 Lecteurs** | 53 comptes créés le 18/06/2026 en attente d'envoi — déclencher via console admin (bouton 📧 Identif.) ou script masse après validation OVH | Haute |
-| Couper accès externe PC (tunnel Cloudflare) | Après validation OVH stable | Haute |
-| SMTP OVH `.env` à jour | Mettre à jour `NC_SMTP_PASS` dans `/opt/nc/.env` via WinSCP | Moyenne |
+| **Envoi identifiants aux 80 utilisateurs** | ⏳ Mail à envoyer — 80 comptes actifs sur OVH (bouton 📧 Identif. dans la console NC) | Haute |
+| Déployer module BR sur OVH | Puis couper le tunnel Cloudflare formation-sav.fr | Moyenne |
+| Planifier backup OVH → PC | backup_ovh.bat à 03h00 via Gestionnaire des tâches Windows | Moyenne |
 
 ### 18.5 Évolutions fonctionnelles futures (backlog)
 
@@ -1349,7 +1350,7 @@ Référence complète : `D:\formation\RAPPORT_TECHNIQUE_IT_NC.html`
 
 ---
 
-*Document technique v4.0 — Muller Automotive NC System — 29/05/2026*
+*Document technique v5.0 — Muller Automotive NC System — 22/06/2026*
 
 **Nouveautés v4.0** :
 - Architecture PostgreSQL 16 comme source de vérité unique (`DATA_SOURCE=postgres` depuis 25/05/2026)

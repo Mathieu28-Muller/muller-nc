@@ -53,7 +53,7 @@ CREATE TABLE nc_users (
     user_login   TEXT        PRIMARY KEY,
     pass_hash    TEXT        NOT NULL,
     role         TEXT        NOT NULL DEFAULT 'nc_lecteur'
-                             CHECK (role IN ('nc_admin','nc_chef_produit','nc_lecteur','nc_viewer')),
+                             CHECK (role IN ('nc_admin','nc_chef_produit','nc_lecteur','nc_viewer','nc_codir')),
     name         TEXT        NOT NULL,
     email        TEXT,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),

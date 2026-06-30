@@ -1,0 +1,6 @@
+option batch abort
+option confirm off
+open "Serveur Qualite"
+synchronize local "D:\backups_ovh" /opt/backups -filemask="*.sql.gz"
+close
+exit

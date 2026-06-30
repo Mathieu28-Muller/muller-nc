@@ -257,6 +257,12 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100
           <button class="btn-sm green" onclick="addToWhitelist()">+ Ajouter</button>
         </div>
       </div>
+      <!-- Filtres Fait / Non fait -->
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <button id="wl-f-all"   onclick="setWLFilter('all')"   style="padding:5px 14px;border-radius:6px;border:1px solid var(--border2);background:var(--green);color:#031a12;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">Tous</button>
+        <button id="wl-f-fait"  onclick="setWLFilter('fait')"  style="padding:5px 14px;border-radius:6px;border:1px solid var(--border2);background:var(--panel);color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">✓ Fait</button>
+        <button id="wl-f-nonfait" onclick="setWLFilter('nonfait')" style="padding:5px 14px;border-radius:6px;border:1px solid var(--border2);background:var(--panel);color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">⏳ Non fait</button>
+      </div>
       <!-- Barre de sélection / relance -->
       <div id="wl-action-bar" style="display:none;background:var(--panel);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:none;align-items:center;gap:12px;flex-wrap:wrap">
         <span id="wl-sel-count" style="font-size:13px;font-weight:600;color:var(--accent)">0 sélectionné(s)</span>
@@ -362,39 +368,70 @@ function exportCSV(e) {
 }
 
 /* ════ WHITELIST ════ */
+let wlAllRows = [];
+let wlFilter  = 'all';
+
+function setWLFilter(f) {
+  wlFilter = f;
+  ['all','fait','nonfait'].forEach(function(k) {
+    var btn = document.getElementById('wl-f-' + k);
+    if (!btn) return;
+    var active = (k === f);
+    btn.style.background    = active ? 'var(--green)' : 'var(--panel)';
+    btn.style.color         = active ? '#031a12'      : 'var(--muted)';
+    btn.style.borderColor   = active ? 'var(--green)' : 'var(--border2)';
+    btn.style.fontWeight    = active ? '700'          : '600';
+  });
+  renderWL();
+}
+
+function renderWL() {
+  var filtered = wlAllRows.filter(function(w) {
+    var nb = parseInt(w.nb_passations || 0);
+    if (wlFilter === 'fait')    return nb > 0;
+    if (wlFilter === 'nonfait') return nb === 0 && w.actif;
+    return true;
+  });
+  var total   = document.getElementById('wl-total');
+  var nonFait = wlAllRows.filter(function(w){return parseInt(w.nb_passations||0)===0&&w.actif;}).length;
+  if (total) total.textContent = wlAllRows.length + ' personne(s) — ' + nonFait + ' n\'ont pas encore fait le module';
+
+  var el = document.getElementById('wl-body');
+  if (!el) return;
+  if (!filtered.length) {
+    el.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--muted)">Aucun résultat.</td></tr>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(w) {
+    var nom = ((w.prenom||'') + ' ' + (w.nom||'')).trim() || '—';
+    var nb  = parseInt(w.nb_passations||0);
+    var fait = nb > 0;
+    var moduleTag = fait
+      ? '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#0d2e24;color:#2dd4a0">✓ Fait ('+ nb +'×)</span>'
+      : '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#2a1e08;color:#f5a623">⏳ Non fait</span>';
+    return '<tr style="border-bottom:1px solid var(--border)">' +
+      '<td style="padding:9px 10px;text-align:center"><input type="checkbox" class="wl-cb" data-id="' + w.id + '" data-email="' + w.email + '" onchange="updateSelCount()"></td>' +
+      '<td style="padding:9px 14px;font-weight:600">' + nom + '</td>' +
+      '<td style="padding:9px 14px;font-family:monospace;font-size:12px;color:var(--muted)">' + w.email + '</td>' +
+      '<td style="padding:9px 14px;text-align:center">' + moduleTag + '</td>' +
+      '<td style="padding:9px 14px;text-align:center">' +
+        '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:' + (w.actif?'#0d2e24':'#2a0f0f') + ';color:' + (w.actif?'#2dd4a0':'#f04a4a') + '">' + (w.actif?'Actif':'Inactif') + '</span>' +
+      '</td>' +
+      '<td style="padding:9px 14px;text-align:center">' +
+        '<div style="display:flex;gap:5px;justify-content:center">' +
+        '<button onclick="toggleWL(' + w.id + ',' + !w.actif + ')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid var(--border2);border-radius:4px;color:var(--muted);cursor:pointer">' + (w.actif?'Désactiver':'Activer') + '</button>' +
+        '<button onclick="deleteWL(' + w.id + ',\'' + w.email + '\')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid rgba(240,74,74,.3);border-radius:4px;color:var(--red);cursor:pointer">✕</button>' +
+        '</div>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
 async function loadWhitelist() {
   try {
     const r = await fetch(`${API}/whitelist`, { headers: authHdr() });
-    const rows = await r.json();
-    const el = document.getElementById('wl-body');
-    if (!el) return;
-    const total = document.getElementById('wl-total');
-    if (total) total.textContent = rows.length + ' personne(s) autorisée(s)';
-    var nonFait = rows.filter(function(w){return parseInt(w.nb_passations||0)===0&&w.actif;}).length;
-    if (total) total.textContent = rows.length + ' personne(s) — ' + nonFait + ' n\'ont pas encore fait le module';
-    el.innerHTML = rows.map(function(w) {
-      var nom = ((w.prenom||'') + ' ' + (w.nom||'')).trim() || '—';
-      var nb  = parseInt(w.nb_passations||0);
-      var fait = nb > 0;
-      var moduleTag = fait
-        ? '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#0d2e24;color:#2dd4a0">✓ Fait ('+ nb +'×)</span>'
-        : '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#2a1e08;color:#f5a623">⏳ Non fait</span>';
-      return '<tr style="border-bottom:1px solid var(--border)">' +
-        '<td style="padding:9px 10px;text-align:center"><input type="checkbox" class="wl-cb" data-id="' + w.id + '" data-email="' + w.email + '" onchange="updateSelCount()"></td>' +
-        '<td style="padding:9px 14px;font-weight:600">' + nom + '</td>' +
-        '<td style="padding:9px 14px;font-family:monospace;font-size:12px;color:var(--muted)">' + w.email + '</td>' +
-        '<td style="padding:9px 14px;text-align:center">' + moduleTag + '</td>' +
-        '<td style="padding:9px 14px;text-align:center">' +
-          '<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:' + (w.actif?'#0d2e24':'#2a0f0f') + ';color:' + (w.actif?'#2dd4a0':'#f04a4a') + '">' + (w.actif?'Actif':'Inactif') + '</span>' +
-        '</td>' +
-        '<td style="padding:9px 14px;text-align:center">' +
-          '<div style="display:flex;gap:5px;justify-content:center">' +
-          '<button onclick="toggleWL(' + w.id + ',' + !w.actif + ')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid var(--border2);border-radius:4px;color:var(--muted);cursor:pointer">' + (w.actif?'Désactiver':'Activer') + '</button>' +
-          '<button onclick="deleteWL(' + w.id + ',\'' + w.email + '\')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid rgba(240,74,74,.3);border-radius:4px;color:var(--red);cursor:pointer">✕</button>' +
-          '</div>' +
-        '</td>' +
-      '</tr>';
-    }).join('');
+    wlAllRows = await r.json();
+    renderWL();
   } catch(e) { console.warn('Whitelist error', e); }
 }
 async function toggleWL(id, actif) {

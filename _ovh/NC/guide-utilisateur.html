@@ -44,16 +44,18 @@ nav a.sub{padding-left:28px;font-size:0.74rem}
 .subsection-title{font-size:0.98rem;font-weight:700;color:var(--dark);margin-bottom:12px;padding-left:10px;border-left:3px solid var(--red)}
 p{color:#444;line-height:1.7;margin-bottom:10px;font-size:0.9rem}
 /* ── ROLES ── */
-.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0}
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:16px 0}
 .role-card{border-radius:8px;padding:16px 18px;border:2px solid}
 .role-admin{background:#fff5f5;border-color:#c0392b}
 .role-pilote{background:#f0f7ff;border-color:#2980b9}
 .role-lecteur{background:#f5f5f5;border-color:#aaa}
+.role-codir{background:#fdf8f0;border-color:#e67e22}
 .role-card .rc-title{font-weight:800;font-size:0.88rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .rc-badge{display:inline-block;border-radius:4px;padding:1px 8px;font-size:0.68rem;font-weight:700;letter-spacing:.5px}
 .rc-admin{background:#fdddd8;color:#7d1a1a}
 .rc-pilote{background:#d8eaff;color:#0a2d5a}
 .rc-lecteur{background:#e8e8e8;color:#555}
+.rc-codir{background:#fde8c8;color:#7d4a00}
 .role-card ul{list-style:none;margin-top:4px}
 .role-card ul li{font-size:0.82rem;color:#444;padding:2px 0 2px 14px;position:relative}
 .role-card ul li::before{content:'·';position:absolute;left:2px;color:var(--red);font-weight:900}
@@ -168,7 +170,7 @@ tr:nth-child(even) td{background:#f9f9f9}
   <div id="sidebar-header">
     <div class="badge">GUIDE</div>
     <h1>Module NC<br>Guide Utilisateur</h1>
-    <p>v5.13 — 29/06/2026</p>
+    <p>v4.12 — 18/06/2026</p>
   </div>
   <nav>
     <div class="nav-sep">Démarrage</div>
@@ -188,7 +190,9 @@ tr:nth-child(even) td{background:#f9f9f9}
     <a href="#s6-4" class="sub">6.4 Clôture</a>
     <a href="#s7">7. Export & rapports</a>
     <a href="#s8">8. Configuration</a>
-    <div class="nav-sep">Console nc_chef_produit</div>
+    <div class="nav-sep">Console nc_codir</div>
+    <a href="#s-codir">Profil Codir / Direction</a>
+    <div class="nav-sep">Console Pilote (nc_chef_produit)</div>
     <a href="#s9">9. Vue pilote</a>
     <a href="#s9-1" class="sub">9.1 Répondre à une action</a>
     <div class="nav-sep">Référence</div>
@@ -206,10 +210,10 @@ tr:nth-child(even) td{background:#f9f9f9}
 <div id="top-banner">
   <h1>Guide Utilisateur — Module NC</h1>
   <div class="sub">Gestion des Non-Conformités — Muller Automotive</div>
-  <div class="ver-badge" id="guide-ver-badge">Version 4.12 — 18/06/2026</div>
+  <div class="ver-badge" id="guide-ver-badge">Version 5.3 — 29/06/2026</div>
   <div class="meta-row">
-    <div class="meta-item"><strong>Rôles couverts :</strong> nc_admin · nc_chef_produit · nc_lecteur</div>
-    <div class="meta-item"><strong>URL :</strong> formation-sav.fr/NC/</div>
+    <div class="meta-item"><strong>Rôles couverts :</strong> nc_admin · nc_chef_produit · nc_lecteur · nc_codir</div>
+    <div class="meta-item"><strong>URL production :</strong> quali-form.mullerautomotive.fr/NC/</div>
   </div>
 </div>
 
@@ -283,21 +287,52 @@ tr:nth-child(even) td{background:#f9f9f9}
     <div class="role-card role-pilote">
       <div class="rc-title"><span class="rc-badge rc-pilote">nc_chef_produit</span> Pilote</div>
       <ul>
-        <li>Voir ses NC assignées</li>
+        <li>Voir ses NC assignées (filtrées par pilote)</li>
         <li>Répondre aux actions CAPA</li>
         <li>Uploader des preuves</li>
-        <li>Mode Lecteur : toutes NC en lecture</li>
+        <li>Mode Lecteur : toutes NC en lecture seule</li>
+        <li>Apparaît automatiquement sur les NC de sa famille produit (via mapping admin)</li>
       </ul>
+      <div class="tip" style="margin-top:8px;font-size:0.75rem">
+        <strong>Chef produit ≠ Pilote d'action :</strong> le <em>chef produit</em> est responsable d'une famille (ex. Fabrice Simon → PONT). Le <em>pilote</em> est la personne assignée à une action CAPA spécifique — ce peut être le même ou quelqu'un d'autre.
+      </div>
     </div>
     <div class="role-card role-lecteur">
       <div class="rc-title"><span class="rc-badge rc-lecteur">nc_lecteur</span> Lecteur</div>
       <ul>
-        <li>Consulter toutes les NC</li>
-        <li>Voir les statistiques</li>
+        <li>Consulter la liste des NC</li>
         <li>Accéder aux archives</li>
-        <li>Aucune modification</li>
+        <li>Ouvrir une fiche NC en lecture</li>
+        <li>Aucune modification possible</li>
+        <li>❌ Pas d'accès au dashboard ni aux statistiques</li>
       </ul>
     </div>
+    <div class="role-card role-codir">
+      <div class="rc-title"><span class="rc-badge rc-codir">nc_codir</span> Codir / Direction</div>
+      <ul>
+        <li>Tableau de bord complet (KPI, alertes)</li>
+        <li>Liste de toutes les NC</li>
+        <li>Statistiques et reporting</li>
+        <li>Archives</li>
+        <li>Lecture seule — aucune modification</li>
+      </ul>
+      <div class="tip" style="margin-top:8px;font-size:0.75rem">
+        <strong>Codir vs Lecteur :</strong> le Lecteur accède uniquement à la liste et aux archives. Le Codir a en plus le <em>tableau de bord</em> et les <em>statistiques</em> — vue globale pour le pilotage qualité.
+      </div>
+    </div>
+  </div>
+
+  <div class="box box-blue" style="margin-top:4px">
+    <strong>Récapitulatif des accès par profil</strong>
+    <table style="margin-top:8px;width:100%;font-size:0.8rem;border-collapse:collapse">
+      <tr style="background:#f0f4f8"><th style="padding:5px 8px;text-align:left">Fonctionnalité</th><th>Admin</th><th>Pilote</th><th>Codir</th><th>Lecteur</th></tr>
+      <tr><td style="padding:4px 8px">Tableau de bord</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td></tr>
+      <tr style="background:#f9f9f9"><td style="padding:4px 8px">Liste des NC</td><td style="text-align:center">✅</td><td style="text-align:center">⚠ ses NC</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+      <tr><td style="padding:4px 8px">Statistiques</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td></tr>
+      <tr style="background:#f9f9f9"><td style="padding:4px 8px">Archives</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+      <tr><td style="padding:4px 8px">Modifier / Traiter</td><td style="text-align:center">✅</td><td style="text-align:center">⚠ CAPA</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+      <tr style="background:#f9f9f9"><td style="padding:4px 8px">Configuration</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+    </table>
   </div>
 </div>
 
@@ -487,11 +522,22 @@ tr:nth-child(even) td{background:#f9f9f9}
   </div>
 
   <ul class="annot-list">
-    <li><span class="annot-tag">1</span><strong>Filtres</strong> — Filtrez par statut, famille produit ou gravité. Les filtres se combinent.</li>
-    <li><span class="annot-tag">2</span><strong>Recherche</strong> — Tapez un numéro, un nom client ou un mot-clé pour filtrer instantanément.</li>
+    <li><span class="annot-tag">1</span><strong>Filtres</strong> — Filtrez par statut, famille produit, pilote ou gravité. Les filtres se combinent.</li>
+    <li><span class="annot-tag">2</span><strong>Recherche</strong> — Tapez un numéro, un nom client, un rédacteur, un chef produit ou un mot-clé pour filtrer instantanément.</li>
     <li><span class="annot-tag">3</span><strong>Cliquez sur une ligne</strong> pour ouvrir la fiche complète de la NC.</li>
     <li><span class="annot-tag">4</span><strong>Export CSV</strong> — Exporte toutes les NC filtrées en fichier Excel.</li>
   </ul>
+
+  <div class="subsection">
+    <div class="subsection-title">5.1 Colonnes personnalisables</div>
+    <p>Chaque utilisateur peut choisir quelles colonnes afficher et dans quel ordre — la préférence est sauvegardée dans le navigateur et est <strong>personnelle</strong> (non partagée).</p>
+    <ul class="annot-list">
+      <li><span class="annot-tag">⚙</span><strong>Bouton "Colonnes"</strong> (barre de filtres) — cochez/décochez les colonnes visibles. Colonnes disponibles : N°, Date, Client, Famille, <strong>Chef produit</strong>, <strong>Rédacteur</strong>, Périmètre, Source, Problème, Statut, Pilote, Durée, Échéance, Gravité.</li>
+      <li><span class="annot-tag">↔</span><strong>Glisser-déposer</strong> — maintenez le clic sur un en-tête de colonne et faites-le glisser à gauche ou à droite pour réorganiser. L'en-tête cible se surligne en rouge pour indiquer la position de dépôt.</li>
+      <li><span class="annot-tag">↺</span><strong>Réinitialiser l'ordre</strong> — bouton dans le panneau ⚙ Colonnes pour remettre l'ordre par défaut.</li>
+    </ul>
+    <div class="box box-blue"><strong>Colonnes Chef produit et Rédacteur</strong> — masquées par défaut pour ne pas surcharger l'écran. À activer dans ⚙ Colonnes selon votre besoin de suivi.</div>
+  </div>
 </div>
 
 <!-- ══ 6. TRAITER ══ -->
@@ -633,11 +679,42 @@ tr:nth-child(even) td{background:#f9f9f9}
     <tr><th>Paramètre</th><th>Description</th><th>État</th></tr>
     <tr><td>Email qualité</td><td>Adresse qui reçoit les notifications NC (création, clôture…)</td><td>✅ Actif</td></tr>
     <tr><td>Familles produits</td><td>Liste des familles affichées dans le formulaire de déclaration</td><td>✅ Actif</td></tr>
+    <tr><td><strong>👤 Chefs produit</strong></td><td>Liste des chefs produit + mapping Famille → Chef. La colonne "Chef produit" de la liste NC est remplie automatiquement à la création selon ce mapping.</td><td>✅ Actif</td></tr>
     <tr><td>Types de cause</td><td>Liste des causes proposées à la clôture</td><td>✅ Actif</td></tr>
     <tr><td>Périmètres</td><td>Zones de l'entreprise concernées par les NC</td><td>✅ Actif</td></tr>
     <tr><td>Sources de détection</td><td>Comment le problème a été découvert</td><td>✅ Actif</td></tr>
     <tr><td>Utilisateurs</td><td>Créer, modifier, désactiver les comptes NC</td><td>✅ Actif</td></tr>
   </table>
+
+  <div class="box box-blue" style="margin-top:12px"><strong>👤 Card Chefs produit — 3 actions disponibles</strong><br>
+  <ul style="margin-top:6px;margin-left:16px;font-size:0.85rem">
+    <li><strong>Ajouter/supprimer un chef</strong> — liste des noms (colonne gauche)</li>
+    <li><strong>Modifier le mapping</strong> — chaque famille a un menu déroulant pour choisir son chef (colonne droite)</li>
+    <li><strong>⚡ Initialiser sur les NC existantes</strong> — rétro-assigne le chef produit sur toutes les NC qui n'en ont pas encore, selon le mapping actuel</li>
+  </ul>
+  </div>
+</div>
+
+<!-- ══ CODIR ══ -->
+<div class="section" id="s-codir">
+  <div class="section-title">Profil Codir / Direction <span style="font-size:0.72rem;font-weight:400;color:#888;margin-left:8px">nc_codir</span></div>
+  <p>Le profil Codir est conçu pour la direction et les membres du comité de direction. Il donne une <strong>vision complète en lecture seule</strong> — idéal pour le pilotage qualité sans risque de modification accidentelle.</p>
+
+  <div class="role-card role-codir" style="margin:16px 0">
+    <div class="rc-title"><span class="rc-badge rc-codir">nc_codir</span> Accès disponibles</div>
+    <ul>
+      <li><strong>Tableau de bord</strong> — KPI temps réel, alertes délai, NC en retard, coûts non-qualité</li>
+      <li><strong>Liste des NC</strong> — toutes les NC, tous filtres disponibles, ouverture de chaque fiche en lecture</li>
+      <li><strong>Statistiques</strong> — 13 onglets d'analyse (par famille, périmètre, gravité, délai, CAPA…)</li>
+      <li><strong>Archives</strong> — NC clôturées et non-pertinentes</li>
+    </ul>
+  </div>
+
+  <div class="box box-blue">
+    <strong>Ce que le Codir ne peut PAS faire :</strong> créer ou modifier une NC, changer un statut, créer des actions CAPA, accéder à la configuration, gérer les utilisateurs. Son rôle est exclusivement consultatif.
+  </div>
+
+  <div class="tip" style="margin-top:12px"><strong>💡 Usage type</strong> Le profil Codir est destiné aux revues de direction (ISO 9001:2015 §9.3). Le tableau de bord présente les KPI nécessaires à la revue : NC ouvertes, délais moyens, coûts, taux de récurrence.</div>
 </div>
 
 <!-- ══ 9. PILOTE ══ -->

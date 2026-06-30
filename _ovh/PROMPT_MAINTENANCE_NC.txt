@@ -1,61 +1,44 @@
 ================================================================================
 PROMPT DE MAINTENANCE — Module NC — Muller Automotive
 Copier dans une nouvelle conversation Claude pour toute mise à jour du module
-Mis à jour le : 30/06/2026 — Version applicative : v5.3
+Mis à jour le : 04/06/2026
 ================================================================================
 
 Tu travailles sur le système NC de Muller Automotive (ISO 9001:2015 / LNE).
 Serveur Node.js, port 3001, base de données PostgreSQL 16 (source de vérité unique).
-Dossier principal PC : C:\formation\
-Dossier test local OVH : C:\formation\_ovh\NC\ (servi sur http://localhost:8080/NC/)
-Production OVH : https://quali-form.mullerautomotive.fr/NC/ — process PM2 : formation-sav (id 0)
-Dossier OVH : /opt/nc/ — utilisateur système : qualiform — SSH port 7255
+Dossier principal : C:\formation\
 
 FICHIERS DU MODULE (ne jamais supprimer, toujours ajouter) :
-  C:\formation\server.js                  → API Express (routes /api/nc/* + /api/br/*) — v5.3
+  C:\formation\server.js                  → API Express (routes /api/nc/*)
   C:\formation\.env                       → DATA_SOURCE=postgres, PG_HOST/PORT/USER/PASSWORD/DB
-  C:\formation\nc-config.json             → Config NC : familles, chefsProduit, famillesToChef, typesCause, périmètres, sources
-  C:\formation\schema_postgresql.sql      → Schéma PG NC (12 tables, 3 vues)
-  C:\formation\schema_br_tables.sql       → Schéma PG module BR (br_emails_autorises, br_resultats)
+  C:\formation\schema_postgresql.sql      → Schéma PG complet (12 tables, 3 vues)
   C:\formation\migrate.js                 → Migration JSON → PG (idempotent, safe à relancer)
   C:\formation\plan_controle.js           → Vérification complète JSON ↔ PG (8 sections)
-  C:\formation\nc-parent-groups.json      → Persistance groupes NC parent (ne pas modifier manuellement)
+  C:\formation\NC\console.html            → Interface admin NC (4500+ lignes)
+  C:\formation\NC\nc_parent_satellites.js → Module NC parent/satellites
+  C:\formation\NC\nc_parent_avance.js     → Rattachement tardif, post-clôture
+  C:\formation\NC\nc_droits_pilote.js     → Droits chef produit (bouton tb supprimé)
+  C:\formation\NC\nc_liste_accordeon.js   → Accordéon liste NC parent/satellites
+  C:\formation\NC\nc_stats.js             → Statistiques ISO §9.1 (exclusion satellites) + KPI §10.3
+  C:\formation\NC\synoptique.html         → Synoptique cycle de vie NC
+  C:\formation\NC\synoptique_nc_groupe.html → Documentation visuelle groupes parent 6 onglets
+  C:\formation\NC\index.html              → Formulaire public déclaration NC (champs dynamiques via API)
+  C:\formation\NC\presentation.html       → Notice d'utilisation (lien header)
+  C:\formation\NC\CAHIER_DES_CHARGES_NC.md → Cahier des charges v4.0 (29/05/2026) — partage développeurs
+  C:\formation\nc-parent-groups.json      → Persistance groupes (ne pas modifier manuellement)
   C:\formation\nc-data.json               → ARCHIVE JSON — ne plus modifier (source = PostgreSQL)
 
-FICHIERS TEST LOCAL (_ovh = miroir OVH, servi port 8080) :
-  C:\formation\_ovh\NC\console.html            → Interface admin NC v5.3 (colonnes drag&drop, chef produit)
-  C:\formation\_ovh\NC\nc_liste_accordeon.js   → Accordéon liste NC parent/satellites
-  C:\formation\_ovh\NC\nc_droits_pilote.js     → Droits pilote
-  C:\formation\_ovh\NC\nc_parent_satellites.js → Module NC parent/satellites
-  C:\formation\_ovh\NC\nc_parent_avance.js     → Rattachement tardif, post-clôture
-  C:\formation\_ovh\NC\nc_stats.js             → Statistiques ISO §9.1 + KPI §10.3
-  C:\formation\_ovh\NC\index.html              → ⚠️ Pré-qualification en dev — NE PAS déployer sur OVH
-  C:\formation\_ovh\NC\guide-utilisateur.html  → Guide utilisateur v5.3 (4 profils)
-  C:\formation\_ovh\NC\presentation.html       → Notice complète v5.3
-  C:\formation\_ovh\NC\synoptique.html         → Synoptique cycle de vie NC
-
-DOCUMENTATION DÉPLOIEMENT :
-  C:\formation\RAPPORT_DEPLOIEMENT_OVH_20260617.md → Infrastructure OVH (mis à jour 30/06/2026)
-  C:\formation\LIVRET_MAINTENANCE_OVH.md            → Routines maintenance hebdo/mensuelle/annuelle
-  C:\formation\NC\CAHIER_DES_CHARGES_NC.md          → Cahier des charges v4.12
-
-ÉTAT AU 30/06/2026 — MODE PRODUCTION POSTGRESQL (PC + OVH) :
+ÉTAT AU 03/06/2026 — MODE PRODUCTION POSTGRESQL :
   DATA_SOURCE=postgres dans .env (bascule effectuée le 25/05/2026)
     → Lecture et écriture exclusivement depuis PostgreSQL
     → nc-data.json = archive historique uniquement (ne plus modifier manuellement)
     → En cas d'erreur PG, l'application renvoie une erreur HTTP (plus de fallback JSON)
-
-  PRODUCTION OVH (quali-form.mullerautomotive.fr) — v5.3 — 30/06/2026 :
-    PostgreSQL 16 : base nc_muller — user nc_user
-    ~30 NC fiches · ~80 utilisateurs (2 admins · 16 pilotes · 6 codir · 56 lecteurs)
-    Colonne chef_produit ajoutée (30/06/2026) : ALTER TABLE nc_fiches ADD COLUMN IF NOT EXISTS chef_produit TEXT;
-    Module BR : désactivé OVH (BR_ENABLED=false), actif sur PC
-
-  PC LOCAL (formation-sav.fr / localhost:8080) — v5.3 :
-    PostgreSQL 16 : Service Windows postgresql-x64-16 (démarrage automatique)
-    Base : nc_muller — User : postgres / MullerNC2026!
-    ~21 NC fiches (données PC — OVH a davantage de NC depuis la mise en production)
-    Module BR : actif (port 80) — br_emails_autorises (57) · br_resultats (52)
+  PostgreSQL 16 :
+    Service Windows : postgresql-x64-16 (démarrage automatique)
+    Base : nc_muller (12 tables, 3 vues)
+    User : postgres / MullerNC2026!
+    État validé 25/05/2026 : 8 fiches, 24 historiques, 4 actions, 5 réponses, 20 utilisateurs
+    plan_controle.js → TOUT VERT ✅ (25/05/2026)
   Sécurité active (Phase 1 + compléments 29/05) :
     - bcryptjs : lazy migration hash (verifyPass détecte $2b$/$2a$ ou legacy)
     - rate-limit : 5 tentatives / 15 min / IP sur les 2 routes login
@@ -278,7 +261,7 @@ ROUTES API GESTION MOTS DE PASSE — AJOUTÉES 03/06/2026
   Lien login : "Mot de passe oublié ?" → /NC/reset-password.html
 
 ================================================================================
-PLANIFICATION — ÉTAT AU 30/06/2026
+PLANIFICATION — ÉTAT AU 03/06/2026
 ================================================================================
 
   ✅ 09/05 — Phase 1 sécurité + PostgreSQL dual-write
@@ -289,22 +272,26 @@ PLANIFICATION — ÉTAT AU 30/06/2026
   ✅ 05/06 — v4.6 : forçage MDP première connexion + PDF restructuré par action
   ✅ 05/06 — v4.7 : SMTP NC → noreply-nc@mullerautomotive.fr (OVH ssl0.ovh.net:465)
   ✅ 10/06 — v4.8 : satellites NC Parent cliquables + chargement automatique mode Pilote
-  ✅ 12/06 — v4.9 : formulaire bilingue FR/EN + Code SAP Distributeur
-  ✅ 17/06 — v4.10 : menus déroulants bilingues FR/EN (31+8+7 valeurs)
-  ✅ 18/06 — v4.11 : email bilingue complet, PDF bilingue, stats "actions en retard" alignées
-  ✅ 18/06 — v4.12 : console utilisateurs tri/recherche/pagination, sécurité lecture Lecteur
-  ✅ 22/06 — v5.0 : MISE EN PRODUCTION OVH quali-form.mullerautomotive.fr — 80 utilisateurs
-  ✅ 25/06 — v5.1 : rate limiting par compte (5 MDP → verrou 15 min)
-  ✅ 26/06 — v5.2 : chef produit + colonnes Rédacteur/Chef produit + mapping famille→chef
-  ✅ 29/06 — v5.3 : colonnes drag&drop + card config Chef produit pleine largeur + guides mis à jour
-  ✅ 30/06 — v5.3 déployé sur OVH : ALTER TABLE chef_produit, fichiers WinSCP, pm2 restart
+  ✅ 12/06 — v4.9 : formulaire bilingue FR/EN + Code SAP Distributeur + guide aide traduit + commentaire automatique En traitement
+  ✅ 17/06 — v4.10 : menus déroulants bilingues FR/EN (31+8+7 valeurs), emails changement statut bilingues, sujets enrichis SAP+client
+  ✅ 18/06 — v4.11 : email création NC bilingue complet, PDF bilingue, stats "actions en retard" alignées dashboard
+  ✅ 18/06 — v4.12 : console utilisateurs tri/recherche/pagination 20/page, section Usage interne masquée Lecteur, fiche HTML pièce jointe clôture, Super Admin Matsupport, 6 Codir + 53 Lecteurs créés
 
-  ☐ À venir :
-               → Questionnaire pré-qualification formulaire NC (3 questions, en dev local)
-               → CORS : restreindre origins (enlever *)
-               → Helmet CSP : contentSecurityPolicy adapté
-               → Module BR : déploiement OVH (BR_ENABLED=true + migration tables BR)
-               → Formulaire NC : pré-qualification 3 questions (en test local — index.html _ovh)
+  ☐ Phase 4 sécurité (juin 2026) :
+               → pg_dump automatique quotidien (tâche planifiée Windows)
+                 Script : pg_dump -U postgres -d nc_muller -F c -f D:\backups\pg\nc_muller_DATE.dump
+               → CORS : restreindre origins autorisées (enlever *)
+               → Helmet CSP : activer contentSecurityPolicy avec directives adaptées
+
+  ☐ Déploiement OVH (juin 2026) :
+               Voir D:\formation\RAPPORT_TECHNIQUE_IT_NC.html pour checklist complète
+               Points restants :
+                 - PostgreSQL OVH (Managed DB ou VPS)
+                 - DATA_SOURCE=postgres en production OVH
+                 - SMTP @mullerautomotive.fr configuré
+                 - Compléter C:\Users\MULLER\Documents\SECRETS_DEPLOIEMENT_NC.txt (PG_*, SMTP OVH)
+                 - Supprimer nc-data.json, nc-users.json du dépôt OVH
+                 - Nginx reverse proxy + Let's Encrypt SSL
 
 ================================================================================
 3 QUESTIONS AVANT TOUTE MODIFICATION

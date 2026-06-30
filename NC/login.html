@@ -2,113 +2,39 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<link rel="icon" type="image/svg+xml" href="/NC/favicon.svg">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Connexion — Console Non-Conformités</title>
+<title>Module NC — Nouvelle adresse</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#111;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-.logo-wrap{margin-bottom:32px;text-align:center}
-.logo-wrap img{height:52px;object-fit:contain;filter:brightness(1.1)}
-.logo-wrap h2{color:#e07070;font-size:0.72rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;margin-top:10px}
-.card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.card h1{color:#fff;font-size:1.1rem;font-weight:700;margin-bottom:6px}
-.card p{color:#666;font-size:0.8rem;margin-bottom:24px}
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.field label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#777}
-.field input{padding:11px 14px;background:#111;border:1.5px solid #333;border-radius:7px;color:#fff;font-size:0.9rem;font-family:inherit;transition:border-color .2s}
-.field input:focus{outline:none;border-color:#c0392b}
-.field input::placeholder{color:#444}
-.btn{width:100%;background:#c0392b;color:#fff;border:none;padding:13px;border-radius:7px;font-size:0.95rem;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s}
+.card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:40px 36px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center}
+.badge{display:inline-flex;align-items:center;gap:8px;background:#1e3a1e;border:1px solid #2d6a2d;color:#7dcea0;font-size:0.78rem;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:28px}
+h1{color:#fff;font-size:1.25rem;font-weight:700;margin-bottom:10px}
+p{color:#888;font-size:0.92rem;line-height:1.6;margin-bottom:28px}
+.url-box{background:#0d1f0d;border:2px solid #2d6a2d;border-radius:10px;padding:18px 22px;margin-bottom:28px}
+.url-box span{display:block;color:#aaa;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.url-box a{color:#7dcea0;font-size:1.05rem;font-weight:700;text-decoration:none;word-break:break-all}
+.url-box a:hover{text-decoration:underline}
+.btn{display:inline-block;background:#c0392b;color:#fff;font-size:0.95rem;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none;transition:background .18s}
 .btn:hover{background:#a93226}
-.btn:disabled{background:#444;cursor:default}
-.msg{margin-top:14px;padding:10px 14px;border-radius:6px;font-size:0.82rem;display:none}
-.msg.error{background:#3a1a1a;border:1px solid #6a2020;color:#e07070}
-.msg.ok{background:#1a3a1a;border:1px solid #206a20;color:#70e070}
-footer{margin-top:32px;font-size:0.7rem;color:#333;text-align:center;letter-spacing:2px;text-transform:uppercase}
+.footer{color:#444;font-size:0.75rem;margin-top:32px}
 </style>
 </head>
 <body>
-
-<div class="logo-wrap">
-  <img src="../Base de cas/logo/Logo.png" alt="Muller Automotive" onerror="this.style.display='none'">
-  <h2>Console Non-Conformités</h2>
-</div>
-
 <div class="card">
-  <h1>Connexion</h1>
-  <p>Accès réservé aux responsables NC</p>
-
-  <form id="form-login" onsubmit="doLogin(event)">
-    <div class="field">
-      <label>Identifiant</label>
-      <input type="text" id="nc-user" placeholder="identifiant" required autocomplete="username">
-    </div>
-    <div class="field">
-      <label>Mot de passe</label>
-      <input type="password" id="nc-pass" placeholder="••••••••" required autocomplete="current-password">
-    </div>
-    <button type="submit" class="btn" id="btn-login">Connexion</button>
-  </form>
-
-  <div class="msg" id="msg"></div>
-  <p style="margin-top:16px;text-align:center">
-    <a href="/NC/reset-password.html" style="font-size:0.75rem;color:#666;text-decoration:none;border-bottom:1px solid #444">Mot de passe oublié ?</a>
-  </p>
+  <div class="badge">✓ Site en production</div>
+  <h1>Le module NC a déménagé</h1>
+  <p>L'application Non-Conformités est désormais hébergée sur le serveur de production Muller Automotive.</p>
+  <div class="url-box">
+    <span>Nouvelle adresse</span>
+    <a href="https://quali-form.mullerautomotive.fr/NC/" target="_blank">
+      quali-form.mullerautomotive.fr/NC/
+    </a>
+  </div>
+  <a class="btn" href="https://quali-form.mullerautomotive.fr/NC/" target="_blank">
+    Accéder au module NC →
+  </a>
+  <div class="footer">Muller Automotive — Service Qualité</div>
 </div>
-
-<footer>© Muller Automotive — formation-sav.fr &nbsp;·&nbsp; <span style="color:#e67e22;font-weight:700" id="ver-footer">…</span></footer>
-
-<script>
-(async function(){ try { const d=await(await fetch('/api/nc/appversion')).json(); document.getElementById('ver-footer').textContent='v'+d.version; } catch{} })();
-
-// Si ?logout dans l'URL, effacer le token et rester sur la page de login
-(function(){
-  if (window.location.search.includes('logout')) {
-    localStorage.removeItem('nc_jwt');
-    history.replaceState(null,'',window.location.pathname);
-    return;
-  }
-  // Si déjà connecté avec un token valide, rediriger directement
-  const token = localStorage.getItem('nc_jwt');
-  if (!token) return;
-  try {
-    const b64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
-    const p = JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-    if (p.scope === 'nc' && p.exp > Date.now()/1000) window.location.href = 'console.html';
-  } catch {}
-})();
-
-async function doLogin(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btn-login');
-  const msg = document.getElementById('msg');
-  btn.disabled = true; btn.textContent = 'Connexion…'; msg.style.display='none';
-
-  const user = document.getElementById('nc-user').value.trim();
-  const pass = document.getElementById('nc-pass').value;
-
-  try {
-    const res = await fetch('/api/nc-auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user, pass })
-    });
-    const data = await res.json();
-    if (data.result === 'ok') {
-      localStorage.setItem('nc_jwt', data.token);
-      window.location.href = 'console.html';
-    } else {
-      msg.textContent = 'Identifiant ou mot de passe incorrect.';
-      msg.className = 'msg error'; msg.style.display = 'block';
-      btn.disabled = false; btn.textContent = 'Connexion';
-    }
-  } catch {
-    msg.textContent = 'Serveur inaccessible.';
-    msg.className = 'msg error'; msg.style.display = 'block';
-    btn.disabled = false; btn.textContent = 'Connexion';
-  }
-}
-</script>
 </body>
 </html>

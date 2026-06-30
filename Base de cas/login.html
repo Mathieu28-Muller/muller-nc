@@ -106,6 +106,7 @@ async function tenterConnexion() {
         else if (res === 'ok_user')           window.location.href = 'index.html';
         else if (res === 'pending')           showMsg('info', '⏳ Votre compte est en attente de validation par un administrateur.');
         else if (res === 'no_module_access')  showMsg('error', '🔒 Accès à la Base de cas non autorisé. Contactez un administrateur.');
+        else if (res === 'locked')             showMsg('error', '🔒 Compte verrouillé — Trop de tentatives incorrectes. Réessayez dans 15 minutes.')
         else                                  showMsg('error', 'Identifiant ou mot de passe incorrect.');
     } catch {
         showMsg('error', 'Serveur inaccessible. Réessayez dans un instant.');

@@ -43,8 +43,11 @@ const NC_MEDIA        = path.join(__dirname, 'NC', 'media');
 const NC_USERS_FILE   = path.join(__dirname, 'nc-users.json');
 const NC_CONFIG_FILE  = path.join(__dirname, 'nc-config.json');
 
+const SITE_URL    = process.env.SITE_URL || 'https://formation-sav.fr';
+const SITE_DOMAIN = SITE_URL.replace(/^https?:\/\//, '');
+
 // ── Version applicative Module NC ─────────────────────────────
-const NC_APP_VERSION = '4.12';
+const NC_APP_VERSION = '5.3';
 const NC_VERSION_HISTORY = [
   {
     version: '1.0', date: '2026-03-15', label: 'Lancement',
@@ -222,11 +225,61 @@ const NC_VERSION_HISTORY = [
   },
   {
     version: '4.12', date: '2026-06-18', label: 'Console utilisateurs + sécurité lecture + pièce jointe clôture',
-    current: true,
     changes: [
       'Console utilisateurs : recherche par nom/identifiant en temps réel, filtre par rôle, pagination 20 utilisateurs/page',
       'Sécurité lecture : section "🔒 Clôture — Usage interne Service Qualité" masquée pour le rôle Lecteur dans la modale fiche NC',
       'Email clôture : fiche NC HTML en pièce jointe automatique (version lecteur, sans données internes qualité)'
+    ]
+  },
+  {
+    version: '5.0', date: '2026-06-22', label: 'Mise en production OVH — quali-form.mullerautomotive.fr',
+    changes: [
+      'Mise en production définitive sur OVH — quali-form.mullerautomotive.fr/NC/',
+      'SITE_URL dynamique via variable d\'environnement — PC garde formation-sav.fr, OVH utilise le domaine production',
+      'Module BR conditionnel — BR_ENABLED=false sur OVH, actif sur PC',
+      'Contrainte PostgreSQL nc_codir ajoutée sur PC et OVH',
+      'Pages NC et Base de cas sur formation-sav.fr remplacées par page de bascule vers OVH',
+      'SMTP OVH opérationnel — noreply-nc@mullerautomotive.fr'
+    ]
+  },
+  {
+    version: '5.1', date: '2026-06-25', label: 'Sécurité login — verrouillage par compte',
+    changes: [
+      'Rate limiting par compte : 5 mauvais mots de passe → compte verrouillé 15 minutes (tous modules)',
+      'Compteurs indépendants par module : préfixe bc: (Base de cas) et nc: (NC) — même identifiant, verrous séparés',
+      'Protection anti-bot IP conservée (seuil 50/15min) en parallèle',
+      'Message explicite affiché : "🔒 Compte verrouillé — Réessayez dans X minute(s)"',
+      'Déverrouillage automatique : connexion réussie remet le compteur à zéro',
+      'login.html NC : correction affichage message verrouillage + footer URL OVH',
+      'Base de cas/login.html : idem correction affichage message verrouillage'
+    ]
+  },
+  {
+    version: '5.2', date: '2026-06-26', label: 'Chef produit + colonnes Rédacteur/Chef produit',
+    current: false,
+    changes: [
+      'Nouveau concept Chef produit — responsable d\'une famille de produit (7 chefs : Leroy, Simon, Skrzypczak, Cortey, Costa, Job, Gouache)',
+      'Mapping automatique famille produit → chef produit : auto-remplissage à la soumission du formulaire et lors du changement de famille en console',
+      'Colonnes "Chef produit" et "Rédacteur" ajoutées dans la liste NC — masquées par défaut, activables via "Colonnes visibles"',
+      'Champ Chef produit éditable dans la fiche NC (modal) — sélecteur avec les chefs configurés',
+      'Configuration admin : nouvelle card "👤 Chefs produit" — gestion de la liste + mapping famille → chef modifiable',
+      'Bouton "⚡ Initialiser sur les NC existantes" — rétro-assigne le chef produit sur toutes les NC sans chef selon le mapping',
+      'Ordre des colonnes personnalisable par glisser-déposer sur les en-têtes — préférence sauvegardée par utilisateur',
+      'Famille DIAG supprimée (produit obsolète — sans impact sur les NC existantes)',
+      'SOFT RPH ajouté au mapping : Anne-Sophie Costa',
+      'PostgreSQL : colonne chef_produit TEXT ajoutée à nc_fiches (sync via pgSyncFiche)'
+    ]
+  },
+  {
+    version: '5.3', date: '2026-06-29', label: 'Colonnes personnalisables + Chef produit complet',
+    current: true,
+    changes: [
+      'Colonnes de la liste NC réorganisables par glisser-déposer sur les en-têtes — ordre sauvegardé par utilisateur/navigateur',
+      'Réinitialisation de l\'ordre des colonnes disponible dans ⚙ Colonnes',
+      'Card Configuration "👤 Chefs produit" : liste + mapping Famille → Chef sur pleine largeur, mise en page 2 colonnes',
+      'Mapping se rafraîchit instantanément après ajout/suppression d\'un chef ou d\'une famille',
+      'Correctif : colonnes Rédacteur et Chef produit chargées dès le démarrage (sans attendre l\'onglet Configuration)',
+      'Guides, synoptique et présentation mis à jour — URL OVH, profil chef produit, colonnes personnalisables'
     ]
   }
 ];
@@ -298,12 +351,12 @@ function pgSyncFiche(nc, parentSet, satSet) {
                     commentaire_cloture, analyse_5p, preuve_efficacite,
                     is_parent, is_satellite, parent_id, parent_label, satellites,
                     groupe_label, groupe_motif, groupe_created_at, groupe_created_by,
-                    groupe_perimetre, rattachement_date, rattachement_by, sap_code_distributeur, langue
+                    groupe_perimetre, rattachement_date, rattachement_by, sap_code_distributeur, langue, chef_produit
                 ) VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,
                     $19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,
                     $35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,
-                    $51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67
+                    $51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68
                 )
                 ON CONFLICT (numero) DO UPDATE SET
                     updated_at=EXCLUDED.updated_at, statut=EXCLUDED.statut,
@@ -326,7 +379,8 @@ function pgSyncFiche(nc, parentSet, satSet) {
                     media_files=EXCLUDED.media_files,
                     media_files_traitement=EXCLUDED.media_files_traitement,
                     sap_code_distributeur=EXCLUDED.sap_code_distributeur,
-                    langue=EXCLUDED.langue
+                    langue=EXCLUDED.langue,
+                    chef_produit=EXCLUDED.chef_produit
             `, [
                 nc.numero, nc.createdAt||null, nc.updatedAt||null, nc.statut||'ouvert',
                 nc.closedAt||null, nc.closPar||null, nc.clotureViaParent||null,
@@ -357,6 +411,7 @@ function pgSyncFiche(nc, parentSet, satSet) {
                 nc.rattachementDate||null, nc.rattachementBy||null,
                 nc.sapCodeDistributeur||null,
                 nc.langue||'fr',
+                nc.chefProduit||null,
             ]);
 
             // ── 2. Resync nc_historique (delete + insert) ────────
@@ -511,9 +566,12 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '20mb' }));
 
 // ── Module BR (Rappel Sécurité Basse Tension) ─────────────────
-const brRouter = require('./BR/br_backend');
-app.use(brRouter);
-app.use('/BR', express.static(path.join(__dirname, 'BR')));
+// Désactivé sur OVH via BR_ENABLED=false dans .env
+if (process.env.BR_ENABLED !== 'false') {
+  const brRouter = require('./BR/br_backend');
+  app.use(brRouter);
+  app.use('/BR', express.static(path.join(__dirname, 'BR')));
+}
 
 // HTML jamais mis en cache par Cloudflare ni le navigateur
 app.use((req, res, next) => {
@@ -759,24 +817,59 @@ app.get('/api/health', (req, res) => {
     res.json({ ok: true, time: new Date().toISOString(), users: loadUsers().length });
 });
 
-// ── Rate limiter commun aux deux routes de login ───────────────
+// ── Rate limiter IP — protection anti-bot (seuil haut) ─────────
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5,
-    message: { result: 'invalid', error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+    windowMs: 15 * 60 * 1000,
+    max: 50,
+    message: { result: 'invalid', error: 'Trop de requêtes depuis cette adresse. Réessayez dans 15 minutes.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
+
+// ── Verrouillage par compte — 5 mauvais MDP → blocage 15 min ──
+const _loginFails = new Map(); // login_lower → {count, lockedUntil}
+
+function checkAccountLock(username) {
+    const k = (username || '').toLowerCase();
+    const e = _loginFails.get(k);
+    if (!e) return null;
+    if (e.lockedUntil === 0) return null; // compteur en cours, pas encore bloqué
+    if (Date.now() > e.lockedUntil) { _loginFails.delete(k); return null; } // délai expiré
+    return Math.ceil((e.lockedUntil - Date.now()) / 60000);
+}
+
+function recordLoginFail(username) {
+    const k = (username || '').toLowerCase();
+    const e = _loginFails.get(k) || { count: 0, lockedUntil: 0 };
+    e.count++;
+    if (e.count >= 5) e.lockedUntil = Date.now() + 15 * 60 * 1000;
+    _loginFails.set(k, e);
+}
+
+function clearLoginFails(username) {
+    _loginFails.delete((username || '').toLowerCase());
+}
 
 // ── POST /api/login ────────────────────────────────────────────
 app.post('/api/login', loginLimiter, (req, res) => {
     const { user, pass } = req.body || {};
     if (!user || !pass) return res.status(400).json({ result: 'invalid' });
 
+    // Vérifier verrouillage du compte
+    const wait = checkAccountLock('bc:' + user);
+    if (wait !== null) return res.status(429).json({
+        result: 'locked',
+        error: `Compte verrouillé — trop de tentatives incorrectes. Réessayez dans ${wait} minute${wait > 1 ? 's' : ''}.`
+    });
+
     const users = loadUsers();
     const found = users.find(u => u.user.toLowerCase() === user.toLowerCase());
-    if (!found || !verifyPass(pass, found.passHash)) return res.json({ result: 'invalid' });
+    if (!found || !verifyPass(pass, found.passHash)) {
+        recordLoginFail('bc:' + user);
+        return res.json({ result: 'invalid' });
+    }
     if (found.status === 'pending') return res.json({ result: 'pending' });
+    clearLoginFails('bc:' + user);
 
     const roleResult = found.role === 'admin' ? 'ok_admin'
                      : found.role === 'contributor' ? 'ok_contributor'
@@ -974,7 +1067,7 @@ app.post('/api/send-sensibilisation', async (req, res) => {
 <tr><td style="padding:8px 10px;color:#888">Date</td><td style="padding:8px 10px">${date}</td></tr>
 </table>
 </div>
-<div style="background:#f5f5f5;padding:10px 24px;font-size:.75rem;color:#aaa">Envoi automatique — formation-sav.fr/SENSIBILISATION/</div>
+<div style="background:#f5f5f5;padding:10px 24px;font-size:.75rem;color:#aaa">Envoi automatique — ${SITE_DOMAIN}/SENSIBILISATION/</div>
 </div>`,
         });
         res.json({ ok: true });
@@ -1054,7 +1147,7 @@ app.post('/api/send-diplome', async (req, res) => {
                     <p style="color:#555">Le certificat est joint à cet email en pièce jointe PDF.</p>
                   </div>
                   <div style="background:#f5f5f5;padding:12px 28px;font-size:0.78rem;color:#aaa">
-                    Envoi automatique — formation-sav.fr
+                    Envoi automatique — ${SITE_DOMAIN}
                   </div>
                 </div>`,
             attachments: [{
@@ -1113,9 +1206,22 @@ function requireNCAdmin(req, res, next) {
 app.post('/api/nc-auth/login', loginLimiter, (req,res) => {
     const { user, pass } = req.body||{};
     if (!user||!pass) return res.json({ result:'invalid' });
+
+    // Vérifier verrouillage du compte
+    const wait = checkAccountLock('nc:' + user);
+    if (wait !== null) return res.status(429).json({
+        result:'locked',
+        error:`Compte verrouillé — trop de tentatives incorrectes. Réessayez dans ${wait} minute${wait>1?'s':''}.`
+    });
+
     const users = loadNCUsers();
     const found = users.find(u => u.user.toLowerCase()===user.toLowerCase());
-    if (!found || !verifyPass(pass, found.passHash)) return res.json({ result:'invalid' });
+    if (!found || !verifyPass(pass, found.passHash)) {
+        recordLoginFail('nc:' + user);
+        return res.json({ result:'invalid' });
+    }
+
+    clearLoginFails('nc:' + user);
     // Lazy migration hash → bcrypt si nécessaire
     if (!found.passHash.startsWith('$2b$') && !found.passHash.startsWith('$2a$')) {
         found.passHash = hashBcrypt(pass);
@@ -1253,7 +1359,7 @@ app.post('/api/nc-auth/users/:user/send-credentials', requireNCAdmin, async (req
   <tr><td style="padding:6px 12px;background:#f5f5f5;font-weight:700">Identifiant</td><td style="padding:6px 12px;font-family:monospace">${u.user}</td></tr>
   <tr><td style="padding:6px 12px;background:#f5f5f5;font-weight:700">Mot de passe temporaire</td><td style="padding:6px 12px;font-family:monospace;font-size:1.1em;color:#c0392b">${tmp}</td></tr>
 </table>
-<p>Connectez-vous ici : <a href="https://formation-sav.fr/NC/login.html">https://formation-sav.fr/NC/login.html</a></p>
+<p>Connectez-vous ici : <a href="${SITE_URL}/NC/login.html">${SITE_URL}/NC/login.html</a></p>
 <p style="color:#888;font-size:0.85em">Ce mot de passe est temporaire. Vous serez invité à le modifier lors de votre prochaine connexion.</p>
 <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
 <p style="margin:0;font-size:0.85em;color:#555">Mathieu Avet<br>
@@ -1275,7 +1381,7 @@ app.post('/api/nc-auth/forgot-password', async (req,res) => {
     // Réponse identique qu'on trouve ou non (sécurité : ne pas révéler l'existence du compte)
     if (!u || !u.email) return res.json({ ok:true });
     const token = genResetToken(u.user);
-    const link = `https://formation-sav.fr/NC/reset-password.html?token=${token}`;
+    const link = `${SITE_URL}/NC/reset-password.html?token=${token}`;
     try {
         const tr = nodemailer.createTransport({ host:EMAIL_CFG.host, port:EMAIL_CFG.port, secure:EMAIL_CFG.secure, auth:{ user:EMAIL_CFG.user, pass:EMAIL_CFG.pass } });
         await tr.sendMail({
@@ -1369,7 +1475,7 @@ app.post('/api/nc', async (req,res) => {
     const { redacteur,emailRedacteur,dateDecouverte,decouvreur,perimetre,sourceDetection,noCommande,refProduit,familleProduit,noSerie,versionProg,
             quantiteUnites,
             sapCode,sapCodeDistributeur,nomClient,cp,ville,pays,probleme,reparation,suggestion,
-            langue,
+            langue,chefProduit,
             mediaFiles,mediaFilesTraitement,pdfBase64 } = req.body||{};
     if (!probleme) return res.status(400).json({error:'Champ problème obligatoire'});
     if (!familleProduit) return res.status(400).json({error:'Famille de produit obligatoire'});
@@ -1410,8 +1516,13 @@ app.post('/api/nc', async (req,res) => {
     const trt  = moveFiles(mediaFilesTraitement);
     const emailAttachments = [...prob.attachments, ...trt.attachments];
 
+    // Auto-résolution chef produit côté serveur (fallback si le client n'a pas envoyé)
+    const cfg0 = loadNCConfig();
+    const resolvedChef = chefProduit || (cfg0.famillesToChef||{})[familleProduit] || '';
+
     const nc = { numero, createdAt:now.toISOString(), statut:'ouvert',
         langue: langue === 'en' ? 'en' : 'fr',
+        chefProduit: resolvedChef,
         redacteur:redacteur||'', emailRedacteur:emailRedacteur||'',
         dateDecouverte:dateDecouverte||'', decouvreur:decouvreur||'',
         perimetre:perimetre||'', sourceDetection:sourceDetection||'',
@@ -1548,12 +1659,14 @@ app.get('/api/nc/config', requireNCAuth, (req,res) => {
 app.put('/api/nc/config', requireNCAuth, (req,res) => {
     if (req.ncUser.role !== 'nc_admin')
         return res.status(403).json({ error:'Accès refusé' });
-    const { emailsQualite, famillesProduit, typesCause, notificationsEmail } = req.body||{};
+    const { emailsQualite, famillesProduit, typesCause, notificationsEmail, chefsProduit, famillesToChef } = req.body||{};
     const cfg = loadNCConfig();
     if (Array.isArray(emailsQualite))    cfg.emailsQualite    = emailsQualite.map(e=>e.trim()).filter(Boolean);
     if (Array.isArray(famillesProduit))  cfg.famillesProduit  = famillesProduit.map(f=>f.trim()).filter(Boolean).sort();
     if (Array.isArray(typesCause))       cfg.typesCause       = typesCause.map(t=>t.trim()).filter(Boolean).sort();
     if (notificationsEmail && typeof notificationsEmail==='object') cfg.notificationsEmail = notificationsEmail;
+    if (Array.isArray(chefsProduit))     cfg.chefsProduit     = chefsProduit.map(c=>c.trim()).filter(Boolean).sort();
+    if (famillesToChef && typeof famillesToChef==='object') cfg.famillesToChef = famillesToChef;
     saveNCConfig(cfg);
     res.json({ ok:true, config:cfg });
 });
@@ -1565,7 +1678,9 @@ app.get('/api/nc/config/listes-publiques', (req,res) => {
         perimetres:      cfg.perimetres||[],
         sourcesDetection:cfg.sourcesDetection||[],
         famillesProduit: cfg.famillesProduit||[],
-        typesCause:      cfg.typesCause||[]
+        typesCause:      cfg.typesCause||[],
+        chefsProduit:    cfg.chefsProduit||[],
+        famillesToChef:  cfg.famillesToChef||{}
     });
 });
 
@@ -1573,6 +1688,22 @@ app.get('/api/nc/config/listes-publiques', (req,res) => {
 app.get('/api/nc/config/listes', requireNCAuth, (req,res) => {
     const cfg = loadNCConfig();
     res.json({ perimetres: cfg.perimetres||[], sourcesDetection: cfg.sourcesDetection||[] });
+});
+
+// POST /api/nc/admin/init-chef-produit — rétro-assigne chef_produit sur toutes les NC existantes (admin)
+app.post('/api/nc/admin/init-chef-produit', requireNCAuth, (req, res) => {
+    if (req.ncUser.role !== 'nc_admin')
+        return res.status(403).json({ error: 'Accès refusé' });
+    const mapping = loadNCConfig().famillesToChef || {};
+    const data    = loadNC();
+    let updated = 0, skipped = 0;
+    for (const nc of data.declarations) {
+        if (nc.chefProduit) { skipped++; continue; }
+        const chef = mapping[nc.familleProduit];
+        if (chef) { nc.chefProduit = chef; updated++; }
+    }
+    if (updated > 0) saveNC(data);
+    res.json({ ok: true, updated, skipped, total: data.declarations.length });
 });
 
 // POST /api/nc/config/perimetres — ajouter un périmètre (admin)
@@ -1866,7 +1997,7 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
     if (req.ncUser.role !== 'nc_admin')
         return res.status(403).json({ error:'Seul un administrateur peut modifier le statut' });
     const body = req.body||{};
-    const { statut, commentaire, pilote, delaiAction, typeAction, typeCause, cout, commentaireCloture, familleProduit, perimetre, sourceDetection } = body;
+    const { statut, commentaire, pilote, delaiAction, typeAction, typeCause, cout, commentaireCloture, familleProduit, perimetre, sourceDetection, chefProduit } = body;
     const data = loadNC();
     const nc = data.declarations.find(d=>d.numero===req.params.numero);
     if (!nc) return res.status(404).json({error:'NC non trouvée'});
@@ -1890,7 +2021,15 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
     if (pilote         !== undefined) nc.pilote         = pilote         || '';
     if (delaiAction    !== undefined) nc.delaiAction    = delaiAction    || '';
     if (typeAction     !== undefined) nc.typeAction     = typeAction     || '';
-    if (familleProduit    !== undefined) nc.familleProduit    = familleProduit    || '';
+    if (familleProduit    !== undefined) {
+        nc.familleProduit = familleProduit || '';
+        // Auto-mise à jour chef produit si la famille change et qu'aucun chef n'est fourni explicitement
+        if (chefProduit === undefined) {
+            const cfgMap = (loadNCConfig().famillesToChef || {});
+            if (familleProduit && cfgMap[familleProduit]) nc.chefProduit = cfgMap[familleProduit];
+        }
+    }
+    if (chefProduit       !== undefined) nc.chefProduit       = chefProduit       || '';
     if (perimetre         !== undefined) nc.perimetre         = perimetre         || '';
     if (sourceDetection   !== undefined) nc.sourceDetection   = sourceDetection   || '';
     if (typeCause          !== undefined) nc.typeCause          = typeCause          || '';
@@ -1991,9 +2130,9 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
     ${commentaire?`<tr><td style="padding:7px 10px;color:#555">Action attendue</td><td style="padding:7px 10px">${commentaire.replace(/\n/g,'<br>')}</td></tr>`:''}
     <tr style="background:#fff3cd"><td style="padding:10px;color:#856404"><strong>🗓 Délai de résolution</strong></td><td style="padding:10px;font-weight:700;font-size:1.05rem;color:#856404">${delaiStr}</td></tr>
   </table>
-  <p style="font-size:0.78rem;color:#888">Suivi et mise à jour : <a href="https://formation-sav.fr/NC/console.html">Console NC Muller</a></p>
+  <p style="font-size:0.78rem;color:#888">Suivi et mise à jour : <a href="${SITE_URL}/NC/console.html">Console NC Muller</a></p>
 </div>
-<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive, formation-sav.fr/NC/</div>
+<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive, ${SITE_DOMAIN}/NC/</div>
 </div>`
             });
             console.log(`[NC pilote] Email envoyé à ${piloteEmail} (${effectivePilote}) pour ${nc.numero}`);
@@ -2105,7 +2244,7 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
   </div>` : ''}
 </div>
 <div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">
-  Envoi automatique — Muller Automotive, formation-sav.fr/NC/
+  Envoi automatique — Muller Automotive, ${SITE_DOMAIN}/NC/
 </div></div>`
             });
             console.log(`[NC status] Email envoyé à ${nc.emailRedacteur} pour ${nc.numero} (${statutLabel})`);
@@ -2142,9 +2281,9 @@ app.put('/api/nc/:numero/status', requireNCAuth, async (req,res) => {
     <tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Durée totale</td><td style="padding:7px 10px">${nc.dureeTotal!=null?nc.dureeTotal+' j':'—'}</td></tr>
     ${nc.commentaireCloture?`<tr><td style="padding:7px 10px;color:#888">Commentaire</td><td style="padding:7px 10px;font-style:italic">${nc.commentaireCloture.replace(/\n/g,'<br>')}</td></tr>`:''}
   </table>
-  <p style="font-size:0.78rem;color:#888">Suivi : <a href="https://formation-sav.fr/NC/console.html">Console NC Muller</a></p>
+  <p style="font-size:0.78rem;color:#888">Suivi : <a href="${SITE_URL}/NC/console.html">Console NC Muller</a></p>
 </div>
-<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive, formation-sav.fr/NC/</div></div>`
+<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive, ${SITE_DOMAIN}/NC/</div></div>`
             });
             console.log(`[NC cloture] Email envoyé à ${ncMailTo()} pour ${nc.numero}`);
         } catch(err) {
@@ -2254,7 +2393,7 @@ app.post('/api/nc/:numero/actions', requireNCAuth, async (req,res) => {
     ${commentaireAction?`<tr><td style="padding:7px 10px;color:#555">Action attendue</td><td style="padding:7px 10px">${commentaireAction.replace(/\n/g,'<br>')}</td></tr>`:''}
     <tr style="background:#fff3cd"><td style="padding:10px;color:#856404"><strong>🗓 Délai</strong></td><td style="padding:10px;font-weight:700;font-size:1.05rem;color:#856404">${delaiStr}</td></tr>
   </table>
-  <p style="font-size:0.78rem;color:#888">Accès : <a href="https://formation-sav.fr/NC/console.html">Console NC Muller</a></p>
+  <p style="font-size:0.78rem;color:#888">Accès : <a href="${SITE_URL}/NC/console.html">Console NC Muller</a></p>
 </div>
 <div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive</div>
 </div>`
@@ -2453,9 +2592,9 @@ app.post('/api/nc/action/:id/reponse-pilote', requireNCAuth, async (req,res) => 
     <tr><td style="padding:7px 10px;color:#888">Délai initial</td><td style="padding:7px 10px;font-weight:700;color:#856404">${delaiStr}</td></tr>
     ${reponse?`<tr style="background:#fdf2ff"><td style="padding:10px;color:#6c3483" colspan="2"><strong>Commentaire :</strong><br><div style="margin-top:6px">${reponse.replace(/\n/g,'<br>')}</div></td></tr>`:''}
   </table>
-  <p style="font-size:0.78rem;color:#888">Merci de compléter votre réponse sur la <a href="https://formation-sav.fr/NC/console.html">console NC</a>.</p>
+  <p style="font-size:0.78rem;color:#888">Merci de compléter votre réponse sur la <a href="${SITE_URL}/NC/console.html">console NC</a>.</p>
 </div>
-<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive, formation-sav.fr/NC/</div></div>`
+<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive, ${SITE_DOMAIN}/NC/</div></div>`
                 });
                 console.log(`[NC retour-admin] Email envoyé à ${piloteEmail} pour action ${action.id} (${nc.numero})`);
             } catch(err) { console.error('[NC retour-admin email]', err.message); }
@@ -2487,9 +2626,9 @@ app.post('/api/nc/action/:id/reponse-pilote', requireNCAuth, async (req,res) => 
     <tr style="background:#fafafa"><td style="padding:7px 10px;color:#888">Délai / J+J-</td><td style="padding:7px 10px">${delaiStr} — <strong>${jDiffTxt}</strong> à la réponse</td></tr>
     ${reponse?`<tr style="background:#eafaf1"><td style="padding:10px;color:#1e8449" colspan="2"><strong>Réponse du pilote :</strong><br><div style="margin-top:6px">${reponse.replace(/\n/g,'<br>')}</div></td></tr>`:''}
   </table>
-  <p style="font-size:0.78rem;color:#888">Consulter la NC sur la <a href="https://formation-sav.fr/NC/console.html">console NC</a>.</p>
+  <p style="font-size:0.78rem;color:#888">Consulter la NC sur la <a href="${SITE_URL}/NC/console.html">console NC</a>.</p>
 </div>
-<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive, formation-sav.fr/NC/</div></div>`
+<div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive, ${SITE_DOMAIN}/NC/</div></div>`
                 });
                 console.log(`[NC rep-pilote] Email envoyé à ${ncMailTo()} pour action ${action.id} (${nc.numero})`);
             } catch(err) { console.error('[NC rep-pilote email]', err.message); }
@@ -2543,7 +2682,7 @@ app.post('/api/nc/action/:id/relance', requireNCAuth, async (req,res) => {
     <tr style="background:#fff3cd"><td style="padding:10px;color:#856404"><strong>🗓 Délai</strong></td><td style="padding:10px;font-weight:700;color:#856404">${delaiStr}</td></tr>
     ${commentaire?`<tr><td style="padding:7px 10px;color:#555">Message</td><td style="padding:7px 10px">${commentaire}</td></tr>`:''}
   </table>
-  <p style="font-size:0.78rem;color:#888">Accès : <a href="https://formation-sav.fr/NC/console.html">Console NC Muller</a></p>
+  <p style="font-size:0.78rem;color:#888">Accès : <a href="${SITE_URL}/NC/console.html">Console NC Muller</a></p>
 </div>
 <div style="background:#f5f5f5;padding:10px 24px;font-size:0.72rem;color:#aaa">Envoi automatique — Muller Automotive</div>
 </div>`
@@ -3235,7 +3374,7 @@ app.post('/api/nc/parent-groups/notify-email', requireNCAuth, async (req, res) =
               <div style="padding:22px 24px">
                 <p style="font-size:0.9rem;margin-bottom:8px">Bonjour <strong>${to_nom||to_email}</strong>,</p>
                 <div style="background:#f4f8fd;border-left:4px solid #0c447c;padding:12px 16px;border-radius:4px;font-size:0.88rem;line-height:1.6">${message.replace(/\n/g,'<br>')}</div>
-                <p style="margin-top:16px;font-size:0.82rem;color:#888">Accès console : <a href="https://formation-sav.fr/NC/console.html" style="color:#0c447c">formation-sav.fr/NC/console.html</a> → onglet <strong>NC Parents</strong></p>
+                <p style="margin-top:16px;font-size:0.82rem;color:#888">Accès console : <a href="${SITE_URL}/NC/console.html" style="color:#0c447c">${SITE_DOMAIN}/NC/console.html</a> → onglet <strong>NC Parents</strong></p>
               </div>
               <div style="background:#f8f9fa;padding:10px 24px;font-size:0.72rem;color:#aaa;text-align:center">
                 Notification automatique — Muller Automotive · Service Qualité NC

@@ -6,6 +6,36 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 ---
 
+## [5.1] — 25/06/2026
+
+### Sécurité
+- **Verrouillage par compte** — 5 mauvais mots de passe consécutifs → compte bloqué 15 minutes (NC et Base de cas)
+- Compteurs **indépendants par module** : préfixe `bc:` pour Base de cas, `nc:` pour NC — un même identifiant sur les deux modules ne propage pas le verrou
+- Protection anti-bot IP conservée en parallèle (seuil 50 requêtes / 15 min) — résout le blocage par réseau d'entreprise (NAT)
+- Déverrouillage automatique : connexion réussie remet le compteur à zéro
+
+### Corrigé
+- `login.html` NC : message **🔒 Compte verrouillé — Réessayez dans X minute(s)** affiché au 6e échec + footer URL mis à jour vers OVH
+- `Base de cas/login.html` : idem message verrouillage + cas `'locked'` géré explicitement
+- Bug `checkAccountLock` : condition `lockedUntil === 0` corrigée — le compteur n'était jamais incrémenté correctement
+
+---
+
+## [5.0] — 22/06/2026
+
+### Infrastructure
+- **Mise en production définitive** sur OVH — `https://quali-form.mullerautomotive.fr/NC/`
+- `SITE_URL` dynamique via variable d'environnement — PC garde `formation-sav.fr`, OVH utilise le domaine production
+- Module BR conditionnel : `BR_ENABLED=false` sur OVH, actif sur PC
+- Contrainte PostgreSQL `nc_users_role_check` mise à jour : `nc_codir` ajouté (PC + OVH)
+- SMTP OVH opérationnel : `noreply-nc@mullerautomotive.fr` — validé 22/06/2026
+
+### Modifié
+- Pages `NC/login.html`, `NC/index.html`, `NC/console.html` sur `formation-sav.fr` → page de bascule avec lien OVH
+- Pages `Base de cas/index.html`, `login.html`, `admin.html` sur `formation-sav.fr` → idem
+
+---
+
 ## [Non publié] — Phase 4 sécurité (post-OVH)
 
 ### Sécurité (à faire)
@@ -271,4 +301,4 @@ Versionnage : `MAJEUR.MINEUR` — majeur = fonctionnalité structurante, mineur 
 
 *Propriétaire : Mathieu Avet — avet.mat@gmail.com*  
 *Développé avec Claude Code (Anthropic) — abonnement personnel*  
-*Version actuelle : v4.12 — Production : https://quali-form.mullerautomotive.fr/NC/*
+*Version actuelle : v5.1 — Production : https://quali-form.mullerautomotive.fr/NC/*

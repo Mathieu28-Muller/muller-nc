@@ -60,7 +60,7 @@ const AUTH = (() => {
         const res  = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, pass }) });
         const data = await res.json();
         if (data.token) localStorage.setItem(TOKEN_KEY, data.token);
-        return data.result; // 'ok_admin' | 'ok_user' | 'pending' | 'invalid'
+        return data.result; // 'ok_admin' | 'ok_user' | 'pending' | 'invalid' | 'locked'
     }
 
     async function register(name, user, pass, company) {

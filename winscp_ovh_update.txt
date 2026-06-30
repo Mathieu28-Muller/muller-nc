@@ -1,0 +1,48 @@
+option batch abort
+option confirm off
+
+# Connexion via session sauvegardee WinSCP "Serveur Qualite"
+open "Serveur Qualite"
+
+# ── Fichiers racine ────────────────────────────────────────────
+put "C:\formation\server.js"             "/opt/nc/server.js"
+put "C:\formation\nc-data.json"          "/opt/nc/nc-data.json"
+put "C:\formation\nc-users.json"         "/opt/nc/nc-users.json"
+put "C:\formation\nc-config.json"        "/opt/nc/nc-config.json"
+put "C:\formation\nc-parent-groups.json" "/opt/nc/nc-parent-groups.json"
+put "C:\formation\schema_postgresql.sql" "/opt/nc/schema_postgresql.sql"
+
+# ── Dossier NC — fichiers HTML/JS ──────────────────────────────
+put "C:\formation\NC\console.html"              "/opt/nc/NC/console.html"
+put "C:\formation\NC\index.html"               "/opt/nc/NC/index.html"
+put "C:\formation\NC\login.html"               "/opt/nc/NC/login.html"
+put "C:\formation\NC\reset-password.html"      "/opt/nc/NC/reset-password.html"
+put "C:\formation\NC\guide-utilisateur.html"   "/opt/nc/NC/guide-utilisateur.html"
+put "C:\formation\NC\presentation.html"        "/opt/nc/NC/presentation.html"
+put "C:\formation\NC\synoptique.html"          "/opt/nc/NC/synoptique.html"
+put "C:\formation\NC\synoptique_nc_groupe.html" "/opt/nc/NC/synoptique_nc_groupe.html"
+put "C:\formation\NC\favicon.svg"              "/opt/nc/NC/favicon.svg"
+put "C:\formation\NC\nc_stats.js"             "/opt/nc/NC/nc_stats.js"
+put "C:\formation\NC\nc_droits_pilote.js"     "/opt/nc/NC/nc_droits_pilote.js"
+put "C:\formation\NC\nc_liste_accordeon.js"   "/opt/nc/NC/nc_liste_accordeon.js"
+put "C:\formation\NC\nc_parent_avance.js"     "/opt/nc/NC/nc_parent_avance.js"
+put "C:\formation\NC\nc_parent_satellites.js" "/opt/nc/NC/nc_parent_satellites.js"
+
+# ── Medias NC — dossiers depuis le 09/06 ──────────────────────
+synchronize remote "C:\formation\NC\media\260609-0014" "/opt/nc/NC/media/260609-0014"
+synchronize remote "C:\formation\NC\media\260610-0015" "/opt/nc/NC/media/260610-0015"
+synchronize remote "C:\formation\NC\media\260611-0016" "/opt/nc/NC/media/260611-0016"
+synchronize remote "C:\formation\NC\media\260611-0017" "/opt/nc/NC/media/260611-0017"
+synchronize remote "C:\formation\NC\media\260612-0018" "/opt/nc/NC/media/260612-0018"
+synchronize remote "C:\formation\NC\media\260617-0019" "/opt/nc/NC/media/260617-0019"
+synchronize remote "C:\formation\NC\media\260617-0020" "/opt/nc/NC/media/260617-0020"
+synchronize remote "C:\formation\NC\media\260618-0020" "/opt/nc/NC/media/260618-0020"
+synchronize remote "C:\formation\NC\media\260618-0021" "/opt/nc/NC/media/260618-0021"
+
+# ── Base de cas — nouveaux PDFs ────────────────────────────────
+synchronize remote "C:\formation\Base de cas\media\CT\ACTIGAS_AT505" "/opt/nc/Base de cas/media/CT/ACTIGAS_AT505"
+synchronize remote "C:\formation\Base de cas\media\CT\ACTIGAS_AT605" "/opt/nc/Base de cas/media/CT/ACTIGAS_AT605"
+synchronize remote "C:\formation\Base de cas\media\MRA\FIX_15"       "/opt/nc/Base de cas/media/MRA/FIX_15"
+
+close
+exit
