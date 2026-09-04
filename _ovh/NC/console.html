@@ -315,6 +315,7 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
 <!-- ═══ DASHBOARD ═══ -->
 <div id="tab-dashboard" class="tab-content active">
 <div class="container">
+  <div class="year-band" id="dash-year-band"></div>
   <div id="dash-pilote-perso" style="display:none"></div>
   <div class="stats-bar">
     <div class="stat-card s-total"><div class="num" id="s-total">—</div><div class="lbl">Total</div><div class="sub" id="s-sub-total"></div></div>
@@ -344,7 +345,7 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
     </div>
   </div>
   <div class="card" style="margin-bottom:16px">
-    <div class="card-head">Déclarations par mois (12 derniers mois)</div>
+    <div class="card-head" id="dash-timeline-head">Déclarations par mois (12 derniers mois)</div>
     <div class="card-body" id="dash-timeline"><div class="loader"></div></div>
   </div>
   <div class="card" style="margin-bottom:22px">
@@ -503,9 +504,9 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
     </div>
   </div>
   <div class="stats-grid" style="margin-bottom:16px">
-    <div class="card">
-      <div class="card-head">📅 Respect de l'échéance de clôture</div>
-      <div class="card-body" id="st-echeance"><div class="loader"></div></div>
+    <div class="card" style="border-top:3px solid #e67e22">
+      <div class="card-head">⏱ Respect des délais par type d'action CAPA</div>
+      <div class="card-body" id="st-actions-delai"><div class="loader"></div></div>
     </div>
   </div>
   <div class="stats-grid">
@@ -676,6 +677,20 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
     </div>
   </div>
 
+  <!-- File d'attente emails -->
+  <div class="card" style="margin-bottom:16px;border-top:3px solid #e67e22">
+    <div class="card-head">📬 File d'attente emails — relance manuelle</div>
+    <div class="card-body">
+      <div id="email-queue-stats" style="font-size:0.83rem;color:#555;margin-bottom:12px"><span style="color:#aaa">Chargement…</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-upd" style="background:#e67e22" onclick="emailQueueRetry()">🔄 Relancer tous les emails en attente / en échec</button>
+        <button class="btn-upd" style="background:#555" onclick="emailQueueStats()">↺ Rafraîchir l'état</button>
+      </div>
+      <div id="email-queue-msg" style="font-size:0.75rem;margin-top:8px"></div>
+      <div style="font-size:0.68rem;color:#aaa;margin-top:8px">Retry automatique toutes les 5 min jusqu'à 30 jours · Au-delà ou sur action manuelle : remet en file et déclenche immédiatement</div>
+    </div>
+  </div>
+
   <!-- Notifications email -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-head">🔔 Notifications email — activer / désactiver</div>
@@ -839,7 +854,7 @@ details[open]>.action-summary{border-radius:8px 8px 0 0;background:#e8f4fd}
 </div>
 
 <!-- ═══ MODAL DÉTAIL ═══ -->
-<div class="overlay" id="overlay" onclick="closeModal(event)">
+<div class="overlay" id="overlay">
 <div class="modal" onclick="event.stopPropagation()">
   <div class="modal-header">
     <h2 id="modal-title">Fiche NC</h2>
@@ -872,6 +887,29 @@ const session = (() => {
     }
     return payload;
   } catch { window.location.href = '/NC/login.html'; return null; }
+})();
+
+/* ════════ SESSION EXPIRÉE — INTERCEPTEUR GLOBAL ════════
+   `window.location.href=...` ne stoppe pas l'exécution du script en cours :
+   sans ce garde-fou, tout le reste de l'appli (initApp, les modules NC
+   Parent/Stats…) continuait à lancer des appels API pendant la fraction de
+   seconde précédant la vraie navigation vers login.html, produisant une
+   rafale de 401 et donnant l'impression que "les NC ont disparu" juste
+   avant la redirection. On coupe court dès la toute première 401. */
+(function () {
+  const _fetch = window.fetch;
+  let _redirecting = !session;
+  window.fetch = function (input, init) {
+    const url = typeof input === 'string' ? input : (input?.url || '');
+    return _fetch(input, init).then(res => {
+      if (res.status === 401 && url.startsWith('/api/nc') && !_redirecting) {
+        _redirecting = true;
+        localStorage.removeItem(NC_TOKEN_KEY);
+        window.location.href = '/NC/login.html';
+      }
+      return res;
+    });
+  };
 })();
 
 let isAdmin       = session?.role === 'nc_admin';
@@ -1074,6 +1112,7 @@ async function loadPilotesFromAPI() {
 let _ncConfig = {};
 
 async function loadConfig() {
+  emailQueueStats();
   try {
     const r = await fetch('/api/nc/config', { headers: authHdr() });
     if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -1119,6 +1158,43 @@ async function loadConfig() {
   if (_ncConfig.perimetres       && _ncConfig.perimetres.length)        PERIMETRES_LIST = [..._ncConfig.perimetres];
   if (_ncConfig.sourcesDetection && _ncConfig.sourcesDetection.length)  SOURCES_LIST    = [..._ncConfig.sourcesDetection];
   if (_ncConfig.chefsProduit     && _ncConfig.chefsProduit.length)      CHEFS_PRODUIT   = [..._ncConfig.chefsProduit];
+}
+
+async function emailQueueStats() {
+  const el=document.getElementById('email-queue-stats');
+  if(el) el.innerHTML='<span style="color:#aaa">Chargement…</span>';
+  try {
+    const r=await fetch('/api/nc/email-queue/stats',{headers:authHdr()});
+    const d=await r.json();
+    if(!d.disponible){ if(el) el.innerHTML='<span style="color:#aaa">PostgreSQL non disponible</span>'; return; }
+    const rows=d.stats||[];
+    // N'alerte que sur les emails encore problématiques maintenant — l'historique des
+    // envois déjà résolus (statut 'envoye') reste en base pour audit mais n'est plus
+    // affiché ici, pour ne pas laisser croire à un souci en cours qui n'existe plus.
+    const nbAttente = parseInt(rows.find(r=>r.statut==='en_attente')?.nb || 0);
+    const nbEchec   = parseInt(rows.find(r=>r.statut==='echec_definitif')?.nb || 0);
+    const nbProbleme = nbAttente + nbEchec;
+    if (!nbProbleme) {
+      if(el) el.innerHTML='<span style="color:#27ae60;font-weight:700">✓ Aucun email bloqué</span> <span style="font-size:0.72rem;color:#aaa">— tous les envois sont passés</span>';
+      return;
+    }
+    const colors={'en_attente':'#e67e22','echec_definitif':'#c0392b'};
+    const labels={'en_attente':'En attente','echec_definitif':'Échec définitif'};
+    const pb = rows.filter(r=>r.statut==='en_attente'||r.statut==='echec_definitif');
+    if(el) el.innerHTML=`<span style="color:#c0392b;font-weight:700">⚠ ${nbProbleme} email(s) bloqué(s)</span> — `
+      +pb.map(r=>`<span style="color:${colors[r.statut]||'#555'};font-weight:700">${r.nb} ${labels[r.statut]||r.statut}</span>`).join(' · ')
+      +(rows.find(r=>r.statut==='en_attente')?` <span style="font-size:0.72rem;color:#aaa">(plus ancien : ${new Date(rows.find(r=>r.statut==='en_attente').plus_ancien).toLocaleString('fr-FR')})</span>`:'');
+  } catch(e){ if(el) el.innerHTML=`<span style="color:#c0392b">Erreur : ${e.message}</span>`; }
+}
+async function emailQueueRetry() {
+  const msg=document.getElementById('email-queue-msg');
+  if(msg){ msg.textContent='Relance en cours…'; msg.style.color='#e67e22'; }
+  try {
+    const r=await fetch('/api/nc/email-queue/retry',{method:'POST',headers:authHdr()});
+    const d=await r.json();
+    if(msg){ msg.textContent=`✓ ${d.remisEnAttente} email(s) remis en attente — ${d.totalEnAttente} dans la file — envoi déclenché immédiatement`; msg.style.color='#27ae60'; }
+    setTimeout(emailQueueStats, 2000);
+  } catch(e){ if(msg){ msg.textContent='Erreur : '+e.message; msg.style.color='#c0392b'; } }
 }
 
 async function testSmtpEmail() {
@@ -1530,7 +1606,8 @@ function joursChip(nc){
 
 /* ════════ STATE ════════ */
 let allNC=[], filtered=[], sortCol='createdAt', sortDir=-1, currentPage=1;
-let _listYear=String(new Date().getFullYear()), _statsYear=new Date().getFullYear();
+let _listYear=String(new Date().getFullYear()), _statsYear=new Date().getFullYear(), _dashYear=new Date().getFullYear();
+let _statsDateFrom='', _statsDateTo='';
 
 function _ncYears(){ return [...new Set(allNC.map(nc=>new Date(nc.createdAt).getFullYear()))].sort((a,b)=>b-a); }
 
@@ -1569,11 +1646,33 @@ function buildStatsYearBand(){
   const el=document.getElementById('stats-year-band'); if(!el) return;
   const years=_ncYears(); const curY=new Date().getFullYear();
   if(!years.includes(_statsYear)&&years.length) _statsYear=years[0];
-  el.innerHTML=`<span style="font-size:0.7rem;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.4px">Année</span>`
-    +years.map(y=>`<button class="yr-pill ${y===_statsYear?'active':''}" onclick="setStatsYear(${y})">${y}${y===curY?' ▸':''}</button>`).join('');
+  const modeDate=!!(_statsDateFrom||_statsDateTo);
+  el.innerHTML=
+    `<span style="font-size:0.7rem;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.4px">Année</span>`
+    +years.map(y=>`<button class="yr-pill ${!modeDate&&y===_statsYear?'active':''}" onclick="setStatsYear(${y})">${y}${y===curY?' ▸':''}</button>`).join('')
+    +`<span style="font-size:0.7rem;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.4px;margin-left:14px;border-left:1px solid #ddd;padding-left:14px">Période</span>`
+    +`<input type="date" id="stats-date-from" value="${_statsDateFrom}" oninput="setStatsDateFilter()" style="padding:3px 8px;border:1.5px solid ${modeDate&&_statsDateFrom?'#2980b9':'var(--border)'};border-radius:6px;font-size:0.78rem;font-family:inherit;background:#fafafa">`
+    +`<span style="font-size:0.7rem;color:#888;margin:0 2px">→</span>`
+    +`<input type="date" id="stats-date-to" value="${_statsDateTo}" oninput="setStatsDateFilter()" style="padding:3px 8px;border:1.5px solid ${modeDate&&_statsDateTo?'#2980b9':'var(--border)'};border-radius:6px;font-size:0.78rem;font-family:inherit;background:#fafafa">`
+    +(modeDate?`<button onclick="resetStatsDateFilter()" style="padding:3px 10px;border:1.5px solid #e74c3c;border-radius:6px;font-size:0.72rem;color:#e74c3c;background:#fff;cursor:pointer;margin-left:4px">✕ Réinitialiser</button>`:'');
 }
 
-function setStatsYear(y){ _statsYear=y; buildStatsYearBand(); renderStats(); }
+function setStatsYear(y){ _statsYear=y; _statsDateFrom=''; _statsDateTo=''; buildStatsYearBand(); renderStats(); }
+
+function buildDashYearBand(){
+  const el=document.getElementById('dash-year-band'); if(!el) return;
+  const years=_ncYears(); const curY=new Date().getFullYear();
+  if(!years.includes(_dashYear)&&years.length) _dashYear=years[0]||curY;
+  el.innerHTML=`<span style="font-size:0.7rem;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.4px">Année</span>`
+    +years.map(y=>`<button class="yr-pill ${y===_dashYear?'active':''}" onclick="setDashYear(${y})">${y}${y===curY?' ▸':''}</button>`).join('');
+}
+function setDashYear(y){ _dashYear=y; buildDashYearBand(); updateStats(); renderDashboard(); }
+function setStatsDateFilter(){
+  _statsDateFrom=document.getElementById('stats-date-from')?.value||'';
+  _statsDateTo  =document.getElementById('stats-date-to')?.value||'';
+  buildStatsYearBand(); renderStats();
+}
+function resetStatsDateFilter(){ _statsDateFrom=''; _statsDateTo=''; buildStatsYearBand(); renderStats(); }
 function arcPage(p){ _archivePage=p; renderArchive(); window.scrollTo({top:0,behavior:'smooth'}); }
 const PAGE_SIZE=20;
 
@@ -1583,6 +1682,7 @@ function showTab(name, btn) {
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   if (btn) btn.classList.add('active');
+  if (name==='dashboard') buildDashYearBand();
   if (name==='liste')   buildListYearBand();
   if (name==='stats')   { buildStatsYearBand(); renderStats(); }
   if (name==='archive') renderArchive();
@@ -1592,7 +1692,7 @@ function showTab(name, btn) {
 }
 
 /* ════════ LOAD NC ════════ */
-async function loadNC() {
+async function loadNC(silent=false) {
   try {
     const viewAll = (session?.role === 'nc_chef_produit' && _viewRole === 'nc_lecteur') ? '?viewAll=1' : '';
     const res = await fetch('/api/nc' + viewAll, { headers: authHdr() });
@@ -1603,17 +1703,18 @@ async function loadNC() {
     buildPiloteFilter();
     buildPerimetreSourceFilters();
     buildListYearBand();
+    buildDashYearBand();
     loadStatuts(); // restaurer les statuts cochés depuis localStorage
     updateStats();
     renderDashboard();
     renderModeBanner();
     renderDashboardPilote();
-    applyFilters();
+    applyFilters(!silent); // rafraîchissement silencieux (auto-refresh) : ne pas revenir à la page 1
     if (document.getElementById('tab-stats')?.classList.contains('active')) {
       buildStatsYearBand(); renderStats();
     }
   } catch(e) {
-    document.getElementById('nc-tbody').innerHTML=`<tr><td colspan="7"><div class="empty">Erreur : ${e.message}</div></td></tr>`;
+    if (!silent) document.getElementById('nc-tbody').innerHTML=`<tr><td colspan="7"><div class="empty">Erreur : ${e.message}</div></td></tr>`;
   }
 }
 
@@ -1681,7 +1782,7 @@ function buildPerimetreSourceFilters() {
 function updateStats() {
   const c={ouvert:0,en_cours:0,resolu:0,clos:0,non_pertinent:0};
   let td=0,tc=0;
-  const ncReelles=allNC.filter(nc=>!nc.is_satellite);
+  const ncReelles=allNC.filter(nc=>!nc.is_satellite&&new Date(nc.createdAt).getFullYear()===_dashYear);
   ncReelles.forEach(nc=>{
     const s=nc.statut||nc.status||'ouvert';
     if(c[s]!==undefined) c[s]++;
@@ -1725,8 +1826,8 @@ function updateStats() {
     }
   }
 
-  // Coût total NC closes — satellites exclus (coût compté via NC parent uniquement)
-  const ncAvecCout = allNC.filter(nc => nc.statut==='clos' && !nc.is_satellite && nc.cout!=null && nc.cout!=='');
+  // Coût total NC closes — filtre année dashboard
+  const ncAvecCout = allNC.filter(nc => nc.statut==='clos' && !nc.is_satellite && nc.cout!=null && nc.cout!=='' && new Date(nc.createdAt).getFullYear()===_dashYear);
   const coutTotal = ncAvecCout.reduce((s,nc)=>s+(parseFloat(nc.cout)||0),0);
   const elCout = document.getElementById('s-cout-total');
   const elSubCout = document.getElementById('s-sub-cout');
@@ -1748,8 +1849,9 @@ function updateStats() {
 
 /* ════════ DASHBOARD ════════ */
 function renderDashboard() {
+  const ncDash=allNC.filter(nc=>!nc.is_satellite&&new Date(nc.createdAt).getFullYear()===_dashYear);
   const mm={};
-  allNC.filter(nc=>!nc.is_satellite).forEach(nc=>{ const k=nc.familleProduit||'(non renseigné)'; mm[k]=(mm[k]||0)+1; });
+  ncDash.forEach(nc=>{ const k=nc.familleProduit||'(non renseigné)'; mm[k]=(mm[k]||0)+1; });
   const sorted=Object.entries(mm).sort((a,b)=>b[1]-a[1]).slice(0,10);
   const max=sorted[0]?.[1]||1;
   const el=document.getElementById('dash-machines');
@@ -1759,7 +1861,7 @@ function renderDashboard() {
     <div class="machine-count">${c}</div></div>`).join('')
   :'<div class="empty">Aucune donnée</div>';
 
-  const recent=[...allNC].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,10);
+  const recent=[...ncDash].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,10);
   document.getElementById('dash-recent').innerHTML=recent.length
     ?recent.map(nc=>`<tr onclick="openModal('${esc(nc.numero)}')">
       <td><span class="nc-num">${esc(nc.numero)}</span></td>
@@ -1768,13 +1870,21 @@ function renderDashboard() {
       <td>${pillHtml(nc.statut||nc.status)}</td></tr>`).join('')
     :'<tr><td colspan="4" class="empty">Aucune NC</td></tr>';
 
-  const now=new Date(), months=[];
-  for(let i=11;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,
-      label:d.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'}),count:0});
+  const now=new Date(), months=[], isCurrentYear=_dashYear===now.getFullYear();
+  const tlHead=document.getElementById('dash-timeline-head');
+  if(tlHead) tlHead.textContent=isCurrentYear?'Déclarations par mois (12 derniers mois)':`Déclarations par mois — ${_dashYear}`;
+  if(isCurrentYear){
+    for(let i=11;i>=0;i--){
+      const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+      months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'}),count:0});
+    }
+  } else {
+    for(let i=0;i<12;i++){
+      const d=new Date(_dashYear,i,1);
+      months.push({key:`${_dashYear}-${String(i+1).padStart(2,'0')}`,label:d.toLocaleDateString('fr-FR',{month:'short'}),count:0});
+    }
   }
-  allNC.forEach(nc=>{ const m=months.find(m=>m.key===(nc.createdAt||'').slice(0,7)); if(m)m.count++; });
+  ncDash.forEach(nc=>{ const m=months.find(m=>m.key===(nc.createdAt||'').slice(0,7)); if(m)m.count++; });
   const maxM=Math.max(1,...months.map(m=>m.count));
   document.getElementById('dash-timeline').innerHTML=months.map(m=>`<div class="month-row">
     <div class="month-label">${m.label}</div>
@@ -1893,7 +2003,7 @@ document.addEventListener('click',function(e){
   }
 });
 
-function applyFilters() {
+function applyFilters(resetPage=true) {
   const search=document.getElementById('f-search').value.toLowerCase().trim();
   const activeStatuts=getActiveStatuts(); // Set ou null
   const famille=document.getElementById('f-machine').value;
@@ -1941,7 +2051,8 @@ function applyFilters() {
     if(sortCol==='createdAt') return sortDir*(new Date(va||0)-new Date(vb||0));
     return sortDir*String(va||'').localeCompare(String(vb||''),'fr');
   });
-  currentPage=1; renderTable();
+  if (resetPage) currentPage=1;
+  renderTable();
 }
 function resetFilters(){
   _listYear=String(new Date().getFullYear());
@@ -2191,10 +2302,20 @@ function goPage(p){currentPage=p;renderTable();window.scrollTo({top:0,behavior:'
 
 /* ════════ STATS ════════ */
 function renderStats(){
-  // ── Coûts ──────────────────────────────────────────────────
+  // ── Filtre période ou année ────────────────────────────────
   const annee = _statsYear;
-  document.getElementById('st-cout-annee').textContent = annee;
-  const ncClos = allNC.filter(nc => nc.statut==='clos' && nc.cout!=null && nc.cout!=='' && new Date(nc.createdAt).getFullYear()===annee);
+  const modeDate=!!(_statsDateFrom||_statsDateTo);
+  const periodeLabel = modeDate
+    ? `${_statsDateFrom?new Date(_statsDateFrom).toLocaleDateString('fr-FR'):'début'} → ${_statsDateTo?new Date(_statsDateTo).toLocaleDateString('fr-FR'):'aujourd\'hui'}`
+    : String(annee);
+  document.getElementById('st-cout-annee').textContent = periodeLabel;
+
+  // ── Coûts ──────────────────────────────────────────────────
+  const ncClos = allNC.filter(nc => {
+    if(nc.statut!=='clos'||nc.cout==null||nc.cout==='') return false;
+    if(modeDate) return (!_statsDateFrom||nc.createdAt>=_statsDateFrom)&&(!_statsDateTo||nc.createdAt<=_statsDateTo+'T23:59:59');
+    return new Date(nc.createdAt).getFullYear()===annee;
+  });
   const ncClosAn = ncClos;
   const totalAn = ncClosAn.reduce((s,nc)=>s+(parseFloat(nc.cout)||0),0);
   const totalAll = totalAn;
@@ -2254,7 +2375,11 @@ function renderStats(){
     </div>`).join('')
     :'<div class="empty">Aucune NC clôturée avec coût</div>';
   const now2=new Date();
-  const ncAnnee=allNC.filter(nc=>!nc.is_satellite&&new Date(nc.createdAt).getFullYear()===annee);
+  const ncAnnee=allNC.filter(nc=>{
+    if(nc.is_satellite) return false;
+    if(modeDate) return (!_statsDateFrom||nc.createdAt>=_statsDateFrom)&&(!_statsDateTo||nc.createdAt<=_statsDateTo+'T23:59:59');
+    return new Date(nc.createdAt).getFullYear()===annee;
+  });
   const mm={};
   ncAnnee.forEach(nc=>{
     const k=nc.familleProduit||'(non renseigné)';
@@ -2289,50 +2414,73 @@ function renderStats(){
     <div class="machine-count" style="width:38px;font-size:0.7rem">${d.nb} NC</div></div>`).join('')
   :'<div class="empty">Pas encore de NC closes</div>';
 
-  // ── Respect de l'échéance de clôture ─────────────────────────
-  const ncClosTous = ncAnnee.filter(nc=>nc.statut==='clos');
-  let nbEchRespect=0, nbEchDepasse=0, nbEchSansDelai=0, nbEchSansClosed=0;
-  ncClosTous.forEach(nc=>{
-    if(!nc.delaiAction){ nbEchSansDelai++; return; }
-    if(nc.closedAt){
-      const cd=new Date(nc.closedAt); cd.setHours(0,0,0,0);
-      const dd=new Date(nc.delaiAction); dd.setHours(0,0,0,0);
-      if((cd-dd)/86400000<=0) nbEchRespect++; else nbEchDepasse++;
-    } else if(nc.echeanceRespectee===true)  nbEchRespect++;
-      else if(nc.echeanceRespectee===false) nbEchDepasse++;
-      else nbEchSansClosed++;
+  // ── Respect des délais par type d'action CAPA ─────────────────
+  const now4=new Date();
+  const CAPA_TYPES=[
+    {k:'immediate', l:'Immédiate',  c:'#8e44ad'},
+    {k:'curative',  l:'Curative',   c:'#2980b9'},
+    {k:'corrective',l:'Corrective', c:'#e67e22'},
+    {k:'preventive',l:'Préventive', c:'#27ae60'}
+  ];
+  const actMap={
+    immediate: {clot_ok:0,clot_ko:0,clot_sd:0,act_ok:0,act_ret:0,total:0},
+    curative:  {clot_ok:0,clot_ko:0,clot_sd:0,act_ok:0,act_ret:0,total:0},
+    corrective:{clot_ok:0,clot_ko:0,clot_sd:0,act_ok:0,act_ret:0,total:0},
+    preventive:{clot_ok:0,clot_ko:0,clot_sd:0,act_ok:0,act_ret:0,total:0}
+  };
+  ncAnnee.forEach(nc=>{
+    (nc.actions||[]).forEach(a=>{
+      const t=actMap[a.type]; if(!t) return;
+      t.total++;
+      if(a.statut==='cloturé'){
+        if(a.echeanceRespectee===true) t.clot_ok++;
+        else if(a.echeanceRespectee===false) t.clot_ko++;
+        else t.clot_sd++;
+      } else {
+        const enRet=a.echeance&&new Date(a.echeance)<now4&&
+          (!a.datePiloteReponse||new Date(a.datePiloteReponse)>new Date(a.echeance));
+        if(enRet) t.act_ret++; else t.act_ok++;
+      }
+    });
   });
-  const nbEchTotal=ncClosTous.length;
-  const nbEchAvecDelai=nbEchRespect+nbEchDepasse+nbEchSansClosed;
-  const pctR=nbEchAvecDelai?Math.round(nbEchRespect/nbEchAvecDelai*100):0;
-  const pctD=nbEchAvecDelai?Math.round(nbEchDepasse/nbEchAvecDelai*100):0;
-  const barW=nbEchAvecDelai?(nbEchRespect/nbEchAvecDelai*100):0;
-  document.getElementById('st-echeance').innerHTML=nbEchTotal===0
-    ?'<div class="empty">Aucune NC clôturée</div>'
-    :`<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:stretch;margin-bottom:14px">
-      <div style="display:flex;align-items:center;gap:12px;background:#eafaf1;border:1.5px solid #a9dfbf;border-radius:8px;padding:14px 20px;min-width:150px;flex:1">
-        <div style="font-size:2.4rem;font-weight:800;color:#1e8449;line-height:1">${nbEchRespect}</div>
-        <div><div style="font-size:0.73rem;font-weight:700;color:#1e8449">✓ Échéance respectée</div>
-        <div style="font-size:0.7rem;color:#888;margin-top:2px">${pctR}% des NC avec délai</div></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;background:#fde8e8;border:1.5px solid #e6b0aa;border-radius:8px;padding:14px 20px;min-width:150px;flex:1">
-        <div style="font-size:2.4rem;font-weight:800;color:#c0392b;line-height:1">${nbEchDepasse}</div>
-        <div><div style="font-size:0.73rem;font-weight:700;color:#c0392b">✗ Échéance dépassée</div>
-        <div style="font-size:0.7rem;color:#888;margin-top:2px">${pctD}% des NC avec délai</div></div>
-      </div>
-      ${nbEchSansDelai>0?`<div style="display:flex;align-items:center;gap:12px;background:#f7f7f7;border:1.5px solid #ddd;border-radius:8px;padding:14px 20px;min-width:140px;flex:1">
-        <div style="font-size:2.4rem;font-weight:800;color:#aaa;line-height:1">${nbEchSansDelai}</div>
-        <div><div style="font-size:0.73rem;font-weight:700;color:#888">— Sans délai défini</div>
-        <div style="font-size:0.7rem;color:#aaa;margin-top:2px">NC closes sans échéance</div></div>
-      </div>`:''}
-    </div>
-    <div style="background:#f2f4f7;border-radius:6px;overflow:hidden;height:10px;margin-bottom:6px" title="${nbEchRespect} respectées / ${nbEchDepasse} dépassées">
-      <div style="display:flex;height:100%">
-        <div style="background:#27ae60;width:${barW}%;transition:width .4s"></div>
-        <div style="background:#e74c3c;flex:1"></div>
-      </div>
-    </div>
-    <div style="font-size:0.7rem;color:#aaa">${nbEchTotal} NC closes — ${nbEchAvecDelai} avec délai défini${nbEchSansClosed>0?' — '+nbEchSansClosed+' sans date de clôture enregistrée':''}</div>`;
+  const stActEl=document.getElementById('st-actions-delai');
+  if(stActEl){
+    const hasAny=CAPA_TYPES.some(({k})=>actMap[k].total>0);
+    stActEl.innerHTML=!hasAny?'<div class="empty">Aucune action CAPA sur cette période</div>'
+    :`<div style="display:grid;gap:10px">${CAPA_TYPES.map(({k,l,c})=>{
+      const d=actMap[k];
+      const clotTotal=d.clot_ok+d.clot_ko+d.clot_sd;
+      const pctOk=clotTotal?Math.round(d.clot_ok/clotTotal*100):0;
+      const pctKo=clotTotal?Math.round(d.clot_ko/clotTotal*100):0;
+      const barOk=clotTotal?(d.clot_ok/clotTotal*100):0;
+      const barKo=clotTotal?(d.clot_ko/clotTotal*100):0;
+      return `<div style="padding:10px 14px;border-radius:8px;background:#f8f9fa;border-left:4px solid ${c}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-size:0.82rem;font-weight:700;color:${c};min-width:90px">${l}</span>
+          <span style="font-size:0.7rem;color:#888">${d.total} action${d.total>1?'s':''} au total</span>
+          ${d.act_ret>0?`<span style="font-size:0.7rem;font-weight:700;color:#c0392b;background:#fde8e8;padding:2px 8px;border-radius:10px">⚠ ${d.act_ret} en retard</span>`:''}
+          ${d.act_ok>0&&d.act_ret===0?`<span style="font-size:0.7rem;color:#27ae60;background:#eafaf1;padding:2px 8px;border-radius:10px">${d.act_ok} active${d.act_ok>1?'s':''} dans les délais</span>`:''}
+        </div>
+        ${clotTotal>0?`
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px">
+          <span style="font-size:0.68rem;color:#888;min-width:72px">Clôturées :</span>
+          <div style="flex:1;background:#ddd;border-radius:4px;overflow:hidden;height:14px;display:flex">
+            <div style="background:#27ae60;width:${barOk}%;height:100%;transition:width .4s" title="${d.clot_ok} dans les délais"></div>
+            <div style="background:#e74c3c;width:${barKo}%;height:100%;transition:width .4s" title="${d.clot_ko} hors délais"></div>
+          </div>
+          <span style="font-size:0.72rem;font-weight:700;color:${pctOk>=80?'#27ae60':pctOk>=50?'#e67e22':'#c0392b'};min-width:34px">${pctOk}%</span>
+        </div>
+        <div style="display:flex;gap:16px;font-size:0.68rem">
+          <span style="color:#27ae60">✓ ${d.clot_ok} dans les délais (${pctOk}%)</span>
+          <span style="color:#e74c3c">✗ ${d.clot_ko} hors délais (${pctKo}%)</span>
+          ${d.clot_sd>0?`<span style="color:#aaa">— ${d.clot_sd} sans délai</span>`:''}
+        </div>`:`<div style="font-size:0.72rem;color:#aaa;font-style:italic">Aucune action clôturée${d.act_ok+d.act_ret>0?' — '+(d.act_ok+d.act_ret)+' en cours':''}</div>`}
+      </div>`;
+    }).join('')}
+    <div style="font-size:0.67rem;color:#bbb;padding-top:6px;border-top:1px solid #eee">
+      ISO §10.2.1 — En retard = échéance dépassée ET pilote n'a pas répondu dans les délais · ✓/✗ calculé à la clôture de l'action (champ echeanceRespectee)
+    </div></div>`;
+  }
 
   const baseNC=ncAnnee.filter(n=>(n.statut||n.status||'ouvert')!=='non_pertinent');
   const total=baseNC.length||1;
@@ -3153,6 +3301,7 @@ async function pgfEnvoyer(actionId, groupId) {
       { method:'POST', headers:authHdr(), body: JSON.stringify({ reponse: txt||'', mediaFiles }) }
     );
     if (!res.ok) { const e=await safeJson(res); throw new Error(e.error||'HTTP '+res.status); }
+    localStorage.removeItem(_draftKey(groupId, pfx+'-txt-'+actionId));
     alert('Réponse enregistrée avec succès.');
     openParentGroupFiche(groupId);
   } catch(e) { alert('Erreur : '+e.message); }
@@ -3181,6 +3330,7 @@ async function pgfForceEnvoyer(actionId, groupId, pfx) {
       { method:'POST', headers:authHdr(), body: JSON.stringify({ reponse: txt||'', mediaFiles, force: true }) }
     );
     if (!res.ok) { const e=await safeJson(res); throw new Error(e.error||'HTTP '+res.status); }
+    localStorage.removeItem(_draftKey(groupId, pfx+'-fr-txt-'+actionId));
     alert('Réponse admin forcée enregistrée.');
     openParentGroupFiche(groupId);
   } catch(e) { alert('Erreur : '+e.message); }
@@ -3268,6 +3418,49 @@ function renderIshikawaSVG(nc) {
 
   s+=`</svg></div>`;
   return s;
+}
+
+/* ════════ BROUILLONS (protection contre la perte de saisie) ════════
+   Sauvegarde locale (navigateur) du texte en cours dans les champs de la
+   fiche (5 Pourquoi, Ishikawa, réponses d'action…). Si la fiche est
+   reconstruite avant que l'utilisateur ait cliqué sur "Enregistrer"
+   (rafraîchissement auto, fermeture accidentelle, session expirée…),
+   le texte non enregistré est restauré automatiquement à la réouverture. */
+const DRAFT_MAX_AGE_MS = 7*24*3600*1000; // 7 jours
+function _draftKey(numero, fieldId) { return 'nc_draft_'+numero+'_'+fieldId; }
+function saveDraft(numero, fieldId, value) {
+  const key = _draftKey(numero, fieldId);
+  try {
+    if (!value || !value.trim()) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify({ value, ts: Date.now() }));
+  } catch {}
+}
+function attachDraftAutosave(numero) {
+  const body = document.getElementById('modal-body');
+  if (!body) return;
+  body.querySelectorAll('textarea[id]').forEach(ta => {
+    const fieldId = ta.id;
+    const key = _draftKey(numero, fieldId);
+    ta.addEventListener('input', () => saveDraft(numero, fieldId, ta.value));
+    let draft = null;
+    try { draft = JSON.parse(localStorage.getItem(key) || 'null'); } catch {}
+    if (!draft) return;
+    if ((Date.now() - draft.ts) > DRAFT_MAX_AGE_MS || draft.value === ta.value) {
+      localStorage.removeItem(key); // expiré, ou déjà enregistré côté serveur entre-temps
+      return;
+    }
+    // Le champ vient d'être reconstruit avec les données serveur, qui ne contiennent
+    // pas ce texte : il n'a jamais été enregistré → on le restaure et on prévient l'utilisateur.
+    ta.value = draft.value;
+    ta.style.borderColor = '#e67e22';
+    if (!ta.nextElementSibling?.classList?.contains('draft-hint')) {
+      const hint = document.createElement('div');
+      hint.className = 'draft-hint';
+      hint.style.cssText = 'font-size:0.7rem;color:#e67e22;font-weight:700;margin:3px 0 6px';
+      hint.textContent = "⚠ Brouillon non enregistré restauré — relisez avant d'enregistrer";
+      ta.insertAdjacentElement('afterend', hint);
+    }
+  });
 }
 
 function renderModal(nc) {
@@ -3657,6 +3850,7 @@ function renderModal(nc) {
               ${nbRel?`<span style="font-size:0.68rem;color:#e67e22">📢 ${nbRel}</span>`:''}
               <span style="font-size:0.65rem;color:#aaa;margin-left:auto">${fmtDate(a.createdAt)}</span>
               ${canRelance?`<button class="btn-upd" style="background:#e67e22;font-size:0.7rem;padding:3px 10px;flex-shrink:0" onclick="event.preventDefault();showActionRelanceForm('${esc(a.id)}')">📢 Relancer</button>`:''}
+              ${isAdmin&&!a.datePiloteReponse&&a.statut!=='cloturé'?`<button class="btn-upd" style="background:#8e44ad;font-size:0.7rem;padding:3px 10px;flex-shrink:0" onclick="event.preventDefault();event.stopPropagation();toggleChangerPilote('${esc(a.id)}')">✏ Pilote</button>`:''}
               ${isAdmin?`<button class="btn-del" style="font-size:0.68rem;padding:2px 7px;color:#c0392b;flex-shrink:0" onclick="event.preventDefault();deleteAction('${esc(a.id)}','${esc(nc.numero)}')">✕</button>`:''}
             </summary>
             <div class="action-detail-body">
@@ -3701,6 +3895,18 @@ function renderModal(nc) {
                 <div style="display:flex;gap:8px;margin-top:6px">
                   <button class="btn-upd" style="background:#e67e22;flex:2" onclick="doActionRelance('${esc(a.id)}','${esc(nc.numero)}')">Envoyer la relance</button>
                   <button class="btn-upd" style="background:#888;flex:1" onclick="document.getElementById('action-relance-form-${esc(a.id)}').style.display='none'">Annuler</button>
+                </div>
+              </div>`:''}
+              ${isAdmin&&!a.datePiloteReponse&&a.statut!=='cloturé'?`<div id="changer-pilote-${esc(a.id)}" style="display:none;margin-top:10px;padding:12px 14px;background:#f5f0fc;border-radius:6px;border:1.5px solid #c9a8e8">
+                <div style="font-size:0.72rem;font-weight:700;color:#7d3c98;text-transform:uppercase;letter-spacing:.3px;margin-bottom:10px">✏ Changer le pilote de cette action</div>
+                <div style="font-size:0.72rem;color:#888;margin-bottom:8px">Pilote actuel : <strong style="color:#2980b9">${esc(a.pilote)}</strong> — aucune réponse reçue</div>
+                <select id="pilote-sel-${esc(a.id)}" style="width:100%;padding:8px 10px;border:1.5px solid #c9a8e8;border-radius:6px;font-size:0.84rem;font-family:inherit;background:#fafafa;margin-bottom:10px">
+                  <option value="">— Sélectionner un nouveau pilote —</option>
+                  ${PILOTES_LIST.map(p=>`<option value="${esc(p)}"${p===a.pilote?' selected':''}>${esc(p)}</option>`).join('')}
+                </select>
+                <div style="display:flex;gap:8px">
+                  <button class="btn-upd" style="background:#8e44ad;flex:2" onclick="confirmerChangerPilote('${esc(a.id)}','${esc(nc.numero)}')">✏ Confirmer le changement</button>
+                  <button class="btn-upd" style="background:#888;flex:1" onclick="toggleChangerPilote('${esc(a.id)}')">Annuler</button>
                 </div>
               </div>`:''}
             </div>
@@ -3968,16 +4174,12 @@ function renderModal(nc) {
             </div>
             <div>
               <label style="display:block;font-size:0.78rem;font-weight:600;color:#7d3c98;margin-bottom:4px">Coût NC (€)</label>
-              <input type="number" id="val-cout" min="0" step="0.01" placeholder="0.00" style="width:140px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:0.84rem;font-family:inherit;background:#fafafa">
+              <input type="number" id="val-cout" min="0" step="0.01" value="0" style="width:140px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:0.84rem;font-family:inherit;background:#fafafa">
             </div>
           </div>
-          <div style="margin-bottom:10px">
+          <div style="margin-bottom:14px">
             <label style="display:block;font-size:0.78rem;font-weight:600;color:#7d3c98;margin-bottom:4px">Commentaire de clôture (interne)</label>
             <textarea id="val-comment-cloture" placeholder="Analyse, actions correctives, observations internes…" style="width:100%;border:1.5px solid #c9a8e8;min-height:65px;padding:8px 10px;border-radius:6px;font-family:inherit;font-size:0.84rem;resize:vertical;box-sizing:border-box"></textarea>
-          </div>
-          <div style="margin-bottom:14px">
-            <label style="display:block;font-size:0.78rem;font-weight:600;color:#555;margin-bottom:4px">Commentaire général <span style="font-weight:400;color:#999">(transmis par mail)</span></label>
-            <textarea id="val-comment" placeholder="Message de clôture pour le rédacteur…" style="width:100%;min-height:55px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.84rem;resize:vertical;box-sizing:border-box"></textarea>
           </div>
           <div style="display:flex;gap:8px">
             <button class="btn-upd" style="background:#888;flex:1" onclick="hideValiderOK()">Annuler</button>
@@ -4028,6 +4230,7 @@ function renderModal(nc) {
 
   document.getElementById('modal-body').innerHTML=html;
   if(window.NCAide) window.NCAide.injectButtons();
+  attachDraftAutosave(nc.numero);
 }
 
 
@@ -4254,6 +4457,7 @@ async function sendReponsePilote(numero) {
     });
     if (!res.ok) { const e=await res.json(); throw new Error(e.error||'HTTP '+res.status); }
     const updated = await res.json();
+    localStorage.removeItem(_draftKey(numero, 'rp-comment'));
     ncMarkSeen(updated.numero||numero,updated);
     syncNC(updated); renderModal(updated);
   } catch(e) { alert('Erreur : '+e.message); }
@@ -4303,14 +4507,12 @@ async function confirmerValiderOK(numero) {
   // Validation — coût accepté à 0 mais doit être renseigné
   const manquants = [];
   const hi='#e74c3c', ok1='#c9a8e8', ok2='var(--border)';
-  if(!typeCause)   { manquants.push('Type de cause');              if(elCause)  elCause.style.borderColor=hi; }
-  else             {                                                if(elCause)  elCause.style.borderColor=ok2; }
-  if(cout==='')    { manquants.push('Coût NC (0 accepté)');        if(elCout)   elCout.style.borderColor=hi; }
-  else             {                                                if(elCout)   elCout.style.borderColor=ok2; }
-  if(!commentaireCloture){ manquants.push('Commentaire clôture (interne)'); if(elComInt) elComInt.style.borderColor=hi; }
-  else             {                                                if(elComInt) elComInt.style.borderColor=ok1; }
-  if(!commentaire) { manquants.push('Commentaire général (mail)'); if(elComGen) elComGen.style.borderColor=hi; }
-  else             {                                                if(elComGen) elComGen.style.borderColor=ok2; }
+  if(!typeCause)          { manquants.push('Type de cause');                 if(elCause)  elCause.style.borderColor=hi; }
+  else                   {                                                   if(elCause)  elCause.style.borderColor=ok2; }
+  if(cout==='')          { manquants.push('Coût NC — saisir 0 si non quantifié'); if(elCout)   elCout.style.borderColor=hi; }
+  else                   {                                                   if(elCout)   elCout.style.borderColor=ok2; }
+  if(!commentaireCloture){ manquants.push('Commentaire de clôture (interne)'); if(elComInt) elComInt.style.borderColor=hi; }
+  else                   {                                                   if(elComInt) elComInt.style.borderColor=ok1; }
   if(manquants.length){ alert('Champs obligatoires manquants :\n• '+manquants.join('\n• ')); return; }
   // ── Validation ISO 9001 §10.2.1 / LNE pour NC Parent ──────────────
   const _ncItem = (typeof allNC !== 'undefined' ? allNC : []).find(n => n.numero === numero);
@@ -4339,8 +4541,9 @@ async function confirmerValiderOK(numero) {
 }
 
 
-function closeModal(evt){
-  if(evt&&evt.target!==document.getElementById('overlay'))return;
+function closeModal(){
+  // Fermeture volontaire uniquement (croix) — le clic à l'extérieur de la
+  // fiche ne ferme plus rien, pour éviter de perdre une saisie en cours.
   const overlay=document.getElementById('overlay');
   overlay.classList.remove('open');
   delete overlay.dataset.num;
@@ -4452,6 +4655,7 @@ async function ncRpEnvoyer(actionId, ncNumero) {
     });
     if (!res.ok) { const e=await safeJson(res); throw new Error(e.error||'HTTP '+res.status); }
     const updated = await res.json();
+    localStorage.removeItem(_draftKey(ncNumero, 'nc-rp-txt-'+actionId));
     ncMarkSeen(updated.numero, updated);
     syncNC(updated); renderModal(updated);
   } catch(e) { alert('Erreur : '+e.message); }
@@ -4476,6 +4680,7 @@ async function grpRpEnvoyer(actionId, groupId, ncNumero) {
       { method:'POST', headers:authHdr(), body: JSON.stringify({ reponse: txt||'', mediaFiles }) }
     );
     if (!res.ok) { const e=await safeJson(res); throw new Error(e.error||'HTTP '+res.status); }
+    localStorage.removeItem(_draftKey(ncNumero, 'grp-rp-txt-'+actionId));
     await openModal(ncNumero);
   } catch(e) { alert('Erreur : '+e.message); }
 }
@@ -4510,6 +4715,7 @@ async function actionRepondre(actionId, ncNumero, idPrefix='action-rp') {
     });
     if (!res.ok) { const e=await safeJson(res); throw new Error(e.error||'HTTP '+res.status); }
     const updated = await res.json();
+    localStorage.removeItem(_draftKey(ncNumero, idPrefix+'-txt-'+actionId));
     ncMarkSeen(updated.numero,updated);
     syncNC(updated); renderModal(updated);
   } catch(e) { alert('Erreur : '+e.message); }
@@ -4529,6 +4735,7 @@ async function actionForceRepondre(actionId, ncNumero) {
     });
     if (!res.ok) { const e=await safeJson(res); throw new Error(e.error||'HTTP '+res.status); }
     const updated = await res.json();
+    localStorage.removeItem(_draftKey(ncNumero, 'action-fr-txt-'+actionId));
     ncMarkSeen(updated.numero, updated);
     syncNC(updated); renderModal(updated);
   } catch(e) { alert('Erreur : '+e.message); }
@@ -4557,6 +4764,7 @@ async function actionRepondreGroupe(actionId, groupId, ncNumero) {
       { method:'POST', headers:authHdr(), body: JSON.stringify({ reponse: txt||'', mediaFiles }) }
     );
     if (!res.ok) { const e=await safeJson(res); throw new Error(e.error||'HTTP '+res.status); }
+    localStorage.removeItem(_draftKey(ncNumero, idPrefix+'-txt-'+actionId));
     // Recharger la fiche pour refléter la réponse enregistrée
     await openModal(ncNumero);
   } catch(e) { alert('Erreur : '+e.message); }
@@ -4636,6 +4844,25 @@ async function deleteAction(actionId, ncNumero) {
   } catch(e) { alert('Erreur : '+e.message); }
 }
 
+function toggleChangerPilote(actionId){
+  const el=document.getElementById('changer-pilote-'+actionId);
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+async function confirmerChangerPilote(actionId, ncNumero){
+  const sel=document.getElementById('pilote-sel-'+actionId);
+  const newPilote=sel?.value?.trim();
+  if(!newPilote){ alert('Veuillez sélectionner un pilote.'); return; }
+  try {
+    const res=await fetch('/api/nc/action/'+encodeURIComponent(actionId)+'/pilote',{
+      method:'PUT', headers:authHdr(),
+      body:JSON.stringify({ pilote:newPilote })
+    });
+    if(!res.ok){ const e=await res.json(); throw new Error(e.error||'HTTP '+res.status); }
+    const updated=await res.json();
+    syncNC(updated); renderModal(updated);
+  } catch(e){ alert('Erreur : '+e.message); }
+}
+
 function syncNC(updated) {
   const idx = allNC.findIndex(n=>n.numero===updated.numero);
   if (idx !== -1) { allNC[idx]=updated; allNC[idx]._duree=dureeJours(updated); allNC[idx]._jours=nextActionJours(updated); }
@@ -4653,10 +4880,15 @@ async function checkVersion() {
     if (!mtime) return;
     if (_lastMtime && mtime !== _lastMtime) {
       _lastMtime = mtime;
-      await loadNC();
-      // si le modal est ouvert, rafraîchir la fiche visible
+      await loadNC(true); // silencieux : ne touche pas à la pagination de la liste
+      // si le modal est ouvert, ne rafraîchir la fiche visible que si l'utilisateur
+      // n'est pas en train de saisir dedans (sinon on écrase du texte non enregistré :
+      // 5 Pourquoi, Ishikawa, réponse d'action pilote/admin...)
       const overlay = document.getElementById('overlay');
-      if (overlay?.classList.contains('open')) {
+      const active = document.activeElement;
+      const isEditingInsideOverlay = overlay && active && overlay.contains(active) &&
+        ['INPUT','TEXTAREA','SELECT'].includes(active.tagName);
+      if (overlay?.classList.contains('open') && !isEditingInsideOverlay) {
         const num = overlay.dataset.num;
         if (num) { const nc = allNC.find(n=>n.numero===num); if (nc) renderModal(nc); }
       }
@@ -4686,7 +4918,7 @@ async function initApp() {
   } catch {}
   loadNC();
 }
-initApp();
+if (session) initApp(); // session déjà détectée invalide/expirée : redirection en cours, inutile de lancer les appels
 
 /* ════════════════════════════════════════════════════════════
    MODULE AIDE & RÉFÉRENTIEL NORMATIF ISO 9001 / LNE
@@ -5217,7 +5449,7 @@ initApp();
     // ── Bulle Synoptique (au-dessus de Aide normes) ──
     const fabSyno = document.createElement('a');
     fabSyno.id = 'nc-synoptique-fab';
-    fabSyno.href = 'https://formation-sav.fr/NC/synoptique.html';
+    fabSyno.href = 'https://quali-form.mullerautomotive.fr/NC/synoptique.html';
     fabSyno.target = '_blank';
     fabSyno.rel = 'noopener';
     fabSyno.title = 'Synoptique — Schéma de fonctionnement';
